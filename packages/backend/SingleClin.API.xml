@@ -282,12 +282,15 @@
             <summary>
             Get all plans with pagination and filtering
             </summary>
-            <param name="filter">Filter criteria</param>
+            <param name="filter">Filter criteria including pagination, search, price range, credits range, featured status, and sorting</param>
             <returns>Paginated list of plans</returns>
             <response code="200">Returns the paginated list of plans</response>
             <response code="400">Invalid filter parameters</response>
             <response code="401">Unauthorized</response>
             <response code="403">Forbidden - Admin role required</response>
+            <example>
+            GET /api/plan?pageNumber=1&amp;pageSize=10&amp;isActive=true&amp;searchTerm=premium&amp;minPrice=50&amp;maxPrice=200&amp;isFeatured=true&amp;sortBy=price&amp;sortDirection=desc
+            </example>
         </member>
         <member name="M:SingleClin.API.Controllers.PlanController.GetActive">
             <summary>
@@ -312,13 +315,27 @@
             <summary>
             Create a new plan
             </summary>
-            <param name="planRequest">Plan creation data</param>
+            <param name="planRequest">Plan creation data with validation rules</param>
             <returns>Created plan</returns>
             <response code="201">Plan created successfully</response>
             <response code="400">Invalid plan data or validation errors</response>
             <response code="401">Unauthorized</response>
             <response code="403">Forbidden - Admin role required</response>
             <response code="409">Plan name already exists</response>
+            <example>
+            POST /api/plan
+            {
+              "name": "Premium Plan",
+              "description": "Premium subscription with enhanced features",
+              "credits": 1000,
+              "price": 99.99,
+              "originalPrice": 149.99,
+              "validityDays": 365,
+              "isActive": true,
+              "displayOrder": 1,
+              "isFeatured": true
+            }
+            </example>
         </member>
         <member name="M:SingleClin.API.Controllers.PlanController.Update(System.Guid,SingleClin.API.DTOs.Plan.PlanRequestDto)">
             <summary>
@@ -1547,6 +1564,26 @@
             Calculated price per credit
             </summary>
         </member>
+        <member name="T:SingleClin.API.Exceptions.PlanNotFoundException">
+            <summary>
+            Exception thrown when a plan is not found
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.DuplicatePlanNameException">
+            <summary>
+            Exception thrown when attempting to create a plan with a duplicate name
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.PlanValidationException">
+            <summary>
+            Exception thrown when plan validation fails
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.InvalidPlanOperationException">
+            <summary>
+            Exception thrown when attempting to perform invalid operations on plans
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Extensions.DatabaseExtensions">
             <summary>
             Extension methods for database configuration
@@ -1618,7 +1655,7 @@
             Repository contract for Plan entity operations
             </summary>
         </member>
-        <member name="M:SingleClin.API.Repositories.IPlanRepository.GetAllAsync(System.Int32,System.Int32,System.Nullable{System.Boolean},System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal})">
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.GetAllAsync(System.Int32,System.Int32,System.Nullable{System.Boolean},System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.Nullable{System.Boolean},System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
             <summary>
             Get all plans with pagination and filtering
             </summary>
@@ -1628,6 +1665,11 @@
             <param name="searchTerm">Search term for name or description</param>
             <param name="minPrice">Minimum price filter</param>
             <param name="maxPrice">Maximum price filter</param>
+            <param name="isFeatured">Filter by featured status (null for all)</param>
+            <param name="minCredits">Minimum credits filter</param>
+            <param name="maxCredits">Maximum credits filter</param>
+            <param name="sortBy">Field to sort by</param>
+            <param name="sortDirection">Sort direction (asc or desc)</param>
             <returns>Paginated list of plans</returns>
         </member>
         <member name="M:SingleClin.API.Repositories.IPlanRepository.GetByIdAsync(System.Guid)">
@@ -1689,6 +1731,15 @@
             <summary>
             Repository implementation for Plan entity operations
             </summary>
+        </member>
+        <member name="M:SingleClin.API.Repositories.PlanRepository.ApplySorting(System.Linq.IQueryable{SingleClin.API.Data.Models.Plan},System.String,System.String)">
+            <summary>
+            Apply dynamic sorting to the query based on sort field and direction
+            </summary>
+            <param name="query">The query to sort</param>
+            <param name="sortBy">Field to sort by</param>
+            <param name="sortDirection">Sort direction (asc or desc)</param>
+            <returns>Sorted query</returns>
         </member>
         <member name="T:SingleClin.API.Services.AuthService">
             <summary>
@@ -1944,6 +1995,25 @@
             <summary>
             Service for managing refresh tokens
             </summary>
+        </member>
+        <member name="T:SingleClin.API.Validators.PlanRequestValidator">
+            <summary>
+            Validator for PlanRequestDto using FluentValidation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Validators.PlanRequestValidator.HaveMaxTwoDecimalPlaces(System.Decimal)">
+            <summary>
+            Validates that decimal value has maximum 2 decimal places
+            </summary>
+            <param name="value">Decimal value to validate</param>
+            <returns>True if valid, false otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Validators.PlanRequestValidator.HaveMaxTwoDecimalPlaces(System.Nullable{System.Decimal})">
+            <summary>
+            Validates that nullable decimal value has maximum 2 decimal places
+            </summary>
+            <param name="value">Nullable decimal value to validate</param>
+            <returns>True if valid, false otherwise</returns>
         </member>
     </members>
 </doc>

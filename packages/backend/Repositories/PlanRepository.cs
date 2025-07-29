@@ -24,7 +24,12 @@ public class PlanRepository : IPlanRepository
         bool? isActive = null, 
         string? searchTerm = null, 
         decimal? minPrice = null, 
-        decimal? maxPrice = null)
+        decimal? maxPrice = null,
+        bool? isFeatured = null,
+        int? minCredits = null,
+        int? maxCredits = null,
+        string sortBy = "DisplayOrder",
+        string sortDirection = "asc")
     {
         var query = _context.Plans.AsQueryable();
 
@@ -50,20 +55,36 @@ public class PlanRepository : IPlanRepository
             query = query.Where(p => p.Price <= maxPrice.Value);
         }
 
+        if (isFeatured.HasValue)
+        {
+            query = query.Where(p => p.IsFeatured == isFeatured.Value);
+        }
+
+        if (minCredits.HasValue)
+        {
+            query = query.Where(p => p.Credits >= minCredits.Value);
+        }
+
+        if (maxCredits.HasValue)
+        {
+            query = query.Where(p => p.Credits <= maxCredits.Value);
+        }
+
         // Get total count for pagination
         int totalCount = await query.CountAsync();
 
-        // Apply pagination and ordering
+        // Apply dynamic sorting
+        query = ApplySorting(query, sortBy, sortDirection);
+
+        // Apply pagination
         var plans = await query
-            .OrderBy(p => p.DisplayOrder)
-            .ThenBy(p => p.Name)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .AsNoTracking()
             .ToListAsync();
 
-        _logger.LogDebug("Retrieved {Count} plans from database with filters: Active={IsActive}, Search={SearchTerm}, MinPrice={MinPrice}, MaxPrice={MaxPrice}", 
-            plans.Count, isActive, searchTerm, minPrice, maxPrice);
+        _logger.LogDebug("Retrieved {Count} plans from database with filters: Active={IsActive}, Search={SearchTerm}, MinPrice={MinPrice}, MaxPrice={MaxPrice}, IsFeatured={IsFeatured}, SortBy={SortBy}, SortDirection={SortDirection}", 
+            plans.Count, isActive, searchTerm, minPrice, maxPrice, isFeatured, sortBy, sortDirection);
 
         return (plans, totalCount);
     }
@@ -195,5 +216,32 @@ public class PlanRepository : IPlanRepository
         result["Featured"] = await _context.Plans.CountAsync(p => p.IsFeatured && p.IsActive);
 
         return result;
+    }
+
+    /// <summary>
+    /// Apply dynamic sorting to the query based on sort field and direction
+    /// </summary>
+    /// <param name="query">The query to sort</param>
+    /// <param name="sortBy">Field to sort by</param>
+    /// <param name="sortDirection">Sort direction (asc or desc)</param>
+    /// <returns>Sorted query</returns>
+    private static IQueryable<Plan> ApplySorting(IQueryable<Plan> query, string sortBy, string sortDirection)
+    {
+        var isDescending = sortDirection.Equals("desc", StringComparison.OrdinalIgnoreCase);
+
+        return sortBy.ToLowerInvariant() switch
+        {
+            "name" => isDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
+            "price" => isDescending ? query.OrderByDescending(p => p.Price) : query.OrderBy(p => p.Price),
+            "credits" => isDescending ? query.OrderByDescending(p => p.Credits) : query.OrderBy(p => p.Credits),
+            "validitydays" => isDescending ? query.OrderByDescending(p => p.ValidityDays) : query.OrderBy(p => p.ValidityDays),
+            "createdat" => isDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
+            "updatedat" => isDescending ? query.OrderByDescending(p => p.UpdatedAt) : query.OrderBy(p => p.UpdatedAt),
+            "isfeatured" => isDescending ? query.OrderByDescending(p => p.IsFeatured) : query.OrderBy(p => p.IsFeatured),
+            "isactive" => isDescending ? query.OrderByDescending(p => p.IsActive) : query.OrderBy(p => p.IsActive),
+            "displayorder" or _ => isDescending 
+                ? query.OrderByDescending(p => p.DisplayOrder).ThenByDescending(p => p.Name)
+                : query.OrderBy(p => p.DisplayOrder).ThenBy(p => p.Name)
+        };
     }
 }

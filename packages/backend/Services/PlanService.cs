@@ -28,7 +28,12 @@ public class PlanService : IPlanService
             filter.IsActive,
             filter.SearchTerm,
             filter.MinPrice,
-            filter.MaxPrice);
+            filter.MaxPrice,
+            filter.IsFeatured,
+            filter.MinCredits,
+            filter.MaxCredits,
+            filter.SortBy,
+            filter.SortDirection);
 
         var planDtos = plans.Select(MapToResponseDto);
 
@@ -181,7 +186,7 @@ public class PlanService : IPlanService
             var nameExists = await _planRepository.NameExistsAsync(planRequest.Name, excludeId);
             if (nameExists)
             {
-                errors.Add($"A plan with the name '{planRequest.Name}' already exists");
+                throw new DuplicatePlanNameException(planRequest.Name);
             }
         }
 

@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Swashbuckle.AspNetCore.Annotations;
 using DotNetEnv;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace SingleClin.API;
 
@@ -27,6 +29,11 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllers();
+
+        // Add FluentValidation
+        builder.Services.AddFluentValidationAutoValidation()
+            .AddFluentValidationClientsideAdapters()
+            .AddValidatorsFromAssemblyContaining<Program>();
         
         // Add Entity Framework Core with PostgreSQL
         builder.Services.AddSingleton<SingleClin.API.Data.Interceptors.AuditingInterceptor>();
