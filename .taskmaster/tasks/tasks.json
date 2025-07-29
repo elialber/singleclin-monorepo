@@ -9,7 +9,7 @@
         "testStrategy": "Validar que comandos npm run build:all compilam todos os projetos. Testar que imports entre packages funcionam corretamente. Verificar isolamento de dependências entre workspaces.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -17,43 +17,51 @@
             "description": "Criar estrutura base do monorepo e configurar npm workspaces para gerenciar múltiplos pacotes",
             "dependencies": [],
             "details": "Criar diretório raiz do projeto. Inicializar package.json principal com 'npm init -y'. Adicionar configuração workspaces no package.json: { \"workspaces\": [\"packages/*\"] }. Criar diretório /packages com subdiretórios: /mobile, /web-admin, /backend, /shared. Inicializar package.json em cada subdiretório com nome apropriado (@singleclin/mobile, @singleclin/web-admin, @singleclin/backend, @singleclin/shared). Configurar .gitignore principal incluindo node_modules, dist, .env",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Executar 'npm install' na raiz e verificar criação de node_modules compartilhado. Testar instalação de dependência em workspace específico com 'npm install express -w @singleclin/backend'"
           },
           {
             "id": 2,
             "title": "Configurar TypeScript e Ferramentas de Linting",
             "description": "Estabelecer configuração TypeScript compartilhada e ferramentas de qualidade de código para todo o monorepo",
-            "dependencies": ["1.1"],
+            "dependencies": [
+              "1.1"
+            ],
             "details": "Criar tsconfig.base.json na raiz com configurações compartilhadas (target: ES2020, module: commonjs, strict: true). Criar tsconfig.json em cada package estendendo a base. Instalar e configurar ESLint com @typescript-eslint/parser e plugins. Criar .eslintrc.js na raiz com regras padrão. Configurar Prettier com .prettierrc incluindo: printWidth: 80, semi: true, singleQuote: true. Adicionar .editorconfig para consistência entre IDEs. Instalar husky e lint-staged para pre-commit hooks",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Executar 'npx tsc --noEmit' em cada package para validar configuração TypeScript. Testar ESLint com 'npm run lint' verificando detecção de erros. Validar formatação Prettier executando em arquivo de teste"
           },
           {
             "id": 3,
             "title": "Estruturar Package Shared com Tipos e Utilidades",
             "description": "Criar pacote compartilhado contendo tipos TypeScript, interfaces e utilidades comuns entre projetos",
-            "dependencies": ["1.2"],
+            "dependencies": [
+              "1.2"
+            ],
             "details": "No /packages/shared, criar estrutura: /src/types (interfaces de domínio), /src/utils (funções auxiliares), /src/constants (valores constantes). Definir interfaces base: IUser, IClinic, IPlan, ITransaction. Criar enums para roles, status de transação, tipos de clínica. Implementar utilidades: formatters de data/moeda, validators, helpers de API response. Configurar build com tsc para gerar declarações .d.ts. Adicionar export principal em index.ts",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Compilar package shared e verificar geração de arquivos .d.ts. Importar tipos em outro package para validar resolução. Escrever testes unitários Jest para utilidades"
           },
           {
             "id": 4,
             "title": "Configurar Scripts npm para Gerenciamento do Monorepo",
             "description": "Implementar scripts npm centralizados para build, test e deploy de todos os workspaces",
-            "dependencies": ["1.3"],
+            "dependencies": [
+              "1.3"
+            ],
             "details": "No package.json raiz, adicionar scripts: 'build:all' executando build em todos packages sequencialmente, 'test:all' rodando testes em paralelo, 'lint:all' verificando código em todos packages, 'clean:all' limpando node_modules e dist. Implementar script 'dev' que inicia todos os serviços em desenvolvimento. Adicionar scripts específicos por package: 'build:backend', 'build:web', etc. Configurar concurrently para execução paralela. Criar script 'postinstall' para setup automático após npm install",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Executar 'npm run build:all' e verificar compilação bem-sucedida de todos packages. Testar 'npm run dev' confirmando que todos serviços iniciam. Validar que 'npm run clean:all' remove artefatos corretamente"
           },
           {
             "id": 5,
             "title": "Implementar CI/CD Pipeline Básico",
             "description": "Configurar pipeline de integração contínua para validar builds e qualidade do código",
-            "dependencies": ["1.4"],
+            "dependencies": [
+              "1.4"
+            ],
             "details": "Criar arquivo .github/workflows/ci.yml para GitHub Actions (ou equivalente para GitLab/Bitbucket). Configurar jobs: install (cache de dependências), lint (verificação de código), build (compilação de todos packages), test (execução de testes). Adicionar matrix strategy para testar em múltiplas versões Node.js. Configurar cache de node_modules para otimizar builds. Adicionar badges de status no README. Criar workflow separado para deploy com estratégia por branch (dev/staging/prod)",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Fazer push para branch e verificar execução automática do pipeline. Introduzir erro de linting proposital para validar falha. Verificar tempo de execução e efetividade do cache"
           }
         ]
@@ -65,8 +73,10 @@
         "details": "Criar projeto .NET 9 Web API. Configurar middleware de autenticação JWT com Firebase Admin SDK. Implementar classes base: BaseController com autorização, ResponseWrapper para respostas padronizadas. Configurar Swagger com autenticação Bearer. Adicionar health check endpoint. Configurar CORS para permitir requisições do app e web admin.",
         "testStrategy": "Testar geração e validação de tokens JWT. Verificar que endpoints protegidos retornam 401 sem token. Testar CORS com requisições do frontend. Validar documentação Swagger.",
         "priority": "high",
-        "dependencies": [1],
-        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -74,43 +84,51 @@
             "description": "Inicializar novo projeto .NET 9 Web API com estrutura de pastas organizada e configurações iniciais",
             "dependencies": [],
             "details": "Executar 'dotnet new webapi -n SingleClin.API'. Criar estrutura de pastas: /Controllers, /Services, /Models, /Middleware, /Extensions, /DTOs. Configurar Program.cs com builder pattern. Adicionar pacotes NuGet essenciais: Microsoft.AspNetCore.Authentication.JwtBearer, FirebaseAdmin, Swashbuckle.AspNetCore. Configurar appsettings.json com seções para JWT, Firebase e ConnectionStrings.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verificar que a API inicia corretamente na porta configurada. Testar endpoint padrão /weatherforecast. Validar estrutura de pastas criada."
           },
           {
             "id": 2,
             "title": "Configurar Firebase Admin SDK e middleware de autenticação JWT",
             "description": "Integrar Firebase Admin SDK para validação de tokens JWT e configurar middleware de autenticação",
-            "dependencies": ["2.1"],
+            "dependencies": [
+              "2.1"
+            ],
             "details": "Baixar arquivo de credenciais do Firebase (service account JSON). Configurar FirebaseApp no Program.cs usando FirebaseAdmin. Criar JwtAuthenticationMiddleware para validar tokens Firebase. Implementar extension method AddFirebaseAuthentication() para configurar serviços. Configurar options de autenticação com esquema Bearer. Adicionar tratamento de erros para tokens inválidos ou expirados.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar requisição sem token (deve retornar 401). Testar com token Firebase válido (deve passar). Testar com token expirado ou inválido (deve retornar 401)."
           },
           {
             "id": 3,
             "title": "Implementar BaseController e ResponseWrapper para padronização",
             "description": "Criar classes base para controllers e respostas padronizadas da API",
-            "dependencies": ["2.2"],
+            "dependencies": [
+              "2.2"
+            ],
             "details": "Criar BaseController herdando de ControllerBase com atributos [ApiController], [Authorize] e métodos auxiliares. Implementar ResponseWrapper<T> genérico com propriedades: Success, Data, Message, Errors, StatusCode. Criar métodos no BaseController: OkResponse<T>(), BadRequestResponse(), UnauthorizedResponse(), NotFoundResponse(). Adicionar propriedade CurrentUserId extraída do token JWT. Implementar filtro global para tratamento de exceções.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Criar controller de teste herdando BaseController. Verificar que retorna respostas no formato ResponseWrapper. Testar extração do UserId do token."
           },
           {
             "id": 4,
             "title": "Configurar Swagger com autenticação Bearer e documentação",
             "description": "Configurar Swagger/OpenAPI com suporte para autenticação JWT Bearer",
-            "dependencies": ["2.3"],
+            "dependencies": [
+              "2.3"
+            ],
             "details": "Configurar SwaggerGen com SecurityDefinition para Bearer JWT. Adicionar SecurityRequirement global para endpoints autenticados. Configurar XML documentation com comentários nos controllers. Personalizar UI do Swagger com título, versão e descrição do projeto. Adicionar exemplos de request/response usando atributos. Configurar para mostrar apenas em ambiente de desenvolvimento.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Acessar /swagger e verificar UI carregada. Testar botão 'Authorize' com token JWT. Verificar que documentação XML aparece nos endpoints."
           },
           {
             "id": 5,
             "title": "Implementar Health Check e configurar CORS",
             "description": "Adicionar endpoint de health check e configurar CORS para permitir requisições do frontend",
-            "dependencies": ["2.4"],
+            "dependencies": [
+              "2.4"
+            ],
             "details": "Adicionar pacote Microsoft.AspNetCore.Diagnostics.HealthChecks. Implementar health check customizado verificando: conectividade Firebase, status da API. Criar endpoint GET /health retornando status detalhado. Configurar CORS policy 'AllowSpecificOrigins' com origins do app mobile e web admin. Adicionar headers permitidos: Content-Type, Authorization. Configurar métodos HTTP permitidos e credentials.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar GET /health retorna status 200 com informações. Fazer requisição CORS do frontend local. Verificar headers CORS na resposta. Testar bloqueio de origins não permitidas."
           }
         ]
@@ -122,7 +140,9 @@
         "details": "Instalar PostgreSQL e configurar connection string. Adicionar Entity Framework Core com Npgsql. Criar DbContext principal. Implementar modelos: User (id, email, role, createdAt), Clinic (id, name, type, address), Plan (id, name, credits, price), UserPlan (userId, planId, remainingCredits), Transaction (id, userPlanId, clinicId, createdAt, qrCode). Configurar migrations automáticas.",
         "testStrategy": "Executar migrations e verificar criação de tabelas. Testar CRUD básico em cada entidade. Validar constraints e relacionamentos. Testar rollback de migrations.",
         "priority": "high",
-        "dependencies": [2],
+        "dependencies": [
+          2
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -131,14 +151,16 @@
             "description": "Instalar PostgreSQL localmente e configurar banco de dados para desenvolvimento",
             "dependencies": [],
             "details": "Instalar PostgreSQL 15+ via Docker ou instalador nativo. Criar banco de dados 'singleclin_dev' com usuário dedicado. Configurar pg_hba.conf para permitir conexões locais. Definir variáveis de ambiente DATABASE_URL no formato 'Host=localhost;Database=singleclin_dev;Username=app_user;Password=secure_password'. Adicionar arquivo .env.example com template de configuração.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Testar conexão via psql ou pgAdmin. Verificar criação do banco e permissões do usuário."
           },
           {
             "id": 2,
             "title": "Adicionar Entity Framework Core com Npgsql",
             "description": "Configurar Entity Framework Core com provider Npgsql para PostgreSQL",
-            "dependencies": ["3.1"],
+            "dependencies": [
+              "3.1"
+            ],
             "details": "Adicionar pacotes NuGet: Npgsql.EntityFrameworkCore.PostgreSQL, Microsoft.EntityFrameworkCore.Design, Microsoft.EntityFrameworkCore.Tools. Criar pasta Data no projeto backend. Configurar serviços no Program.cs com builder.Services.AddDbContext<AppDbContext> usando connection string do ambiente. Habilitar logging detalhado em desenvolvimento para debug de queries SQL.",
             "status": "pending",
             "testStrategy": "Verificar instalação dos pacotes. Testar injeção de dependência do DbContext em um controller de teste."
@@ -147,7 +169,9 @@
             "id": 3,
             "title": "Criar DbContext e Configurações Base",
             "description": "Implementar DbContext principal com configurações e convenções do projeto",
-            "dependencies": ["3.2"],
+            "dependencies": [
+              "3.2"
+            ],
             "details": "Criar classe AppDbContext herdando de DbContext. Implementar OnModelCreating com convenções: tabelas em snake_case, timestamps automáticos (CreatedAt, UpdatedAt), soft delete global filter. Criar interface IEntity base com Id, CreatedAt, UpdatedAt. Configurar value conversions para Enums. Adicionar interceptors para audit logging. Configurar comportamento de deleção em cascata.",
             "status": "pending",
             "testStrategy": "Criar migration vazia e verificar se compila. Testar convenções aplicadas no modelo."
@@ -156,7 +180,9 @@
             "id": 4,
             "title": "Implementar Modelos de Domínio",
             "description": "Criar todas as entidades do sistema com seus relacionamentos",
-            "dependencies": ["3.3"],
+            "dependencies": [
+              "3.3"
+            ],
             "details": "Criar entidades em /Data/Models: User (Guid Id, string Email, UserRole Role, DateTime CreatedAt), Clinic (Guid Id, string Name, ClinicType Type, string Address, bool IsActive), Plan (Guid Id, string Name, int Credits, decimal Price, bool IsActive), UserPlan (Guid Id, Guid UserId, Guid PlanId, int RemainingCredits, DateTime ExpiresAt), Transaction (Guid Id, Guid UserPlanId, Guid ClinicId, DateTime CreatedAt, string QrCode, TransactionStatus Status). Configurar relacionamentos no OnModelCreating: User 1-N UserPlan, Plan 1-N UserPlan, UserPlan 1-N Transaction, Clinic 1-N Transaction. Adicionar índices para performance em campos de busca frequente.",
             "status": "pending",
             "testStrategy": "Compilar modelos e verificar ausência de erros. Gerar diagrama do modelo para validar relacionamentos."
@@ -165,7 +191,9 @@
             "id": 5,
             "title": "Configurar Migrations e Seed Data",
             "description": "Configurar sistema de migrations automáticas e dados iniciais",
-            "dependencies": ["3.4"],
+            "dependencies": [
+              "3.4"
+            ],
             "details": "Configurar migrations automáticas no startup da aplicação usando context.Database.Migrate(). Criar classe DatabaseSeeder com método SeedAsync para dados iniciais: planos padrão (Basic, Premium, Enterprise), clínica administrativa, usuário admin. Implementar comando CLI 'dotnet ef migrations add' no package.json. Criar migration inicial 'InitialCreate' com todas as tabelas. Configurar backup automático antes de migrations em produção.",
             "status": "pending",
             "testStrategy": "Executar migration e verificar criação de todas as tabelas no PostgreSQL. Validar seed data inserido corretamente. Testar rollback com 'dotnet ef database update [migration anterior]'."
@@ -179,7 +207,10 @@
         "details": "Implementar AuthService com métodos: Register, Login, RefreshToken, Logout. Criar middleware de autorização por roles. Implementar login social com Google/Apple usando Firebase Auth. Criar endpoints: POST /auth/register, POST /auth/login, POST /auth/refresh, POST /auth/logout. Adicionar claims customizadas para role e clinicId quando aplicável.",
         "testStrategy": "Testar registro e login com email/senha. Verificar login social Google/Apple. Testar autorização por role em endpoints protegidos. Validar refresh token e expiração.",
         "priority": "high",
-        "dependencies": [2, 3],
+        "dependencies": [
+          2,
+          3
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -195,7 +226,9 @@
             "id": 2,
             "title": "Implementar AuthService com Métodos Base de Autenticação",
             "description": "Criar AuthService com implementação dos métodos principais de autenticação usando Identity",
-            "dependencies": ["4.1"],
+            "dependencies": [
+              "4.1"
+            ],
             "details": "Criar interface IAuthService com métodos: RegisterAsync(RegisterDto), LoginAsync(LoginDto), RefreshTokenAsync(string refreshToken), LogoutAsync(string userId). Implementar RegisterAsync validando email único, criando usuário com role apropriada. Implementar LoginAsync verificando credenciais e retornando tokens JWT. Criar RefreshTokenService para armazenar e validar refresh tokens no banco. Implementar LogoutAsync invalidando refresh token. Adicionar DTOs: RegisterDto (email, password, role, clinicName para clínicas), LoginDto (email, password), AuthResponseDto (accessToken, refreshToken, expiresIn).",
             "status": "pending",
             "testStrategy": "Criar testes de integração para cada método do AuthService. Mockar UserManager e SignInManager. Testar cenários de sucesso e falha para registro e login."
@@ -204,7 +237,9 @@
             "id": 3,
             "title": "Criar Endpoints de Autenticação e Middleware de Autorização",
             "description": "Implementar AuthController com endpoints REST e middleware customizado para autorização por roles",
-            "dependencies": ["4.2"],
+            "dependencies": [
+              "4.2"
+            ],
             "details": "Criar AuthController com endpoints: POST /api/auth/register (validar role permitida), POST /api/auth/login (retornar tokens), POST /api/auth/refresh (renovar access token), POST /api/auth/logout (invalidar refresh token). Criar RoleAuthorizationMiddleware que valida JWT e verifica role do usuário. Implementar atributos customizados: [AuthorizeRole(Roles.Admin)], [AuthorizeRole(Roles.Clinic)], [AuthorizeRole(Roles.Patient)]. Adicionar validação de clinicId para usuários de clínica. Configurar Swagger para incluir autenticação JWT.",
             "status": "pending",
             "testStrategy": "Testar cada endpoint com Postman/REST Client. Verificar retornos 401/403 para acesso não autorizado. Testar middleware com diferentes roles e claims."
@@ -213,7 +248,9 @@
             "id": 4,
             "title": "Integrar Login Social com Firebase Auth",
             "description": "Implementar autenticação social com Google e Apple usando Firebase Admin SDK",
-            "dependencies": ["4.3"],
+            "dependencies": [
+              "4.3"
+            ],
             "details": "Instalar FirebaseAdmin SDK. Criar FirebaseAuthService com método VerifyIdTokenAsync para validar tokens do Firebase. Adicionar endpoint POST /api/auth/social-login que recebe Firebase ID token. Implementar fluxo: validar token Firebase, extrair email/uid, verificar se usuário existe ou criar novo, gerar JWT próprio do sistema. Criar SocialLoginDto com idToken e provider (google/apple). Mapear claims do Firebase para claims do sistema. Configurar Firebase project settings no appsettings.json.",
             "status": "pending",
             "testStrategy": "Criar testes de integração mockando Firebase Admin SDK. Testar criação de novo usuário via social login. Verificar mapeamento correto de claims."
@@ -222,7 +259,9 @@
             "id": 5,
             "title": "Implementar Sistema de Roles e Claims Customizadas",
             "description": "Configurar sistema completo de roles com claims específicas para cada perfil de usuário",
-            "dependencies": ["4.4"],
+            "dependencies": [
+              "4.4"
+            ],
             "details": "Criar enum Roles: Patient, ClinicOrigin, ClinicPartner, Admin. Implementar RoleSeeder para criar roles no banco na inicialização. Adicionar claims customizadas: 'clinicId' para usuários de clínica, 'clinicType' (origin/partner), 'permissions' array para admin. Criar ClaimsTransformation para adicionar claims dinamicamente no login. Implementar políticas de autorização: RequireClinicOwner (verifica clinicId), RequireAdminOrClinicOwner. Adicionar método GetUserClaims no AuthService para retornar claims do usuário autenticado.",
             "status": "pending",
             "testStrategy": "Testar seed de roles na inicialização. Verificar atribuição correta de claims por perfil. Testar políticas de autorização em controllers protegidos."
@@ -236,7 +275,10 @@
         "details": "Criar PlanController com autorização [Authorize(Roles='Admin')]. Endpoints: GET /plans (listar), GET /plans/{id}, POST /plans (criar), PUT /plans/{id} (atualizar), DELETE /plans/{id}. Modelo Plan: name, description, totalCredits, price, isActive. Implementar validações: nome único, créditos > 0, preço >= 0. Adicionar paginação e filtros na listagem.",
         "testStrategy": "Testar CRUD completo com usuário admin. Verificar rejeição com outros roles. Validar regras de negócio. Testar paginação e filtros. Verificar soft delete.",
         "priority": "high",
-        "dependencies": [3, 4],
+        "dependencies": [
+          3,
+          4
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -252,7 +294,9 @@
             "id": 2,
             "title": "Implementar Repository e Service Layer para Plans",
             "description": "Criar camada de repositório e serviço com lógica de negócio para gerenciamento de planos",
-            "dependencies": ["5.1"],
+            "dependencies": [
+              "5.1"
+            ],
             "details": "Implementar PlanRepository : IPlanRepository com métodos: GetAllAsync(paginação, filtros), GetByIdAsync(id), GetByNameAsync(name), CreateAsync(plan), UpdateAsync(plan), DeleteAsync(id - soft delete). Criar IPlanService e PlanService com validações: verificar nome único antes de criar/atualizar, validar totalCredits > 0, validar price >= 0. Implementar paginação com PagedResult<Plan> e filtros por IsActive, price range, nome parcial.",
             "status": "pending",
             "testStrategy": "Criar testes unitários para repository com banco in-memory. Testar validações do service com diferentes cenários. Verificar comportamento de soft delete."
@@ -261,7 +305,9 @@
             "id": 3,
             "title": "Criar DTOs e Implementar PlanController",
             "description": "Desenvolver controller REST com autorização admin e endpoints completos do CRUD",
-            "dependencies": ["5.2"],
+            "dependencies": [
+              "5.2"
+            ],
             "details": "Criar DTOs: PlanRequestDto (para criação/atualização), PlanResponseDto (para retorno), PlanFilterDto (para filtros). Implementar PlanController com [Authorize(Roles='Admin')] no nível da classe. Endpoints: GET /api/plans (com paginação e filtros), GET /api/plans/{id}, POST /api/plans, PUT /api/plans/{id}, DELETE /api/plans/{id}. Usar AutoMapper para conversão DTO<->Entity. Retornar códigos HTTP apropriados: 200/201 sucesso, 400 validação, 401/403 autorização, 404 não encontrado.",
             "status": "pending",
             "testStrategy": "Criar testes de integração para cada endpoint. Testar com diferentes roles (admin, paciente, clínica). Verificar respostas HTTP e validações."
@@ -270,7 +316,9 @@
             "id": 4,
             "title": "Implementar Validações e Tratamento de Erros",
             "description": "Adicionar validações detalhadas usando FluentValidation e middleware de tratamento de erros",
-            "dependencies": ["5.3"],
+            "dependencies": [
+              "5.3"
+            ],
             "details": "Criar PlanRequestValidator com FluentValidation: Name (required, max 100 chars), Description (max 500 chars), TotalCredits (greater than 0), Price (greater or equal 0). Implementar middleware global de exceções para padronizar respostas de erro. Criar exceções customizadas: PlanNotFoundException, DuplicatePlanNameException. Adicionar logging estruturado com Serilog para todas operações do CRUD. Implementar rate limiting específico para endpoints de criação/atualização.",
             "status": "pending",
             "testStrategy": "Testar cada regra de validação isoladamente. Verificar respostas de erro padronizadas. Testar cenários de exceção e logging."
@@ -279,7 +327,9 @@
             "id": 5,
             "title": "Adicionar Funcionalidades Avançadas e Documentação",
             "description": "Implementar features adicionais como busca, ordenação e documentação Swagger completa",
-            "dependencies": ["5.4"],
+            "dependencies": [
+              "5.4"
+            ],
             "details": "Adicionar ordenação dinâmica por nome, preço, créditos, data criação. Implementar busca full-text no nome e descrição usando LIKE ou FTS se disponível. Criar endpoint GET /api/plans/active para listar apenas planos ativos. Adicionar cache Redis para listagem de planos com invalidação em alterações. Documentar todos endpoints no Swagger com exemplos de request/response, códigos de erro possíveis e descrições detalhadas. Implementar versionamento da API preparando para futuras mudanças.",
             "status": "pending",
             "testStrategy": "Testar ordenação com diferentes campos e direções. Verificar busca com termos parciais. Testar cache e invalidação. Validar documentação Swagger gerada."
@@ -293,7 +343,9 @@
         "details": "Criar projeto Flutter com suporte Android (API 21+) e iOS (12+). Implementar arquitetura: /lib/core (utils, constants), /lib/data (repositories, datasources), /lib/domain (entities, usecases), /lib/presentation (screens, widgets). Configurar GetX ou Riverpod para gerenciamento de estado. Implementar navegação com go_router. Adicionar temas light/dark.",
         "testStrategy": "Testar build para Android e iOS. Verificar navegação entre telas. Testar mudança de tema. Validar estrutura de pastas e imports.",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -309,7 +361,9 @@
             "id": 2,
             "title": "Implementar Estrutura de Pastas com Arquitetura Limpa",
             "description": "Criar estrutura de diretórios seguindo Clean Architecture e configurar barrel exports",
-            "dependencies": ["6.1"],
+            "dependencies": [
+              "6.1"
+            ],
             "details": "Criar estrutura: lib/core (constants/, utils/, errors/, usecases/), lib/data (datasources/, models/, repositories/), lib/domain (entities/, repositories/, usecases/), lib/presentation (screens/, widgets/, controllers/). Adicionar arquivo index.dart (barrel export) em cada pasta. Criar core/constants/app_constants.dart com configurações base. Implementar core/errors/failures.dart para tratamento de erros padronizado.",
             "status": "pending",
             "testStrategy": "Verificar imports usando barrel exports. Criar arquivo exemplo em cada camada para validar separação de responsabilidades."
@@ -318,7 +372,9 @@
             "id": 3,
             "title": "Configurar Gerenciamento de Estado com GetX",
             "description": "Integrar GetX para gerenciamento de estado, injeção de dependências e navegação reativa",
-            "dependencies": ["6.2"],
+            "dependencies": [
+              "6.2"
+            ],
             "details": "Adicionar get: ^4.6.6 no pubspec.yaml. Criar lib/core/bindings/initial_binding.dart para injeção de dependências inicial. Implementar base controller em presentation/controllers/base_controller.dart com tratamento de loading e erros. Criar GetMaterialApp no main.dart. Configurar estrutura de bindings por feature. Implementar exemplo de reactive state com .obs e Obx().",
             "status": "pending",
             "testStrategy": "Criar controller de exemplo com estado reativo. Testar navegação com Get.to() e Get.back(). Validar injeção de dependências com Get.put() e Get.find()."
@@ -327,7 +383,9 @@
             "id": 4,
             "title": "Implementar Sistema de Navegação com go_router",
             "description": "Configurar navegação declarativa com go_router incluindo rotas protegidas e deep linking",
-            "dependencies": ["6.3"],
+            "dependencies": [
+              "6.3"
+            ],
             "details": "Adicionar go_router: ^13.0.0 no pubspec.yaml. Criar lib/core/routes/app_routes.dart com constantes de rotas. Implementar lib/core/routes/app_router.dart com GoRouter configuration. Configurar rotas: '/' (splash), '/login', '/home', '/qrcode', '/profile'. Implementar redirect logic para rotas protegidas baseado em autenticação. Adicionar suporte a deep links no Android e iOS. Integrar com GetX usando Get.key para navigator key.",
             "status": "pending",
             "testStrategy": "Testar navegação entre todas as rotas. Verificar redirect para rotas protegidas. Testar deep links em ambas plataformas. Validar back navigation e WillPopScope."
@@ -336,7 +394,9 @@
             "id": 5,
             "title": "Implementar Sistema de Temas Light e Dark",
             "description": "Criar sistema de temas dinâmico com suporte a light/dark mode e personalização de cores",
-            "dependencies": ["6.4"],
+            "dependencies": [
+              "6.4"
+            ],
             "details": "Criar lib/core/theme/app_colors.dart com paleta de cores para light e dark. Implementar lib/core/theme/app_theme.dart com ThemeData completo para ambos modos. Adicionar controller em presentation/controllers/theme_controller.dart para gerenciar tema atual. Implementar persistência de preferência usando shared_preferences. Criar widgets customizados que respondem ao tema. Adicionar toggle de tema na UI. Configurar cores específicas para sucesso, erro, warning.",
             "status": "pending",
             "testStrategy": "Alternar entre temas e verificar todas as telas. Testar persistência após restart do app. Validar contraste e acessibilidade em ambos temas. Verificar responsividade de cores em diferentes componentes."
@@ -350,7 +410,10 @@
         "details": "Adicionar firebase_auth, google_sign_in, sign_in_with_apple. Criar AuthRepository com métodos: signInEmail, signInGoogle, signInApple, signOut, currentUser. Implementar telas: LoginScreen, RegisterScreen, ForgotPasswordScreen. Adicionar interceptor HTTP para incluir token JWT em requisições. Implementar auto-refresh de token.",
         "testStrategy": "Testar login/registro com email. Verificar login Google em Android e Apple em iOS. Testar persistência de sessão. Validar refresh automático de token.",
         "priority": "high",
-        "dependencies": [4, 6],
+        "dependencies": [
+          4,
+          6
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -366,7 +429,9 @@
             "id": 2,
             "title": "Criar AuthRepository com Métodos de Autenticação",
             "description": "Implementar repositório centralizado para gerenciar toda lógica de autenticação com Firebase",
-            "dependencies": ["7.1"],
+            "dependencies": [
+              "7.1"
+            ],
             "details": "Criar classe AuthRepository com métodos: signInWithEmail(email, password), signInWithGoogle(), signInWithApple(), signUp(email, password, name), signOut(), getCurrentUser(), isAuthenticated(), getIdToken(). Implementar Stream<User?> authStateChanges para monitorar mudanças de autenticação. Adicionar tratamento de erros específicos do Firebase (weak-password, email-already-in-use, etc). Criar modelo UserModel para encapsular dados do usuário.",
             "status": "pending",
             "testStrategy": "Criar testes unitários para cada método do repositório. Mockar FirebaseAuth para testar fluxos de sucesso e erro."
@@ -375,7 +440,9 @@
             "id": 3,
             "title": "Implementar Telas de Autenticação (Login, Registro, Recuperação)",
             "description": "Criar interfaces de usuário para login, registro e recuperação de senha com validações",
-            "dependencies": ["7.2"],
+            "dependencies": [
+              "7.2"
+            ],
             "details": "LoginScreen: campos email/senha com validação, botões para Google/Apple Sign In, link para registro e esqueci senha. RegisterScreen: campos nome, email, senha e confirmação com validações (email válido, senha >= 6 caracteres). ForgotPasswordScreen: campo email com envio de reset por Firebase. Implementar loading states, mensagens de erro localizadas, teclado apropriado para cada campo. Usar Form e TextFormField com validadores. Adicionar animações suaves entre telas.",
             "status": "pending",
             "testStrategy": "Testar navegação entre telas. Verificar validações de formulário. Testar exibição de erros do Firebase."
@@ -384,7 +451,9 @@
             "id": 4,
             "title": "Implementar HTTP Interceptor para Token JWT",
             "description": "Criar interceptor para automaticamente incluir token de autenticação em todas requisições HTTP",
-            "dependencies": ["7.2"],
+            "dependencies": [
+              "7.2"
+            ],
             "details": "Criar AuthInterceptor que implementa InterceptorsWrapper do Dio. No onRequest, obter token atual via FirebaseAuth.instance.currentUser?.getIdToken(). Adicionar header 'Authorization: Bearer $token' em todas requisições. Implementar lógica de retry em caso de token expirado (401): obter novo token e repetir requisição. Configurar timeout de requisições. Adicionar logs para debug em desenvolvimento. Registrar interceptor na instância global do Dio.",
             "status": "pending",
             "testStrategy": "Verificar se token é incluído em requisições. Testar renovação automática com token expirado. Validar retry de requisições."
@@ -393,7 +462,10 @@
             "id": 5,
             "title": "Implementar Auto-Refresh de Token e Persistência de Sessão",
             "description": "Garantir que usuário permaneça autenticado entre sessões e token seja renovado automaticamente",
-            "dependencies": ["7.2", "7.4"],
+            "dependencies": [
+              "7.2",
+              "7.4"
+            ],
             "details": "Configurar FirebaseAuth para persistir autenticação localmente. Implementar listener em authStateChanges para detectar mudanças de autenticação. Criar método refreshToken() que força renovação do ID token a cada 50 minutos (tokens expiram em 60min). Usar Timer.periodic para agendar refresh automático enquanto app está ativo. Implementar AppLifecycleObserver para pausar/retomar timer conforme estado do app. Adicionar splash screen que verifica autenticação antes de direcionar para home ou login.",
             "status": "pending",
             "testStrategy": "Testar persistência fechando e reabrindo app. Verificar refresh automático após 50 minutos. Validar comportamento com app em background."
@@ -407,7 +479,10 @@
         "details": "Criar QRCodeService no backend. Gerar token único: JWT com claims (userPlanId, expiresAt, nonce). QR Code contém: {token: 'jwt', version: '1.0'}. Endpoint POST /qrcodes/generate retorna token e data URL do QR. Configurar expiração padrão 30 minutos. Armazenar nonce em cache Redis para prevenir reuso.",
         "testStrategy": "Testar geração de QR Code único. Verificar expiração após 30 min. Testar que mesmo QR não pode ser usado duas vezes. Validar formato e decodificação.",
         "priority": "medium",
-        "dependencies": [3, 5],
+        "dependencies": [
+          3,
+          5
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -423,7 +498,9 @@
             "id": 2,
             "title": "Implementar geração de tokens JWT para QR Code",
             "description": "Criar lógica de geração de tokens JWT únicos com claims específicas para cada visita",
-            "dependencies": ["8.1"],
+            "dependencies": [
+              "8.1"
+            ],
             "details": "Criar QRCodeTokenService com método generateToken(userPlanId). Gerar nonce único usando crypto.randomUUID(). Criar JWT com claims: userPlanId, expiresAt (30 min), nonce, issuedAt. Assinar token com chave privada RS256. Armazenar nonce no Redis com chave qr_nonce:{nonce} e TTL 30 min. Retornar token assinado.",
             "status": "pending",
             "testStrategy": "Verificar geração de nonces únicos. Validar estrutura e assinatura do JWT. Testar que nonces são armazenados no Redis. Verificar expiração correta do token."
@@ -432,7 +509,9 @@
             "id": 3,
             "title": "Implementar geração de QR Code em formato Data URL",
             "description": "Criar serviço para gerar imagem QR Code a partir do token JWT",
-            "dependencies": ["8.2"],
+            "dependencies": [
+              "8.2"
+            ],
             "details": "Instalar biblioteca qrcode. Criar QRCodeGeneratorService com método generateQRCode(token). Gerar QR Code contendo JSON: {token: 'jwt_string', version: '1.0'}. Configurar opções: errorCorrectionLevel: 'M', type: 'image/png', quality: 0.92, margin: 1, color: {dark: '#000000', light: '#FFFFFF'}, width: 300. Retornar QR Code como Data URL base64.",
             "status": "pending",
             "testStrategy": "Testar geração de QR Code válido. Verificar que QR decodifica para JSON esperado. Validar formato Data URL. Testar diferentes tamanhos de token."
@@ -441,7 +520,9 @@
             "id": 4,
             "title": "Criar endpoint POST /qrcodes/generate",
             "description": "Implementar endpoint REST para geração de QR codes temporários",
-            "dependencies": ["8.3"],
+            "dependencies": [
+              "8.3"
+            ],
             "details": "Criar QRCodeController com rota POST /qrcodes/generate. Middleware de autenticação para validar usuário logado. Extrair userPlanId do token de autenticação. Chamar QRCodeService.generateQRCode(userPlanId). Retornar resposta: {success: true, qrCode: dataUrl, expiresAt: timestamp, token: jwtToken}. Implementar rate limiting: máximo 5 QR codes por minuto por usuário.",
             "status": "pending",
             "testStrategy": "Testar endpoint com usuário autenticado. Verificar resposta com QR Code válido. Testar rate limiting. Validar erro para usuário não autenticado."
@@ -450,7 +531,9 @@
             "id": 5,
             "title": "Criar QRCodeService integrador",
             "description": "Implementar serviço principal que orquestra toda a geração de QR Code",
-            "dependencies": ["8.4"],
+            "dependencies": [
+              "8.4"
+            ],
             "details": "Criar QRCodeService com método principal generateQRCode(userPlanId). Orquestrar: chamar QRCodeTokenService.generateToken(), depois QRCodeGeneratorService.generateQRCode(). Adicionar logging de auditoria para cada QR gerado. Implementar métricas: total de QR codes gerados, taxa de erro. Criar método validateUserPlan() para verificar se plano está ativo antes de gerar. Adicionar cache temporário de 1 minuto para evitar regeneração desnecessária.",
             "status": "pending",
             "testStrategy": "Testar fluxo completo de geração. Verificar logs de auditoria. Validar rejeição para plano inativo. Testar cache temporário. Verificar métricas sendo registradas."
@@ -464,7 +547,9 @@
         "details": "Criar HomeScreen com card principal mostrando: nome do plano, créditos restantes/total, barra de progresso visual. Implementar pull-to-refresh. Adicionar botão 'Gerar QR Code' prominente. Criar PlanRepository para buscar dados. Implementar cache local com expiração. Mostrar histórico resumido de últimas visitas.",
         "testStrategy": "Testar exibição correta de dados do plano. Verificar atualização em tempo real. Testar comportamento sem plano ativo. Validar pull-to-refresh.",
         "priority": "medium",
-        "dependencies": [7],
+        "dependencies": [
+          7
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -489,7 +574,10 @@
             "id": 3,
             "title": "Criar Card Principal de Visualização do Plano",
             "description": "Desenvolver o componente visual principal que exibe informações do plano ativo",
-            "dependencies": ["9.1", "9.2"],
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
             "details": "Criar PlanCard widget com design moderno usando Container decorado. Exibir: nome do plano em destaque, créditos restantes/total (ex: 7/10), barra de progresso circular ou linear mostrando porcentagem de uso. Adicionar gradiente de cores baseado no saldo (verde > amarelo > vermelho). Implementar animações suaves para mudanças de valor. Adicionar ícones ilustrativos.",
             "status": "pending",
             "testStrategy": "Testar exibição com diferentes valores de créditos. Verificar animações e transições. Validar cores baseadas em porcentagem."
@@ -498,7 +586,10 @@
             "id": 4,
             "title": "Implementar Cache Local e Pull-to-Refresh",
             "description": "Adicionar persistência local dos dados e atualização manual pelo usuário",
-            "dependencies": ["9.2", "9.3"],
+            "dependencies": [
+              "9.2",
+              "9.3"
+            ],
             "details": "Implementar cache usando shared_preferences ou hive para armazenar dados do plano. Configurar expiração de cache de 5 minutos. Adicionar RefreshIndicator envolvendo a tela principal. Implementar lógica de pull-to-refresh que: mostra loading, busca dados atualizados da API, atualiza cache local, exibe feedback visual de sucesso/erro. Adicionar timestamp de última atualização.",
             "status": "pending",
             "testStrategy": "Testar persistência de dados offline. Verificar expiração do cache. Validar comportamento do pull-to-refresh com e sem conexão."
@@ -507,7 +598,10 @@
             "id": 5,
             "title": "Adicionar Botão Gerar QR Code e Histórico Resumido",
             "description": "Implementar funcionalidades complementares de QR Code e visualização de histórico",
-            "dependencies": ["9.3", "9.4"],
+            "dependencies": [
+              "9.3",
+              "9.4"
+            ],
             "details": "Criar botão prominente 'Gerar QR Code' com ícone e cor de destaque. Ao clicar, navegar para tela de QR Code (implementada na task 10). Adicionar seção 'Últimas Visitas' mostrando lista resumida das 3 últimas consultas com: data, clínica, créditos utilizados. Implementar navegação para tela completa de histórico. Adicionar estado vazio quando não houver histórico.",
             "status": "pending",
             "testStrategy": "Testar navegação para tela de QR Code. Verificar exibição correta do histórico resumido. Validar estado vazio e loading states."
@@ -521,7 +615,10 @@
         "details": "Criar QRCodeScreen com: exibição grande do QR Code, timer countdown mostrando tempo restante, botão para gerar novo QR. Usar qr_flutter para renderizar. Implementar brightness boost automático. Adicionar instruções para clínica. Salvar QR em galeria opcional. Mostrar código alfanumérico como fallback.",
         "testStrategy": "Testar geração e exibição do QR. Verificar timer countdown. Testar salvamento em galeria. Validar brightness da tela. Testar regeneração de QR.",
         "priority": "medium",
-        "dependencies": [8, 9],
+        "dependencies": [
+          8,
+          9
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -537,7 +634,9 @@
             "id": 2,
             "title": "Implementar Geração e Exibição do QR Code",
             "description": "Criar lógica para gerar código único temporário e exibir QR Code centralizado na tela",
-            "dependencies": ["10.1"],
+            "dependencies": [
+              "10.1"
+            ],
             "details": "Criar QRCodeService em /lib/domain/services/ para gerar código alfanumérico único (ex: 'USR-${userId}-${timestamp}'). Implementar widget QrImageView no centro da tela com size: 280. Adicionar padding e container com bordas arredondadas. Exibir código alfanumérico abaixo do QR como Text com fontSize: 18 e fontWeight.bold. Implementar estado loading enquanto gera o código.",
             "status": "pending",
             "testStrategy": "Verificar se o QR Code é gerado com dados únicos. Testar diferentes tamanhos de tela para responsividade. Validar se o código alfanumérico é legível"
@@ -546,7 +645,9 @@
             "id": 3,
             "title": "Adicionar Timer Countdown e Expiração",
             "description": "Implementar contador regressivo de 5 minutos e regeneração automática ao expirar",
-            "dependencies": ["10.2"],
+            "dependencies": [
+              "10.2"
+            ],
             "details": "Criar Timer.periodic para atualizar countdown a cada segundo. Exibir tempo restante em formato 'MM:SS' acima do QR Code. Usar CircularProgressIndicator ao redor do timer. Quando chegar a 00:00, mostrar estado 'Expirado' e desabilitar QR. Implementar botão 'Gerar Novo QR Code' que reseta timer e gera novo código. Adicionar animação de fade quando QR expira.",
             "status": "pending",
             "testStrategy": "Testar se o timer decrementa corretamente. Verificar regeneração ao clicar no botão. Validar estado visual quando QR expira. Testar se timer continua ao minimizar app"
@@ -555,7 +656,9 @@
             "id": 4,
             "title": "Implementar Brightness Boost e Instruções",
             "description": "Adicionar aumento automático de brilho da tela e seção de instruções para a clínica",
-            "dependencies": ["10.3"],
+            "dependencies": [
+              "10.3"
+            ],
             "details": "Usar screen_brightness package para aumentar brilho ao entrar na tela e restaurar ao sair. Implementar no initState() e dispose(). Adicionar Card expansível abaixo do QR com título 'Como usar'. Incluir instruções: '1. Apresente este QR Code na recepção', '2. O código expira em 5 minutos', '3. Cada uso consome 1 crédito do seu plano'. Usar ExpansionTile para mostrar/ocultar instruções.",
             "status": "pending",
             "testStrategy": "Verificar se o brilho aumenta ao entrar e volta ao normal ao sair. Testar expansão/colapso das instruções. Validar em diferentes níveis de bateria"
@@ -564,7 +667,9 @@
             "id": 5,
             "title": "Adicionar Funcionalidade de Salvar QR Code",
             "description": "Implementar botão opcional para salvar QR Code na galeria do dispositivo",
-            "dependencies": ["10.4"],
+            "dependencies": [
+              "10.4"
+            ],
             "details": "Adicionar packages: screenshot e image_gallery_saver. Envolver QrImageView com Screenshot widget usando GlobalKey. Criar IconButton com ícone de download no AppBar. Implementar função para capturar screenshot e salvar na galeria. Solicitar permissão de armazenamento se necessário. Mostrar SnackBar de sucesso/erro após salvar. Adicionar analytics para rastrear uso do recurso.",
             "status": "pending",
             "testStrategy": "Testar salvamento em Android e iOS. Verificar se a imagem aparece na galeria. Validar fluxo de permissões. Testar mensagens de feedback ao usuário"
@@ -578,7 +683,9 @@
         "details": "Criar endpoint POST /transactions/validate-qr com body {qrToken, clinicId, serviceType?}. Validar JWT, verificar expiração, checar nonce no Redis. Se válido: debitar 1 crédito, criar registro Transaction, invalidar nonce. Retornar dados do paciente e confirmação. Implementar rate limiting por clínica.",
         "testStrategy": "Testar validação de QR válido. Verificar rejeição de QR expirado/usado. Testar débito correto de crédito. Validar rate limiting.",
         "priority": "medium",
-        "dependencies": [8],
+        "dependencies": [
+          8
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -594,7 +701,9 @@
             "id": 2,
             "title": "Implementar validação de JWT e verificação de nonce",
             "description": "Criar lógica de validação do token JWT extraído do QR Code e verificação de uso único via Redis",
-            "dependencies": ["11.1"],
+            "dependencies": [
+              "11.1"
+            ],
             "details": "Implementar método validateQRToken que: decodifica e valida JWT usando a chave secreta, verifica claims obrigatórias (userPlanId, expiresAt, nonce), checa expiração do token, consulta Redis para verificar se nonce já foi usado. Configurar TTL no Redis igual ao tempo de expiração do QR. Retornar dados decodificados ou lançar exceção específica.",
             "status": "pending",
             "testStrategy": "Testar validação com token válido, expirado e malformado. Verificar detecção de nonce já utilizado. Testar comportamento com Redis indisponível."
@@ -603,7 +712,9 @@
             "id": 3,
             "title": "Implementar débito de crédito e criação de transação",
             "description": "Criar lógica para debitar crédito do plano do usuário e registrar a transação",
-            "dependencies": ["11.2"],
+            "dependencies": [
+              "11.2"
+            ],
             "details": "Implementar método processTransaction que: busca UserPlan pelo userPlanId, verifica se há créditos disponíveis, debita 1 crédito do saldo, cria registro Transaction com todos os dados, invalida nonce no Redis marcando como usado. Usar transação de banco de dados para garantir consistência. Implementar rollback em caso de erro.",
             "status": "pending",
             "testStrategy": "Testar débito com saldo suficiente e insuficiente. Verificar atomicidade da transação. Testar rollback em caso de falha."
@@ -612,7 +723,9 @@
             "id": 4,
             "title": "Criar endpoint REST para validação de QR Code",
             "description": "Implementar endpoint POST /transactions/validate-qr com autenticação e autorização",
-            "dependencies": ["11.3"],
+            "dependencies": [
+              "11.3"
+            ],
             "details": "Criar controller com endpoint POST /transactions/validate-qr. Request body: {qrToken: string, clinicId: string, serviceType?: string}. Adicionar middleware de autenticação JWT para clínicas. Validar que clinicId do token corresponde à clínica autenticada. Chamar QRCodeValidationService para processar. Retornar response com dados do paciente (nome, telefone) e confirmação da transação. Implementar tratamento de erros com status codes apropriados.",
             "status": "pending",
             "testStrategy": "Testar endpoint com tokens válidos e inválidos. Verificar autenticação e autorização. Testar diferentes cenários de erro e responses."
@@ -621,7 +734,9 @@
             "id": 5,
             "title": "Implementar rate limiting por clínica",
             "description": "Adicionar proteção contra uso excessivo do endpoint de validação por clínica",
-            "dependencies": ["11.4"],
+            "dependencies": [
+              "11.4"
+            ],
             "details": "Implementar middleware de rate limiting usando Redis. Configurar limite de 100 validações por minuto por clinicId. Usar sliding window para contagem. Retornar status 429 (Too Many Requests) quando exceder limite. Incluir headers X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset. Criar configuração customizável por clínica se necessário. Adicionar logs para monitoramento de uso.",
             "status": "pending",
             "testStrategy": "Testar limite de requisições dentro da janela. Verificar reset do contador após período. Testar headers de rate limit. Validar comportamento com múltiplas clínicas."
@@ -635,7 +750,10 @@
         "details": "Criar ClinicScannerScreen usando mobile_scanner. Implementar validação em tempo real com feedback visual/sonoro. Mostrar dados do paciente após scan bem-sucedido. Adicionar campo opcional para tipo de serviço. Implementar modo manual para digitar código. Criar histórico de scans do dia.",
         "testStrategy": "Testar scan de QR válido e inválido. Verificar feedback visual/sonoro. Testar entrada manual de código. Validar histórico de scans.",
         "priority": "medium",
-        "dependencies": [6, 11],
+        "dependencies": [
+          6,
+          11
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -651,7 +769,9 @@
             "id": 2,
             "title": "Implementar Interface de Scanner com Validação em Tempo Real",
             "description": "Criar a interface do scanner QR com feedback visual e sonoro durante a leitura",
-            "dependencies": ["12.1"],
+            "dependencies": [
+              "12.1"
+            ],
             "details": "Implementar MobileScanner widget com overlay customizado mostrando área de scan. Criar AnimationController para feedback visual (borda verde/vermelha). Adicionar AudioPlayer para sons de sucesso/erro. Implementar método onDetect que valida formato do QR (UUID do paciente). Mostrar indicador de carregamento durante validação. Adicionar botão de flash/lanterna e switch câmera frontal/traseira.",
             "status": "pending",
             "testStrategy": "Testar scan com QR válido (UUID) e inválido. Verificar feedback visual mudando cor da borda. Confirmar reprodução de sons diferentes para sucesso/erro"
@@ -660,7 +780,9 @@
             "id": 3,
             "title": "Criar Modal de Dados do Paciente e Seleção de Serviço",
             "description": "Implementar bottom sheet que exibe dados do paciente após scan bem-sucedido",
-            "dependencies": ["12.2"],
+            "dependencies": [
+              "12.2"
+            ],
             "details": "Criar PatientDataBottomSheet como widget separado. Fazer requisição GET /patients/{qrCode} para buscar dados. Exibir: nome, foto, plano ativo, créditos restantes. Adicionar DropdownButton com lista de serviços da clínica (buscar de endpoint /clinics/{id}/services). Implementar botões 'Confirmar Atendimento' e 'Cancelar'. Mostrar loading durante requisições. Tratar erros de rede com retry.",
             "status": "pending",
             "testStrategy": "Verificar exibição correta dos dados do paciente. Testar seleção de diferentes serviços. Validar comportamento com paciente sem plano ativo"
@@ -669,7 +791,9 @@
             "id": 4,
             "title": "Adicionar Modo Manual e Validação de Código",
             "description": "Implementar entrada manual de código como alternativa ao scanner",
-            "dependencies": ["12.3"],
+            "dependencies": [
+              "12.3"
+            ],
             "details": "Adicionar FloatingActionButton com ícone de teclado para modo manual. Criar ManualCodeDialog com TextFormField para entrada de código. Implementar máscara/validação para formato UUID. Adicionar botão 'Verificar' que chama mesmo fluxo de validação do scanner. Mostrar erro inline para código inválido. Permitir colar código da área de transferência. Salvar últimos 5 códigos digitados em SharedPreferences.",
             "status": "pending",
             "testStrategy": "Testar entrada de código válido e inválido. Verificar máscara UUID funcionando. Confirmar que fluxo manual leva ao mesmo resultado que scanner"
@@ -678,7 +802,10 @@
             "id": 5,
             "title": "Implementar Histórico de Scans do Dia",
             "description": "Criar funcionalidade para visualizar e gerenciar scans realizados no dia atual",
-            "dependencies": ["12.3", "12.4"],
+            "dependencies": [
+              "12.3",
+              "12.4"
+            ],
             "details": "Criar ScanHistoryScreen acessível por ícone no AppBar. Implementar ListView com cards mostrando: hora do scan, nome do paciente, serviço realizado, status. Buscar dados de GET /clinics/{id}/scans?date=today com paginação. Adicionar pull-to-refresh para atualizar lista. Implementar swipe-to-delete para cancelar atendimento (se dentro de 5 minutos). Mostrar totalizadores: total de atendimentos e créditos consumidos. Salvar cache local com Hive para offline.",
             "status": "pending",
             "testStrategy": "Verificar listagem correta ordenada por hora. Testar cancelamento dentro e fora do prazo. Validar funcionamento offline com dados em cache"
@@ -692,7 +819,10 @@
         "details": "Criar app React com TypeScript. Usar Material-UI ou Ant Design. Implementar layout com sidebar navegável. Criar páginas: Dashboard (gráficos resumo), Planos (CRUD), Clínicas (listagem e cadastro), Transações (histórico com filtros), Pacientes (busca e detalhes). Integrar com API usando axios. Implementar autenticação com redirect.",
         "testStrategy": "Testar responsividade mobile/desktop. Verificar navegação e rotas protegidas. Testar integração com API. Validar filtros e paginação.",
         "priority": "low",
-        "dependencies": [1, 5],
+        "dependencies": [
+          1,
+          5
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -708,7 +838,9 @@
             "id": 2,
             "title": "Implementar layout base com sidebar navegável e roteamento",
             "description": "Criar estrutura de layout principal com sidebar fixa/responsiva, header com informações do usuário e área de conteúdo principal com roteamento",
-            "dependencies": ["13.1"],
+            "dependencies": [
+              "13.1"
+            ],
             "details": "Implementar componente Layout com Material-UI Drawer para sidebar. Criar menu de navegação com ícones: Dashboard, Planos, Clínicas, Transações, Pacientes. Configurar React Router v6 com rotas protegidas. Implementar ResponsiveDrawer que alterna entre permanente (desktop) e temporário (mobile). Adicionar AppBar com título da página atual, avatar do usuário e botão de logout. Criar contexto de navegação para gerenciar estado da sidebar. Implementar breadcrumbs para navegação secundária.",
             "status": "pending",
             "testStrategy": "Testar responsividade em diferentes tamanhos de tela. Verificar navegação entre todas as rotas. Validar persistência do estado da sidebar. Testar comportamento em mobile vs desktop"
@@ -717,7 +849,9 @@
             "id": 3,
             "title": "Desenvolver sistema de autenticação e proteção de rotas",
             "description": "Implementar fluxo completo de autenticação com login, logout, persistência de sessão e proteção de rotas administrativas",
-            "dependencies": ["13.2"],
+            "dependencies": [
+              "13.2"
+            ],
             "details": "Criar página de Login com formulário Material-UI. Implementar AuthContext com useContext para gerenciar estado de autenticação global. Configurar axios com interceptors para adicionar token JWT em todas requisições. Criar HOC ProtectedRoute para envolver rotas que necessitam autenticação. Implementar refresh token automático. Adicionar localStorage/sessionStorage para persistir sessão. Configurar redirect automático para login quando não autenticado. Implementar loading state durante verificação de autenticação.",
             "status": "pending",
             "testStrategy": "Testar fluxo completo de login/logout. Verificar persistência de sessão ao recarregar página. Validar redirecionamento de rotas protegidas. Testar expiração e renovação de token"
@@ -726,7 +860,9 @@
             "id": 4,
             "title": "Implementar páginas de CRUD para Planos e listagem de Clínicas",
             "description": "Criar interfaces completas para gerenciamento de planos (criar, editar, deletar) e visualização de clínicas cadastradas com filtros",
-            "dependencies": ["13.3"],
+            "dependencies": [
+              "13.3"
+            ],
             "details": "Página Planos: criar DataGrid do Material-UI com colunas (nome, créditos, preço, ações). Implementar modal/drawer para criar/editar plano com validação de formulário usando react-hook-form. Adicionar confirmação antes de deletar. Página Clínicas: implementar lista com cards ou tabela mostrando informações da clínica. Adicionar filtros por nome, tipo e localização. Implementar paginação server-side. Criar serviços no axios para todas operações CRUD. Adicionar feedback visual com Snackbar para ações bem-sucedidas/erros.",
             "status": "pending",
             "testStrategy": "Testar todas operações CRUD de planos. Verificar validações de formulário. Testar filtros e paginação de clínicas. Validar tratamento de erros da API"
@@ -735,7 +871,9 @@
             "id": 5,
             "title": "Criar Dashboard com gráficos e páginas de Transações/Pacientes",
             "description": "Desenvolver dashboard com visualizações de dados e implementar páginas para histórico de transações e busca de pacientes",
-            "dependencies": ["13.4"],
+            "dependencies": [
+              "13.4"
+            ],
             "details": "Dashboard: integrar biblioteca de gráficos (recharts ou Chart.js). Criar cards com métricas: total de pacientes, transações do mês, planos mais usados, clínicas mais ativas. Implementar gráficos: linha (transações por dia), pizza (distribuição por plano), barras (clínicas top 10). Página Transações: criar tabela com filtros por data, clínica, paciente. Adicionar exportação para CSV/Excel. Página Pacientes: implementar busca por nome/CPF/email. Mostrar detalhes: plano atual, histórico de visitas, informações de contato. Adicionar skeleton loaders durante carregamento de dados.",
             "status": "pending",
             "testStrategy": "Verificar renderização correta dos gráficos com dados reais. Testar todos os filtros de transações. Validar busca de pacientes e exibição de detalhes. Testar exportação de dados"
@@ -749,7 +887,9 @@
         "details": "Implementar NotificationService com providers: FCM para push, SendGrid para email. Criar job agendado que verifica saldos < 20%. Enviar notificação quando saldo atingir 3, 2 e 1 crédito restante. Implementar preferências de notificação por usuário. Adicionar template de email responsivo.",
         "testStrategy": "Testar envio de push para Android/iOS. Verificar entrega de emails. Testar triggers de saldo baixo. Validar preferências de usuário.",
         "priority": "low",
-        "dependencies": [11],
+        "dependencies": [
+          11
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -765,7 +905,9 @@
             "id": 2,
             "title": "Implementar NotificationService",
             "description": "Criar serviço central para gerenciar envio de notificações através dos diferentes canais",
-            "dependencies": ["14.1"],
+            "dependencies": [
+              "14.1"
+            ],
             "details": "Criar NotificationService com métodos: SendLowBalanceAlert, SendEmailNotification, SendPushNotification. Implementar lógica para determinar canal baseado em preferências do usuário. Criar enum NotificationType (LowBalance, Payment, General). Implementar retry policy para falhas de envio. Adicionar logging detalhado de sucessos e falhas. Criar NotificationRepository para salvar histórico de notificações enviadas.",
             "status": "pending",
             "testStrategy": "Testar cenários de envio por email e push. Verificar comportamento com falhas de provider. Validar salvamento de histórico."
@@ -783,7 +925,10 @@
             "id": 4,
             "title": "Implementar Job de Verificação de Saldo",
             "description": "Criar job agendado que verifica saldos baixos e dispara notificações automaticamente",
-            "dependencies": ["14.2", "14.3"],
+            "dependencies": [
+              "14.2",
+              "14.3"
+            ],
             "details": "Implementar BalanceCheckJob usando Hangfire ou Quartz.NET. Configurar execução a cada 4 horas. Buscar usuários com saldo < 20% do plano e que ainda não foram notificados no threshold atual. Implementar lógica para notificar em 3, 2 e 1 crédito restante. Criar tabela NotificationLog para evitar duplicatas. Adicionar configuração para horário de quiet hours (22h-8h) sem notificações push.",
             "status": "pending",
             "testStrategy": "Testar execução do job com diferentes cenários de saldo. Verificar prevenção de duplicatas. Validar respeito a quiet hours."
@@ -792,7 +937,9 @@
             "id": 5,
             "title": "Criar Templates de Email Responsivos",
             "description": "Desenvolver templates HTML responsivos para emails de notificação de saldo baixo",
-            "dependencies": ["14.2"],
+            "dependencies": [
+              "14.2"
+            ],
             "details": "Criar template HTML/CSS responsivo usando MJML ou similar. Design deve incluir: logo da clínica, mensagem personalizada com nome do paciente, saldo atual destacado, botão CTA para renovar plano, footer com link para gerenciar preferências. Implementar variáveis de template: {{userName}}, {{currentBalance}}, {{planName}}, {{clinicName}}. Criar versão plain text alternativa. Testar renderização em clientes de email populares.",
             "status": "pending",
             "testStrategy": "Testar renderização em Gmail, Outlook, Apple Mail. Verificar responsividade mobile. Validar links e CTAs."
@@ -806,7 +953,10 @@
         "details": "Criar ReportService com queries otimizadas. Implementar relatórios: uso por período, ranking clínicas, serviços mais utilizados, taxa de utilização de planos. Adicionar exportação para Excel/PDF. Criar gráficos interativos com Chart.js. Implementar cache de relatórios pesados. Adicionar filtros por data, clínica, plano.",
         "testStrategy": "Testar geração de cada tipo de relatório. Verificar performance com volume de dados. Testar exportação Excel/PDF. Validar precisão dos cálculos.",
         "priority": "low",
-        "dependencies": [11, 13],
+        "dependencies": [
+          11,
+          13
+        ],
         "status": "pending",
         "subtasks": [
           {
@@ -822,7 +972,9 @@
             "id": 2,
             "title": "Implementar Relatórios de Uso por Período e Ranking de Clínicas",
             "description": "Criar relatórios de análise temporal de uso e ranking comparativo entre clínicas",
-            "dependencies": ["15.1"],
+            "dependencies": [
+              "15.1"
+            ],
             "details": "Implementar GetUsageByPeriodReport com agregação por dia/semana/mês. Query deve incluir: total de transações, créditos consumidos, média por paciente. Criar GetClinicRankingReport ordenando por: volume de atendimentos, taxa de crescimento, satisfação (se disponível). Implementar gráficos de linha temporal com grouping dinâmico. Adicionar cálculos de variação percentual entre períodos. Retornar dados formatados para Chart.js.",
             "status": "pending",
             "testStrategy": "Testar agregações com diferentes períodos. Validar cálculos de ranking e ordenação. Verificar performance com grande volume de dados. Testar formatação para Chart.js."
@@ -831,7 +983,9 @@
             "id": 3,
             "title": "Criar Relatórios de Serviços e Taxa de Utilização de Planos",
             "description": "Implementar análises de serviços mais utilizados e eficiência de utilização dos planos",
-            "dependencies": ["15.1"],
+            "dependencies": [
+              "15.1"
+            ],
             "details": "Implementar GetTopServicesReport agrupando por ServiceType com contagem e percentual. Criar GetPlanUtilizationReport calculando: taxa de uso (créditos usados/total), frequência média de uso, tempo médio entre utilizações. Adicionar análise de sazonalidade para identificar padrões. Implementar drill-down por tipo de serviço e plano. Incluir métricas de retenção e churn rate por plano.",
             "status": "pending",
             "testStrategy": "Validar cálculos de percentuais e médias. Testar agrupamentos por diferentes dimensões. Verificar precisão dos cálculos de utilização. Testar análise de sazonalidade."
@@ -840,7 +994,10 @@
             "id": 4,
             "title": "Implementar Sistema de Exportação para Excel e PDF",
             "description": "Criar funcionalidade de exportação de relatórios em formatos Excel e PDF com formatação profissional",
-            "dependencies": ["15.2", "15.3"],
+            "dependencies": [
+              "15.2",
+              "15.3"
+            ],
             "details": "Integrar EPPlus para geração de Excel com abas por tipo de relatório. Implementar formatação condicional, gráficos nativos do Excel e totalizadores. Para PDF, usar QuestPDF ou similar com templates customizados. Criar ExportService com métodos: ExportToExcel, ExportToPDF. Adicionar cabeçalho com logo, período e filtros aplicados. Implementar download assíncrono para relatórios grandes. Configurar templates responsivos para diferentes tamanhos de papel.",
             "status": "pending",
             "testStrategy": "Testar geração de arquivos Excel/PDF válidos. Verificar formatação e fórmulas no Excel. Validar layout responsivo do PDF. Testar download de arquivos grandes."
@@ -849,7 +1006,10 @@
             "id": 5,
             "title": "Criar Interface de Filtros e Visualização com Chart.js",
             "description": "Implementar interface interativa com filtros avançados e gráficos dinâmicos usando Chart.js",
-            "dependencies": ["15.2", "15.3"],
+            "dependencies": [
+              "15.2",
+              "15.3"
+            ],
             "details": "Criar ReportsController com endpoints GET /reports/{type} com query parameters para filtros. Implementar filtros: período (data início/fim), clínica (múltipla seleção), plano, tipo de serviço. No frontend, integrar Chart.js com gráficos: linha (temporal), barra (comparativo), pizza (distribuição), radar (análise multidimensional). Adicionar interatividade: zoom, pan, drill-down ao clicar. Implementar loading states e tratamento de erros. Criar dashboard unificado com widgets de resumo.",
             "status": "pending",
             "testStrategy": "Testar aplicação de filtros combinados. Verificar renderização de gráficos com diferentes volumes de dados. Validar interatividade e responsividade. Testar performance do dashboard."
@@ -859,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-29T18:09:04.499Z",
+      "updated": "2025-07-29T21:22:26.280Z",
       "description": "Tasks for master context"
     }
   }
