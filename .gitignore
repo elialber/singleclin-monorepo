@@ -29,4 +29,21 @@ node_modules/
 # tasks/
 
 # MCP configuration with secrets
-.mcp.json 
+.mcp.json
+
+# Firebase service account credentials
+firebase-service-account.json
+firebase-service-account*.json
+serviceAccountKey.json
+
+# .NET specific
+bin/
+obj/
+*.user
+*.userprefs
+.vs/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo 

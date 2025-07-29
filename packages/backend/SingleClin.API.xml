@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SingleClin.API</name>
+    </assembly>
+    <members>
+        <member name="M:SingleClin.API.Controllers.AuthTestController.GetPublic">
+            <summary>
+            Public endpoint - no authentication required
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthTestController.GetProtected">
+            <summary>
+            Protected endpoint - requires authentication
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthTestController.GetAdminOnly">
+            <summary>
+            Admin only endpoint
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthTestController.GetClinicOnly">
+            <summary>
+            Clinic only endpoint
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthTestController.GetPatientOnly">
+            <summary>
+            Patient only endpoint
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.BaseController.CurrentUserId">
+            <summary>
+            Gets the current authenticated user's ID from the JWT token
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.BaseController.CurrentUserEmail">
+            <summary>
+            Gets the current authenticated user's email from the JWT token
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.BaseController.CurrentUserRole">
+            <summary>
+            Gets the current authenticated user's role from the JWT token
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.BaseController.CurrentUserClinicId">
+            <summary>
+            Gets the current authenticated user's clinic ID from the JWT token (if applicable)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.IsInRole(System.String)">
+            <summary>
+            Checks if the current user has a specific role
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.BaseController.IsAdmin">
+            <summary>
+            Checks if the current user is an admin
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.BaseController.IsClinicUser">
+            <summary>
+            Checks if the current user is a clinic user (any type)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.BaseController.IsPatient">
+            <summary>
+            Checks if the current user is a patient
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.OkResponse``1(``0,System.String)">
+            <summary>
+            Returns a successful response with data
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.OkResponse(System.String)">
+            <summary>
+            Returns a successful response without data
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.CreatedResponse``1(``0,System.String,System.String)">
+            <summary>
+            Returns a created response with data
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.BadRequestResponse(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            Returns a bad request response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.ValidationErrorResponse(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Returns a validation error response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.ValidationErrorResponse">
+            <summary>
+            Returns a validation error response from ModelState
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.UnauthorizedResponse(System.String)">
+            <summary>
+            Returns an unauthorized response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.ForbiddenResponse(System.String)">
+            <summary>
+            Returns a forbidden response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.NotFoundResponse(System.String)">
+            <summary>
+            Returns a not found response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.ConflictResponse(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            Returns a conflict response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.InternalServerErrorResponse(System.String)">
+            <summary>
+            Returns an internal server error response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.CustomResponse``1(System.Int32,``0,System.String)">
+            <summary>
+            Returns a custom status code response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.CustomErrorResponse(System.Int32,System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            Returns a custom error response
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Controllers.HealthController">
+            <summary>
+            Health check endpoints documentation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.HealthController.GetHealthCheckInfo">
+            <summary>
+            Get information about available health check endpoints
+            </summary>
+            <response code="200">Returns information about health check endpoints</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.HealthController.TestCors">
+            <summary>
+            Test CORS configuration
+            </summary>
+            <response code="200">Returns CORS test response with headers information</response>
+        </member>
+        <member name="T:SingleClin.API.Controllers.TestResponseController">
+            <summary>
+            Test controller to demonstrate BaseController and ResponseWrapper functionality
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.GetSuccessWithData">
+            <summary>
+            Test successful response with data
+            </summary>
+            <response code="200">Returns the test data wrapped in a successful response</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.GetSuccessNoData">
+            <summary>
+            Test successful response without data
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.CreateItem(SingleClin.API.Controllers.CreateItemRequest)">
+            <summary>
+            Test created response
+            </summary>
+            <param name="request">The item creation request</param>
+            <response code="201">Returns the created item</response>
+            <response code="422">If the request validation fails</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.TestValidationError">
+            <summary>
+            Test validation error response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.GetNotFound(System.Int32)">
+            <summary>
+            Test not found response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.GetUserInfo">
+            <summary>
+            Test unauthorized response (requires authentication)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.AdminOnlyAction">
+            <summary>
+            Test forbidden response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.ThrowException">
+            <summary>
+            Test exception handling
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestResponseController.TestConflict">
+            <summary>
+            Test conflict response
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Controllers.CreateItemRequest">
+            <summary>
+            Request model for creating a test item
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.CreateItemRequest.Name">
+            <summary>
+            The name of the item (required)
+            </summary>
+            <example>Test Item 1</example>
+        </member>
+        <member name="P:SingleClin.API.Controllers.CreateItemRequest.Description">
+            <summary>
+            Optional description of the item
+            </summary>
+            <example>This is a test item description</example>
+        </member>
+        <member name="T:SingleClin.API.Filters.SwaggerDefaultValues">
+            <summary>
+            Swagger operation filter to improve API documentation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Filters.SwaggerDefaultValues.Apply(Microsoft.OpenApi.Models.OpenApiOperation,Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext)">
+            <summary>
+            Apply the filter to the operation
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.HealthChecks.ApiHealthCheck">
+            <summary>
+            General API health check
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.HealthChecks.FirebaseHealthCheck">
+            <summary>
+            Health check for Firebase Admin SDK connectivity
+            </summary>
+        </member>
+    </members>
+</doc>
