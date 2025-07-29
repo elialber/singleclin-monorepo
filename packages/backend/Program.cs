@@ -5,18 +5,39 @@ using SingleClin.API.Filters;
 using SingleClin.API.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
+using DotNetEnv;
 
 namespace SingleClin.API;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
+        // Load .env file for development
+        Env.Load();
+        
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
         builder.Services.AddControllers();
+        
+        // Add Entity Framework Core with PostgreSQL
+        builder.Services.AddSingleton<SingleClin.API.Data.Interceptors.AuditingInterceptor>();
+        builder.Services.AddDbContext<SingleClin.API.Data.AppDbContext>((serviceProvider, options) =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+                .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+                .EnableDetailedErrors(builder.Environment.IsDevelopment());
+            
+            // Add auditing interceptor in development
+            if (builder.Environment.IsDevelopment())
+            {
+                var auditingInterceptor = serviceProvider.GetRequiredService<SingleClin.API.Data.Interceptors.AuditingInterceptor>();
+                options.AddInterceptors(auditingInterceptor);
+            }
+        });
         
         // Add CORS
         builder.Services.AddCors(options =>
@@ -108,7 +129,10 @@ public class Program
             .AddCheck<SingleClin.API.HealthChecks.ApiHealthCheck>("api", tags: new[] { "api", "live" })
             .AddCheck<SingleClin.API.HealthChecks.FirebaseHealthCheck>("firebase", 
                 failureStatus: HealthStatus.Degraded,
-                tags: new[] { "firebase", "auth" });
+                tags: new[] { "firebase", "auth" })
+            .AddDbContextCheck<SingleClin.API.Data.AppDbContext>("database",
+                failureStatus: HealthStatus.Unhealthy,
+                tags: new[] { "database", "ready" });
 
         var app = builder.Build();
 
@@ -196,7 +220,10 @@ public class Program
             Predicate = check => check.Tags.Contains("ready") || check.Tags.Contains("firebase")
         });
 
-        app.Run();
+        // Configure database migrations and seeding
+        await app.ConfigureDatabaseAsync();
+
+        await app.RunAsync();
     }
 }
 

@@ -1,0 +1,28 @@
+{
+  "name": "@singleclin/backend",
+  "version": "1.0.0",
+  "description": "SingleClin Backend API",
+  "private": true,
+  "scripts": {
+    "dev": "dotnet watch run",
+    "build": "dotnet build",
+    "start": "dotnet run",
+    "ef": "dotnet ef",
+    "migration:add": "dotnet ef migrations add",
+    "migration:remove": "dotnet ef migrations remove",
+    "migration:list": "dotnet ef migrations list",
+    "db:update": "dotnet ef database update",
+    "db:drop": "dotnet ef database drop",
+    "test": "dotnet test",
+    "format": "dotnet format",
+    "restore": "dotnet restore",
+    "clean": "dotnet clean"
+  },
+  "keywords": [
+    "dotnet",
+    "api",
+    "healthcare"
+  ],
+  "author": "SingleClin Team",
+  "license": "UNLICENSED"
+}

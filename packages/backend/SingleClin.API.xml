@@ -222,6 +222,506 @@
             </summary>
             <example>This is a test item description</example>
         </member>
+        <member name="T:SingleClin.API.Data.AppDbContext">
+            <summary>
+            Main database context for the SingleClin application
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.Users">
+            <summary>
+            Users in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.Clinics">
+            <summary>
+            Clinics registered in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.Plans">
+            <summary>
+            Available plans for purchase
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.UserPlans">
+            <summary>
+            User purchased plans
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.Transactions">
+            <summary>
+            Transactions (credit usage)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Configurations.BaseEntityConfiguration`1">
+            <summary>
+            Base configuration for entities that implement IEntity
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Data.Configurations.BaseEntityConfiguration`1.ConfigureEntity(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{`0})">
+            <summary>
+            Override this method to add entity-specific configurations
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.DatabaseSeeder">
+            <summary>
+            Seed initial data for the database
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Data.DatabaseSeeder.SeedAsync">
+            <summary>
+            Seed all initial data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.DesignTimeDbContextFactory">
+            <summary>
+            Design-time factory for EF Core migrations
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Interceptors.AuditingInterceptor">
+            <summary>
+            Interceptor for logging database operations in development
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.BaseEntity">
+            <summary>
+            Base entity class that implements IEntity
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.BaseEntity.Id">
+            <summary>
+            Unique identifier for the entity
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.BaseEntity.CreatedAt">
+            <summary>
+            Date and time when the entity was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.BaseEntity.UpdatedAt">
+            <summary>
+            Date and time when the entity was last updated
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Clinic">
+            <summary>
+            Represents a clinic in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Name">
+            <summary>
+            Clinic name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Type">
+            <summary>
+            Type of clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Address">
+            <summary>
+            Clinic address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.PhoneNumber">
+            <summary>
+            Clinic phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Email">
+            <summary>
+            Clinic email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Cnpj">
+            <summary>
+            Clinic CNPJ (Brazilian company registration)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.IsActive">
+            <summary>
+            Indicates if the clinic is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Latitude">
+            <summary>
+            Latitude coordinate
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Longitude">
+            <summary>
+            Longitude coordinate
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Transactions">
+            <summary>
+            Transactions processed by this clinic
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Enums.ClinicType">
+            <summary>
+            Types of clinics in the system
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.ClinicType.Regular">
+            <summary>
+            Regular clinic
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.ClinicType.Origin">
+            <summary>
+            Origin clinic - provides services
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.ClinicType.Partner">
+            <summary>
+            Partner clinic - has special agreements
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.ClinicType.Administrative">
+            <summary>
+            Administrative clinic
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Enums.TransactionStatus">
+            <summary>
+            Status of a transaction
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.TransactionStatus.Pending">
+            <summary>
+            Transaction is pending validation
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.TransactionStatus.Validated">
+            <summary>
+            Transaction was validated successfully
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.TransactionStatus.Cancelled">
+            <summary>
+            Transaction was cancelled
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.TransactionStatus.Expired">
+            <summary>
+            Transaction expired before validation
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Enums.UserRole">
+            <summary>
+            User roles in the system
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.UserRole.Patient">
+            <summary>
+            Patient user - can purchase and use plans
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.UserRole.Clinic">
+            <summary>
+            Clinic user - can validate QR codes
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.UserRole.ClinicOrigin">
+            <summary>
+            Clinic origin - special clinic type
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.UserRole.ClinicPartner">
+            <summary>
+            Clinic partner - partner clinic type
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.UserRole.Admin">
+            <summary>
+            System administrator
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.IEntity">
+            <summary>
+            Base interface for all entities in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.IEntity.Id">
+            <summary>
+            Unique identifier for the entity
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.IEntity.CreatedAt">
+            <summary>
+            Date and time when the entity was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.IEntity.UpdatedAt">
+            <summary>
+            Date and time when the entity was last updated
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Plan">
+            <summary>
+            Represents a plan that users can purchase
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.Name">
+            <summary>
+            Plan name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.Description">
+            <summary>
+            Plan description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.Credits">
+            <summary>
+            Number of credits included in the plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.Price">
+            <summary>
+            Plan price
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.OriginalPrice">
+            <summary>
+            Original price (for showing discounts)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.ValidityDays">
+            <summary>
+            Validity period in days
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.IsActive">
+            <summary>
+            Indicates if the plan is active for purchase
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.DisplayOrder">
+            <summary>
+            Display order
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.IsFeatured">
+            <summary>
+            Indicates if this is a featured plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Plan.UserPlans">
+            <summary>
+            User plans purchased from this plan
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Transaction">
+            <summary>
+            Represents a transaction (credit usage) in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.Code">
+            <summary>
+            Unique transaction code
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.UserPlanId">
+            <summary>
+            User plan used for this transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.UserPlan">
+            <summary>
+            Navigation property to UserPlan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.ClinicId">
+            <summary>
+            Clinic where the transaction occurred
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.Clinic">
+            <summary>
+            Navigation property to Clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.Status">
+            <summary>
+            Transaction status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.CreditsUsed">
+            <summary>
+            Number of credits used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.ServiceDescription">
+            <summary>
+            Service or procedure description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.ValidationDate">
+            <summary>
+            Date when the transaction was validated
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.ValidatedBy">
+            <summary>
+            User who validated the transaction (clinic staff)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.ValidationNotes">
+            <summary>
+            Validation notes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.IpAddress">
+            <summary>
+            IP address from where the transaction was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.UserAgent">
+            <summary>
+            User agent of the device that created the transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.Latitude">
+            <summary>
+            Latitude where the transaction occurred
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.Longitude">
+            <summary>
+            Longitude where the transaction occurred
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.CancellationReason">
+            <summary>
+            Cancellation reason if cancelled
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.CancellationDate">
+            <summary>
+            Date when the transaction was cancelled
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.User">
+            <summary>
+            Represents a user in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.Email">
+            <summary>
+            User's email address (unique)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.Role">
+            <summary>
+            User's role in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.DisplayName">
+            <summary>
+            User's display name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.PhoneNumber">
+            <summary>
+            User's phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.FirebaseUid">
+            <summary>
+            Firebase UID for authentication
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.IsActive">
+            <summary>
+            Indicates if the user account is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.UserPlans">
+            <summary>
+            User's purchased plans
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.UserPlan">
+            <summary>
+            Represents a plan purchased by a user
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.UserId">
+            <summary>
+            User who purchased the plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.User">
+            <summary>
+            Navigation property to User
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.PlanId">
+            <summary>
+            Plan that was purchased
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.Plan">
+            <summary>
+            Navigation property to Plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.Credits">
+            <summary>
+            Number of credits purchased
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.CreditsRemaining">
+            <summary>
+            Number of credits remaining
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.AmountPaid">
+            <summary>
+            Amount paid for the plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.ExpirationDate">
+            <summary>
+            Date when the plan expires
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.IsActive">
+            <summary>
+            Indicates if the plan is currently active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.PaymentMethod">
+            <summary>
+            Payment method used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.PaymentTransactionId">
+            <summary>
+            Payment transaction ID from payment provider
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.Notes">
+            <summary>
+            Notes about the purchase
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.Transactions">
+            <summary>
+            Transactions made using this plan
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Extensions.DatabaseExtensions">
+            <summary>
+            Extension methods for database configuration
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Extensions.DatabaseExtensions.ConfigureDatabaseAsync(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            Configure database migrations and seeding
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Filters.SwaggerDefaultValues">
             <summary>
             Swagger operation filter to improve API documentation
@@ -241,6 +741,18 @@
             <summary>
             Health check for Firebase Admin SDK connectivity
             </summary>
+        </member>
+        <member name="T:SingleClin.API.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
         </member>
     </members>
 </doc>
