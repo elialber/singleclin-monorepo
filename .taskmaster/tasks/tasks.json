@@ -346,7 +346,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -354,7 +354,7 @@
             "description": "Inicializar projeto Flutter com configurações base para Android e iOS",
             "dependencies": [],
             "details": "Executar 'flutter create singleclin_app --org br.com.singleclin --platforms=android,ios'. Configurar minSdkVersion para 21 no android/app/build.gradle. Configurar iOS deployment target para 12.0 no ios/Runner.xcodeproj. Adicionar .gitignore apropriado. Configurar análise estática com analysis_options.yaml incluindo linter rules rigorosas.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Executar flutter build apk e flutter build ios para validar configurações. Testar em emuladores Android API 21 e iOS 12."
           },
           {
@@ -365,7 +365,7 @@
               "6.1"
             ],
             "details": "Criar estrutura: lib/core (constants/, utils/, errors/, usecases/), lib/data (datasources/, models/, repositories/), lib/domain (entities/, repositories/, usecases/), lib/presentation (screens/, widgets/, controllers/). Adicionar arquivo index.dart (barrel export) em cada pasta. Criar core/constants/app_constants.dart com configurações base. Implementar core/errors/failures.dart para tratamento de erros padronizado.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verificar imports usando barrel exports. Criar arquivo exemplo em cada camada para validar separação de responsabilidades."
           },
           {
@@ -376,7 +376,7 @@
               "6.2"
             ],
             "details": "Adicionar get: ^4.6.6 no pubspec.yaml. Criar lib/core/bindings/initial_binding.dart para injeção de dependências inicial. Implementar base controller em presentation/controllers/base_controller.dart com tratamento de loading e erros. Criar GetMaterialApp no main.dart. Configurar estrutura de bindings por feature. Implementar exemplo de reactive state com .obs e Obx().",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Criar controller de exemplo com estado reativo. Testar navegação com Get.to() e Get.back(). Validar injeção de dependências com Get.put() e Get.find()."
           },
           {
@@ -386,8 +386,8 @@
             "dependencies": [
               "6.3"
             ],
-            "details": "Adicionar go_router: ^13.0.0 no pubspec.yaml. Criar lib/core/routes/app_routes.dart com constantes de rotas. Implementar lib/core/routes/app_router.dart com GoRouter configuration. Configurar rotas: '/' (splash), '/login', '/home', '/qrcode', '/profile'. Implementar redirect logic para rotas protegidas baseado em autenticação. Adicionar suporte a deep links no Android e iOS. Integrar com GetX usando Get.key para navigator key.",
-            "status": "pending",
+            "details": "Adicionar go_router: ^13.0.0 no pubspec.yaml. Criar lib/core/routes/app_routes.dart com constantes de rotas. Implementar lib/core/routes/app_router.dart com GoRouter configuration. Configurar rotas: '/' (splash), '/login', '/home', '/qrcode', '/profile'. Implementar redirect logic para rotas protegidas baseado em autenticação. Adicionar suporte a deep links no Android e iOS. Integrar com GetX usando Get.key para navigator key.\n<info added on 2025-07-29T22:04:46.941Z>\nImplementação concluída com sucesso do sistema de navegação go_router:\n- Atualizada dependência para go_router ^14.6.2\n- Criado app_routes.dart com constantes de rotas abrangentes e métodos auxiliares\n- Criado app_router.dart com configuração completa do GoRouter incluindo:\n  - Lógica de autenticação para rotas protegidas\n  - Tratamento de erros\n  - Integração com GetX usando navigator key\n  - Observadores de rota para analytics\n- Criadas telas placeholder para todas as rotas principais (splash, login, home, profile, qr code)\n- Integrado go_router com GetX usando GetMaterialApp.router\n- Configurado deep linking para Android (AndroidManifest.xml) e iOS (Info.plist)\n- Adicionado esquema customizado 'singleclin://app' e suporte a links HTTPS\n- Atualizada home page com exemplos de navegação usando context.go()\n\nO sistema de navegação está totalmente funcional com proteção de rotas, suporte a deep linking e integração adequada entre go_router e GetX.\n</info added on 2025-07-29T22:04:46.941Z>",
+            "status": "done",
             "testStrategy": "Testar navegação entre todas as rotas. Verificar redirect para rotas protegidas. Testar deep links em ambas plataformas. Validar back navigation e WillPopScope."
           },
           {
@@ -397,8 +397,8 @@
             "dependencies": [
               "6.4"
             ],
-            "details": "Criar lib/core/theme/app_colors.dart com paleta de cores para light e dark. Implementar lib/core/theme/app_theme.dart com ThemeData completo para ambos modos. Adicionar controller em presentation/controllers/theme_controller.dart para gerenciar tema atual. Implementar persistência de preferência usando shared_preferences. Criar widgets customizados que respondem ao tema. Adicionar toggle de tema na UI. Configurar cores específicas para sucesso, erro, warning.",
-            "status": "pending",
+            "details": "Criar lib/core/theme/app_colors.dart com paleta de cores para light e dark. Implementar lib/core/theme/app_theme.dart com ThemeData completo para ambos modos. Adicionar controller em presentation/controllers/theme_controller.dart para gerenciar tema atual. Implementar persistência de preferência usando shared_preferences. Criar widgets customizados que respondem ao tema. Adicionar toggle de tema na UI. Configurar cores específicas para sucesso, erro, warning.\n<info added on 2025-07-29T22:11:10.166Z>\nImplementação completa do sistema de temas com sucesso:\n\nAdicionada dependência shared_preferences ^2.3.3 para persistência de tema. Criado app_colors.dart com paleta de cores abrangente para temas light/dark incluindo cores primárias e secundárias otimizadas para tema healthcare, cores de status (success, warning, error, info), cores especiais para QR codes e clínicas, cores de gradiente e sombra/divisor, métodos auxiliares para obter cores baseadas no tema atual.\n\nCriado app_theme.dart com configurações completas de ThemeData Material 3 incluindo temas light e dark abrangentes, todos os temas de componentes configurados (botões, inputs, cards, diálogos, etc.), suporte para fonte customizada, estilos de overlay do sistema para status bar.\n\nCriado theme_controller.dart com persistência de tema usando SharedPreferences, gerenciamento reativo de estado de tema com GetX, suporte para temas light, dark e sistema, métodos de alternância e seleção de tema, opções de tema com ícones e descrições.\n\nAtualizado initial_binding.dart para registrar ThemeController. Atualizado main.dart para usar AppTheme.lightTheme e AppTheme.darkTheme. Atualizado home_controller.dart para usar ThemeController centralizado.\n\nCriado theme_settings_screen.dart com UI de seleção de tema com radio tiles, preview de cores ao vivo, preview de componentes (botões, switches, etc.). Adicionada rota de configurações de tema e integrada com navegação.\n\nSistema de temas totalmente funcional com persistência, alternância ao vivo e tematização Material 3 abrangente.\n</info added on 2025-07-29T22:11:10.166Z>",
+            "status": "done",
             "testStrategy": "Alternar entre temas e verificar todas as telas. Testar persistência após restart do app. Validar contraste e acessibilidade em ambos temas. Verificar responsividade de cores em diferentes componentes."
           }
         ]
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-29T21:39:32.466Z",
+      "updated": "2025-07-29T22:11:23.538Z",
       "description": "Tasks for master context"
     }
   }
