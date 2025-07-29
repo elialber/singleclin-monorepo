@@ -1,6 +1,7 @@
 using SingleClin.API.Extensions;
 using SingleClin.API.Middleware;
 using SingleClin.API.Services;
+using SingleClin.API.Repositories;
 using SingleClin.API.Filters;
 using SingleClin.API.HealthChecks;
 using SingleClin.API.Data;
@@ -95,6 +96,10 @@ public class Program
         builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IFirebaseAuthService, FirebaseAuthService>();
+
+        // Add Plan services
+        builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+        builder.Services.AddScoped<IPlanService, PlanService>();
 
         // Add claims transformation service
         builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformationService>();

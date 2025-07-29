@@ -379,7 +379,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
                     b.HasIndex("Latitude", "Longitude")
                         .HasFilter("latitude IS NOT NULL AND longitude IS NOT NULL");
 
-                    b.ToTable("clinics");
+                    b.ToTable("clinics", (string)null);
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.Plan", b =>
@@ -455,7 +455,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
 
                     b.HasIndex("IsFeatured");
 
-                    b.ToTable("plans");
+                    b.ToTable("plans", (string)null);
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.RefreshToken", b =>
@@ -623,7 +623,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
 
                     b.HasIndex("ClinicId", "Status", "CreatedAt");
 
-                    b.ToTable("transactions");
+                    b.ToTable("transactions", (string)null);
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.User", b =>
@@ -680,7 +680,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
                         .IsUnique()
                         .HasFilter("firebase_uid IS NOT NULL");
 
-                    b.ToTable("user");
+                    b.ToTable("user", (string)null);
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.UserPlan", b =>
@@ -765,7 +765,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
 
                     b.HasIndex("UserId", "IsActive");
 
-                    b.ToTable("user_plans");
+                    b.ToTable("user_plans", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
