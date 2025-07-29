@@ -6,8 +6,10 @@ class UserEntity extends Equatable {
   final String email;
   final String? displayName;
   final String? phoneNumber;
+  final String? photoUrl;
   final String role;
   final bool isActive;
+  final bool isEmailVerified;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -16,8 +18,10 @@ class UserEntity extends Equatable {
     required this.email,
     this.displayName,
     this.phoneNumber,
+    this.photoUrl,
     required this.role,
     required this.isActive,
+    this.isEmailVerified = false,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -28,8 +32,10 @@ class UserEntity extends Equatable {
         email,
         displayName,
         phoneNumber,
+        photoUrl,
         role,
         isActive,
+        isEmailVerified,
         createdAt,
         updatedAt,
       ];

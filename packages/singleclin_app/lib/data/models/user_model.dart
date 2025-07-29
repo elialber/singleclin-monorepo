@@ -7,8 +7,10 @@ class UserModel extends UserEntity {
     required super.email,
     super.displayName,
     super.phoneNumber,
+    super.photoUrl,
     required super.role,
     required super.isActive,
+    super.isEmailVerified,
     required super.createdAt,
     required super.updatedAt,
   });
@@ -20,8 +22,10 @@ class UserModel extends UserEntity {
       email: json['email'] as String,
       displayName: json['displayName'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
+      photoUrl: json['photoUrl'] as String?,
       role: json['role'] as String,
       isActive: json['isActive'] as bool,
+      isEmailVerified: json['isEmailVerified'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -34,8 +38,10 @@ class UserModel extends UserEntity {
       'email': email,
       'displayName': displayName,
       'phoneNumber': phoneNumber,
+      'photoUrl': photoUrl,
       'role': role,
       'isActive': isActive,
+      'isEmailVerified': isEmailVerified,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -48,8 +54,10 @@ class UserModel extends UserEntity {
       email: entity.email,
       displayName: entity.displayName,
       phoneNumber: entity.phoneNumber,
+      photoUrl: entity.photoUrl,
       role: entity.role,
       isActive: entity.isActive,
+      isEmailVerified: entity.isEmailVerified,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_app/core/bindings/initial_binding.dart';
 import 'package:singleclin_app/core/constants/app_constants.dart';
 import 'package:singleclin_app/core/routes/routes.dart';
 import 'package:singleclin_app/core/theme/theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
+  await Firebase.initializeApp();
+  
   runApp(const MyApp());
 }
 
