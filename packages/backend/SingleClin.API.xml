@@ -100,6 +100,24 @@
             <response code="200">User information retrieved</response>
             <response code="401">Not authenticated</response>
         </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.GetUserClaims">
+            <summary>
+            Get user claims for authenticated user
+            </summary>
+            <returns>User claims and permissions</returns>
+            <response code="200">User claims retrieved successfully</response>
+            <response code="401">Not authenticated</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.SocialLogin(SingleClin.API.DTOs.Auth.SocialLoginDto)">
+            <summary>
+            Login with social provider (Google or Apple)
+            </summary>
+            <param name="socialLoginDto">Social login information</param>
+            <returns>Authentication response with tokens</returns>
+            <response code="200">Social login successful</response>
+            <response code="400">Invalid social login data</response>
+            <response code="503">Social login not available</response>
+        </member>
         <member name="M:SingleClin.API.Controllers.AuthController.RevokeAllTokens">
             <summary>
             Revoke all refresh tokens for current user (logout from all devices)
@@ -1036,6 +1054,21 @@
             Transactions made using this plan
             </summary>
         </member>
+        <member name="T:SingleClin.API.Data.Seeders.RoleSeeder">
+            <summary>
+            Seeder for creating default roles in the system
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Data.Seeders.RoleSeeder.SeedRolesAsync(System.IServiceProvider)">
+            <summary>
+            Seeds the default roles into the database
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Data.Seeders.RoleSeeder.SeedDefaultAdminAsync(System.IServiceProvider)">
+            <summary>
+            Seeds default admin user if it doesn't exist
+            </summary>
+        </member>
         <member name="T:SingleClin.API.DTOs.Auth.AuthResponseDto">
             <summary>
             Data transfer object for authentication response
@@ -1262,6 +1295,21 @@
             Service for handling authentication operations
             </summary>
         </member>
+        <member name="T:SingleClin.API.Services.ClaimsTransformationService">
+            <summary>
+            Service for transforming and adding claims dynamically during authentication
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.FirebaseAuthService">
+            <summary>
+            Service for Firebase authentication operations
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Services.FirebaseAuthService.IsConfigured">
+            <summary>
+            Check if Firebase is properly configured
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.IAuthService">
             <summary>
             Service interface for authentication operations
@@ -1311,6 +1359,61 @@
             Clean up expired refresh tokens
             </summary>
             <returns>Number of tokens removed</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.SocialLoginAsync(SingleClin.API.DTOs.Auth.SocialLoginDto,System.String)">
+            <summary>
+            Authenticate a user with social login
+            </summary>
+            <param name="socialLoginDto">Social login data</param>
+            <param name="ipAddress">Client IP address</param>
+            <returns>Authentication response with tokens</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.GetUserClaimsAsync(System.Guid)">
+            <summary>
+            Get user claims for authenticated user
+            </summary>
+            <param name="userId">User ID</param>
+            <returns>Dictionary of user claims</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IFirebaseAuthService">
+            <summary>
+            Service interface for Firebase authentication operations
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IFirebaseAuthService.VerifyIdTokenAsync(System.String)">
+            <summary>
+            Verify a Firebase ID token
+            </summary>
+            <param name="idToken">The Firebase ID token to verify</param>
+            <returns>Firebase token information if valid, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IFirebaseAuthService.GetUserAsync(System.String)">
+            <summary>
+            Get user information from Firebase
+            </summary>
+            <param name="uid">Firebase user ID</param>
+            <returns>User record if found, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IFirebaseAuthService.CreateCustomTokenAsync(System.String,System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Create a custom token for a user
+            </summary>
+            <param name="uid">User ID</param>
+            <param name="claims">Optional custom claims</param>
+            <returns>Custom token</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IFirebaseAuthService.DeleteUserAsync(System.String)">
+            <summary>
+            Delete a user from Firebase
+            </summary>
+            <param name="uid">Firebase user ID</param>
+            <returns>Success status</returns>
+        </member>
+        <member name="P:SingleClin.API.Services.IFirebaseAuthService.IsConfigured">
+            <summary>
+            Check if Firebase is properly configured
+            </summary>
+            <returns>True if Firebase is configured, false otherwise</returns>
         </member>
         <member name="T:SingleClin.API.Services.IRefreshTokenService">
             <summary>

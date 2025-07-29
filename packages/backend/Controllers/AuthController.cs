@@ -256,6 +256,103 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Get user claims for authenticated user
+    /// </summary>
+    /// <returns>User claims and permissions</returns>
+    /// <response code="200">User claims retrieved successfully</response>
+    /// <response code="401">Not authenticated</response>
+    [HttpGet("claims")]
+    [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetUserClaims()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+        {
+            return Unauthorized(new ProblemDetails
+            {
+                Title = "Invalid User",
+                Detail = "User ID not found in token",
+                Status = StatusCodes.Status401Unauthorized
+            });
+        }
+
+        try
+        {
+            var claims = await _authService.GetUserClaimsAsync(userGuid);
+            return Ok(claims);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving user claims for {UserId}", userGuid);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "Claims Retrieval Error",
+                Detail = "An unexpected error occurred while retrieving user claims",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    /// <summary>
+    /// Login with social provider (Google or Apple)
+    /// </summary>
+    /// <param name="socialLoginDto">Social login information</param>
+    /// <returns>Authentication response with tokens</returns>
+    /// <response code="200">Social login successful</response>
+    /// <response code="400">Invalid social login data</response>
+    /// <response code="503">Social login not available</response>
+    [HttpPost("social-login")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IActionResult> SocialLogin([FromBody] SocialLoginDto socialLoginDto)
+    {
+        try
+        {
+            var ipAddress = GetIpAddress();
+            var result = await _authService.SocialLoginAsync(socialLoginDto, ipAddress);
+
+            if (!result.Success)
+            {
+                // Check if it's a configuration issue
+                if (result.Error?.Contains("not configured") ?? false)
+                {
+                    return StatusCode(StatusCodes.Status503ServiceUnavailable, new ProblemDetails
+                    {
+                        Title = "Service Unavailable",
+                        Detail = result.Error,
+                        Status = StatusCodes.Status503ServiceUnavailable
+                    });
+                }
+
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Social Login Failed",
+                    Detail = result.Error,
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            _logger.LogInformation("Social login successful: {Email}, Provider: {Provider}", 
+                result.Response!.Email, socialLoginDto.Provider);
+            return Ok(result.Response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during social login for provider {Provider}", socialLoginDto.Provider);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "Social Login Error",
+                Detail = "An unexpected error occurred during social login",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    /// <summary>
     /// Revoke all refresh tokens for current user (logout from all devices)
     /// </summary>
     /// <returns>Number of tokens revoked</returns>

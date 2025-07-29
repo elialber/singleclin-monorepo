@@ -51,4 +51,19 @@ public interface IAuthService
     /// </summary>
     /// <returns>Number of tokens removed</returns>
     Task<int> CleanupExpiredTokensAsync();
+
+    /// <summary>
+    /// Authenticate a user with social login
+    /// </summary>
+    /// <param name="socialLoginDto">Social login data</param>
+    /// <param name="ipAddress">Client IP address</param>
+    /// <returns>Authentication response with tokens</returns>
+    Task<(bool Success, AuthResponseDto? Response, string? Error)> SocialLoginAsync(SocialLoginDto socialLoginDto, string? ipAddress = null);
+
+    /// <summary>
+    /// Get user claims for authenticated user
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <returns>Dictionary of user claims</returns>
+    Task<Dictionary<string, string>> GetUserClaimsAsync(Guid userId);
 }
