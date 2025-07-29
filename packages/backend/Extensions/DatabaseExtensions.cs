@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data;
+using SingleClin.API.Data.Seeders;
 
 namespace SingleClin.API.Extensions;
 
@@ -14,7 +15,7 @@ public static class DatabaseExtensions
     public static async Task ConfigureDatabaseAsync(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         
         try
@@ -38,10 +39,20 @@ public static class DatabaseExtensions
                 await context.Database.EnsureCreatedAsync();
             }
             
-            // Seed initial data
-            logger.LogInformation("Seeding database...");
-            var seeder = new DatabaseSeeder(context);
-            await seeder.SeedAsync();
+            // Seed roles and default admin user
+            logger.LogInformation("Seeding roles and default admin...");
+            await RoleSeeder.SeedRolesAsync(scope.ServiceProvider);
+            await RoleSeeder.SeedDefaultAdminAsync(scope.ServiceProvider);
+            logger.LogInformation("Roles and admin seeding completed");
+            
+            // Seed legacy data if exists
+            logger.LogInformation("Seeding legacy database...");
+            var legacyContext = scope.ServiceProvider.GetService<AppDbContext>();
+            if (legacyContext != null)
+            {
+                var seeder = new DatabaseSeeder(legacyContext);
+                await seeder.SeedAsync();
+            }
             logger.LogInformation("Database seeding completed");
         }
         catch (Exception ex)

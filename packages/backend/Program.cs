@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Swashbuckle.AspNetCore.Annotations;
 using DotNetEnv;
 
@@ -93,6 +94,71 @@ public class Program
         builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IFirebaseAuthService, FirebaseAuthService>();
+
+        // Add claims transformation service
+        builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformationService>();
+
+        // Configure authorization policies
+        builder.Services.AddAuthorization(options =>
+        {
+            // Role-based policies
+            options.AddPolicy("RequirePatientRole", policy => 
+                policy.RequireClaim("role", "Patient"));
+            
+            options.AddPolicy("RequireClinicRole", policy => 
+                policy.RequireClaim("role", "ClinicOrigin", "ClinicPartner"));
+            
+            options.AddPolicy("RequireAdminRole", policy => 
+                policy.RequireClaim("role", "Administrator"));
+
+            // Clinic owner policy - requires clinic role and clinicId claim
+            options.AddPolicy("RequireClinicOwner", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireAssertion(context =>
+                {
+                    var roleClaim = context.User.FindFirst("role")?.Value;
+                    var isAdmin = roleClaim == "Administrator";
+                    var isClinicUser = roleClaim == "ClinicOrigin" || roleClaim == "ClinicPartner";
+                    var hasClinicId = context.User.HasClaim(c => c.Type == "clinicId");
+                    
+                    return isAdmin || (isClinicUser && hasClinicId);
+                });
+            });
+
+            // Admin or clinic owner policy
+            options.AddPolicy("RequireAdminOrClinicOwner", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireAssertion(context =>
+                {
+                    var roleClaim = context.User.FindFirst("role")?.Value;
+                    var isAdmin = roleClaim == "Administrator";
+                    var isClinicUser = roleClaim == "ClinicOrigin" || roleClaim == "ClinicPartner";
+                    var hasClinicId = context.User.HasClaim(c => c.Type == "clinicId");
+                    
+                    return isAdmin || (isClinicUser && hasClinicId);
+                });
+            });
+
+            // Permission-based policies
+            options.AddPolicy("CanManageUsers", policy =>
+                policy.RequireClaim("permissions", "users.manage"));
+            
+            options.AddPolicy("CanManageClinics", policy =>
+                policy.RequireClaim("permissions", "clinics.manage"));
+            
+            options.AddPolicy("CanValidateQR", policy =>
+                policy.RequireClaim("permissions", "qr.validate"));
+            
+            options.AddPolicy("CanGenerateQR", policy =>
+                policy.RequireClaim("permissions", "qr.generate"));
+
+            // Active user policy
+            options.AddPolicy("RequireActiveUser", policy =>
+                policy.RequireClaim("isActive", "True"));
+        });
 
         // Configure Swagger with JWT support
         builder.Services.AddEndpointsApiExplorer();
