@@ -1,14 +1,17 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using SingleClin.API.Data.Models;
 
 namespace SingleClin.API.Services;
 
 public interface IJwtService
 {
-    string GenerateToken(string userId, string email, string role, string? clinicId = null);
-    ClaimsPrincipal? ValidateToken(string token);
+    string GenerateAccessToken(ApplicationUser user);
+    string GenerateRefreshToken();
+    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
 }
 
 public class JwtService : IJwtService
@@ -22,43 +25,49 @@ public class JwtService : IJwtService
         _logger = logger;
     }
 
-    public string GenerateToken(string userId, string email, string role, string? clinicId = null)
+    public string GenerateAccessToken(ApplicationUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"] ?? 
-            throw new InvalidOperationException("JWT:SecretKey is not configured"));
-
+        var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"]!);
+        
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, userId),
-            new Claim(ClaimTypes.Email, email),
-            new Claim(ClaimTypes.Role, role),
-            new Claim("userId", userId),
-            new Claim("role", role)
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            new Claim(ClaimTypes.Name, user.FullName),
+            new Claim("role", user.Role.ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 
-        if (!string.IsNullOrEmpty(clinicId))
+        // Add clinic ID claim if user is associated with a clinic
+        if (user.ClinicId.HasValue)
         {
-            claims.Add(new Claim("clinicId", clinicId));
+            claims.Add(new Claim("clinicId", user.ClinicId.Value.ToString()));
         }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(
-                Convert.ToDouble(_configuration["JWT:ExpirationInMinutes"] ?? "60")),
+            Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JWT:AccessTokenExpirationInMinutes"])),
             Issuer = _configuration["JWT:Issuer"],
             Audience = _configuration["JWT:Audience"],
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
 
-    public ClaimsPrincipal? ValidateToken(string token)
+    public string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
+    }
+
+    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
         try
         {
@@ -73,16 +82,24 @@ public class JwtService : IJwtService
                 ValidIssuer = _configuration["JWT:Issuer"],
                 ValidateAudience = true,
                 ValidAudience = _configuration["JWT:Audience"],
-                ValidateLifetime = true,
+                ValidateLifetime = false, // Don't validate lifetime for refresh token validation
                 ClockSkew = TimeSpan.Zero
             };
 
             var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+            
+            // Ensure the token is a valid JWT token
+            if (validatedToken is not JwtSecurityToken jwtSecurityToken || 
+                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+            
             return principal;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error validating token");
+            _logger.LogError(ex, "Error validating expired token");
             return null;
         }
     }

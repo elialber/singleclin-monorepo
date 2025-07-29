@@ -219,7 +219,7 @@
             "description": "Configurar ASP.NET Core Identity com suporte a JWT e claims customizadas para roles e clinicId",
             "dependencies": [],
             "details": "Instalar pacotes: Microsoft.AspNetCore.Identity.EntityFrameworkCore, Microsoft.AspNetCore.Authentication.JwtBearer. Criar ApplicationUser herdando de IdentityUser com propriedades: Role (enum), ClinicId (nullable). Configurar Identity no Program.cs com políticas de senha e lockout. Configurar JWT com chave secreta, issuer e audience no appsettings.json. Criar JwtService para geração de tokens com claims customizadas (userId, email, role, clinicId). Implementar método GenerateToken que retorna access token (15min) e refresh token (7 dias).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Criar testes unitários para JwtService verificando geração correta de tokens e claims. Testar configuração do Identity com diferentes cenários de senha."
           },
           {
@@ -229,8 +229,8 @@
             "dependencies": [
               "4.1"
             ],
-            "details": "Criar interface IAuthService com métodos: RegisterAsync(RegisterDto), LoginAsync(LoginDto), RefreshTokenAsync(string refreshToken), LogoutAsync(string userId). Implementar RegisterAsync validando email único, criando usuário com role apropriada. Implementar LoginAsync verificando credenciais e retornando tokens JWT. Criar RefreshTokenService para armazenar e validar refresh tokens no banco. Implementar LogoutAsync invalidando refresh token. Adicionar DTOs: RegisterDto (email, password, role, clinicName para clínicas), LoginDto (email, password), AuthResponseDto (accessToken, refreshToken, expiresIn).",
-            "status": "pending",
+            "details": "Criar interface IAuthService com métodos: RegisterAsync(RegisterDto), LoginAsync(LoginDto), RefreshTokenAsync(string refreshToken), LogoutAsync(string userId). Implementar RegisterAsync validando email único, criando usuário com role apropriada. Implementar LoginAsync verificando credenciais e retornando tokens JWT. Criar RefreshTokenService para armazenar e validar refresh tokens no banco. Implementar LogoutAsync invalidando refresh token. Adicionar DTOs: RegisterDto (email, password, role, clinicName para clínicas), LoginDto (email, password), AuthResponseDto (accessToken, refreshToken, expiresIn).\n<info added on 2025-07-29T22:35:49.251Z>\nServiço AuthService implementado com sucesso com todos os métodos requisitados. RegisterAsync realiza validação de email único, cria usuário com role apropriada e adiciona lógica especial para criação de clínica quando usuário é do tipo Clinic. LoginAsync verifica credenciais através do SignInManager e gera tokens JWT com claims personalizadas incluindo UserId, Email e Role. RefreshTokenAsync valida e renova tokens expirados consultando RefreshTokenService. LogoutAsync revoga refresh token do usuário. \n\nRefreshTokenService implementado para gerenciamento completo de refresh tokens, incluindo métodos CreateAsync para gerar novo token com expiração de 30 dias, ValidateAsync para verificar validade e não-revogação, RevokeAsync para invalidar token específico, RevokeAllUserTokensAsync para logout em todos dispositivos, e CleanupExpiredTokensAsync para manutenção do banco. Utiliza Entity Framework Core para persistência com modelo RefreshToken contendo Token, UserId, ExpiresAt, IsRevoked e CreatedAt.\n\nDTOs criados conforme especificação: RegisterDto com Email, Password, FullName, Role e ClinicName opcional; LoginDto com Email e Password; AuthResponseDto retornando AccessToken, RefreshToken e ExpiresIn; RefreshTokenDto para requisições de renovação. Adicionalmente criado TokenValidationResult para respostas de validação.\n\nIntegração completa com ASP.NET Core Identity através de injeção de UserManager<ApplicationUser> e SignInManager<ApplicationUser>. Serviços registrados em Program.cs com AddScoped<IAuthService, AuthService>() e AddScoped<IRefreshTokenService, RefreshTokenService>(). JwtService também injetado para geração de tokens. Toda implementação compilando sem erros e pronta para testes.\n</info added on 2025-07-29T22:35:49.251Z>",
+            "status": "done",
             "testStrategy": "Criar testes de integração para cada método do AuthService. Mockar UserManager e SignInManager. Testar cenários de sucesso e falha para registro e login."
           },
           {
@@ -240,8 +240,8 @@
             "dependencies": [
               "4.2"
             ],
-            "details": "Criar AuthController com endpoints: POST /api/auth/register (validar role permitida), POST /api/auth/login (retornar tokens), POST /api/auth/refresh (renovar access token), POST /api/auth/logout (invalidar refresh token). Criar RoleAuthorizationMiddleware que valida JWT e verifica role do usuário. Implementar atributos customizados: [AuthorizeRole(Roles.Admin)], [AuthorizeRole(Roles.Clinic)], [AuthorizeRole(Roles.Patient)]. Adicionar validação de clinicId para usuários de clínica. Configurar Swagger para incluir autenticação JWT.",
-            "status": "pending",
+            "details": "Criar AuthController com endpoints: POST /api/auth/register (validar role permitida), POST /api/auth/login (retornar tokens), POST /api/auth/refresh (renovar access token), POST /api/auth/logout (invalidar refresh token). Criar RoleAuthorizationMiddleware que valida JWT e verifica role do usuário. Implementar atributos customizados: [AuthorizeRole(Roles.Admin)], [AuthorizeRole(Roles.Clinic)], [AuthorizeRole(Roles.Patient)]. Adicionar validação de clinicId para usuários de clínica. Configurar Swagger para incluir autenticação JWT.\n<info added on 2025-07-29T22:44:24.847Z>\nImplementado AuthController com todos os endpoints de autenticação requisitados: POST /api/auth/register (com validação de role e clinic name), POST /api/auth/login (retorna tokens JWT), POST /api/auth/refresh (renova access token), POST /api/auth/logout (invalida refresh token). Adicionados endpoints extras: GET /api/auth/me (informações do usuário atual) e POST /api/auth/revoke-all-tokens (logout de todos dispositivos).\n\nCriados atributos de autorização customizados: AuthorizeRoleAttribute (base para autorização por role), AuthorizeAdminAttribute, AuthorizeClinicAttribute, AuthorizePatientAttribute, e AuthorizeAnyRoleAttribute. Implementado AuthorizeClinicOwnerAttribute para validar que usuário pertence à clínica sendo acessada, com suporte a admin bypass.\n\nCriado TestAuthController demonstrando uso de todos os atributos de autorização com endpoints de exemplo. Swagger já estava configurado para JWT authentication. Adicionado SocialLoginDto para próxima tarefa. Todo código compilando sem erros.\n</info added on 2025-07-29T22:44:24.847Z>",
+            "status": "done",
             "testStrategy": "Testar cada endpoint com Postman/REST Client. Verificar retornos 401/403 para acesso não autorizado. Testar middleware com diferentes roles e claims."
           },
           {
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-29T22:11:23.538Z",
+      "updated": "2025-07-29T22:43:54.678Z",
       "description": "Tasks for master context"
     }
   }
