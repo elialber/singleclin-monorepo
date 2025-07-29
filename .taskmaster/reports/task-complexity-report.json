@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "generatedAt": "2025-07-29T18:10:32.905Z",
+    "tasksAnalyzed": 15,
+    "totalTasks": 15,
+    "analysisCount": 15,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": false
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "Configurar Estrutura Monorepo",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Divida a configuração do monorepo em: 1) Setup inicial do workspace manager (npm/yarn), 2) Criação da estrutura de diretórios para cada package, 3) Configuração do TypeScript e paths compartilhados, 4) Setup de linting e formatação unificados, 5) Configuração de scripts de build cross-package, 6) Setup de CI/CD para monorepo",
+      "reasoning": "Configurar um monorepo é complexo pois envolve coordenação entre múltiplas tecnologias (Flutter, React, .NET), configuração de ferramentas compartilhadas, e garantir isolamento adequado entre packages"
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Configurar Backend API com .NET e JWT",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Separe em: 1) Criar projeto .NET 9 Web API base, 2) Configurar Firebase Admin SDK e middleware JWT, 3) Implementar BaseController e ResponseWrapper, 4) Configurar Swagger com autenticação, 5) Implementar health checks e versionamento, 6) Configurar CORS e políticas de segurança, 7) Criar estrutura de testes unitários e integração",
+      "reasoning": "Alta complexidade devido à integração com Firebase, configuração de segurança JWT, e necessidade de estabelecer padrões arquiteturais que serão usados em todo o projeto"
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "Configurar Banco de Dados PostgreSQL",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Organize em: 1) Instalar e configurar PostgreSQL com Docker, 2) Configurar Entity Framework Core e Npgsql, 3) Criar DbContext e configurações base, 4) Implementar modelos de domínio com validações, 5) Configurar relacionamentos e índices, 6) Criar migrations iniciais e seed data",
+      "reasoning": "Complexidade moderada-alta pela necessidade de modelar corretamente as entidades, configurar relacionamentos complexos, e estabelecer padrões de acesso a dados"
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Implementar Sistema de Autenticação Multi-Perfil",
+      "complexityScore": 9,
+      "recommendedSubtasks": 8,
+      "expansionPrompt": "Divida em: 1) Criar AuthService base com interface, 2) Implementar registro e login com email/senha, 3) Integrar login social Google, 4) Integrar login social Apple, 5) Implementar sistema de roles e claims, 6) Criar middleware de autorização customizado, 7) Implementar refresh token e gerenciamento de sessão, 8) Criar testes de integração para todos os fluxos",
+      "reasoning": "Muito complexo por envolver múltiplos provedores de autenticação, sistema de roles, integração com Firebase, e necessidade de alta segurança"
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Criar CRUD de Planos (Admin Only)",
+      "complexityScore": 5,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Separe em: 1) Criar PlanController com autorização admin, 2) Implementar endpoints de listagem com paginação e filtros, 3) Implementar criação e atualização com validações, 4) Implementar soft delete e reativação, 5) Criar testes unitários e de integração",
+      "reasoning": "Complexidade média pois é um CRUD padrão, mas requer atenção às validações de negócio, autorização adequada e implementação de soft delete"
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Desenvolver App Mobile Flutter - Estrutura Base",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Organize em: 1) Criar projeto Flutter e configurar flavors para dev/prod, 2) Implementar arquitetura Clean com camadas, 3) Configurar gerenciamento de estado (GetX/Riverpod), 4) Implementar sistema de navegação com go_router, 5) Criar tema e design system base, 6) Configurar injeção de dependências",
+      "reasoning": "Complexidade alta por estabelecer arquitetura que será base para todo desenvolvimento mobile, incluindo padrões e estrutura escalável"
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Implementar Autenticação no App Mobile",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Divida em: 1) Configurar Firebase Auth no Flutter, 2) Implementar AuthRepository com padrão Repository, 3) Criar telas de login e registro, 4) Integrar login social Google, 5) Integrar login social Apple, 6) Implementar interceptor HTTP para tokens, 7) Criar sistema de auto-refresh e persistência de sessão",
+      "reasoning": "Alta complexidade devido à integração com múltiplos provedores, gerenciamento de tokens, e necessidade de experiência fluida no app"
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Criar Sistema de Geração de QR Code",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Separe em: 1) Implementar QRCodeService com geração de JWT, 2) Criar endpoint de geração com validações, 3) Configurar Redis para armazenamento de nonces, 4) Implementar lógica de expiração e invalidação, 5) Criar testes de carga e segurança",
+      "reasoning": "Complexidade moderada focada em segurança (prevenção de reuso) e performance (cache Redis), com lógica de negócio relativamente direta"
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Implementar Tela de Visualização de Plano e Saldo",
+      "complexityScore": 5,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Organize em: 1) Criar HomeScreen com design responsivo, 2) Implementar PlanRepository e integração com API, 3) Criar componentes visuais (cards, progress bars), 4) Implementar cache local e sincronização, 5) Adicionar pull-to-refresh e estados de loading/erro",
+      "reasoning": "Complexidade média focada em UX/UI e gerenciamento de estado, com integração API relativamente simples"
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Desenvolver Funcionalidade de Geração de QR Code no App",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Divida em: 1) Criar QRCodeScreen com layout otimizado, 2) Integrar biblioteca qr_flutter, 3) Implementar timer com countdown visual, 4) Adicionar controle de brightness e save to gallery, 5) Criar fallback com código alfanumérico",
+      "reasoning": "Complexidade moderada com foco em UX (brightness, timer) e funcionalidades nativas (salvar na galeria)"
+    },
+    {
+      "taskId": 11,
+      "taskTitle": "Criar Sistema de Leitura e Validação de QR Code",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Separe em: 1) Criar endpoint de validação com autenticação de clínica, 2) Implementar validação JWT e verificação de nonce, 3) Criar lógica de débito de créditos com transação, 4) Implementar rate limiting por clínica, 5) Adicionar logging e auditoria, 6) Criar testes de concorrência",
+      "reasoning": "Complexidade alta devido a questões de segurança, concorrência (evitar débito duplo), e necessidade de transações atômicas"
+    },
+    {
+      "taskId": 12,
+      "taskTitle": "Implementar Scanner de QR Code no App da Clínica",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Organize em: 1) Criar ClinicScannerScreen com permissões de câmera, 2) Integrar mobile_scanner com feedback visual/sonoro, 3) Implementar validação em tempo real com API, 4) Criar modo manual de entrada, 5) Implementar histórico local de scans",
+      "reasoning": "Complexidade moderada focada em UX do scanner e integração com hardware (câmera), com lógica de negócio já implementada no backend"
+    },
+    {
+      "taskId": 13,
+      "taskTitle": "Desenvolver Portal Web Admin com React",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Divida em: 1) Criar projeto React com TypeScript e configurar roteamento, 2) Implementar layout base com Material-UI/Ant Design, 3) Criar páginas de autenticação e proteção de rotas, 4) Desenvolver Dashboard com gráficos, 5) Implementar CRUD de planos e clínicas, 6) Criar listagem de transações com filtros avançados, 7) Implementar sistema de notificações e feedback",
+      "reasoning": "Alta complexidade por ser uma aplicação completa com múltiplas funcionalidades, gráficos interativos, e necessidade de boa UX para administradores"
+    },
+    {
+      "taskId": 14,
+      "taskTitle": "Implementar Sistema de Notificações",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Separe em: 1) Configurar Firebase Cloud Messaging, 2) Integrar SendGrid para emails, 3) Criar NotificationService com strategy pattern, 4) Implementar job scheduler para verificação de saldos, 5) Criar sistema de preferências por usuário, 6) Desenvolver templates de email responsivos",
+      "reasoning": "Complexidade alta devido a múltiplos canais de notificação, necessidade de job scheduling confiável, e personalização por usuário"
+    },
+    {
+      "taskId": 15,
+      "taskTitle": "Criar Sistema de Relatórios e Analytics",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Organize em: 1) Criar ReportService com queries otimizadas, 2) Implementar agregações e cálculos de métricas, 3) Desenvolver sistema de cache para relatórios, 4) Criar exportação para Excel/PDF, 5) Implementar gráficos interativos com Chart.js, 6) Criar filtros avançados e salvamento de views, 7) Otimizar performance para grandes volumes",
+      "reasoning": "Alta complexidade por envolver queries complexas, otimização de performance, múltiplos formatos de exportação, e visualizações interativas"
+    }
+  ]
+}

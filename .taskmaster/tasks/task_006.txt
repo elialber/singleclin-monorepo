@@ -1,0 +1,47 @@
+# Task ID: 6
+# Title: Desenvolver App Mobile Flutter - Estrutura Base
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Criar estrutura base do app Flutter com arquitetura limpa e navegação
+# Details:
+Criar projeto Flutter com suporte Android (API 21+) e iOS (12+). Implementar arquitetura: /lib/core (utils, constants), /lib/data (repositories, datasources), /lib/domain (entities, usecases), /lib/presentation (screens, widgets). Configurar GetX ou Riverpod para gerenciamento de estado. Implementar navegação com go_router. Adicionar temas light/dark.
+
+# Test Strategy:
+Testar build para Android e iOS. Verificar navegação entre telas. Testar mudança de tema. Validar estrutura de pastas e imports.
+
+# Agente Delegado:
+**Principal:** @flutter-mobile-expert
+Especialista em Flutter e desenvolvimento mobile
+
+# Subtasks:
+## 1. Criar Projeto Flutter e Configurar Ambiente [pending]
+### Dependencies: None
+### Description: Inicializar projeto Flutter com configurações base para Android e iOS
+### Details:
+Executar 'flutter create singleclin_app --org br.com.singleclin --platforms=android,ios'. Configurar minSdkVersion para 21 no android/app/build.gradle. Configurar iOS deployment target para 12.0 no ios/Runner.xcodeproj. Adicionar .gitignore apropriado. Configurar análise estática com analysis_options.yaml incluindo linter rules rigorosas.
+
+## 2. Implementar Estrutura de Pastas com Arquitetura Limpa [pending]
+### Dependencies: 6.1
+### Description: Criar estrutura de diretórios seguindo Clean Architecture e configurar barrel exports
+### Details:
+Criar estrutura: lib/core (constants/, utils/, errors/, usecases/), lib/data (datasources/, models/, repositories/), lib/domain (entities/, repositories/, usecases/), lib/presentation (screens/, widgets/, controllers/). Adicionar arquivo index.dart (barrel export) em cada pasta. Criar core/constants/app_constants.dart com configurações base. Implementar core/errors/failures.dart para tratamento de erros padronizado.
+
+## 3. Configurar Gerenciamento de Estado com GetX [pending]
+### Dependencies: 6.2
+### Description: Integrar GetX para gerenciamento de estado, injeção de dependências e navegação reativa
+### Details:
+Adicionar get: ^4.6.6 no pubspec.yaml. Criar lib/core/bindings/initial_binding.dart para injeção de dependências inicial. Implementar base controller em presentation/controllers/base_controller.dart com tratamento de loading e erros. Criar GetMaterialApp no main.dart. Configurar estrutura de bindings por feature. Implementar exemplo de reactive state com .obs e Obx().
+
+## 4. Implementar Sistema de Navegação com go_router [pending]
+### Dependencies: 6.3
+### Description: Configurar navegação declarativa com go_router incluindo rotas protegidas e deep linking
+### Details:
+Adicionar go_router: ^13.0.0 no pubspec.yaml. Criar lib/core/routes/app_routes.dart com constantes de rotas. Implementar lib/core/routes/app_router.dart com GoRouter configuration. Configurar rotas: '/' (splash), '/login', '/home', '/qrcode', '/profile'. Implementar redirect logic para rotas protegidas baseado em autenticação. Adicionar suporte a deep links no Android e iOS. Integrar com GetX usando Get.key para navigator key.
+
+## 5. Implementar Sistema de Temas Light e Dark [pending]
+### Dependencies: 6.4
+### Description: Criar sistema de temas dinâmico com suporte a light/dark mode e personalização de cores
+### Details:
+Criar lib/core/theme/app_colors.dart com paleta de cores para light e dark. Implementar lib/core/theme/app_theme.dart com ThemeData completo para ambos modos. Adicionar controller em presentation/controllers/theme_controller.dart para gerenciar tema atual. Implementar persistência de preferência usando shared_preferences. Criar widgets customizados que respondem ao tema. Adicionar toggle de tema na UI. Configurar cores específicas para sucesso, erro, warning.
+

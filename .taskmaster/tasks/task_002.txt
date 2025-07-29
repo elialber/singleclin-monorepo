@@ -1,0 +1,47 @@
+# Task ID: 2
+# Title: Configurar Backend API com .NET e JWT
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Implementar API REST usando .NET com autenticação JWT integrada ao Firebase Authentication
+# Details:
+Criar projeto .NET 9 Web API. Configurar middleware de autenticação JWT com Firebase Admin SDK. Implementar classes base: BaseController com autorização, ResponseWrapper para respostas padronizadas. Configurar Swagger com autenticação Bearer. Adicionar health check endpoint. Configurar CORS para permitir requisições do app e web admin.
+
+# Test Strategy:
+Testar geração e validação de tokens JWT. Verificar que endpoints protegidos retornam 401 sem token. Testar CORS com requisições do frontend. Validar documentação Swagger.
+
+# Agente Delegado:
+**Principal:** @dotnet-api-expert
+Especialista em .NET backend e APIs
+
+# Subtasks:
+## 1. Criar projeto .NET 9 Web API e configurar estrutura base [pending]
+### Dependencies: None
+### Description: Inicializar novo projeto .NET 9 Web API com estrutura de pastas organizada e configurações iniciais
+### Details:
+Executar 'dotnet new webapi -n SingleClin.API'. Criar estrutura de pastas: /Controllers, /Services, /Models, /Middleware, /Extensions, /DTOs. Configurar Program.cs com builder pattern. Adicionar pacotes NuGet essenciais: Microsoft.AspNetCore.Authentication.JwtBearer, FirebaseAdmin, Swashbuckle.AspNetCore. Configurar appsettings.json com seções para JWT, Firebase e ConnectionStrings.
+
+## 2. Configurar Firebase Admin SDK e middleware de autenticação JWT [pending]
+### Dependencies: 2.1
+### Description: Integrar Firebase Admin SDK para validação de tokens JWT e configurar middleware de autenticação
+### Details:
+Baixar arquivo de credenciais do Firebase (service account JSON). Configurar FirebaseApp no Program.cs usando FirebaseAdmin. Criar JwtAuthenticationMiddleware para validar tokens Firebase. Implementar extension method AddFirebaseAuthentication() para configurar serviços. Configurar options de autenticação com esquema Bearer. Adicionar tratamento de erros para tokens inválidos ou expirados.
+
+## 3. Implementar BaseController e ResponseWrapper para padronização [pending]
+### Dependencies: 2.2
+### Description: Criar classes base para controllers e respostas padronizadas da API
+### Details:
+Criar BaseController herdando de ControllerBase com atributos [ApiController], [Authorize] e métodos auxiliares. Implementar ResponseWrapper<T> genérico com propriedades: Success, Data, Message, Errors, StatusCode. Criar métodos no BaseController: OkResponse<T>(), BadRequestResponse(), UnauthorizedResponse(), NotFoundResponse(). Adicionar propriedade CurrentUserId extraída do token JWT. Implementar filtro global para tratamento de exceções.
+
+## 4. Configurar Swagger com autenticação Bearer e documentação [pending]
+### Dependencies: 2.3
+### Description: Configurar Swagger/OpenAPI com suporte para autenticação JWT Bearer
+### Details:
+Configurar SwaggerGen com SecurityDefinition para Bearer JWT. Adicionar SecurityRequirement global para endpoints autenticados. Configurar XML documentation com comentários nos controllers. Personalizar UI do Swagger com título, versão e descrição do projeto. Adicionar exemplos de request/response usando atributos. Configurar para mostrar apenas em ambiente de desenvolvimento.
+
+## 5. Implementar Health Check e configurar CORS [pending]
+### Dependencies: 2.4
+### Description: Adicionar endpoint de health check e configurar CORS para permitir requisições do frontend
+### Details:
+Adicionar pacote Microsoft.AspNetCore.Diagnostics.HealthChecks. Implementar health check customizado verificando: conectividade Firebase, status da API. Criar endpoint GET /health retornando status detalhado. Configurar CORS policy 'AllowSpecificOrigins' com origins do app mobile e web admin. Adicionar headers permitidos: Content-Type, Authorization. Configurar métodos HTTP permitidos e credentials.
+

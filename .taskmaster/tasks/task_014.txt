@@ -1,0 +1,47 @@
+# Task ID: 14
+# Title: Implementar Sistema de Notificações
+# Status: pending
+# Dependencies: 11
+# Priority: low
+# Description: Criar sistema de alertas por push e email para saldo baixo de créditos
+# Details:
+Implementar NotificationService com providers: FCM para push, SendGrid para email. Criar job agendado que verifica saldos < 20%. Enviar notificação quando saldo atingir 3, 2 e 1 crédito restante. Implementar preferências de notificação por usuário. Adicionar template de email responsivo.
+
+# Test Strategy:
+Testar envio de push para Android/iOS. Verificar entrega de emails. Testar triggers de saldo baixo. Validar preferências de usuário.
+
+# Agente Delegado:
+**Principal:** @notification-system-expert
+Especialista em notificações e comunicação
+
+# Subtasks:
+## 1. Configurar Provedores de Notificação [pending]
+### Dependencies: None
+### Description: Configurar e integrar Firebase Cloud Messaging (FCM) para push notifications e SendGrid para envio de emails
+### Details:
+Instalar pacotes: Firebase.Messaging para FCM e SendGrid. Criar appsettings com chaves: FCM ServerKey, SendGrid API Key. Implementar interfaces INotificationProvider com métodos SendPush e SendEmail. Criar classes FcmProvider e SendGridProvider implementando a interface. Configurar injeção de dependência no Program.cs. Adicionar modelos NotificationRequest e NotificationResponse.
+
+## 2. Implementar NotificationService [pending]
+### Dependencies: 14.1
+### Description: Criar serviço central para gerenciar envio de notificações através dos diferentes canais
+### Details:
+Criar NotificationService com métodos: SendLowBalanceAlert, SendEmailNotification, SendPushNotification. Implementar lógica para determinar canal baseado em preferências do usuário. Criar enum NotificationType (LowBalance, Payment, General). Implementar retry policy para falhas de envio. Adicionar logging detalhado de sucessos e falhas. Criar NotificationRepository para salvar histórico de notificações enviadas.
+
+## 3. Criar Sistema de Preferências de Notificação [pending]
+### Dependencies: None
+### Description: Implementar modelo e endpoints para usuários configurarem suas preferências de notificação
+### Details:
+Criar tabela UserNotificationPreferences com campos: userId, enablePush, enableEmail, lowBalanceThreshold. Implementar endpoints: GET /users/{id}/notification-preferences, PUT /users/{id}/notification-preferences. Adicionar validações: threshold entre 1-5 créditos. Criar UI no app para configurar preferências com switches para email/push e slider para threshold. Implementar cache de preferências para otimizar consultas.
+
+## 4. Implementar Job de Verificação de Saldo [pending]
+### Dependencies: 14.2, 14.3
+### Description: Criar job agendado que verifica saldos baixos e dispara notificações automaticamente
+### Details:
+Implementar BalanceCheckJob usando Hangfire ou Quartz.NET. Configurar execução a cada 4 horas. Buscar usuários com saldo < 20% do plano e que ainda não foram notificados no threshold atual. Implementar lógica para notificar em 3, 2 e 1 crédito restante. Criar tabela NotificationLog para evitar duplicatas. Adicionar configuração para horário de quiet hours (22h-8h) sem notificações push.
+
+## 5. Criar Templates de Email Responsivos [pending]
+### Dependencies: 14.2
+### Description: Desenvolver templates HTML responsivos para emails de notificação de saldo baixo
+### Details:
+Criar template HTML/CSS responsivo usando MJML ou similar. Design deve incluir: logo da clínica, mensagem personalizada com nome do paciente, saldo atual destacado, botão CTA para renovar plano, footer com link para gerenciar preferências. Implementar variáveis de template: {{userName}}, {{currentBalance}}, {{planName}}, {{clinicName}}. Criar versão plain text alternativa. Testar renderização em clientes de email populares.
+

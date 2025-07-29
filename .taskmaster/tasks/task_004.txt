@@ -1,0 +1,48 @@
+# Task ID: 4
+# Title: Implementar Sistema de Autenticação Multi-Perfil
+# Status: pending
+# Dependencies: 2, 3
+# Priority: high
+# Description: Criar sistema de autenticação com perfis distintos: Paciente, Clínica (Origem/Parceira) e Administrador
+# Details:
+Implementar AuthService com métodos: Register, Login, RefreshToken, Logout. Criar middleware de autorização por roles. Implementar login social com Google/Apple usando Firebase Auth. Criar endpoints: POST /auth/register, POST /auth/login, POST /auth/refresh, POST /auth/logout. Adicionar claims customizadas para role e clinicId quando aplicável.
+
+# Test Strategy:
+Testar registro e login com email/senha. Verificar login social Google/Apple. Testar autorização por role em endpoints protegidos. Validar refresh token e expiração.
+
+# Agente Delegado:
+**Principal:** @auth-security-expert
+Especialista em autenticação e segurança
+**Auxiliar:** @dotnet-api-expert
+
+# Subtasks:
+## 1. Configurar Infraestrutura de Autenticação com ASP.NET Core Identity [pending]
+### Dependencies: None
+### Description: Configurar ASP.NET Core Identity com suporte a JWT e claims customizadas para roles e clinicId
+### Details:
+Instalar pacotes: Microsoft.AspNetCore.Identity.EntityFrameworkCore, Microsoft.AspNetCore.Authentication.JwtBearer. Criar ApplicationUser herdando de IdentityUser com propriedades: Role (enum), ClinicId (nullable). Configurar Identity no Program.cs com políticas de senha e lockout. Configurar JWT com chave secreta, issuer e audience no appsettings.json. Criar JwtService para geração de tokens com claims customizadas (userId, email, role, clinicId). Implementar método GenerateToken que retorna access token (15min) e refresh token (7 dias).
+
+## 2. Implementar AuthService com Métodos Base de Autenticação [pending]
+### Dependencies: 4.1
+### Description: Criar AuthService com implementação dos métodos principais de autenticação usando Identity
+### Details:
+Criar interface IAuthService com métodos: RegisterAsync(RegisterDto), LoginAsync(LoginDto), RefreshTokenAsync(string refreshToken), LogoutAsync(string userId). Implementar RegisterAsync validando email único, criando usuário com role apropriada. Implementar LoginAsync verificando credenciais e retornando tokens JWT. Criar RefreshTokenService para armazenar e validar refresh tokens no banco. Implementar LogoutAsync invalidando refresh token. Adicionar DTOs: RegisterDto (email, password, role, clinicName para clínicas), LoginDto (email, password), AuthResponseDto (accessToken, refreshToken, expiresIn).
+
+## 3. Criar Endpoints de Autenticação e Middleware de Autorização [pending]
+### Dependencies: 4.2
+### Description: Implementar AuthController com endpoints REST e middleware customizado para autorização por roles
+### Details:
+Criar AuthController com endpoints: POST /api/auth/register (validar role permitida), POST /api/auth/login (retornar tokens), POST /api/auth/refresh (renovar access token), POST /api/auth/logout (invalidar refresh token). Criar RoleAuthorizationMiddleware que valida JWT e verifica role do usuário. Implementar atributos customizados: [AuthorizeRole(Roles.Admin)], [AuthorizeRole(Roles.Clinic)], [AuthorizeRole(Roles.Patient)]. Adicionar validação de clinicId para usuários de clínica. Configurar Swagger para incluir autenticação JWT.
+
+## 4. Integrar Login Social com Firebase Auth [pending]
+### Dependencies: 4.3
+### Description: Implementar autenticação social com Google e Apple usando Firebase Admin SDK
+### Details:
+Instalar FirebaseAdmin SDK. Criar FirebaseAuthService com método VerifyIdTokenAsync para validar tokens do Firebase. Adicionar endpoint POST /api/auth/social-login que recebe Firebase ID token. Implementar fluxo: validar token Firebase, extrair email/uid, verificar se usuário existe ou criar novo, gerar JWT próprio do sistema. Criar SocialLoginDto com idToken e provider (google/apple). Mapear claims do Firebase para claims do sistema. Configurar Firebase project settings no appsettings.json.
+
+## 5. Implementar Sistema de Roles e Claims Customizadas [pending]
+### Dependencies: 4.4
+### Description: Configurar sistema completo de roles com claims específicas para cada perfil de usuário
+### Details:
+Criar enum Roles: Patient, ClinicOrigin, ClinicPartner, Admin. Implementar RoleSeeder para criar roles no banco na inicialização. Adicionar claims customizadas: 'clinicId' para usuários de clínica, 'clinicType' (origin/partner), 'permissions' array para admin. Criar ClaimsTransformation para adicionar claims dinamicamente no login. Implementar políticas de autorização: RequireClinicOwner (verifica clinicId), RequireAdminOrClinicOwner. Adicionar método GetUserClaims no AuthService para retornar claims do usuário autenticado.
+

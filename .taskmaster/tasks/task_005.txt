@@ -1,0 +1,48 @@
+# Task ID: 5
+# Title: Criar CRUD de Planos (Admin Only)
+# Status: pending
+# Dependencies: 3, 4
+# Priority: high
+# Description: Implementar gestão completa de planos acessível apenas por administradores
+# Details:
+Criar PlanController com autorização [Authorize(Roles='Admin')]. Endpoints: GET /plans (listar), GET /plans/{id}, POST /plans (criar), PUT /plans/{id} (atualizar), DELETE /plans/{id}. Modelo Plan: name, description, totalCredits, price, isActive. Implementar validações: nome único, créditos > 0, preço >= 0. Adicionar paginação e filtros na listagem.
+
+# Test Strategy:
+Testar CRUD completo com usuário admin. Verificar rejeição com outros roles. Validar regras de negócio. Testar paginação e filtros. Verificar soft delete.
+
+# Agente Delegado:
+**Principal:** @dotnet-api-expert
+Especialista em CRUD e APIs REST
+**Auxiliar:** @database-architect
+
+# Subtasks:
+## 1. Criar Modelo e Configuração do Banco de Dados para Plan [pending]
+### Dependencies: None
+### Description: Definir a entidade Plan com suas propriedades e configurar o mapeamento no Entity Framework
+### Details:
+Criar classe Plan em Models/Plan.cs com propriedades: Id (int), Name (string, unique), Description (string), TotalCredits (int), Price (decimal), IsActive (bool), CreatedAt (DateTime), UpdatedAt (DateTime?), DeletedAt (DateTime? - soft delete). Configurar DbContext com DbSet<Plan> Plans. Criar migration para adicionar tabela Plans com índice único em Name. Implementar interface IPlanRepository com métodos básicos do CRUD.
+
+## 2. Implementar Repository e Service Layer para Plans [pending]
+### Dependencies: 5.1
+### Description: Criar camada de repositório e serviço com lógica de negócio para gerenciamento de planos
+### Details:
+Implementar PlanRepository : IPlanRepository com métodos: GetAllAsync(paginação, filtros), GetByIdAsync(id), GetByNameAsync(name), CreateAsync(plan), UpdateAsync(plan), DeleteAsync(id - soft delete). Criar IPlanService e PlanService com validações: verificar nome único antes de criar/atualizar, validar totalCredits > 0, validar price >= 0. Implementar paginação com PagedResult<Plan> e filtros por IsActive, price range, nome parcial.
+
+## 3. Criar DTOs e Implementar PlanController [pending]
+### Dependencies: 5.2
+### Description: Desenvolver controller REST com autorização admin e endpoints completos do CRUD
+### Details:
+Criar DTOs: PlanRequestDto (para criação/atualização), PlanResponseDto (para retorno), PlanFilterDto (para filtros). Implementar PlanController com [Authorize(Roles='Admin')] no nível da classe. Endpoints: GET /api/plans (com paginação e filtros), GET /api/plans/{id}, POST /api/plans, PUT /api/plans/{id}, DELETE /api/plans/{id}. Usar AutoMapper para conversão DTO<->Entity. Retornar códigos HTTP apropriados: 200/201 sucesso, 400 validação, 401/403 autorização, 404 não encontrado.
+
+## 4. Implementar Validações e Tratamento de Erros [pending]
+### Dependencies: 5.3
+### Description: Adicionar validações detalhadas usando FluentValidation e middleware de tratamento de erros
+### Details:
+Criar PlanRequestValidator com FluentValidation: Name (required, max 100 chars), Description (max 500 chars), TotalCredits (greater than 0), Price (greater or equal 0). Implementar middleware global de exceções para padronizar respostas de erro. Criar exceções customizadas: PlanNotFoundException, DuplicatePlanNameException. Adicionar logging estruturado com Serilog para todas operações do CRUD. Implementar rate limiting específico para endpoints de criação/atualização.
+
+## 5. Adicionar Funcionalidades Avançadas e Documentação [pending]
+### Dependencies: 5.4
+### Description: Implementar features adicionais como busca, ordenação e documentação Swagger completa
+### Details:
+Adicionar ordenação dinâmica por nome, preço, créditos, data criação. Implementar busca full-text no nome e descrição usando LIKE ou FTS se disponível. Criar endpoint GET /api/plans/active para listar apenas planos ativos. Adicionar cache Redis para listagem de planos com invalidação em alterações. Documentar todos endpoints no Swagger com exemplos de request/response, códigos de erro possíveis e descrições detalhadas. Implementar versionamento da API preparando para futuras mudanças.
+

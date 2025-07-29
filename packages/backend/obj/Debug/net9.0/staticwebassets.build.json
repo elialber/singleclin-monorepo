@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "7ipN3MNyiVFhQtIOw+rQRdaJWgniDkNThA/tni7N+fY=",
+  "Source": "SingleClin.API",
+  "BasePath": "_content/SingleClin.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

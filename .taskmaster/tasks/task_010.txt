@@ -1,0 +1,48 @@
+# Task ID: 10
+# Title: Desenvolver Funcionalidade de Geração de QR Code no App
+# Status: pending
+# Dependencies: 8, 9
+# Priority: medium
+# Description: Implementar tela para gerar e exibir QR Code temporário no app mobile
+# Details:
+Criar QRCodeScreen com: exibição grande do QR Code, timer countdown mostrando tempo restante, botão para gerar novo QR. Usar qr_flutter para renderizar. Implementar brightness boost automático. Adicionar instruções para clínica. Salvar QR em galeria opcional. Mostrar código alfanumérico como fallback.
+
+# Test Strategy:
+Testar geração e exibição do QR. Verificar timer countdown. Testar salvamento em galeria. Validar brightness da tela. Testar regeneração de QR.
+
+# Agente Delegado:
+**Principal:** @flutter-mobile-expert
+Especialista em QR code display
+**Auxiliar:** @qr-transaction-specialist
+
+# Subtasks:
+## 1. Configurar Dependências e Criar Tela Base do QR Code [pending]
+### Dependencies: None
+### Description: Adicionar pacote qr_flutter ao projeto e criar a estrutura inicial da QRCodeScreen com navegação
+### Details:
+Adicionar qr_flutter: ^4.1.0 ao pubspec.yaml. Criar QRCodeScreen em /lib/presentation/screens/qr_code/. Implementar StatefulWidget básico com Scaffold. Adicionar rota no go_router para '/qr-code'. Criar botão na tela principal para navegar até QRCodeScreen. Configurar AppBar com título 'Meu QR Code' e botão de voltar.
+
+## 2. Implementar Geração e Exibição do QR Code [pending]
+### Dependencies: 10.1
+### Description: Criar lógica para gerar código único temporário e exibir QR Code centralizado na tela
+### Details:
+Criar QRCodeService em /lib/domain/services/ para gerar código alfanumérico único (ex: 'USR-${userId}-${timestamp}'). Implementar widget QrImageView no centro da tela com size: 280. Adicionar padding e container com bordas arredondadas. Exibir código alfanumérico abaixo do QR como Text com fontSize: 18 e fontWeight.bold. Implementar estado loading enquanto gera o código.
+
+## 3. Adicionar Timer Countdown e Expiração [pending]
+### Dependencies: 10.2
+### Description: Implementar contador regressivo de 5 minutos e regeneração automática ao expirar
+### Details:
+Criar Timer.periodic para atualizar countdown a cada segundo. Exibir tempo restante em formato 'MM:SS' acima do QR Code. Usar CircularProgressIndicator ao redor do timer. Quando chegar a 00:00, mostrar estado 'Expirado' e desabilitar QR. Implementar botão 'Gerar Novo QR Code' que reseta timer e gera novo código. Adicionar animação de fade quando QR expira.
+
+## 4. Implementar Brightness Boost e Instruções [pending]
+### Dependencies: 10.3
+### Description: Adicionar aumento automático de brilho da tela e seção de instruções para a clínica
+### Details:
+Usar screen_brightness package para aumentar brilho ao entrar na tela e restaurar ao sair. Implementar no initState() e dispose(). Adicionar Card expansível abaixo do QR com título 'Como usar'. Incluir instruções: '1. Apresente este QR Code na recepção', '2. O código expira em 5 minutos', '3. Cada uso consome 1 crédito do seu plano'. Usar ExpansionTile para mostrar/ocultar instruções.
+
+## 5. Adicionar Funcionalidade de Salvar QR Code [pending]
+### Dependencies: 10.4
+### Description: Implementar botão opcional para salvar QR Code na galeria do dispositivo
+### Details:
+Adicionar packages: screenshot e image_gallery_saver. Envolver QrImageView com Screenshot widget usando GlobalKey. Criar IconButton com ícone de download no AppBar. Implementar função para capturar screenshot e salvar na galeria. Solicitar permissão de armazenamento se necessário. Mostrar SnackBar de sucesso/erro após salvar. Adicionar analytics para rastrear uso do recurso.
+

@@ -1,0 +1,47 @@
+# Task ID: 8
+# Title: Criar Sistema de Geração de QR Code
+# Status: pending
+# Dependencies: 3, 5
+# Priority: medium
+# Description: Implementar geração de QR Code único e temporário para cada visita do paciente
+# Details:
+Criar QRCodeService no backend. Gerar token único: JWT com claims (userPlanId, expiresAt, nonce). QR Code contém: {token: 'jwt', version: '1.0'}. Endpoint POST /qrcodes/generate retorna token e data URL do QR. Configurar expiração padrão 30 minutos. Armazenar nonce em cache Redis para prevenir reuso.
+
+# Test Strategy:
+Testar geração de QR Code único. Verificar expiração após 30 min. Testar que mesmo QR não pode ser usado duas vezes. Validar formato e decodificação.
+
+# Agente Delegado:
+**Principal:** @qr-transaction-specialist
+Especialista em QR codes e transações
+
+# Subtasks:
+## 1. Configurar Redis para armazenamento de nonces [pending]
+### Dependencies: None
+### Description: Configurar instância Redis para armazenar nonces únicos dos QR codes e prevenir reuso
+### Details:
+Instalar e configurar Redis no ambiente de desenvolvimento e produção. Criar RedisService com métodos para conectar, armazenar e verificar nonces. Implementar configuração de TTL (Time To Live) de 30 minutos para auto-expiração dos nonces. Adicionar variáveis de ambiente REDIS_HOST, REDIS_PORT, REDIS_PASSWORD. Implementar reconnect automático e tratamento de erros de conexão.
+
+## 2. Implementar geração de tokens JWT para QR Code [pending]
+### Dependencies: 8.1
+### Description: Criar lógica de geração de tokens JWT únicos com claims específicas para cada visita
+### Details:
+Criar QRCodeTokenService com método generateToken(userPlanId). Gerar nonce único usando crypto.randomUUID(). Criar JWT com claims: userPlanId, expiresAt (30 min), nonce, issuedAt. Assinar token com chave privada RS256. Armazenar nonce no Redis com chave qr_nonce:{nonce} e TTL 30 min. Retornar token assinado.
+
+## 3. Implementar geração de QR Code em formato Data URL [pending]
+### Dependencies: 8.2
+### Description: Criar serviço para gerar imagem QR Code a partir do token JWT
+### Details:
+Instalar biblioteca qrcode. Criar QRCodeGeneratorService com método generateQRCode(token). Gerar QR Code contendo JSON: {token: 'jwt_string', version: '1.0'}. Configurar opções: errorCorrectionLevel: 'M', type: 'image/png', quality: 0.92, margin: 1, color: {dark: '#000000', light: '#FFFFFF'}, width: 300. Retornar QR Code como Data URL base64.
+
+## 4. Criar endpoint POST /qrcodes/generate [pending]
+### Dependencies: 8.3
+### Description: Implementar endpoint REST para geração de QR codes temporários
+### Details:
+Criar QRCodeController com rota POST /qrcodes/generate. Middleware de autenticação para validar usuário logado. Extrair userPlanId do token de autenticação. Chamar QRCodeService.generateQRCode(userPlanId). Retornar resposta: {success: true, qrCode: dataUrl, expiresAt: timestamp, token: jwtToken}. Implementar rate limiting: máximo 5 QR codes por minuto por usuário.
+
+## 5. Criar QRCodeService integrador [pending]
+### Dependencies: 8.4
+### Description: Implementar serviço principal que orquestra toda a geração de QR Code
+### Details:
+Criar QRCodeService com método principal generateQRCode(userPlanId). Orquestrar: chamar QRCodeTokenService.generateToken(), depois QRCodeGeneratorService.generateQRCode(). Adicionar logging de auditoria para cada QR gerado. Implementar métricas: total de QR codes gerados, taxa de erro. Criar método validateUserPlan() para verificar se plano está ativo antes de gerar. Adicionar cache temporário de 1 minuto para evitar regeneração desnecessária.
+

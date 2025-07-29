@@ -1,0 +1,47 @@
+# Task ID: 13
+# Title: Desenvolver Portal Web Admin com React
+# Status: pending
+# Dependencies: 1, 5
+# Priority: low
+# Description: Criar portal administrativo responsivo para gerenciar planos, clínicas e visualizar relatórios
+# Details:
+Criar app React com TypeScript. Usar Material-UI ou Ant Design. Implementar layout com sidebar navegável. Criar páginas: Dashboard (gráficos resumo), Planos (CRUD), Clínicas (listagem e cadastro), Transações (histórico com filtros), Pacientes (busca e detalhes). Integrar com API usando axios. Implementar autenticação com redirect.
+
+# Test Strategy:
+Testar responsividade mobile/desktop. Verificar navegação e rotas protegidas. Testar integração com API. Validar filtros e paginação.
+
+# Agente Delegado:
+**Principal:** @react-admin-specialist
+Especialista em React e dashboards
+
+# Subtasks:
+## 1. Configurar projeto React com TypeScript e Material-UI [pending]
+### Dependencies: None
+### Description: Criar estrutura base do projeto React com TypeScript, configurar Material-UI como biblioteca de componentes e estabelecer arquitetura de pastas
+### Details:
+Executar create-react-app com template TypeScript. Instalar @mui/material, @mui/icons-material e @emotion/react. Criar estrutura de pastas: /src/components (componentes reutilizáveis), /src/pages (páginas da aplicação), /src/services (integração com API), /src/utils (funções auxiliares), /src/types (interfaces TypeScript). Configurar tema customizado do Material-UI com cores da marca. Adicionar configurações de ESLint e Prettier para padronização de código.
+
+## 2. Implementar layout base com sidebar navegável e roteamento [pending]
+### Dependencies: 13.1
+### Description: Criar estrutura de layout principal com sidebar fixa/responsiva, header com informações do usuário e área de conteúdo principal com roteamento
+### Details:
+Implementar componente Layout com Material-UI Drawer para sidebar. Criar menu de navegação com ícones: Dashboard, Planos, Clínicas, Transações, Pacientes. Configurar React Router v6 com rotas protegidas. Implementar ResponsiveDrawer que alterna entre permanente (desktop) e temporário (mobile). Adicionar AppBar com título da página atual, avatar do usuário e botão de logout. Criar contexto de navegação para gerenciar estado da sidebar. Implementar breadcrumbs para navegação secundária.
+
+## 3. Desenvolver sistema de autenticação e proteção de rotas [pending]
+### Dependencies: 13.2
+### Description: Implementar fluxo completo de autenticação com login, logout, persistência de sessão e proteção de rotas administrativas
+### Details:
+Criar página de Login com formulário Material-UI. Implementar AuthContext com useContext para gerenciar estado de autenticação global. Configurar axios com interceptors para adicionar token JWT em todas requisições. Criar HOC ProtectedRoute para envolver rotas que necessitam autenticação. Implementar refresh token automático. Adicionar localStorage/sessionStorage para persistir sessão. Configurar redirect automático para login quando não autenticado. Implementar loading state durante verificação de autenticação.
+
+## 4. Implementar páginas de CRUD para Planos e listagem de Clínicas [pending]
+### Dependencies: 13.3
+### Description: Criar interfaces completas para gerenciamento de planos (criar, editar, deletar) e visualização de clínicas cadastradas com filtros
+### Details:
+Página Planos: criar DataGrid do Material-UI com colunas (nome, créditos, preço, ações). Implementar modal/drawer para criar/editar plano com validação de formulário usando react-hook-form. Adicionar confirmação antes de deletar. Página Clínicas: implementar lista com cards ou tabela mostrando informações da clínica. Adicionar filtros por nome, tipo e localização. Implementar paginação server-side. Criar serviços no axios para todas operações CRUD. Adicionar feedback visual com Snackbar para ações bem-sucedidas/erros.
+
+## 5. Criar Dashboard com gráficos e páginas de Transações/Pacientes [pending]
+### Dependencies: 13.4
+### Description: Desenvolver dashboard com visualizações de dados e implementar páginas para histórico de transações e busca de pacientes
+### Details:
+Dashboard: integrar biblioteca de gráficos (recharts ou Chart.js). Criar cards com métricas: total de pacientes, transações do mês, planos mais usados, clínicas mais ativas. Implementar gráficos: linha (transações por dia), pizza (distribuição por plano), barras (clínicas top 10). Página Transações: criar tabela com filtros por data, clínica, paciente. Adicionar exportação para CSV/Excel. Página Pacientes: implementar busca por nome/CPF/email. Mostrar detalhes: plano atual, histórico de visitas, informações de contato. Adicionar skeleton loaders durante carregamento de dados.
+

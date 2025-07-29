@@ -1,0 +1,150 @@
+Product Requirements Document (PRD)
+
+Produto: Sistema de Gestão de Planos com Uso de Créditos em Clínicas Parceiras
+
+Visão Geral
+
+O produto é uma plataforma digital que permite que pacientes adquiram planos de tratamentos em uma clínica principal e utilizem seus créditos em qualquer clínica parceira do mesmo grupo. Foco na liberdade geográfica, continuidade do atendimento e fidelização.
+
+Objetivo do Negócio
+
+Garantir que o paciente possa pagar na clínica principal e realizar procedimentos em clínicas parceiras, permitindo atendimento em diferentes localidades sem comprometer a experiência ou o controle de uso.
+
+Monetização
+
+Não há monetização direta. A plataforma é um serviço interno oferecido pelo grupo de clínicas para aumentar conveniência e retenção.
+
+Funcionalidades Principais
+
+1. Cadastro e Autenticação
+
+Autenticação por e-mail/senha ou redes sociais (Google/Apple).
+
+Perfis distintos: Paciente, Clínica (Origem/Parceira), Administrador.
+
+2. Gestão de Planos
+
+Apenas o administrador pode criar e configurar planos.
+
+Cada plano tem quantidade fixa de créditos (acessos).
+
+Planos são vinculados a pacientes.
+
+3. Gerenciamento de Créditos
+
+Visualização em tempo real de saldo de créditos.
+
+Geração de QR Code único e temporário por visita.
+
+QR Code inclui token seguro e validade configurável.
+
+4. Uso de Crédito em Clínica Parceira
+
+App da clínica escaneia QR Code.
+
+Validação online obrigatória.
+
+Sistema debita 1 crédito por visita.
+
+Registra opcionalmente tipo de serviço prestado.
+
+5. Relatórios e Notificações
+
+Alertas automáticos por push/email para saldo baixo.
+
+Relatórios de uso por paciente, clínica e tipo de serviço.
+
+6. Administração Central
+
+Portal web responsivo para o administrador.
+
+Visualiza planos, saldos, transações e clínicas cadastradas.
+
+Experiência do Usuário
+
+Personas
+
+Paciente: compra plano, gera QR Code, acompanha saldo.
+
+Clínica de Origem: vende plano, monitora saldo do paciente.
+
+Clínica Parceira: escaneia QR Code e registra atendimento.
+
+Administrador: gerencia planos, relatórios e clínicas.
+
+Fluxos Principais
+
+Paciente faz login e visualiza plano.
+
+Gera QR Code para nova visita.
+
+Clínica parceira escaneia e valida QR Code.
+
+Crédito é debitado e saldo atualizado.
+
+Notificação enviada e dados salvos para relatório.
+
+UI/UX
+
+Interface simples para gerar/ler QR Code.
+
+Feedback em tempo real sobre saldo e validade.
+
+Dashboard com gráficos e filtros.
+
+Compatível com Android (API 21+) e iOS (iOS 12+).
+
+Roadmap de Desenvolvimento
+
+MVP
+
+Cadastro e autenticação de pacientes e clínicas.
+
+CRUD de planos (admin only).
+
+Visualização de saldo e geração de QR Code.
+
+Leitura de QR Code e débito de crédito.
+
+Dashboard básico com planos e transações.
+
+Futuras Implementações
+
+Notificações push e e-mail para saldo baixo.
+
+Relatórios avançados (por período, clínica, serviço).
+
+Modo offline para leitura de QR Code.
+
+Suporte a internacionalização e acessibilidade.
+
+Integrações com ERPs de clínicas via API.
+
+Cadeia de Dependências Lógicas
+
+Autenticação é obrigatória para operações.
+
+Planos devem estar configurados para haver créditos.
+
+Créditos devem existir para gerar QR Code.
+
+QR Code é validado online no momento do uso.
+
+Relatórios e notificações dependem de histórico de transações.
+
+Tecnologias e Plataformas
+
+Mobile App: Flutter
+
+Portal Web: React + .NET (Admin)
+
+Backend: REST API com autenticação JWT (Firebase Authentication)
+
+Banco de Dados: PostgreSQL ou Firebase
+
+Hospedagem: Cloud (Azure)
+
+Segurança: Tokens seguros, HTTPS, criptografia de dados sensíveis
+
+
+USE UMA Estrutura de diretórios MONOREPO

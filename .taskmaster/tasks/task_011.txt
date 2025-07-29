@@ -1,0 +1,48 @@
+# Task ID: 11
+# Title: Criar Sistema de Leitura e Validação de QR Code
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Implementar scanner de QR Code para clínicas parceiras com validação online
+# Details:
+Criar endpoint POST /transactions/validate-qr com body {qrToken, clinicId, serviceType?}. Validar JWT, verificar expiração, checar nonce no Redis. Se válido: debitar 1 crédito, criar registro Transaction, invalidar nonce. Retornar dados do paciente e confirmação. Implementar rate limiting por clínica.
+
+# Test Strategy:
+Testar validação de QR válido. Verificar rejeição de QR expirado/usado. Testar débito correto de crédito. Validar rate limiting.
+
+# Agente Delegado:
+**Principal:** @qr-transaction-specialist
+Especialista em validação de QR codes
+**Auxiliar:** @dotnet-api-expert
+
+# Subtasks:
+## 1. Criar estrutura de validação de QR Code e modelos de dados [pending]
+### Dependencies: None
+### Description: Implementar modelos de dados para transações e estrutura base do serviço de validação
+### Details:
+Criar modelo Transaction com campos: id, userPlanId, clinicId, serviceType, qrToken, validatedAt, amount. Criar QRCodeValidationService com interface para validação. Definir DTOs para request/response da validação. Implementar estrutura de erros customizados para validação (QRExpiredError, QRAlreadyUsedError, InvalidQRError).
+
+## 2. Implementar validação de JWT e verificação de nonce [pending]
+### Dependencies: 11.1
+### Description: Criar lógica de validação do token JWT extraído do QR Code e verificação de uso único via Redis
+### Details:
+Implementar método validateQRToken que: decodifica e valida JWT usando a chave secreta, verifica claims obrigatórias (userPlanId, expiresAt, nonce), checa expiração do token, consulta Redis para verificar se nonce já foi usado. Configurar TTL no Redis igual ao tempo de expiração do QR. Retornar dados decodificados ou lançar exceção específica.
+
+## 3. Implementar débito de crédito e criação de transação [pending]
+### Dependencies: 11.2
+### Description: Criar lógica para debitar crédito do plano do usuário e registrar a transação
+### Details:
+Implementar método processTransaction que: busca UserPlan pelo userPlanId, verifica se há créditos disponíveis, debita 1 crédito do saldo, cria registro Transaction com todos os dados, invalida nonce no Redis marcando como usado. Usar transação de banco de dados para garantir consistência. Implementar rollback em caso de erro.
+
+## 4. Criar endpoint REST para validação de QR Code [pending]
+### Dependencies: 11.3
+### Description: Implementar endpoint POST /transactions/validate-qr com autenticação e autorização
+### Details:
+Criar controller com endpoint POST /transactions/validate-qr. Request body: {qrToken: string, clinicId: string, serviceType?: string}. Adicionar middleware de autenticação JWT para clínicas. Validar que clinicId do token corresponde à clínica autenticada. Chamar QRCodeValidationService para processar. Retornar response com dados do paciente (nome, telefone) e confirmação da transação. Implementar tratamento de erros com status codes apropriados.
+
+## 5. Implementar rate limiting por clínica [pending]
+### Dependencies: 11.4
+### Description: Adicionar proteção contra uso excessivo do endpoint de validação por clínica
+### Details:
+Implementar middleware de rate limiting usando Redis. Configurar limite de 100 validações por minuto por clinicId. Usar sliding window para contagem. Retornar status 429 (Too Many Requests) quando exceder limite. Incluir headers X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset. Criar configuração customizável por clínica se necessário. Adicionar logs para monitoramento de uso.
+

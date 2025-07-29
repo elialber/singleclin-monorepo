@@ -1,0 +1,48 @@
+# Task ID: 7
+# Title: Implementar Autenticação no App Mobile
+# Status: pending
+# Dependencies: 4, 6
+# Priority: high
+# Description: Integrar autenticação Firebase no app Flutter com suporte a email/senha e login social
+# Details:
+Adicionar firebase_auth, google_sign_in, sign_in_with_apple. Criar AuthRepository com métodos: signInEmail, signInGoogle, signInApple, signOut, currentUser. Implementar telas: LoginScreen, RegisterScreen, ForgotPasswordScreen. Adicionar interceptor HTTP para incluir token JWT em requisições. Implementar auto-refresh de token.
+
+# Test Strategy:
+Testar login/registro com email. Verificar login Google em Android e Apple em iOS. Testar persistência de sessão. Validar refresh automático de token.
+
+# Agente Delegado:
+**Principal:** @flutter-mobile-expert
+Especialista em autenticação mobile
+**Auxiliar:** @auth-security-expert
+
+# Subtasks:
+## 1. Configurar Firebase e Dependências no Flutter [pending]
+### Dependencies: None
+### Description: Adicionar e configurar todas as dependências necessárias para autenticação Firebase no projeto Flutter
+### Details:
+Adicionar ao pubspec.yaml: firebase_core, firebase_auth, google_sign_in, sign_in_with_apple, crypto. Configurar Firebase no console para Android (google-services.json) e iOS (GoogleService-Info.plist). Atualizar AndroidManifest.xml com client ID do Google. Configurar entitlements no iOS para Sign in with Apple. Inicializar Firebase no main.dart com Firebase.initializeApp().
+
+## 2. Criar AuthRepository com Métodos de Autenticação [pending]
+### Dependencies: 7.1
+### Description: Implementar repositório centralizado para gerenciar toda lógica de autenticação com Firebase
+### Details:
+Criar classe AuthRepository com métodos: signInWithEmail(email, password), signInWithGoogle(), signInWithApple(), signUp(email, password, name), signOut(), getCurrentUser(), isAuthenticated(), getIdToken(). Implementar Stream<User?> authStateChanges para monitorar mudanças de autenticação. Adicionar tratamento de erros específicos do Firebase (weak-password, email-already-in-use, etc). Criar modelo UserModel para encapsular dados do usuário.
+
+## 3. Implementar Telas de Autenticação (Login, Registro, Recuperação) [pending]
+### Dependencies: 7.2
+### Description: Criar interfaces de usuário para login, registro e recuperação de senha com validações
+### Details:
+LoginScreen: campos email/senha com validação, botões para Google/Apple Sign In, link para registro e esqueci senha. RegisterScreen: campos nome, email, senha e confirmação com validações (email válido, senha >= 6 caracteres). ForgotPasswordScreen: campo email com envio de reset por Firebase. Implementar loading states, mensagens de erro localizadas, teclado apropriado para cada campo. Usar Form e TextFormField com validadores. Adicionar animações suaves entre telas.
+
+## 4. Implementar HTTP Interceptor para Token JWT [pending]
+### Dependencies: 7.2
+### Description: Criar interceptor para automaticamente incluir token de autenticação em todas requisições HTTP
+### Details:
+Criar AuthInterceptor que implementa InterceptorsWrapper do Dio. No onRequest, obter token atual via FirebaseAuth.instance.currentUser?.getIdToken(). Adicionar header 'Authorization: Bearer $token' em todas requisições. Implementar lógica de retry em caso de token expirado (401): obter novo token e repetir requisição. Configurar timeout de requisições. Adicionar logs para debug em desenvolvimento. Registrar interceptor na instância global do Dio.
+
+## 5. Implementar Auto-Refresh de Token e Persistência de Sessão [pending]
+### Dependencies: 7.2, 7.4
+### Description: Garantir que usuário permaneça autenticado entre sessões e token seja renovado automaticamente
+### Details:
+Configurar FirebaseAuth para persistir autenticação localmente. Implementar listener em authStateChanges para detectar mudanças de autenticação. Criar método refreshToken() que força renovação do ID token a cada 50 minutos (tokens expiram em 60min). Usar Timer.periodic para agendar refresh automático enquanto app está ativo. Implementar AppLifecycleObserver para pausar/retomar timer conforme estado do app. Adicionar splash screen que verifica autenticação antes de direcionar para home ou login.
+

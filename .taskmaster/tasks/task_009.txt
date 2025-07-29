@@ -1,0 +1,47 @@
+# Task ID: 9
+# Title: Implementar Tela de Visualização de Plano e Saldo
+# Status: pending
+# Dependencies: 7
+# Priority: medium
+# Description: Criar interface no app para paciente visualizar plano ativo e saldo de créditos
+# Details:
+Criar HomeScreen com card principal mostrando: nome do plano, créditos restantes/total, barra de progresso visual. Implementar pull-to-refresh. Adicionar botão 'Gerar QR Code' prominente. Criar PlanRepository para buscar dados. Implementar cache local com expiração. Mostrar histórico resumido de últimas visitas.
+
+# Test Strategy:
+Testar exibição correta de dados do plano. Verificar atualização em tempo real. Testar comportamento sem plano ativo. Validar pull-to-refresh.
+
+# Agente Delegado:
+**Principal:** @flutter-mobile-expert
+Especialista em UI/UX mobile
+
+# Subtasks:
+## 1. Criar Estrutura Base da HomeScreen e Navigation [pending]
+### Dependencies: None
+### Description: Implementar a estrutura inicial da tela principal com navegação e layout base
+### Details:
+Criar HomeScreen.dart com Scaffold base. Configurar BottomNavigationBar com abas: Home, Histórico, Perfil. Implementar navegação entre telas usando Navigator 2.0 ou go_router. Adicionar AppBar customizada com título e ícone de notificações. Configurar tema consistente com cores da marca.
+
+## 2. Implementar PlanRepository e Models [pending]
+### Dependencies: None
+### Description: Criar camada de dados para buscar informações do plano do paciente
+### Details:
+Criar model Plan com campos: id, name, totalCredits, usedCredits, remainingCredits, expirationDate. Criar model UserPlan associando usuário ao plano. Implementar PlanRepository com métodos: getCurrentPlan(), getPlanHistory(), refreshPlanData(). Integrar com API usando Dio/http. Implementar tratamento de erros e estados de loading.
+
+## 3. Criar Card Principal de Visualização do Plano [pending]
+### Dependencies: 9.1, 9.2
+### Description: Desenvolver o componente visual principal que exibe informações do plano ativo
+### Details:
+Criar PlanCard widget com design moderno usando Container decorado. Exibir: nome do plano em destaque, créditos restantes/total (ex: 7/10), barra de progresso circular ou linear mostrando porcentagem de uso. Adicionar gradiente de cores baseado no saldo (verde > amarelo > vermelho). Implementar animações suaves para mudanças de valor. Adicionar ícones ilustrativos.
+
+## 4. Implementar Cache Local e Pull-to-Refresh [pending]
+### Dependencies: 9.2, 9.3
+### Description: Adicionar persistência local dos dados e atualização manual pelo usuário
+### Details:
+Implementar cache usando shared_preferences ou hive para armazenar dados do plano. Configurar expiração de cache de 5 minutos. Adicionar RefreshIndicator envolvendo a tela principal. Implementar lógica de pull-to-refresh que: mostra loading, busca dados atualizados da API, atualiza cache local, exibe feedback visual de sucesso/erro. Adicionar timestamp de última atualização.
+
+## 5. Adicionar Botão Gerar QR Code e Histórico Resumido [pending]
+### Dependencies: 9.3, 9.4
+### Description: Implementar funcionalidades complementares de QR Code e visualização de histórico
+### Details:
+Criar botão prominente 'Gerar QR Code' com ícone e cor de destaque. Ao clicar, navegar para tela de QR Code (implementada na task 10). Adicionar seção 'Últimas Visitas' mostrando lista resumida das 3 últimas consultas com: data, clínica, créditos utilizados. Implementar navegação para tela completa de histórico. Adicionar estado vazio quando não houver histórico.
+

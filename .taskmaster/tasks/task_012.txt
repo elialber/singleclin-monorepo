@@ -1,0 +1,48 @@
+# Task ID: 12
+# Title: Implementar Scanner de QR Code no App da Clínica
+# Status: pending
+# Dependencies: 6, 11
+# Priority: medium
+# Description: Criar interface de scanner para app das clínicas parceiras
+# Details:
+Criar ClinicScannerScreen usando mobile_scanner. Implementar validação em tempo real com feedback visual/sonoro. Mostrar dados do paciente após scan bem-sucedido. Adicionar campo opcional para tipo de serviço. Implementar modo manual para digitar código. Criar histórico de scans do dia.
+
+# Test Strategy:
+Testar scan de QR válido e inválido. Verificar feedback visual/sonoro. Testar entrada manual de código. Validar histórico de scans.
+
+# Agente Delegado:
+**Principal:** @flutter-mobile-expert
+Especialista em scanner mobile
+**Auxiliar:** @qr-transaction-specialist
+
+# Subtasks:
+## 1. Configurar Dependências e Estrutura Base do Scanner [pending]
+### Dependencies: None
+### Description: Adicionar pacote mobile_scanner ao projeto Flutter e criar estrutura inicial da tela de scanner
+### Details:
+Adicionar mobile_scanner: ^5.1.1 no pubspec.yaml. Configurar permissões de câmera no AndroidManifest.xml e Info.plist. Criar arquivo clinic_scanner_screen.dart em lib/features/clinic/presentation/screens/. Implementar StatefulWidget básico com Scaffold e AppBar. Adicionar rota no sistema de navegação do app.
+
+## 2. Implementar Interface de Scanner com Validação em Tempo Real [pending]
+### Dependencies: 12.1
+### Description: Criar a interface do scanner QR com feedback visual e sonoro durante a leitura
+### Details:
+Implementar MobileScanner widget com overlay customizado mostrando área de scan. Criar AnimationController para feedback visual (borda verde/vermelha). Adicionar AudioPlayer para sons de sucesso/erro. Implementar método onDetect que valida formato do QR (UUID do paciente). Mostrar indicador de carregamento durante validação. Adicionar botão de flash/lanterna e switch câmera frontal/traseira.
+
+## 3. Criar Modal de Dados do Paciente e Seleção de Serviço [pending]
+### Dependencies: 12.2
+### Description: Implementar bottom sheet que exibe dados do paciente após scan bem-sucedido
+### Details:
+Criar PatientDataBottomSheet como widget separado. Fazer requisição GET /patients/{qrCode} para buscar dados. Exibir: nome, foto, plano ativo, créditos restantes. Adicionar DropdownButton com lista de serviços da clínica (buscar de endpoint /clinics/{id}/services). Implementar botões 'Confirmar Atendimento' e 'Cancelar'. Mostrar loading durante requisições. Tratar erros de rede com retry.
+
+## 4. Adicionar Modo Manual e Validação de Código [pending]
+### Dependencies: 12.3
+### Description: Implementar entrada manual de código como alternativa ao scanner
+### Details:
+Adicionar FloatingActionButton com ícone de teclado para modo manual. Criar ManualCodeDialog com TextFormField para entrada de código. Implementar máscara/validação para formato UUID. Adicionar botão 'Verificar' que chama mesmo fluxo de validação do scanner. Mostrar erro inline para código inválido. Permitir colar código da área de transferência. Salvar últimos 5 códigos digitados em SharedPreferences.
+
+## 5. Implementar Histórico de Scans do Dia [pending]
+### Dependencies: 12.3, 12.4
+### Description: Criar funcionalidade para visualizar e gerenciar scans realizados no dia atual
+### Details:
+Criar ScanHistoryScreen acessível por ícone no AppBar. Implementar ListView com cards mostrando: hora do scan, nome do paciente, serviço realizado, status. Buscar dados de GET /clinics/{id}/scans?date=today com paginação. Adicionar pull-to-refresh para atualizar lista. Implementar swipe-to-delete para cancelar atendimento (se dentro de 5 minutos). Mostrar totalizadores: total de atendimentos e créditos consumidos. Salvar cache local com Hive para offline.
+

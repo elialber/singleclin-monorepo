@@ -1,0 +1,47 @@
+# Task ID: 3
+# Title: Configurar Banco de Dados PostgreSQL
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Configurar PostgreSQL com Entity Framework Core e criar modelos de dados iniciais
+# Details:
+Instalar PostgreSQL e configurar connection string. Adicionar Entity Framework Core com Npgsql. Criar DbContext principal. Implementar modelos: User (id, email, role, createdAt), Clinic (id, name, type, address), Plan (id, name, credits, price), UserPlan (userId, planId, remainingCredits), Transaction (id, userPlanId, clinicId, createdAt, qrCode). Configurar migrations automáticas.
+
+# Test Strategy:
+Executar migrations e verificar criação de tabelas. Testar CRUD básico em cada entidade. Validar constraints e relacionamentos. Testar rollback de migrations.
+
+# Agente Delegado:
+**Principal:** @database-architect
+Especialista em PostgreSQL e Entity Framework
+
+# Subtasks:
+## 1. Instalar e Configurar PostgreSQL [pending]
+### Dependencies: None
+### Description: Instalar PostgreSQL localmente e configurar banco de dados para desenvolvimento
+### Details:
+Instalar PostgreSQL 15+ via Docker ou instalador nativo. Criar banco de dados 'singleclin_dev' com usuário dedicado. Configurar pg_hba.conf para permitir conexões locais. Definir variáveis de ambiente DATABASE_URL no formato 'Host=localhost;Database=singleclin_dev;Username=app_user;Password=secure_password'. Adicionar arquivo .env.example com template de configuração.
+
+## 2. Adicionar Entity Framework Core com Npgsql [pending]
+### Dependencies: 3.1
+### Description: Configurar Entity Framework Core com provider Npgsql para PostgreSQL
+### Details:
+Adicionar pacotes NuGet: Npgsql.EntityFrameworkCore.PostgreSQL, Microsoft.EntityFrameworkCore.Design, Microsoft.EntityFrameworkCore.Tools. Criar pasta Data no projeto backend. Configurar serviços no Program.cs com builder.Services.AddDbContext<AppDbContext> usando connection string do ambiente. Habilitar logging detalhado em desenvolvimento para debug de queries SQL.
+
+## 3. Criar DbContext e Configurações Base [pending]
+### Dependencies: 3.2
+### Description: Implementar DbContext principal com configurações e convenções do projeto
+### Details:
+Criar classe AppDbContext herdando de DbContext. Implementar OnModelCreating com convenções: tabelas em snake_case, timestamps automáticos (CreatedAt, UpdatedAt), soft delete global filter. Criar interface IEntity base com Id, CreatedAt, UpdatedAt. Configurar value conversions para Enums. Adicionar interceptors para audit logging. Configurar comportamento de deleção em cascata.
+
+## 4. Implementar Modelos de Domínio [pending]
+### Dependencies: 3.3
+### Description: Criar todas as entidades do sistema com seus relacionamentos
+### Details:
+Criar entidades em /Data/Models: User (Guid Id, string Email, UserRole Role, DateTime CreatedAt), Clinic (Guid Id, string Name, ClinicType Type, string Address, bool IsActive), Plan (Guid Id, string Name, int Credits, decimal Price, bool IsActive), UserPlan (Guid Id, Guid UserId, Guid PlanId, int RemainingCredits, DateTime ExpiresAt), Transaction (Guid Id, Guid UserPlanId, Guid ClinicId, DateTime CreatedAt, string QrCode, TransactionStatus Status). Configurar relacionamentos no OnModelCreating: User 1-N UserPlan, Plan 1-N UserPlan, UserPlan 1-N Transaction, Clinic 1-N Transaction. Adicionar índices para performance em campos de busca frequente.
+
+## 5. Configurar Migrations e Seed Data [pending]
+### Dependencies: 3.4
+### Description: Configurar sistema de migrations automáticas e dados iniciais
+### Details:
+Configurar migrations automáticas no startup da aplicação usando context.Database.Migrate(). Criar classe DatabaseSeeder com método SeedAsync para dados iniciais: planos padrão (Basic, Premium, Enterprise), clínica administrativa, usuário admin. Implementar comando CLI 'dotnet ef migrations add' no package.json. Criar migration inicial 'InitialCreate' com todas as tabelas. Configurar backup automático antes de migrations em produção.
+

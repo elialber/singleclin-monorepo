@@ -1,0 +1,47 @@
+# Task ID: 15
+# Title: Criar Sistema de Relatórios e Analytics
+# Status: pending
+# Dependencies: 11, 13
+# Priority: low
+# Description: Implementar relatórios detalhados de uso por paciente, clínica e tipo de serviço
+# Details:
+Criar ReportService com queries otimizadas. Implementar relatórios: uso por período, ranking clínicas, serviços mais utilizados, taxa de utilização de planos. Adicionar exportação para Excel/PDF. Criar gráficos interativos com Chart.js. Implementar cache de relatórios pesados. Adicionar filtros por data, clínica, plano.
+
+# Test Strategy:
+Testar geração de cada tipo de relatório. Verificar performance com volume de dados. Testar exportação Excel/PDF. Validar precisão dos cálculos.
+
+# Agente Delegado:
+**Principal:** @analytics-reporting-specialist
+Especialista em analytics e relatórios
+
+# Subtasks:
+## 1. Criar ReportService e Estrutura Base de Relatórios [pending]
+### Dependencies: None
+### Description: Implementar serviço principal de relatórios com arquitetura modular e queries otimizadas
+### Details:
+Criar ReportService.cs com métodos base para geração de relatórios. Implementar ReportQuery builder para queries otimizadas com paginação. Criar DTOs: ReportRequest (filtros, período, tipo), ReportResponse (dados, metadata). Configurar conexão read-only para banco de relatórios. Implementar cache em memória com IMemoryCache para queries frequentes. Criar enum ReportType com tipos: UsageByPeriod, ClinicRanking, TopServices, PlanUtilization.
+
+## 2. Implementar Relatórios de Uso por Período e Ranking de Clínicas [pending]
+### Dependencies: 15.1
+### Description: Criar relatórios de análise temporal de uso e ranking comparativo entre clínicas
+### Details:
+Implementar GetUsageByPeriodReport com agregação por dia/semana/mês. Query deve incluir: total de transações, créditos consumidos, média por paciente. Criar GetClinicRankingReport ordenando por: volume de atendimentos, taxa de crescimento, satisfação (se disponível). Implementar gráficos de linha temporal com grouping dinâmico. Adicionar cálculos de variação percentual entre períodos. Retornar dados formatados para Chart.js.
+
+## 3. Criar Relatórios de Serviços e Taxa de Utilização de Planos [pending]
+### Dependencies: 15.1
+### Description: Implementar análises de serviços mais utilizados e eficiência de utilização dos planos
+### Details:
+Implementar GetTopServicesReport agrupando por ServiceType com contagem e percentual. Criar GetPlanUtilizationReport calculando: taxa de uso (créditos usados/total), frequência média de uso, tempo médio entre utilizações. Adicionar análise de sazonalidade para identificar padrões. Implementar drill-down por tipo de serviço e plano. Incluir métricas de retenção e churn rate por plano.
+
+## 4. Implementar Sistema de Exportação para Excel e PDF [pending]
+### Dependencies: 15.2, 15.3
+### Description: Criar funcionalidade de exportação de relatórios em formatos Excel e PDF com formatação profissional
+### Details:
+Integrar EPPlus para geração de Excel com abas por tipo de relatório. Implementar formatação condicional, gráficos nativos do Excel e totalizadores. Para PDF, usar QuestPDF ou similar com templates customizados. Criar ExportService com métodos: ExportToExcel, ExportToPDF. Adicionar cabeçalho com logo, período e filtros aplicados. Implementar download assíncrono para relatórios grandes. Configurar templates responsivos para diferentes tamanhos de papel.
+
+## 5. Criar Interface de Filtros e Visualização com Chart.js [pending]
+### Dependencies: 15.2, 15.3
+### Description: Implementar interface interativa com filtros avançados e gráficos dinâmicos usando Chart.js
+### Details:
+Criar ReportsController com endpoints GET /reports/{type} com query parameters para filtros. Implementar filtros: período (data início/fim), clínica (múltipla seleção), plano, tipo de serviço. No frontend, integrar Chart.js com gráficos: linha (temporal), barra (comparativo), pizza (distribuição), radar (análise multidimensional). Adicionar interatividade: zoom, pan, drill-down ao clicar. Implementar loading states e tratamento de erros. Criar dashboard unificado com widgets de resumo.
+

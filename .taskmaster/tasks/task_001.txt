@@ -1,0 +1,47 @@
+# Task ID: 1
+# Title: Configurar Estrutura Monorepo
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Criar estrutura base do projeto usando monorepo com workspaces para app mobile, web admin e backend API
+# Details:
+Configurar monorepo usando npm workspaces ou Yarn workspaces. Estrutura: /packages/mobile (Flutter), /packages/web-admin (React), /packages/backend (.NET API), /packages/shared (tipos compartilhados). Configurar tsconfig.json base, eslint, prettier. Scripts npm para build, test e deploy de todos os packages.
+
+# Test Strategy:
+Validar que comandos npm run build:all compilam todos os projetos. Testar que imports entre packages funcionam corretamente. Verificar isolamento de dependências entre workspaces.
+
+# Agente Delegado:
+**Principal:** @monorepo-architect
+Especialista em monorepo e build systems
+
+# Subtasks:
+## 1. Inicializar Projeto Monorepo com npm Workspaces [pending]
+### Dependencies: None
+### Description: Criar estrutura base do monorepo e configurar npm workspaces para gerenciar múltiplos pacotes
+### Details:
+Criar diretório raiz do projeto. Inicializar package.json principal com 'npm init -y'. Adicionar configuração workspaces no package.json: { "workspaces": ["packages/*"] }. Criar diretório /packages com subdiretórios: /mobile, /web-admin, /backend, /shared. Inicializar package.json em cada subdiretório com nome apropriado (@singleclin/mobile, @singleclin/web-admin, @singleclin/backend, @singleclin/shared). Configurar .gitignore principal incluindo node_modules, dist, .env
+
+## 2. Configurar TypeScript e Ferramentas de Linting [pending]
+### Dependencies: 1.1
+### Description: Estabelecer configuração TypeScript compartilhada e ferramentas de qualidade de código para todo o monorepo
+### Details:
+Criar tsconfig.base.json na raiz com configurações compartilhadas (target: ES2020, module: commonjs, strict: true). Criar tsconfig.json em cada package estendendo a base. Instalar e configurar ESLint com @typescript-eslint/parser e plugins. Criar .eslintrc.js na raiz com regras padrão. Configurar Prettier com .prettierrc incluindo: printWidth: 80, semi: true, singleQuote: true. Adicionar .editorconfig para consistência entre IDEs. Instalar husky e lint-staged para pre-commit hooks
+
+## 3. Estruturar Package Shared com Tipos e Utilidades [pending]
+### Dependencies: 1.2
+### Description: Criar pacote compartilhado contendo tipos TypeScript, interfaces e utilidades comuns entre projetos
+### Details:
+No /packages/shared, criar estrutura: /src/types (interfaces de domínio), /src/utils (funções auxiliares), /src/constants (valores constantes). Definir interfaces base: IUser, IClinic, IPlan, ITransaction. Criar enums para roles, status de transação, tipos de clínica. Implementar utilidades: formatters de data/moeda, validators, helpers de API response. Configurar build com tsc para gerar declarações .d.ts. Adicionar export principal em index.ts
+
+## 4. Configurar Scripts npm para Gerenciamento do Monorepo [pending]
+### Dependencies: 1.3
+### Description: Implementar scripts npm centralizados para build, test e deploy de todos os workspaces
+### Details:
+No package.json raiz, adicionar scripts: 'build:all' executando build em todos packages sequencialmente, 'test:all' rodando testes em paralelo, 'lint:all' verificando código em todos packages, 'clean:all' limpando node_modules e dist. Implementar script 'dev' que inicia todos os serviços em desenvolvimento. Adicionar scripts específicos por package: 'build:backend', 'build:web', etc. Configurar concurrently para execução paralela. Criar script 'postinstall' para setup automático após npm install
+
+## 5. Implementar CI/CD Pipeline Básico [pending]
+### Dependencies: 1.4
+### Description: Configurar pipeline de integração contínua para validar builds e qualidade do código
+### Details:
+Criar arquivo .github/workflows/ci.yml para GitHub Actions (ou equivalente para GitLab/Bitbucket). Configurar jobs: install (cache de dependências), lint (verificação de código), build (compilação de todos packages), test (execução de testes). Adicionar matrix strategy para testar em múltiplas versões Node.js. Configurar cache de node_modules para otimizar builds. Adicionar badges de status no README. Criar workflow separado para deploy com estratégia por branch (dev/staging/prod)
+
