@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text.Json;
 using SingleClin.API.DTOs;
+using SingleClin.API.Exceptions;
+using FluentValidation;
 
 namespace SingleClin.API.Middleware;
 
@@ -56,8 +58,29 @@ public class GlobalExceptionHandlerMiddleware
     {
         return exception switch
         {
+            // FluentValidation exceptions
+            ValidationException validationEx => ResponseWrapper.ErrorResponse(
+                "Validation failed", 
+                400, 
+                validationEx.Errors.Select(e => e.ErrorMessage).ToList()),
+
+            // Plan-specific exceptions
+            PlanNotFoundException planNotFoundEx => ResponseWrapper.ErrorResponse(planNotFoundEx.Message, 404),
+            DuplicatePlanNameException duplicateNameEx => ResponseWrapper.ErrorResponse(duplicateNameEx.Message, 409),
+            PlanValidationException planValidationEx => ResponseWrapper.ErrorResponse(
+                "Plan validation failed", 
+                400, 
+                planValidationEx.ValidationErrors.ToList()),
+            InvalidPlanOperationException invalidOpEx => ResponseWrapper.ErrorResponse(invalidOpEx.Message, 400),
+
+            // General exceptions
             UnauthorizedAccessException => ResponseWrapper.ErrorResponse(exception.Message, 401),
             KeyNotFoundException => ResponseWrapper.ErrorResponse(exception.Message, 404),
+            InvalidOperationException invalidOpEx when invalidOpEx.Message.Contains("not found") => 
+                ResponseWrapper.ErrorResponse(invalidOpEx.Message, 404),
+            InvalidOperationException invalidOpEx when invalidOpEx.Message.Contains("already exists") => 
+                ResponseWrapper.ErrorResponse(invalidOpEx.Message, 409),
+            InvalidOperationException invalidOpEx => ResponseWrapper.ErrorResponse(invalidOpEx.Message, 400),
             ArgumentException or ArgumentNullException => ResponseWrapper.ErrorResponse(exception.Message, 400),
             NotImplementedException => ResponseWrapper.ErrorResponse("This feature is not yet implemented", 501),
             TimeoutException => ResponseWrapper.ErrorResponse("The operation timed out", 408),

@@ -273,6 +273,88 @@
             </summary>
             <response code="200">Returns CORS test response with headers information</response>
         </member>
+        <member name="T:SingleClin.API.Controllers.PlanController">
+            <summary>
+            Controller for managing subscription plans (Admin Only)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.PlanController.GetAll(SingleClin.API.DTOs.Plan.PlanFilterDto)">
+            <summary>
+            Get all plans with pagination and filtering
+            </summary>
+            <param name="filter">Filter criteria</param>
+            <returns>Paginated list of plans</returns>
+            <response code="200">Returns the paginated list of plans</response>
+            <response code="400">Invalid filter parameters</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.PlanController.GetActive">
+            <summary>
+            Get active plans (no admin authorization required)
+            </summary>
+            <returns>List of active plans</returns>
+            <response code="200">Returns list of active plans</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.PlanController.GetById(System.Guid)">
+            <summary>
+            Get plan by ID
+            </summary>
+            <param name="id">Plan ID</param>
+            <returns>Plan details</returns>
+            <response code="200">Returns the plan</response>
+            <response code="400">Invalid plan ID format</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Plan not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.PlanController.Create(SingleClin.API.DTOs.Plan.PlanRequestDto)">
+            <summary>
+            Create a new plan
+            </summary>
+            <param name="planRequest">Plan creation data</param>
+            <returns>Created plan</returns>
+            <response code="201">Plan created successfully</response>
+            <response code="400">Invalid plan data or validation errors</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="409">Plan name already exists</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.PlanController.Update(System.Guid,SingleClin.API.DTOs.Plan.PlanRequestDto)">
+            <summary>
+            Update an existing plan
+            </summary>
+            <param name="id">Plan ID</param>
+            <param name="planRequest">Updated plan data</param>
+            <returns>Updated plan</returns>
+            <response code="200">Plan updated successfully</response>
+            <response code="400">Invalid plan data or validation errors</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Plan not found</response>
+            <response code="409">Plan name already exists</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.PlanController.Delete(System.Guid)">
+            <summary>
+            Delete a plan
+            </summary>
+            <param name="id">Plan ID</param>
+            <returns>Success confirmation</returns>
+            <response code="204">Plan deleted successfully</response>
+            <response code="400">Invalid plan ID format</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Plan not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.PlanController.GetStatistics">
+            <summary>
+            Get plan statistics
+            </summary>
+            <returns>Plan statistics</returns>
+            <response code="200">Returns plan statistics</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+        </member>
         <member name="T:SingleClin.API.Controllers.TestAuthController">
             <summary>
             Test controller to demonstrate authorization attributes
@@ -1224,6 +1306,247 @@
             User's full name (optional, used if not provided by social provider)
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.Common.PagedResultDto`1">
+            <summary>
+            Generic paginated result data transfer object
+            </summary>
+            <typeparam name="T">Type of items in the result</typeparam>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Common.PagedResultDto`1.Items">
+            <summary>
+            List of items in current page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Common.PagedResultDto`1.PageNumber">
+            <summary>
+            Current page number (1-based)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Common.PagedResultDto`1.PageSize">
+            <summary>
+            Number of items per page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Common.PagedResultDto`1.TotalCount">
+            <summary>
+            Total number of items across all pages
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Common.PagedResultDto`1.TotalPages">
+            <summary>
+            Total number of pages
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Common.PagedResultDto`1.HasPreviousPage">
+            <summary>
+            Whether there is a previous page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Common.PagedResultDto`1.HasNextPage">
+            <summary>
+            Whether there is a next page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Common.PagedResultDto`1.ItemCount">
+            <summary>
+            Number of items in current page
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Common.PagedResultDto`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Create a new paginated result
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Common.PagedResultDto`1.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Plan.PlanFilterDto">
+            <summary>
+            Data transfer object for filtering plans
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.PageNumber">
+            <summary>
+            Page number (1-based)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.PageSize">
+            <summary>
+            Number of items per page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.IsActive">
+            <summary>
+            Filter by active status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.IsFeatured">
+            <summary>
+            Filter by featured status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.SearchTerm">
+            <summary>
+            Search term for name or description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.MinPrice">
+            <summary>
+            Minimum price filter
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.MaxPrice">
+            <summary>
+            Maximum price filter
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.MinCredits">
+            <summary>
+            Minimum credits filter
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.MaxCredits">
+            <summary>
+            Maximum credits filter
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.SortBy">
+            <summary>
+            Sort field
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanFilterDto.SortDirection">
+            <summary>
+            Sort direction (asc or desc)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Plan.PlanRequestDto">
+            <summary>
+            Data transfer object for creating or updating a plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.Name">
+            <summary>
+            Plan name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.Description">
+            <summary>
+            Plan description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.Credits">
+            <summary>
+            Number of credits included in the plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.Price">
+            <summary>
+            Plan price
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.OriginalPrice">
+            <summary>
+            Original price (for discounts)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.ValidityDays">
+            <summary>
+            Validity period in days
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.IsActive">
+            <summary>
+            Whether the plan is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.DisplayOrder">
+            <summary>
+            Display order for sorting
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.IsFeatured">
+            <summary>
+            Whether this is a featured plan
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Plan.PlanResponseDto">
+            <summary>
+            Data transfer object for plan response
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.Id">
+            <summary>
+            Plan unique identifier
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.Name">
+            <summary>
+            Plan name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.Description">
+            <summary>
+            Plan description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.Credits">
+            <summary>
+            Number of credits included in the plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.Price">
+            <summary>
+            Plan price
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.OriginalPrice">
+            <summary>
+            Original price (for showing discounts)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.ValidityDays">
+            <summary>
+            Validity period in days
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.IsActive">
+            <summary>
+            Whether the plan is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.DisplayOrder">
+            <summary>
+            Display order for sorting
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.IsFeatured">
+            <summary>
+            Whether this is a featured plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.CreatedAt">
+            <summary>
+            When the plan was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.UpdatedAt">
+            <summary>
+            When the plan was last updated
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.DiscountPercentage">
+            <summary>
+            Calculated discount percentage (if OriginalPrice is set)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.PricePerCredit">
+            <summary>
+            Calculated price per credit
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Extensions.DatabaseExtensions">
             <summary>
             Extension methods for database configuration
@@ -1289,6 +1612,83 @@
         </member>
         <member name="M:SingleClin.API.Migrations.ApplicationDb.AddLastLoginAtToApplicationUser.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Repositories.IPlanRepository">
+            <summary>
+            Repository contract for Plan entity operations
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.GetAllAsync(System.Int32,System.Int32,System.Nullable{System.Boolean},System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal})">
+            <summary>
+            Get all plans with pagination and filtering
+            </summary>
+            <param name="pageNumber">Page number (1-based)</param>
+            <param name="pageSize">Number of items per page</param>
+            <param name="isActive">Filter by active status (null for all)</param>
+            <param name="searchTerm">Search term for name or description</param>
+            <param name="minPrice">Minimum price filter</param>
+            <param name="maxPrice">Maximum price filter</param>
+            <returns>Paginated list of plans</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.GetByIdAsync(System.Guid)">
+            <summary>
+            Get plan by ID
+            </summary>
+            <param name="id">Plan ID</param>
+            <returns>Plan if found, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.GetByNameAsync(System.String)">
+            <summary>
+            Get plan by name
+            </summary>
+            <param name="name">Plan name</param>
+            <returns>Plan if found, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.GetActiveAsync">
+            <summary>
+            Get all active plans ordered by display order
+            </summary>
+            <returns>List of active plans</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.CreateAsync(SingleClin.API.Data.Models.Plan)">
+            <summary>
+            Create a new plan
+            </summary>
+            <param name="plan">Plan to create</param>
+            <returns>Created plan</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.UpdateAsync(SingleClin.API.Data.Models.Plan)">
+            <summary>
+            Update an existing plan
+            </summary>
+            <param name="plan">Plan to update</param>
+            <returns>Updated plan</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.DeleteAsync(System.Guid)">
+            <summary>
+            Delete a plan (soft delete)
+            </summary>
+            <param name="id">Plan ID to delete</param>
+            <returns>True if deleted, false if not found</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.NameExistsAsync(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check if plan name exists (for validation)
+            </summary>
+            <param name="name">Plan name to check</param>
+            <param name="excludeId">Plan ID to exclude from check (for updates)</param>
+            <returns>True if name exists, false otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IPlanRepository.GetCountsByStatusAsync">
+            <summary>
+            Get plans count by status
+            </summary>
+            <returns>Dictionary with status counts</returns>
+        </member>
+        <member name="T:SingleClin.API.Repositories.PlanRepository">
+            <summary>
+            Repository implementation for Plan entity operations
+            </summary>
         </member>
         <member name="T:SingleClin.API.Services.AuthService">
             <summary>
@@ -1415,6 +1815,69 @@
             </summary>
             <returns>True if Firebase is configured, false otherwise</returns>
         </member>
+        <member name="T:SingleClin.API.Services.IPlanService">
+            <summary>
+            Service contract for Plan business logic
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IPlanService.GetAllAsync(SingleClin.API.DTOs.Plan.PlanFilterDto)">
+            <summary>
+            Get all plans with pagination and filtering
+            </summary>
+            <param name="filter">Filter criteria</param>
+            <returns>Paginated list of plans</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IPlanService.GetByIdAsync(System.Guid)">
+            <summary>
+            Get plan by ID
+            </summary>
+            <param name="id">Plan ID</param>
+            <returns>Plan if found, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IPlanService.GetActiveAsync">
+            <summary>
+            Get all active plans
+            </summary>
+            <returns>List of active plans</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IPlanService.CreateAsync(SingleClin.API.DTOs.Plan.PlanRequestDto)">
+            <summary>
+            Create a new plan
+            </summary>
+            <param name="planRequest">Plan data</param>
+            <returns>Created plan</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when plan name already exists</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IPlanService.UpdateAsync(System.Guid,SingleClin.API.DTOs.Plan.PlanRequestDto)">
+            <summary>
+            Update an existing plan
+            </summary>
+            <param name="id">Plan ID</param>
+            <param name="planRequest">Updated plan data</param>
+            <returns>Updated plan</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when plan not found or name already exists</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IPlanService.DeleteAsync(System.Guid)">
+            <summary>
+            Delete a plan (soft delete)
+            </summary>
+            <param name="id">Plan ID</param>
+            <returns>True if deleted, false if not found</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IPlanService.GetStatisticsAsync">
+            <summary>
+            Get statistics about plans
+            </summary>
+            <returns>Dictionary with plan statistics</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IPlanService.ValidateAsync(SingleClin.API.DTOs.Plan.PlanRequestDto,System.Nullable{System.Guid})">
+            <summary>
+            Validate plan data
+            </summary>
+            <param name="planRequest">Plan data to validate</param>
+            <param name="excludeId">Plan ID to exclude from uniqueness checks (for updates)</param>
+            <returns>List of validation errors</returns>
+        </member>
         <member name="T:SingleClin.API.Services.IRefreshTokenService">
             <summary>
             Service interface for refresh token management
@@ -1471,6 +1934,11 @@
             <param name="token">Refresh token</param>
             <param name="deviceInfo">New device information</param>
             <returns>Success status</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.PlanService">
+            <summary>
+            Service implementation for Plan business logic
+            </summary>
         </member>
         <member name="T:SingleClin.API.Services.RefreshTokenService">
             <summary>

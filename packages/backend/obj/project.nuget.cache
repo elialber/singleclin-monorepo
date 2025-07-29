@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "VEHKOo0OMJY=",
+  "dgSpecHash": "YPKJPi+pTVk=",
   "success": true,
   "projectFilePath": "/Users/elialber/Development/Repos/SingleClin/packages/backend/SingleClin.API.csproj",
   "expectedPackageFiles": [
     "/Users/elialber/.nuget/packages/dotnetenv/3.1.1/dotnetenv.3.1.1.nupkg.sha512",
     "/Users/elialber/.nuget/packages/firebaseadmin/3.3.0/firebaseadmin.3.3.0.nupkg.sha512",
+    "/Users/elialber/.nuget/packages/fluentvalidation/11.11.0/fluentvalidation.11.11.0.nupkg.sha512",
+    "/Users/elialber/.nuget/packages/fluentvalidation.aspnetcore/11.3.1/fluentvalidation.aspnetcore.11.3.1.nupkg.sha512",
+    "/Users/elialber/.nuget/packages/fluentvalidation.dependencyinjectionextensions/11.11.0/fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",
     "/Users/elialber/.nuget/packages/google.api.gax/4.8.0/google.api.gax.4.8.0.nupkg.sha512",
     "/Users/elialber/.nuget/packages/google.api.gax.rest/4.8.0/google.api.gax.rest.4.8.0.nupkg.sha512",
     "/Users/elialber/.nuget/packages/google.apis/1.68.0/google.apis.1.68.0.nupkg.sha512",
