@@ -161,3 +161,8 @@
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/DotNetEnv.dll
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Sprache.dll
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/package.json
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Microsoft.AspNetCore.Cryptography.Internal.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Microsoft.Extensions.Identity.Core.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Microsoft.Extensions.Identity.Stores.dll

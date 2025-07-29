@@ -4,6 +4,110 @@
         <name>SingleClin.API</name>
     </assembly>
     <members>
+        <member name="T:SingleClin.API.Attributes.AuthorizeClinicOwnerAttribute">
+            <summary>
+            Authorization attribute that ensures the user owns or belongs to the clinic being accessed
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Attributes.AuthorizeClinicOwnerAttribute.#ctor(System.String,System.Boolean)">
+            <summary>
+            Initializes a new instance of the AuthorizeClinicOwnerAttribute
+            </summary>
+            <param name="clinicIdParameterName">The name of the route/query parameter containing the clinic ID</param>
+            <param name="allowAdmin">Whether to allow administrators to bypass the check</param>
+        </member>
+        <member name="T:SingleClin.API.Attributes.AuthorizeAdminOrClinicOwnerAttribute">
+            <summary>
+            Authorization attribute that allows either admin or clinic owner
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Attributes.AuthorizeRoleAttribute">
+            <summary>
+            Custom authorization attribute for role-based access control
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Attributes.AuthorizeRoleAttribute.#ctor(SingleClin.API.Data.Enums.UserRole[])">
+            <summary>
+            Initializes a new instance of the AuthorizeRoleAttribute
+            </summary>
+            <param name="roles">Allowed roles</param>
+        </member>
+        <member name="T:SingleClin.API.Attributes.AuthorizeAdminAttribute">
+            <summary>
+            Authorize attribute for Administrator role
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Attributes.AuthorizeClinicAttribute">
+            <summary>
+            Authorize attribute for Clinic roles (Origin and Partner)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Attributes.AuthorizePatientAttribute">
+            <summary>
+            Authorize attribute for Patient role
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Attributes.AuthorizeAnyRoleAttribute">
+            <summary>
+            Authorize attribute for any authenticated user
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Controllers.AuthController">
+            <summary>
+            Controller for authentication endpoints
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.Register(SingleClin.API.DTOs.Auth.RegisterDto)">
+            <summary>
+            Register a new user
+            </summary>
+            <param name="registerDto">Registration information</param>
+            <returns>Authentication response with tokens</returns>
+            <response code="200">Registration successful</response>
+            <response code="400">Invalid registration data or email already exists</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.Login(SingleClin.API.DTOs.Auth.LoginDto)">
+            <summary>
+            Login with email and password
+            </summary>
+            <param name="loginDto">Login credentials</param>
+            <returns>Authentication response with tokens</returns>
+            <response code="200">Login successful</response>
+            <response code="401">Invalid credentials</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.RefreshToken(SingleClin.API.DTOs.Auth.RefreshTokenDto)">
+            <summary>
+            Refresh access token using refresh token
+            </summary>
+            <param name="refreshTokenDto">Refresh token information</param>
+            <returns>New authentication response with tokens</returns>
+            <response code="200">Token refreshed successfully</response>
+            <response code="401">Invalid or expired refresh token</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.Logout">
+            <summary>
+            Logout current user
+            </summary>
+            <returns>Success status</returns>
+            <response code="200">Logout successful</response>
+            <response code="401">Not authenticated</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.GetCurrentUser">
+            <summary>
+            Get current user information
+            </summary>
+            <returns>Current user details</returns>
+            <response code="200">User information retrieved</response>
+            <response code="401">Not authenticated</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.RevokeAllTokens">
+            <summary>
+            Revoke all refresh tokens for current user (logout from all devices)
+            </summary>
+            <returns>Number of tokens revoked</returns>
+            <response code="200">Tokens revoked successfully</response>
+            <response code="401">Not authenticated</response>
+        </member>
         <member name="M:SingleClin.API.Controllers.AuthTestController.GetPublic">
             <summary>
             Public endpoint - no authentication required
@@ -151,6 +255,56 @@
             </summary>
             <response code="200">Returns CORS test response with headers information</response>
         </member>
+        <member name="T:SingleClin.API.Controllers.TestAuthController">
+            <summary>
+            Test controller to demonstrate authorization attributes
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.PublicEndpoint">
+            <summary>
+            Public endpoint - no authentication required
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.AuthenticatedEndpoint">
+            <summary>
+            Requires any authenticated user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.AdminOnlyEndpoint">
+            <summary>
+            Admin only endpoint
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.ClinicOnlyEndpoint">
+            <summary>
+            Clinic users only endpoint (Origin or Partner)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.PatientOnlyEndpoint">
+            <summary>
+            Patient only endpoint
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.AdminOrClinicEndpoint">
+            <summary>
+            Multiple roles allowed (Admin or Clinic)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.GetClinicDetails(System.Guid)">
+            <summary>
+            Clinic-specific resource - only accessible by the clinic owner
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.GetClinicAdminAccess(System.Guid)">
+            <summary>
+            Clinic resource accessible by admin or clinic owner
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TestAuthController.CheckClaims">
+            <summary>
+            Example of using authorization in action - check claims programmatically
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Controllers.TestResponseController">
             <summary>
             Test controller to demonstrate BaseController and ResponseWrapper functionality
@@ -252,6 +406,41 @@
             Transactions (credit usage)
             </summary>
         </member>
+        <member name="T:SingleClin.API.Data.ApplicationDbContext">
+            <summary>
+            Main database context for the SingleClin application with Identity support
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.Clinics">
+            <summary>
+            Clinics registered in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.Plans">
+            <summary>
+            Available plans for purchase
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.UserPlans">
+            <summary>
+            User purchased plans
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.Transactions">
+            <summary>
+            Transactions (credit usage)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.RefreshTokens">
+            <summary>
+            Refresh tokens for JWT authentication
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Configurations.ApplicationUserConfiguration">
+            <summary>
+            Entity configuration for ApplicationUser
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.Configurations.BaseEntityConfiguration`1">
             <summary>
             Base configuration for entities that implement IEntity
@@ -260,6 +449,11 @@
         <member name="M:SingleClin.API.Data.Configurations.BaseEntityConfiguration`1.ConfigureEntity(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{`0})">
             <summary>
             Override this method to add entity-specific configurations
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Configurations.RefreshTokenConfiguration">
+            <summary>
+            Entity configuration for RefreshToken
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.DatabaseSeeder">
@@ -277,9 +471,89 @@
             Design-time factory for EF Core migrations
             </summary>
         </member>
+        <member name="T:SingleClin.API.Data.Enums.UserRole">
+            <summary>
+            User roles in the system
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Enums.UserRole.Patient">
+            <summary>
+            Patient user who can use credits and generate QR codes
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Enums.UserRole.ClinicOrigin">
+            <summary>
+            Origin clinic that provides services and validates QR codes
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Enums.UserRole.ClinicPartner">
+            <summary>
+            Partner clinic that can validate QR codes but not provide services
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Enums.UserRole.Administrator">
+            <summary>
+            System administrator with full access
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.Interceptors.AuditingInterceptor">
             <summary>
             Interceptor for logging database operations in development
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.ApplicationUser">
+            <summary>
+            Extended user class for ASP.NET Core Identity
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.Role">
+            <summary>
+            User's role in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.ClinicId">
+            <summary>
+            Associated clinic ID (for clinic users only)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.Clinic">
+            <summary>
+            Navigation property to the associated clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.FullName">
+            <summary>
+            User's full name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.IsActive">
+            <summary>
+            Whether the user account is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.CreatedAt">
+            <summary>
+            Date when the user was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.UpdatedAt">
+            <summary>
+            Date when the user was last updated
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.LastLoginAt">
+            <summary>
+            Date when the user last logged in
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.RefreshTokens">
+            <summary>
+            Refresh tokens for JWT authentication
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.UserPlans">
+            <summary>
+            User plans (for patients)
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Models.BaseEntity">
@@ -512,6 +786,56 @@
             User plans purchased from this plan
             </summary>
         </member>
+        <member name="T:SingleClin.API.Data.Models.RefreshToken">
+            <summary>
+            Refresh token for JWT authentication
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.Token">
+            <summary>
+            The token value
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.UserId">
+            <summary>
+            User ID this token belongs to
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.User">
+            <summary>
+            Navigation property to the user
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.ExpiresAt">
+            <summary>
+            When the token expires
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.IsRevoked">
+            <summary>
+            Whether the token has been revoked
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.RevokedAt">
+            <summary>
+            When the token was revoked
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.DeviceInfo">
+            <summary>
+            Device information for the token
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.IpAddress">
+            <summary>
+            IP address from which the token was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.RefreshToken.IsActive">
+            <summary>
+            Check if the token is active
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.Models.Transaction">
             <summary>
             Represents a transaction (credit usage) in the system
@@ -712,6 +1036,161 @@
             Transactions made using this plan
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.Auth.AuthResponseDto">
+            <summary>
+            Data transfer object for authentication response
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.AccessToken">
+            <summary>
+            JWT access token
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.RefreshToken">
+            <summary>
+            Refresh token for getting new access tokens
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.ExpiresIn">
+            <summary>
+            Access token expiration time in seconds
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.UserId">
+            <summary>
+            User's ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.Email">
+            <summary>
+            User's email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.FullName">
+            <summary>
+            User's full name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.Role">
+            <summary>
+            User's role
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.ClinicId">
+            <summary>
+            Associated clinic ID (for clinic users)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.IsFirstLogin">
+            <summary>
+            Indicates if this is the user's first login
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Auth.LoginDto">
+            <summary>
+            Data transfer object for user login
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.LoginDto.Email">
+            <summary>
+            User's email address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.LoginDto.Password">
+            <summary>
+            User's password
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.LoginDto.RememberMe">
+            <summary>
+            Whether to remember the user (for longer refresh token expiration)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.LoginDto.DeviceInfo">
+            <summary>
+            Device information for tracking refresh tokens
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Auth.RefreshTokenDto">
+            <summary>
+            Data transfer object for refresh token request
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.RefreshTokenDto.RefreshToken">
+            <summary>
+            The refresh token
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.RefreshTokenDto.DeviceInfo">
+            <summary>
+            Device information for tracking refresh tokens
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Auth.RegisterDto">
+            <summary>
+            Data transfer object for user registration
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.RegisterDto.Email">
+            <summary>
+            User's email address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.RegisterDto.Password">
+            <summary>
+            User's password
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.RegisterDto.ConfirmPassword">
+            <summary>
+            Confirm password
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.RegisterDto.FullName">
+            <summary>
+            User's full name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.RegisterDto.Role">
+            <summary>
+            User's role in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.RegisterDto.ClinicName">
+            <summary>
+            Clinic name (required for clinic users)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Auth.RegisterDto.IsValid">
+            <summary>
+            Validates if clinic name is required based on role
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Auth.SocialLoginDto">
+            <summary>
+            Data transfer object for social login
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SocialLoginDto.IdToken">
+            <summary>
+            Firebase ID token from social provider
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SocialLoginDto.Provider">
+            <summary>
+            Social provider (google, apple)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SocialLoginDto.DeviceInfo">
+            <summary>
+            Device information for tracking refresh tokens
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SocialLoginDto.FullName">
+            <summary>
+            User's full name (optional, used if not provided by social provider)
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Extensions.DatabaseExtensions">
             <summary>
             Extension methods for database configuration
@@ -753,6 +1232,147 @@
         </member>
         <member name="M:SingleClin.API.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.AddIdentityAndRefreshTokens">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddIdentityAndRefreshTokens.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddIdentityAndRefreshTokens.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddIdentityAndRefreshTokens.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.AddLastLoginAtToApplicationUser">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddLastLoginAtToApplicationUser.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddLastLoginAtToApplicationUser.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddLastLoginAtToApplicationUser.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Services.AuthService">
+            <summary>
+            Service for handling authentication operations
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.IAuthService">
+            <summary>
+            Service interface for authentication operations
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.RegisterAsync(SingleClin.API.DTOs.Auth.RegisterDto,System.String)">
+            <summary>
+            Register a new user
+            </summary>
+            <param name="registerDto">Registration data</param>
+            <param name="ipAddress">Client IP address</param>
+            <returns>Authentication response with tokens</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.LoginAsync(SingleClin.API.DTOs.Auth.LoginDto,System.String)">
+            <summary>
+            Authenticate a user with email and password
+            </summary>
+            <param name="loginDto">Login credentials</param>
+            <param name="ipAddress">Client IP address</param>
+            <returns>Authentication response with tokens</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.RefreshTokenAsync(System.String,System.String)">
+            <summary>
+            Refresh access token using refresh token
+            </summary>
+            <param name="refreshToken">Refresh token</param>
+            <param name="ipAddress">Client IP address</param>
+            <returns>New authentication response with tokens</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.LogoutAsync(System.Guid,System.String)">
+            <summary>
+            Logout user by invalidating refresh token
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="refreshToken">Current refresh token to invalidate</param>
+            <returns>Success status</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.RevokeAllUserTokensAsync(System.Guid)">
+            <summary>
+            Revoke all refresh tokens for a user
+            </summary>
+            <param name="userId">User ID</param>
+            <returns>Number of tokens revoked</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.CleanupExpiredTokensAsync">
+            <summary>
+            Clean up expired refresh tokens
+            </summary>
+            <returns>Number of tokens removed</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IRefreshTokenService">
+            <summary>
+            Service interface for refresh token management
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IRefreshTokenService.CreateRefreshTokenAsync(System.Guid,System.String,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Create and store a new refresh token for a user
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="ipAddress">Client IP address</param>
+            <param name="deviceInfo">Device information</param>
+            <param name="expirationDays">Token expiration in days</param>
+            <returns>The created refresh token</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRefreshTokenService.ValidateRefreshTokenAsync(System.String)">
+            <summary>
+            Validate a refresh token and return the associated user ID
+            </summary>
+            <param name="token">Refresh token to validate</param>
+            <returns>User ID if valid, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRefreshTokenService.RevokeTokenAsync(System.String)">
+            <summary>
+            Revoke a specific refresh token
+            </summary>
+            <param name="token">Token to revoke</param>
+            <returns>Success status</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRefreshTokenService.RevokeAllUserTokensAsync(System.Guid)">
+            <summary>
+            Revoke all refresh tokens for a user
+            </summary>
+            <param name="userId">User ID</param>
+            <returns>Number of tokens revoked</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRefreshTokenService.GetActiveUserTokensAsync(System.Guid)">
+            <summary>
+            Get active refresh tokens for a user
+            </summary>
+            <param name="userId">User ID</param>
+            <returns>List of active refresh tokens</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRefreshTokenService.CleanupExpiredTokensAsync">
+            <summary>
+            Clean up expired refresh tokens
+            </summary>
+            <returns>Number of tokens removed</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRefreshTokenService.UpdateDeviceInfoAsync(System.String,System.String)">
+            <summary>
+            Update device info for a refresh token
+            </summary>
+            <param name="token">Refresh token</param>
+            <param name="deviceInfo">New device information</param>
+            <returns>Success status</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.RefreshTokenService">
+            <summary>
+            Service for managing refresh tokens
+            </summary>
         </member>
     </members>
 </doc>

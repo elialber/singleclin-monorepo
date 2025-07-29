@@ -3,9 +3,12 @@ using SingleClin.API.Middleware;
 using SingleClin.API.Services;
 using SingleClin.API.Filters;
 using SingleClin.API.HealthChecks;
+using SingleClin.API.Data;
+using SingleClin.API.Data.Models;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Swashbuckle.AspNetCore.Annotations;
 using DotNetEnv;
 
@@ -25,7 +28,7 @@ public class Program
         
         // Add Entity Framework Core with PostgreSQL
         builder.Services.AddSingleton<SingleClin.API.Data.Interceptors.AuditingInterceptor>();
-        builder.Services.AddDbContext<SingleClin.API.Data.AppDbContext>((serviceProvider, options) =>
+        builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
                 .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
@@ -38,6 +41,33 @@ public class Program
                 options.AddInterceptors(auditingInterceptor);
             }
         });
+
+        // Configure ASP.NET Core Identity
+        builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+        {
+            // Password settings
+            options.Password.RequireDigit = true;
+            options.Password.RequiredLength = 8;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequiredUniqueChars = 6;
+
+            // Lockout settings
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
+
+            // User settings
+            options.User.RequireUniqueEmail = true;
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+            
+            // Sign in settings
+            options.SignIn.RequireConfirmedEmail = false; // Set to true in production
+            options.SignIn.RequireConfirmedPhoneNumber = false;
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
         
         // Add CORS
         builder.Services.AddCors(options =>
@@ -61,6 +91,8 @@ public class Program
         // Add Firebase authentication and JWT services
         builder.Services.AddFirebaseAuthentication(builder.Configuration);
         builder.Services.AddScoped<IJwtService, JwtService>();
+        builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
         // Configure Swagger with JWT support
         builder.Services.AddEndpointsApiExplorer();
@@ -130,7 +162,7 @@ public class Program
             .AddCheck<SingleClin.API.HealthChecks.FirebaseHealthCheck>("firebase", 
                 failureStatus: HealthStatus.Degraded,
                 tags: new[] { "firebase", "auth" })
-            .AddDbContextCheck<SingleClin.API.Data.AppDbContext>("database",
+            .AddDbContextCheck<ApplicationDbContext>("database",
                 failureStatus: HealthStatus.Unhealthy,
                 tags: new[] { "database", "ready" });
 
