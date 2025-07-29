@@ -16,6 +16,11 @@ public interface IPlanRepository
     /// <param name="searchTerm">Search term for name or description</param>
     /// <param name="minPrice">Minimum price filter</param>
     /// <param name="maxPrice">Maximum price filter</param>
+    /// <param name="isFeatured">Filter by featured status (null for all)</param>
+    /// <param name="minCredits">Minimum credits filter</param>
+    /// <param name="maxCredits">Maximum credits filter</param>
+    /// <param name="sortBy">Field to sort by</param>
+    /// <param name="sortDirection">Sort direction (asc or desc)</param>
     /// <returns>Paginated list of plans</returns>
     Task<(IEnumerable<Plan> Plans, int TotalCount)> GetAllAsync(
         int pageNumber = 1, 
@@ -23,7 +28,12 @@ public interface IPlanRepository
         bool? isActive = null, 
         string? searchTerm = null, 
         decimal? minPrice = null, 
-        decimal? maxPrice = null);
+        decimal? maxPrice = null,
+        bool? isFeatured = null,
+        int? minCredits = null,
+        int? maxCredits = null,
+        string sortBy = "DisplayOrder",
+        string sortDirection = "asc");
 
     /// <summary>
     /// Get plan by ID

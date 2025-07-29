@@ -33,7 +33,7 @@ public class PlanRequestValidator : AbstractValidator<PlanRequestDto>
             .WithMessage("Price must be greater than or equal to 0")
             .LessThanOrEqualTo(999999.99m)
             .WithMessage("Price cannot exceed R$ 999,999.99")
-            .Must(HaveMaxTwoDecimalPlaces)
+            .Must(price => HaveMaxTwoDecimalPlaces(price))
             .WithMessage("Price cannot have more than 2 decimal places");
 
         RuleFor(x => x.OriginalPrice)
@@ -41,7 +41,7 @@ public class PlanRequestValidator : AbstractValidator<PlanRequestDto>
             .WithMessage("Original price must be greater than or equal to 0")
             .LessThanOrEqualTo(999999.99m)
             .WithMessage("Original price cannot exceed R$ 999,999.99")
-            .Must(HaveMaxTwoDecimalPlaces)
+            .Must(originalPrice => HaveMaxTwoDecimalPlaces(originalPrice))
             .WithMessage("Original price cannot have more than 2 decimal places")
             .When(x => x.OriginalPrice.HasValue);
 
@@ -92,6 +92,16 @@ public class PlanRequestValidator : AbstractValidator<PlanRequestDto>
     /// Validates that decimal value has maximum 2 decimal places
     /// </summary>
     /// <param name="value">Decimal value to validate</param>
+    /// <returns>True if valid, false otherwise</returns>
+    private static bool HaveMaxTwoDecimalPlaces(decimal value)
+    {
+        return decimal.Round(value, 2) == value;
+    }
+
+    /// <summary>
+    /// Validates that nullable decimal value has maximum 2 decimal places
+    /// </summary>
+    /// <param name="value">Nullable decimal value to validate</param>
     /// <returns>True if valid, false otherwise</returns>
     private static bool HaveMaxTwoDecimalPlaces(decimal? value)
     {

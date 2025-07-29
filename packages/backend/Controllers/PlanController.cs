@@ -29,20 +29,32 @@ public class PlanController : ControllerBase
     /// <summary>
     /// Get all plans with pagination and filtering
     /// </summary>
-    /// <param name="filter">Filter criteria</param>
+    /// <param name="filter">Filter criteria including pagination, search, price range, credits range, featured status, and sorting</param>
     /// <returns>Paginated list of plans</returns>
     /// <response code="200">Returns the paginated list of plans</response>
     /// <response code="400">Invalid filter parameters</response>
     /// <response code="401">Unauthorized</response>
     /// <response code="403">Forbidden - Admin role required</response>
+    /// <example>
+    /// GET /api/plan?pageNumber=1&amp;pageSize=10&amp;isActive=true&amp;searchTerm=premium&amp;minPrice=50&amp;maxPrice=200&amp;isFeatured=true&amp;sortBy=price&amp;sortDirection=desc
+    /// </example>
     [HttpGet]
     [SwaggerOperation(
-        Summary = "Get all plans",
-        Description = "Retrieve all plans with pagination, filtering, and sorting options. Admin role required.",
+        Summary = "Get all plans with advanced filtering",
+        Description = @"Retrieve all plans with comprehensive filtering, pagination, and sorting options. Admin role required.
+        
+**Available sort fields:** name, price, credits, validitydays, createdat, updatedat, isfeatured, isactive, displayorder
+        
+**Filter examples:**
+- Get active plans: `?isActive=true`
+- Search by name: `?searchTerm=premium`
+- Price range: `?minPrice=50&maxPrice=200`
+- Featured plans: `?isFeatured=true`
+- Sort by price desc: `?sortBy=price&sortDirection=desc`",
         OperationId = "GetPlans"
     )]
     [SwaggerResponse(200, "Success", typeof(PagedResultDto<PlanResponseDto>))]
-    [SwaggerResponse(400, "Bad Request")]
+    [SwaggerResponse(400, "Bad Request - Invalid filter parameters")]
     [SwaggerResponse(401, "Unauthorized")]
     [SwaggerResponse(403, "Forbidden - Admin role required")]
     public async Task<ActionResult<PagedResultDto<PlanResponseDto>>> GetAll([FromQuery] PlanFilterDto filter)
@@ -149,17 +161,42 @@ public class PlanController : ControllerBase
     /// <summary>
     /// Create a new plan
     /// </summary>
-    /// <param name="planRequest">Plan creation data</param>
+    /// <param name="planRequest">Plan creation data with validation rules</param>
     /// <returns>Created plan</returns>
     /// <response code="201">Plan created successfully</response>
     /// <response code="400">Invalid plan data or validation errors</response>
     /// <response code="401">Unauthorized</response>
     /// <response code="403">Forbidden - Admin role required</response>
     /// <response code="409">Plan name already exists</response>
+    /// <example>
+    /// POST /api/plan
+    /// {
+    ///   "name": "Premium Plan",
+    ///   "description": "Premium subscription with enhanced features",
+    ///   "credits": 1000,
+    ///   "price": 99.99,
+    ///   "originalPrice": 149.99,
+    ///   "validityDays": 365,
+    ///   "isActive": true,
+    ///   "displayOrder": 1,
+    ///   "isFeatured": true
+    /// }
+    /// </example>
     [HttpPost]
     [SwaggerOperation(
-        Summary = "Create a new plan",
-        Description = "Create a new subscription plan. Plan names must be unique. Admin role required.",
+        Summary = "Create a new subscription plan",
+        Description = @"Create a new subscription plan with comprehensive validation. Admin role required.
+        
+**Validation Rules:**
+- Name: Required, 1-100 characters, alphanumeric with spaces/hyphens/dots only
+- Description: Optional, max 500 characters  
+- Credits: Required, 1-10,000
+- Price: Required, ≥0, max 2 decimal places, ≤999,999.99
+- OriginalPrice: Optional, if provided must be > price
+- ValidityDays: Required, 1-3650 days (max 10 years)
+- DisplayOrder: Optional, 0-999
+- Featured plans must have price > 0
+- Inactive plans cannot be featured",
         OperationId = "CreatePlan"
     )]
     [SwaggerResponse(201, "Plan created successfully", typeof(PlanResponseDto))]
