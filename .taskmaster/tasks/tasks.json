@@ -143,7 +143,7 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -151,7 +151,7 @@
             "description": "Instalar PostgreSQL localmente e configurar banco de dados para desenvolvimento",
             "dependencies": [],
             "details": "Instalar PostgreSQL 15+ via Docker ou instalador nativo. Criar banco de dados 'singleclin_dev' com usuário dedicado. Configurar pg_hba.conf para permitir conexões locais. Definir variáveis de ambiente DATABASE_URL no formato 'Host=localhost;Database=singleclin_dev;Username=app_user;Password=secure_password'. Adicionar arquivo .env.example com template de configuração.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Testar conexão via psql ou pgAdmin. Verificar criação do banco e permissões do usuário."
           },
           {
@@ -162,7 +162,7 @@
               "3.1"
             ],
             "details": "Adicionar pacotes NuGet: Npgsql.EntityFrameworkCore.PostgreSQL, Microsoft.EntityFrameworkCore.Design, Microsoft.EntityFrameworkCore.Tools. Criar pasta Data no projeto backend. Configurar serviços no Program.cs com builder.Services.AddDbContext<AppDbContext> usando connection string do ambiente. Habilitar logging detalhado em desenvolvimento para debug de queries SQL.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verificar instalação dos pacotes. Testar injeção de dependência do DbContext em um controller de teste."
           },
           {
@@ -173,7 +173,7 @@
               "3.2"
             ],
             "details": "Criar classe AppDbContext herdando de DbContext. Implementar OnModelCreating com convenções: tabelas em snake_case, timestamps automáticos (CreatedAt, UpdatedAt), soft delete global filter. Criar interface IEntity base com Id, CreatedAt, UpdatedAt. Configurar value conversions para Enums. Adicionar interceptors para audit logging. Configurar comportamento de deleção em cascata.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Criar migration vazia e verificar se compila. Testar convenções aplicadas no modelo."
           },
           {
@@ -184,7 +184,7 @@
               "3.3"
             ],
             "details": "Criar entidades em /Data/Models: User (Guid Id, string Email, UserRole Role, DateTime CreatedAt), Clinic (Guid Id, string Name, ClinicType Type, string Address, bool IsActive), Plan (Guid Id, string Name, int Credits, decimal Price, bool IsActive), UserPlan (Guid Id, Guid UserId, Guid PlanId, int RemainingCredits, DateTime ExpiresAt), Transaction (Guid Id, Guid UserPlanId, Guid ClinicId, DateTime CreatedAt, string QrCode, TransactionStatus Status). Configurar relacionamentos no OnModelCreating: User 1-N UserPlan, Plan 1-N UserPlan, UserPlan 1-N Transaction, Clinic 1-N Transaction. Adicionar índices para performance em campos de busca frequente.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Compilar modelos e verificar ausência de erros. Gerar diagrama do modelo para validar relacionamentos."
           },
           {
@@ -195,7 +195,7 @@
               "3.4"
             ],
             "details": "Configurar migrations automáticas no startup da aplicação usando context.Database.Migrate(). Criar classe DatabaseSeeder com método SeedAsync para dados iniciais: planos padrão (Basic, Premium, Enterprise), clínica administrativa, usuário admin. Implementar comando CLI 'dotnet ef migrations add' no package.json. Criar migration inicial 'InitialCreate' com todas as tabelas. Configurar backup automático antes de migrations em produção.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Executar migration e verificar criação de todas as tabelas no PostgreSQL. Validar seed data inserido corretamente. Testar rollback com 'dotnet ef database update [migration anterior]'."
           }
         ]
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-29T21:22:26.280Z",
+      "updated": "2025-07-29T21:39:32.466Z",
       "description": "Tasks for master context"
     }
   }
