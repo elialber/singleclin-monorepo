@@ -12,8 +12,8 @@ class InitialBinding extends Bindings {
     // Theme controller - needs to be available immediately
     Get.put<ThemeController>(ThemeController());
     
-    // Example: Authentication service
-    // Get.lazyPut<AuthService>(() => AuthService());
+    // Authentication controller - needs to be available immediately
+    Get.put<AuthController>(AuthController());
     
     // Example: Local storage service
     // Get.lazyPut<StorageService>(() => StorageService());

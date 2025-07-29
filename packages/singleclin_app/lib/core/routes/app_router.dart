@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:singleclin_app/core/routes/app_routes.dart';
 import 'package:singleclin_app/presentation/screens/screens.dart';
 import 'package:singleclin_app/presentation/screens/theme_settings_screen.dart';
+import 'package:singleclin_app/presentation/screens/auth/login_screen.dart' as auth;
+import 'package:singleclin_app/presentation/screens/auth/register_screen.dart' as auth;
+import 'package:singleclin_app/presentation/screens/auth/forgot_password_screen.dart' as auth;
 
 /// App router configuration with GoRouter
 class AppRouter {
@@ -71,11 +74,15 @@ class AppRouter {
       // Auth routes
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => const auth.LoginScreen(),
       ),
       GoRoute(
         path: AppRoutes.register,
-        builder: (context, state) => const RegisterScreen(),
+        builder: (context, state) => const auth.RegisterScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (context, state) => const auth.ForgotPasswordScreen(),
       ),
 
       // Main app routes
