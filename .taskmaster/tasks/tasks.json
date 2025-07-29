@@ -443,8 +443,8 @@
             "dependencies": [
               "7.2"
             ],
-            "details": "LoginScreen: campos email/senha com validação, botões para Google/Apple Sign In, link para registro e esqueci senha. RegisterScreen: campos nome, email, senha e confirmação com validações (email válido, senha >= 6 caracteres). ForgotPasswordScreen: campo email com envio de reset por Firebase. Implementar loading states, mensagens de erro localizadas, teclado apropriado para cada campo. Usar Form e TextFormField com validadores. Adicionar animações suaves entre telas.",
-            "status": "pending",
+            "details": "LoginScreen: campos email/senha com validação, botões para Google/Apple Sign In, link para registro e esqueci senha. RegisterScreen: campos nome, email, senha e confirmação com validações (email válido, senha >= 6 caracteres). ForgotPasswordScreen: campo email com envio de reset por Firebase. Implementar loading states, mensagens de erro localizadas, teclado apropriado para cada campo. Usar Form e TextFormField com validadores. Adicionar animações suaves entre telas.\n<info added on 2025-07-29T23:37:19.190Z>\nImplementação concluída com sucesso! ✅\n\n### 🎨 Interface Completa:\n- **LoginScreen**: Interface moderna com campos email/senha, botões de login social (Google e Apple Sign-In)\n- **RegisterScreen**: Formulário completo com validação e aceite de termos\n- **ForgotPasswordScreen**: Interface de recuperação de senha com instruções claras\n\n### 🎮 Gerenciamento de Estado:\n- **AuthController**: Controlador GetX completo com estado reativo\n- **Formulários**: Controllers integrados com validação\n- **Tratamento de Erros**: Mensagens localizadas em português\n- **Estados de Carregamento**: Indicadores visuais durante operações\n\n### ✅ Validação de Formulários:\n- **FormValidators**: Classe utilitária com validações completas\n- **Email**: Validação com regex\n- **Senha**: Requisitos mínimos de segurança\n- **Confirmação**: Verificação de correspondência\n- **Nome**: Suporte a caracteres brasileiros\n\n### 🗺️ Navegação e Rotas:\n- **Rotas Atualizadas**: Integração com sistema de rotas existente\n- **Proteção de Rotas**: Lógica de proteção mantida\n- **Fluxo de Navegação**: Transições suaves entre telas\n- **Injeção de Dependências**: AuthController registrado no GetX\n\n### 🎯 Recursos de UX:\n- **Login Social**: Google e Apple Sign-In (condicional iOS)\n- **Feedback Visual**: Estados de carregamento e desabilitação\n- **Mensagens de Erro**: Textos amigáveis em português brasileiro\n- **Notificações**: Toast para operações bem-sucedidas\n- **Conformidade Legal**: Links para termos e privacidade\n- **Acessibilidade**: Navegação por teclado otimizada\n\n### 🔧 Implementação Técnica:\n- **Clean Architecture**: Padrões do projeto mantidos\n- **Design Responsivo**: Layout mobile-first\n- **Material Design**: Consistente com design system\n- **Localização BR**: Textos e formatação em português\n- **GetX**: Programação reativa com observables\n- **Firebase**: Integrado com AuthRepository existente\n\n### 📱 Funcionalidades por Tela:\n\n**LoginScreen**:\n- Campos email/senha com validação\n- Botões Google e Apple Sign-In\n- Links \"Esqueci a senha\" e \"Cadastrar\"\n- Estados de carregamento e erro\n\n**RegisterScreen**:\n- Formulário completo (nome, email, senha, confirmação)\n- Aceite de termos e política de privacidade\n- Opções de registro social\n- Validação em tempo real\n\n**ForgotPasswordScreen**:\n- Interface limpa de recuperação\n- Instruções informativas\n- Validação e envio de email\n- Orientações amigáveis\n\nA interface de autenticação está completa e pronta para integração com a API backend via interceptores HTTP na Tarefa 7.4!\n</info added on 2025-07-29T23:37:19.190Z>",
+            "status": "done",
             "testStrategy": "Testar navegação entre telas. Verificar validações de formulário. Testar exibição de erros do Firebase."
           },
           {
@@ -455,7 +455,7 @@
               "7.2"
             ],
             "details": "Criar AuthInterceptor que implementa InterceptorsWrapper do Dio. No onRequest, obter token atual via FirebaseAuth.instance.currentUser?.getIdToken(). Adicionar header 'Authorization: Bearer $token' em todas requisições. Implementar lógica de retry em caso de token expirado (401): obter novo token e repetir requisição. Configurar timeout de requisições. Adicionar logs para debug em desenvolvimento. Registrar interceptor na instância global do Dio.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verificar se token é incluído em requisições. Testar renovação automática com token expirado. Validar retry de requisições."
           },
           {
@@ -467,7 +467,7 @@
               "7.4"
             ],
             "details": "Configurar FirebaseAuth para persistir autenticação localmente. Implementar listener em authStateChanges para detectar mudanças de autenticação. Criar método refreshToken() que força renovação do ID token a cada 50 minutos (tokens expiram em 60min). Usar Timer.periodic para agendar refresh automático enquanto app está ativo. Implementar AppLifecycleObserver para pausar/retomar timer conforme estado do app. Adicionar splash screen que verifica autenticação antes de direcionar para home ou login.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Testar persistência fechando e reabrindo app. Verificar refresh automático após 50 minutos. Validar comportamento com app em background."
           }
         ]
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-29T23:29:57.446Z",
+      "updated": "2025-07-29T23:46:01.660Z",
       "description": "Tasks for master context"
     }
   }
