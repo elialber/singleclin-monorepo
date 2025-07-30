@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:singleclin_app/core/routes/app_routes.dart';
 import 'package:singleclin_app/presentation/screens/screens.dart';
+import 'package:singleclin_app/presentation/screens/home_screen.dart';
 import 'package:singleclin_app/presentation/screens/theme_settings_screen.dart';
 import 'package:singleclin_app/presentation/screens/auth/login_screen.dart' as auth;
 import 'package:singleclin_app/presentation/screens/auth/register_screen.dart' as auth;
@@ -88,7 +89,7 @@ class AppRouter {
       // Main app routes
       GoRoute(
         path: AppRoutes.home,
-        builder: (context, state) => HomePage(),
+        builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
         path: AppRoutes.profile,

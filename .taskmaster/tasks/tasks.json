@@ -414,7 +414,7 @@
           4,
           6
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -466,8 +466,8 @@
               "7.2",
               "7.4"
             ],
-            "details": "Configurar FirebaseAuth para persistir autenticação localmente. Implementar listener em authStateChanges para detectar mudanças de autenticação. Criar método refreshToken() que força renovação do ID token a cada 50 minutos (tokens expiram em 60min). Usar Timer.periodic para agendar refresh automático enquanto app está ativo. Implementar AppLifecycleObserver para pausar/retomar timer conforme estado do app. Adicionar splash screen que verifica autenticação antes de direcionar para home ou login.",
-            "status": "in-progress",
+            "details": "Configurar FirebaseAuth para persistir autenticação localmente. Implementar listener em authStateChanges para detectar mudanças de autenticação. Criar método refreshToken() que força renovação do ID token a cada 50 minutos (tokens expiram em 60min). Usar Timer.periodic para agendar refresh automático enquanto app está ativo. Implementar AppLifecycleObserver para pausar/retomar timer conforme estado do app. Adicionar splash screen que verifica autenticação antes de direcionar para home ou login.\n<info added on 2025-07-29T23:49:34.926Z>\nTask 7.5 concluída com sucesso! Todas as funcionalidades implementadas conforme especificação:\n\nIMPLEMENTAÇÃO REALIZADA:\n\n1. TokenRefreshService:\n- Serviço completo criado em packages/singleclin_app/lib/services/token_refresh_service.dart\n- Timer automático de 50 minutos para refresh antes da expiração (tokens expiram em 60min)\n- Métodos para verificação de expiração e refresh manual\n- Integração com AuthService existente\n- Gestão otimizada de recursos com pause/resume\n\n2. AppLifecycleObserver:\n- Observer criado em packages/singleclin_app/lib/utils/app_lifecycle_observer.dart\n- Detecta quando app vai para background/foreground\n- Pausa refresh automático em background (economia de bateria)\n- Retoma refresh quando app volta ao foreground\n- Usa WidgetsBindingObserver para eficiência\n\n3. Inicialização do App:\n- main.dart atualizado com inicialização dos novos serviços\n- TokenRefreshService e AppLifecycleObserver registrados no GetX\n- Marcados como permanent: true para disponibilidade global\n- Serviços iniciam automaticamente com o app\n\n4. Splash Screen Aprimorada:\n- Verificação de autenticação durante inicialização\n- Valida se usuário está autenticado e token válido\n- Refresh automático se token próximo da expiração\n- Roteamento inteligente: home se autenticado, login se não\n- Tratamento de erros com fallback para tela de login\n\n5. Integração com AuthController:\n- Novos métodos expostos: getCurrentToken(), refreshToken(), isTokenExpiringSoon()\n- Facilita acesso ao gerenciamento de tokens na camada de apresentação\n- Mantém compatibilidade com código existente\n\n6. Widget de Teste:\n- test_token_refresh.dart criado para validação completa\n- Testa refresh, status do serviço, verificação de expiração\n- Interface visual para debug e demonstração\n- Exemplos de uso para desenvolvedores\n\nBENEFÍCIOS IMPLEMENTADOS:\n- Sessão persiste entre reinicializações do app (Firebase Auth gerencia automaticamente)\n- Tokens renovados automaticamente antes de expirar\n- Otimização de bateria com pause em background\n- Experiência seamless sem re-autenticação\n- Logs detalhados para debug e monitoramento\n- Tratamento robusto de erros em todos os fluxos\n\nA implementação garante que usuários permaneçam autenticados sem interrupções, com gerenciamento eficiente de recursos e excelente experiência de usuário.\n</info added on 2025-07-29T23:49:34.926Z>",
+            "status": "done",
             "testStrategy": "Testar persistência fechando e reabrindo app. Verificar refresh automático após 50 minutos. Validar comportamento com app em background."
           }
         ]
@@ -483,7 +483,7 @@
           3,
           5
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -491,7 +491,7 @@
             "description": "Configurar instância Redis para armazenar nonces únicos dos QR codes e prevenir reuso",
             "dependencies": [],
             "details": "Instalar e configurar Redis no ambiente de desenvolvimento e produção. Criar RedisService com métodos para conectar, armazenar e verificar nonces. Implementar configuração de TTL (Time To Live) de 30 minutos para auto-expiração dos nonces. Adicionar variáveis de ambiente REDIS_HOST, REDIS_PORT, REDIS_PASSWORD. Implementar reconnect automático e tratamento de erros de conexão.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar conexão com Redis. Verificar armazenamento e recuperação de nonces. Validar auto-expiração após 30 minutos. Testar comportamento com Redis offline."
           },
           {
@@ -502,7 +502,7 @@
               "8.1"
             ],
             "details": "Criar QRCodeTokenService com método generateToken(userPlanId). Gerar nonce único usando crypto.randomUUID(). Criar JWT com claims: userPlanId, expiresAt (30 min), nonce, issuedAt. Assinar token com chave privada RS256. Armazenar nonce no Redis com chave qr_nonce:{nonce} e TTL 30 min. Retornar token assinado.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verificar geração de nonces únicos. Validar estrutura e assinatura do JWT. Testar que nonces são armazenados no Redis. Verificar expiração correta do token."
           },
           {
@@ -513,7 +513,7 @@
               "8.2"
             ],
             "details": "Instalar biblioteca qrcode. Criar QRCodeGeneratorService com método generateQRCode(token). Gerar QR Code contendo JSON: {token: 'jwt_string', version: '1.0'}. Configurar opções: errorCorrectionLevel: 'M', type: 'image/png', quality: 0.92, margin: 1, color: {dark: '#000000', light: '#FFFFFF'}, width: 300. Retornar QR Code como Data URL base64.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Testar geração de QR Code válido. Verificar que QR decodifica para JSON esperado. Validar formato Data URL. Testar diferentes tamanhos de token."
           },
           {
@@ -550,7 +550,7 @@
         "dependencies": [
           7
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -558,7 +558,7 @@
             "description": "Implementar a estrutura inicial da tela principal com navegação e layout base",
             "dependencies": [],
             "details": "Criar HomeScreen.dart com Scaffold base. Configurar BottomNavigationBar com abas: Home, Histórico, Perfil. Implementar navegação entre telas usando Navigator 2.0 ou go_router. Adicionar AppBar customizada com título e ícone de notificações. Configurar tema consistente com cores da marca.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar navegação entre abas. Verificar renderização correta em diferentes tamanhos de tela. Validar responsividade do layout."
           },
           {
@@ -567,7 +567,7 @@
             "description": "Criar camada de dados para buscar informações do plano do paciente",
             "dependencies": [],
             "details": "Criar model Plan com campos: id, name, totalCredits, usedCredits, remainingCredits, expirationDate. Criar model UserPlan associando usuário ao plano. Implementar PlanRepository com métodos: getCurrentPlan(), getPlanHistory(), refreshPlanData(). Integrar com API usando Dio/http. Implementar tratamento de erros e estados de loading.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar chamadas à API com mock data. Verificar parsing correto dos modelos. Testar cenários de erro de rede."
           },
           {
@@ -579,7 +579,7 @@
               "9.2"
             ],
             "details": "Criar PlanCard widget com design moderno usando Container decorado. Exibir: nome do plano em destaque, créditos restantes/total (ex: 7/10), barra de progresso circular ou linear mostrando porcentagem de uso. Adicionar gradiente de cores baseado no saldo (verde > amarelo > vermelho). Implementar animações suaves para mudanças de valor. Adicionar ícones ilustrativos.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar exibição com diferentes valores de créditos. Verificar animações e transições. Validar cores baseadas em porcentagem."
           },
           {
@@ -591,7 +591,7 @@
               "9.3"
             ],
             "details": "Implementar cache usando shared_preferences ou hive para armazenar dados do plano. Configurar expiração de cache de 5 minutos. Adicionar RefreshIndicator envolvendo a tela principal. Implementar lógica de pull-to-refresh que: mostra loading, busca dados atualizados da API, atualiza cache local, exibe feedback visual de sucesso/erro. Adicionar timestamp de última atualização.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar persistência de dados offline. Verificar expiração do cache. Validar comportamento do pull-to-refresh com e sem conexão."
           },
           {
@@ -603,7 +603,7 @@
               "9.4"
             ],
             "details": "Criar botão prominente 'Gerar QR Code' com ícone e cor de destaque. Ao clicar, navegar para tela de QR Code (implementada na task 10). Adicionar seção 'Últimas Visitas' mostrando lista resumida das 3 últimas consultas com: data, clínica, créditos utilizados. Implementar navegação para tela completa de histórico. Adicionar estado vazio quando não houver histórico.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar navegação para tela de QR Code. Verificar exibição correta do histórico resumido. Validar estado vazio e loading states."
           }
         ]
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-29T23:46:01.660Z",
+      "updated": "2025-07-30T00:14:29.310Z",
       "description": "Tasks for master context"
     }
   }
