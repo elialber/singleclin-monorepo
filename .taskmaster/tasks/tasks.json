@@ -513,7 +513,7 @@
               "8.2"
             ],
             "details": "Instalar biblioteca qrcode. Criar QRCodeGeneratorService com método generateQRCode(token). Gerar QR Code contendo JSON: {token: 'jwt_string', version: '1.0'}. Configurar opções: errorCorrectionLevel: 'M', type: 'image/png', quality: 0.92, margin: 1, color: {dark: '#000000', light: '#FFFFFF'}, width: 300. Retornar QR Code como Data URL base64.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Testar geração de QR Code válido. Verificar que QR decodifica para JSON esperado. Validar formato Data URL. Testar diferentes tamanhos de token."
           },
           {
@@ -524,7 +524,7 @@
               "8.3"
             ],
             "details": "Criar QRCodeController com rota POST /qrcodes/generate. Middleware de autenticação para validar usuário logado. Extrair userPlanId do token de autenticação. Chamar QRCodeService.generateQRCode(userPlanId). Retornar resposta: {success: true, qrCode: dataUrl, expiresAt: timestamp, token: jwtToken}. Implementar rate limiting: máximo 5 QR codes por minuto por usuário.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar endpoint com usuário autenticado. Verificar resposta com QR Code válido. Testar rate limiting. Validar erro para usuário não autenticado."
           },
           {
@@ -535,7 +535,7 @@
               "8.4"
             ],
             "details": "Criar QRCodeService com método principal generateQRCode(userPlanId). Orquestrar: chamar QRCodeTokenService.generateToken(), depois QRCodeGeneratorService.generateQRCode(). Adicionar logging de auditoria para cada QR gerado. Implementar métricas: total de QR codes gerados, taxa de erro. Criar método validateUserPlan() para verificar se plano está ativo antes de gerar. Adicionar cache temporário de 1 minuto para evitar regeneração desnecessária.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Testar fluxo completo de geração. Verificar logs de auditoria. Validar rejeição para plano inativo. Testar cache temporário. Verificar métricas sendo registradas."
           }
         ]
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-30T00:14:29.310Z",
+      "updated": "2025-07-30T00:16:37.156Z",
       "description": "Tasks for master context"
     }
   }
