@@ -529,12 +529,19 @@
             <param name="request">Report request parameters</param>
             <returns>Clinic ranking data</returns>
         </member>
-        <member name="M:SingleClin.API.Controllers.ReportsController.ExportReport(SingleClin.API.DTOs.Report.ReportRequest)">
+        <member name="M:SingleClin.API.Controllers.ReportsController.ExportReport(SingleClin.API.DTOs.Export.ExportRequest)">
             <summary>
             Export a report to specified format
             </summary>
-            <param name="request">Report request with export format</param>
+            <param name="request">Export request with report parameters and format</param>
             <returns>File download</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ReportsController.ExportMultipleReports(SingleClin.API.DTOs.Export.MultipleExportRequest)">
+            <summary>
+            Export multiple reports to a single Excel file
+            </summary>
+            <param name="request">Export request with report types</param>
+            <returns>Excel file with multiple sheets</returns>
         </member>
         <member name="M:SingleClin.API.Controllers.ReportsController.ClearCache(System.Nullable{SingleClin.API.DTOs.Report.ReportType})">
             <summary>
@@ -1847,6 +1854,41 @@
             <param name="textContent">Text content</param>
             <returns>Rendered email template</returns>
         </member>
+        <member name="T:SingleClin.API.DTOs.Export.ExportRequest">
+            <summary>
+            Export request model
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Export.ExportFormat">
+            <summary>
+            Export format options
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Export.ExportOptions">
+            <summary>
+            Export options
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Export.PaperSize">
+            <summary>
+            Paper size options
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Export.PaperOrientation">
+            <summary>
+            Paper orientation options
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Export.ExportResponse">
+            <summary>
+            Export response model
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Export.MultipleExportRequest">
+            <summary>
+            Request model for exporting multiple reports
+            </summary>
+        </member>
         <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.EnablePush">
             <summary>
             Whether the user wants to receive push notifications
@@ -3012,6 +3054,11 @@
             <param name="templateData">Template data</param>
             <returns>Generated subject line</returns>
         </member>
+        <member name="T:SingleClin.API.Services.ExportService">
+            <summary>
+            Service for exporting reports to various formats
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.FirebaseAuthService">
             <summary>
             Service for Firebase authentication operations
@@ -3126,6 +3173,26 @@
             <param name="templateName">Template name</param>
             <param name="cancellationToken">Cancellation token</param>
             <returns>Plain text template content</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IExportService">
+            <summary>
+            Service for exporting reports to various formats
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IExportService.ExportToExcelAsync``1(SingleClin.API.DTOs.Report.ReportResponse{``0},SingleClin.API.DTOs.Export.ExportRequest,System.Threading.CancellationToken)">
+            <summary>
+            Export report to Excel format
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IExportService.ExportToPdfAsync``1(SingleClin.API.DTOs.Report.ReportResponse{``0},SingleClin.API.DTOs.Export.ExportRequest,System.Threading.CancellationToken)">
+            <summary>
+            Export report to PDF format
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IExportService.ExportMultipleToExcelAsync(System.Collections.Generic.Dictionary{System.String,System.Object},SingleClin.API.DTOs.Export.ExportRequest,System.Threading.CancellationToken)">
+            <summary>
+            Export multiple reports to a single Excel file with multiple sheets
+            </summary>
         </member>
         <member name="T:SingleClin.API.Services.IFirebaseAuthService">
             <summary>

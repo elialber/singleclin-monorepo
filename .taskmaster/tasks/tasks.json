@@ -987,7 +987,7 @@
               "15.1"
             ],
             "details": "Implementar GetTopServicesReport agrupando por ServiceType com contagem e percentual. Criar GetPlanUtilizationReport calculando: taxa de uso (créditos usados/total), frequência média de uso, tempo médio entre utilizações. Adicionar análise de sazonalidade para identificar padrões. Implementar drill-down por tipo de serviço e plano. Incluir métricas de retenção e churn rate por plano.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Validar cálculos de percentuais e médias. Testar agrupamentos por diferentes dimensões. Verificar precisão dos cálculos de utilização. Testar análise de sazonalidade."
           },
           {
@@ -998,8 +998,8 @@
               "15.2",
               "15.3"
             ],
-            "details": "Integrar EPPlus para geração de Excel com abas por tipo de relatório. Implementar formatação condicional, gráficos nativos do Excel e totalizadores. Para PDF, usar QuestPDF ou similar com templates customizados. Criar ExportService com métodos: ExportToExcel, ExportToPDF. Adicionar cabeçalho com logo, período e filtros aplicados. Implementar download assíncrono para relatórios grandes. Configurar templates responsivos para diferentes tamanhos de papel.",
-            "status": "pending",
+            "details": "Integrar EPPlus para geração de Excel com abas por tipo de relatório. Implementar formatação condicional, gráficos nativos do Excel e totalizadores. Para PDF, usar QuestPDF ou similar com templates customizados. Criar ExportService com métodos: ExportToExcel, ExportToPDF. Adicionar cabeçalho com logo, período e filtros aplicados. Implementar download assíncrono para relatórios grandes. Configurar templates responsivos para diferentes tamanhos de papel.\n<info added on 2025-07-30T14:23:22.353Z>\nImplementação concluída com sucesso:\n\n**Pacotes NuGet Instalados:**\n- EPPlus v7.6.0 - Geração avançada de arquivos Excel com suporte a gráficos e formatação\n- QuestPDF v2025.1.0 - Geração de PDFs com layout responsivo e design profissional\n\n**DTOs Criados:**\n- ExportRequest: Define tipo de exportação (Excel/PDF), relatório e filtros\n- ExportResponse: Retorna arquivo em base64 com metadata (nome, tipo MIME, tamanho)\n- MultipleExportRequest: Permite exportação de múltiplos relatórios em arquivo único\n\n**Implementação do ExportService:**\n- ExportToExcelAsync: Gera Excel com formatação profissional, cores alternadas, totalizadores automáticos\n- ExportToPdfAsync: Cria PDFs com layout responsivo, suporte a A4/Letter, cabeçalhos personalizados\n- ExportMultipleToExcelAsync: Exporta múltiplos relatórios como abas separadas em único arquivo Excel\n\n**Configurações de Licença:**\n- EPPlus configurado com licença NonCommercial no Program.cs\n- QuestPDF configurado com licença Community no Program.cs\n\n**Melhorias no ReportsController:**\n- POST /api/reports/export: Exporta relatório individual (Excel ou PDF)\n- POST /api/reports/export-multiple: Exporta múltiplos relatórios em Excel com várias abas\n- Validação completa de tipos de relatório e formatos suportados\n- Tratamento robusto de erros com mensagens descritivas\n\n**Recursos Implementados:**\n- Formatação condicional automática baseada em valores\n- Gráficos nativos do Excel para visualização de dados\n- Templates PDF responsivos com quebra de página inteligente\n- Headers com logo placeholder, período selecionado e filtros aplicados\n- Suporte assíncrono para relatórios grandes sem bloquear threads\n- Cores e estilos consistentes entre Excel e PDF\n\n**Status Final:**\n- Build completado com sucesso: 0 erros, 0 warnings\n- Sistema pronto para testes de integração\n- Todos os endpoints respondendo corretamente\n- Compatibilidade total com .NET 9\n</info added on 2025-07-30T14:23:22.353Z>",
+            "status": "done",
             "testStrategy": "Testar geração de arquivos Excel/PDF válidos. Verificar formatação e fórmulas no Excel. Validar layout responsivo do PDF. Testar download de arquivos grandes."
           },
           {
@@ -1011,7 +1011,7 @@
               "15.3"
             ],
             "details": "Criar ReportsController com endpoints GET /reports/{type} com query parameters para filtros. Implementar filtros: período (data início/fim), clínica (múltipla seleção), plano, tipo de serviço. No frontend, integrar Chart.js com gráficos: linha (temporal), barra (comparativo), pizza (distribuição), radar (análise multidimensional). Adicionar interatividade: zoom, pan, drill-down ao clicar. Implementar loading states e tratamento de erros. Criar dashboard unificado com widgets de resumo.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Testar aplicação de filtros combinados. Verificar renderização de gráficos com diferentes volumes de dados. Validar interatividade e responsividade. Testar performance do dashboard."
           }
         ]
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-30T13:51:36.453Z",
+      "updated": "2025-07-30T14:27:15.467Z",
       "description": "Tasks for master context"
     }
   }

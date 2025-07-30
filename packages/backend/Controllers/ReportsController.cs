@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SingleClin.API.DTOs;
+using SingleClin.API.DTOs.Export;
 using SingleClin.API.DTOs.Report;
 using SingleClin.API.Services;
 using Swashbuckle.AspNetCore.Annotations;
@@ -16,13 +17,16 @@ namespace SingleClin.API.Controllers
     public class ReportsController : BaseController
     {
         private readonly IReportService _reportService;
+        private readonly IExportService _exportService;
         private readonly ILogger<ReportsController> _logger;
 
         public ReportsController(
             IReportService reportService,
+            IExportService exportService,
             ILogger<ReportsController> logger)
         {
             _reportService = reportService;
+            _exportService = exportService;
             _logger = logger;
         }
 
@@ -226,18 +230,18 @@ namespace SingleClin.API.Controllers
         /// <summary>
         /// Export a report to specified format
         /// </summary>
-        /// <param name="request">Report request with export format</param>
+        /// <param name="request">Export request with report parameters and format</param>
         /// <returns>File download</returns>
         [HttpPost("export")]
         [Authorize(Policy = "RequireAdminOrClinicOwner")]
         [SwaggerOperation(
             Summary = "Export a report",
-            Description = "Generates and exports a report in the specified format")]
+            Description = "Generates and exports a report in the specified format (Excel or PDF)")]
         [SwaggerResponse(200, "Success - File download")]
         [SwaggerResponse(400, "Bad Request")]
         [SwaggerResponse(401, "Unauthorized")]
         [SwaggerResponse(501, "Not Implemented")]
-        public async Task<IActionResult> ExportReport([FromBody] ReportRequest request)
+        public async Task<IActionResult> ExportReport([FromBody] ExportRequest request)
         {
             try
             {
@@ -249,37 +253,66 @@ namespace SingleClin.API.Controllers
                         GetModelStateErrors()));
                 }
 
-                if (!request.ExportFormat.HasValue)
+                // Create report request from export request
+                var reportRequest = new ReportRequest
                 {
-                    return BadRequest(ResponseWrapper.ErrorResponse(
-                        "Export format is required"));
-                }
-
-                // Generate report first
-                var reportData = await _reportService.GenerateReportAsync(request);
-
-                // Export to requested format
-                var fileContent = await _reportService.ExportReportAsync(
-                    reportData, 
-                    request.ExportFormat.Value);
-
-                // Determine content type and file extension
-                var (contentType, extension) = request.ExportFormat.Value switch
-                {
-                    ExportFormat.Excel => ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"),
-                    ExportFormat.Pdf => ("application/pdf", "pdf"),
-                    ExportFormat.Csv => ("text/csv", "csv"),
-                    _ => ("application/json", "json")
+                    Type = request.ReportType,
+                    StartDate = request.StartDate,
+                    EndDate = request.EndDate,
+                    Period = ReportPeriod.Daily,
+                    TimeZone = request.TimeZone ?? "UTC"
                 };
 
-                var fileName = $"{request.Type}_Report_{DateTime.UtcNow:yyyyMMdd_HHmmss}.{extension}";
+                // Apply clinic filter for clinic owners
+                var userRole = GetUserRole();
+                if (userRole == "ClinicOwner")
+                {
+                    var clinicId = GetUserClinicId();
+                    if (clinicId.HasValue)
+                    {
+                        reportRequest.ClinicIds = new List<Guid> { clinicId.Value };
+                    }
+                }
 
-                return File(fileContent, contentType, fileName);
+                // Generate report based on type
+                object reportData = request.ReportType switch
+                {
+                    ReportType.UsageByPeriod => await _reportService.GenerateUsageReportAsync(reportRequest),
+                    ReportType.ClinicRanking => await _reportService.GenerateClinicRankingAsync(reportRequest),
+                    ReportType.TopServices => await _reportService.GenerateServiceReportAsync(reportRequest),
+                    ReportType.PlanUtilization => await _reportService.GeneratePlanUtilizationAsync(reportRequest),
+                    _ => throw new NotImplementedException($"Report type {request.ReportType} is not implemented")
+                };
+
+                // Export to requested format
+                ExportResponse exportResponse = request.Format switch
+                {
+                    SingleClin.API.DTOs.Export.ExportFormat.Excel => await _exportService.ExportToExcelAsync((dynamic)reportData, request),
+                    SingleClin.API.DTOs.Export.ExportFormat.PDF => await _exportService.ExportToPdfAsync((dynamic)reportData, request),
+                    _ => throw new NotSupportedException($"Export format {request.Format} is not supported")
+                };
+
+                if (!exportResponse.Success)
+                {
+                    return StatusCode(500, ResponseWrapper.ErrorResponse(
+                        "Failed to export report",
+                        500,
+                        exportResponse.Warnings));
+                }
+
+                return File(exportResponse.FileContent, exportResponse.ContentType, exportResponse.FileName);
             }
-            catch (NotImplementedException)
+            catch (NotImplementedException ex)
             {
+                _logger.LogWarning(ex, "Export functionality not implemented for report type: {ReportType}", request.ReportType);
                 return StatusCode(501, ResponseWrapper.ErrorResponse(
-                    "Export functionality is not implemented yet"));
+                    $"Export functionality for {request.ReportType} reports is not implemented yet"));
+            }
+            catch (NotSupportedException ex)
+            {
+                _logger.LogWarning(ex, "Unsupported export format: {Format}", request.Format);
+                return StatusCode(400, ResponseWrapper.ErrorResponse(
+                    ex.Message));
             }
             catch (Exception ex)
             {
@@ -287,6 +320,118 @@ namespace SingleClin.API.Controllers
                 return StatusCode(500, ResponseWrapper.ErrorResponse(
                     "An error occurred while exporting the report"));
             }
+        }
+
+        /// <summary>
+        /// Export multiple reports to a single Excel file
+        /// </summary>
+        /// <param name="request">Export request with report types</param>
+        /// <returns>Excel file with multiple sheets</returns>
+        [HttpPost("export/multiple")]
+        [Authorize(Roles = "Administrator")]
+        [SwaggerOperation(
+            Summary = "Export multiple reports",
+            Description = "Generates and exports multiple reports to a single Excel file with separate sheets")]
+        [SwaggerResponse(200, "Success - Excel file download")]
+        [SwaggerResponse(400, "Bad Request")]
+        [SwaggerResponse(401, "Unauthorized")]
+        [SwaggerResponse(403, "Forbidden")]
+        public async Task<IActionResult> ExportMultipleReports([FromBody] MultipleExportRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ResponseWrapper.ErrorResponse(
+                        "Invalid request parameters", 
+                        400, 
+                        GetModelStateErrors()));
+                }
+
+                var reports = new Dictionary<string, object>();
+
+                foreach (var reportType in request.ReportTypes)
+                {
+                    var reportRequest = new ReportRequest
+                    {
+                        Type = reportType,
+                        StartDate = request.StartDate,
+                        EndDate = request.EndDate,
+                        Period = ReportPeriod.Daily,
+                        TimeZone = request.TimeZone ?? "UTC"
+                    };
+
+                    try
+                    {
+                        object reportData = reportType switch
+                        {
+                            ReportType.UsageByPeriod => await _reportService.GenerateUsageReportAsync(reportRequest),
+                            ReportType.ClinicRanking => await _reportService.GenerateClinicRankingAsync(reportRequest),
+                            ReportType.TopServices => await _reportService.GenerateServiceReportAsync(reportRequest),
+                            ReportType.PlanUtilization => await _reportService.GeneratePlanUtilizationAsync(reportRequest),
+                            _ => null
+                        };
+
+                        if (reportData != null)
+                        {
+                            reports.Add(GetReportTitle(reportType), reportData);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to generate report type: {ReportType}", reportType);
+                    }
+                }
+
+                if (reports.Count == 0)
+                {
+                    return BadRequest(ResponseWrapper.ErrorResponse(
+                        "No reports could be generated"));
+                }
+
+                var exportRequest = new ExportRequest
+                {
+                    Format = SingleClin.API.DTOs.Export.ExportFormat.Excel,
+                    StartDate = request.StartDate,
+                    EndDate = request.EndDate,
+                    TimeZone = request.TimeZone,
+                    LanguageCode = request.LanguageCode,
+                    Options = request.Options
+                };
+
+                var exportResponse = await _exportService.ExportMultipleToExcelAsync(reports, exportRequest);
+
+                if (!exportResponse.Success)
+                {
+                    return StatusCode(500, ResponseWrapper.ErrorResponse(
+                        "Failed to export reports",
+                        500,
+                        exportResponse.Warnings));
+                }
+
+                return File(exportResponse.FileContent, exportResponse.ContentType, exportResponse.FileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error exporting multiple reports");
+                return StatusCode(500, ResponseWrapper.ErrorResponse(
+                    "An error occurred while exporting the reports"));
+            }
+        }
+
+        private string GetReportTitle(ReportType reportType)
+        {
+            return reportType switch
+            {
+                ReportType.UsageByPeriod => "Uso por Período",
+                ReportType.ClinicRanking => "Ranking de Clínicas",
+                ReportType.TopServices => "Top Serviços",
+                ReportType.PlanUtilization => "Utilização de Planos",
+                ReportType.PatientActivity => "Atividade de Pacientes",
+                ReportType.FinancialSummary => "Resumo Financeiro",
+                ReportType.TransactionAnalysis => "Análise de Transações",
+                _ => reportType.ToString()
+            };
         }
 
         /// <summary>

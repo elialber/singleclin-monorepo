@@ -124,8 +124,8 @@ namespace SingleClin.API.DTOs.Report
     {
         public string Label { get; set; } = string.Empty;
         public List<decimal> Data { get; set; } = new();
-        public string? BackgroundColor { get; set; }
-        public string? BorderColor { get; set; }
+        public object? BackgroundColor { get; set; } // Can be string or List<string>
+        public object? BorderColor { get; set; } // Can be string or List<string>
         public int BorderWidth { get; set; } = 1;
         public bool Fill { get; set; } = false;
     }
