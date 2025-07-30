@@ -61,11 +61,10 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      // Remove if already exists to avoid duplicates
-      _recentCodes.remove(code);
-
-      // Add to beginning of list
-      _recentCodes.insert(0, code);
+      // Remove if already exists to avoid duplicates and add to beginning
+      _recentCodes
+        ..remove(code)
+        ..insert(0, code);
 
       // Keep only the most recent codes
       if (_recentCodes.length > _maxRecentCodes) {

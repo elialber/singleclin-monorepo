@@ -1,0 +1,44 @@
+Analyzing mobile...                                             
+
+   info • Sort directive sections alphabetically • lib/data/repositories/firebase_auth_repository.dart:10:1 • directives_ordering
+   info • Use an if-null operator to convert a 'null' to a 'bool' • lib/data/repositories/firebase_auth_repository.dart:141:11 • use_if_null_to_convert_nulls_to_bools
+   info • Static method should be a constructor • lib/data/services/api_client.dart:23:24 • prefer_constructors_over_static_methods
+   info • The value of the argument is redundant because it matches the default value • lib/data/services/api_client.dart:35:62 • avoid_redundant_argument_values
+   info • Closure should be a tearoff • lib/data/services/auth_service.dart:16:45 • unnecessary_lambdas
+   info • Sort directive sections alphabetically • lib/data/services/cache_service.dart:5:1 • directives_ordering
+   info • Static method should be a constructor • lib/data/services/cache_service.dart:30:27 • prefer_constructors_over_static_methods
+   info • Don't invoke 'print' in production code • lib/data/services/cache_service.dart:61:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/services/cache_service.dart:91:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/services/cache_service.dart:123:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/services/cache_service.dart:146:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/services/cache_service.dart:182:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/services/cache_service.dart:215:7 • avoid_print
+   info • The method '==' should not be overridden in classes not annotated with '@immutable' • lib/domain/entities/plan_entity.dart:30:3 • avoid_equals_and_hash_code_on_mutable_classes
+   info • The method 'hashCode' should not be overridden in classes not annotated with '@immutable' • lib/domain/entities/plan_entity.dart:35:3 • avoid_equals_and_hash_code_on_mutable_classes
+   info • The method '==' should not be overridden in classes not annotated with '@immutable' • lib/domain/entities/transaction_entity.dart:65:3 • avoid_equals_and_hash_code_on_mutable_classes
+   info • The method 'hashCode' should not be overridden in classes not annotated with '@immutable' • lib/domain/entities/transaction_entity.dart:72:3 • avoid_equals_and_hash_code_on_mutable_classes
+   info • The method '==' should not be overridden in classes not annotated with '@immutable' • lib/domain/entities/user_plan_entity.dart:70:3 • avoid_equals_and_hash_code_on_mutable_classes
+   info • The method 'hashCode' should not be overridden in classes not annotated with '@immutable' • lib/domain/entities/user_plan_entity.dart:77:3 • avoid_equals_and_hash_code_on_mutable_classes
+   info • Missing an 'await' for the 'Future' computed by this expression • lib/presentation/controllers/auth_controller.dart:57:9 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression • lib/presentation/controllers/auth_controller.dart:189:7 • unawaited_futures
+   info • The method is used to change a property • lib/presentation/controllers/auth_controller.dart:250:8 • use_setters_to_change_properties
+   info • The method is used to change a property • lib/presentation/controllers/auth_controller.dart:255:8 • use_setters_to_change_properties
+   info • The method is used to change a property • lib/presentation/controllers/base_controller.dart:20:8 • use_setters_to_change_properties
+   info • 'bool' parameters should be named parameters • lib/presentation/controllers/base_controller.dart:20:19 • avoid_positional_boolean_parameters
+   info • The method is used to change a property • lib/presentation/controllers/home_controller.dart:87:8 • use_setters_to_change_properties
+   info • Sort directive sections alphabetically • lib/presentation/controllers/theme_controller.dart:5:1 • directives_ordering
+   info • Sort directive sections alphabetically • lib/presentation/screens/clinic/clinic_scanner_screen.dart:6:1 • directives_ordering
+   info • Use an if-null operator to convert a 'null' to a 'bool' • lib/presentation/screens/clinic/clinic_scanner_screen.dart:112:13 • use_if_null_to_convert_nulls_to_bools
+   info • Missing an 'await' for the 'Future' computed by this expression • lib/presentation/screens/clinic/clinic_scanner_screen.dart:402:11 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression • lib/presentation/screens/clinic/clinic_scanner_screen.dart:403:11 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression • lib/presentation/screens/clinic/clinic_scanner_screen.dart:416:11 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression • lib/presentation/screens/clinic/clinic_scanner_screen.dart:426:9 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression • lib/presentation/screens/home_screen.dart:558:7 • unawaited_futures
+   info • Sort directive sections alphabetically • lib/presentation/screens/qr_code/qr_code_screen.dart:12:1 • directives_ordering
+   info • 'foregroundColor' is deprecated and shouldn't be used. use colors in eyeStyle and dataModuleStyle instead • lib/presentation/screens/qr_code/qr_code_screen.dart:314:13 • deprecated_member_use
+warning • Unnecessary cast • lib/presentation/widgets/patient_data_bottom_sheet.dart:103:27 • unnecessary_cast
+warning • Unnecessary cast • lib/presentation/widgets/patient_data_bottom_sheet.dart:104:28 • unnecessary_cast
+warning • Unnecessary cast • lib/presentation/widgets/patient_data_bottom_sheet.dart:105:35 • unnecessary_cast
+   info • Unnecessary statement • lib/presentation/widgets/patient_data_bottom_sheet.dart:131:39 • unnecessary_statements
+
+40 issues found. (ran in 1.1s)

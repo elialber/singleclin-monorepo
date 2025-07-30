@@ -13,9 +13,7 @@ class AuthService {
   AuthService({AuthRepository? authRepository})
     : _authRepository = authRepository ?? FirebaseAuthRepository() {
     // Listen to auth state changes and broadcast them
-    _authRepository.authStateChanges.listen((user) {
-      _authStateController.add(user);
-    });
+    _authRepository.authStateChanges.listen(_authStateController.add);
   }
   final AuthRepository _authRepository;
 

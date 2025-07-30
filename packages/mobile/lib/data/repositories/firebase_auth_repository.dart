@@ -138,7 +138,7 @@ class FirebaseAuthRepository implements AuthRepository {
       }
 
       // Update display name if provided by Apple and not already set
-      if (result.additionalUserInfo?.isNewUser == true &&
+      if ((result.additionalUserInfo?.isNewUser ?? false) &&
           appleCredential.givenName != null &&
           appleCredential.familyName != null) {
         final displayName =

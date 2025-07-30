@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
+
 /// Plan entity representing a healthcare plan
+@immutable
 class PlanEntity {
   const PlanEntity({
     required this.id,

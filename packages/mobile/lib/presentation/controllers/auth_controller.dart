@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -54,7 +56,7 @@ class AuthController extends GetxController {
         // Sync user with backend after authentication
         await _syncUserWithBackend(user);
         // Navigate to home screen when authenticated
-        Get.offAllNamed('/home');
+        unawaited(Get.offAllNamed('/home'));
       }
     });
   }
@@ -71,7 +73,9 @@ class AuthController extends GetxController {
 
   /// Sign in with email and password
   Future<void> signInWithEmail() async {
-    if (!loginFormKey.currentState!.validate()) return;
+    if (!loginFormKey.currentState!.validate()) {
+      return;
+    }
 
     _setLoading(true);
     _clearError();
@@ -94,7 +98,9 @@ class AuthController extends GetxController {
 
   /// Sign up new user
   Future<void> signUp() async {
-    if (!registerFormKey.currentState!.validate()) return;
+    if (!registerFormKey.currentState!.validate()) {
+      return;
+    }
 
     _setLoading(true);
     _clearError();
@@ -152,7 +158,9 @@ class AuthController extends GetxController {
 
   /// Send password reset email
   Future<void> sendPasswordResetEmail() async {
-    if (!forgotPasswordFormKey.currentState!.validate()) return;
+    if (!forgotPasswordFormKey.currentState!.validate()) {
+      return;
+    }
 
     _setLoading(true);
     _clearError();
@@ -180,7 +188,7 @@ class AuthController extends GetxController {
     try {
       await _authService.signOut();
       _clearAllForms();
-      Get.offAllNamed('/login');
+      unawaited(Get.offAllNamed('/login'));
     } catch (e) {
       _setError('Erro ao fazer logout.');
     }

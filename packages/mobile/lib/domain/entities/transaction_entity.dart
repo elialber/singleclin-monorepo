@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
+
 /// Transaction entity representing a healthcare service transaction
+@immutable
 class TransactionEntity {
   const TransactionEntity({
     required this.id,

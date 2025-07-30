@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -109,7 +111,7 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
         // Flash/torch toggle
         IconButton(
           icon: Icon(
-            _controller?.torchEnabled == true
+            (_controller?.torchEnabled ?? false)
                 ? Icons.flash_on
                 : Icons.flash_off,
           ),
@@ -399,8 +401,8 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
 
         if (isValid) {
           // Play success sound and show green border
-          _playSuccessSound();
-          _borderAnimationController?.forward();
+          unawaited(_playSuccessSound());
+          unawaited(_borderAnimationController?.forward());
 
           // Wait a moment for feedback then show patient data
           await Future.delayed(const Duration(milliseconds: 500));
@@ -413,7 +415,7 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
           _borderAnimationController?.reset();
         } else {
           // Play error sound and show red border briefly
-          _playErrorSound();
+          unawaited(_playErrorSound());
           _showErrorFeedback();
         }
       }
@@ -423,7 +425,7 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
           _isProcessing = false;
           _isValid = false;
         });
-        _playErrorSound();
+        unawaited(_playErrorSound());
         _showErrorMessage('Erro ao validar código: ${e.toString()}');
       }
     }
