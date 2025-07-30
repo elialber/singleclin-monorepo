@@ -1,18 +1,8 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { useState, useEffect, ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '@/services/auth.service'
 import { User } from '@/types/user'
-
-interface AuthContextData {
-  user: User | null
-  isLoading: boolean
-  isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
-  refreshUser: () => Promise<void>
-}
-
-export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
+import { AuthContext } from './AuthContextDefinition'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -120,11 +110,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')  
-  }
-  return context
-}
 

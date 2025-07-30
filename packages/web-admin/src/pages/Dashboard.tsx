@@ -33,7 +33,7 @@ import {
 } from 'recharts'
 import { DashboardMetrics, ChartData } from '@/types/transaction'
 import { dashboardService } from '@/services/dashboard.service'
-import { useNotification } from "@/contexts/NotificationContext"
+import { useNotification } from "@/hooks/useNotification"
 import MetricCard from '@/components/MetricCard'
 import ChartSkeleton from '@/components/ChartSkeleton'
 

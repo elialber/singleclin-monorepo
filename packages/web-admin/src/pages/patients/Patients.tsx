@@ -44,7 +44,7 @@ import {
 // Removed date-fns imports due to compatibility issues
 import { Patient, PatientFilters, PatientDetails } from '@/types/patient'
 import { patientService } from '@/services/patient.service'
-import { useNotification } from "@/contexts/NotificationContext"
+import { useNotification } from "@/hooks/useNotification"
 import { useDebounce } from '@/hooks/useDebounce'
 
 export default function Patients() {
