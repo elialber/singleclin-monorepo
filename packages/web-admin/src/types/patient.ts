@@ -5,9 +5,11 @@ export interface Patient {
   fullName: string
   email: string
   phoneNumber?: string
+  phone?: string // Alias for phoneNumber
   cpf?: string
   dateOfBirth?: string
   isActive: boolean
+  hasPlan?: boolean
   createdAt: string
   updatedAt: string
   
@@ -34,14 +36,32 @@ export interface PatientListResponse {
 }
 
 export interface PatientDetails extends Patient {
-  visitHistory: Array<{
+  phone?: string
+  hasPlan?: boolean
+  plans?: Array<{
+    id: string
+    planName: string
+    planDescription: string
+    remainingCredits: number
+    purchaseDate: string
+    isActive: boolean
+  }>
+  recentTransactions?: Array<{
+    id: string
+    clinicName: string
+    planName: string
+    creditsUsed: number
+    transactionDate: string
+    status: 'Pending' | 'Validated' | 'Cancelled'
+  }>
+  visitHistory?: Array<{
     id: string
     clinicName: string
     date: string
     creditsUsed: number
     planName: string
   }>
-  planHistory: Array<{
+  planHistory?: Array<{
     id: string
     planName: string
     purchaseDate: string

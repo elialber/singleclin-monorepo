@@ -181,4 +181,36 @@ public abstract class BaseController : ControllerBase
         var response = ResponseWrapper.ErrorResponse(message, statusCode, errors);
         return StatusCode(statusCode, response);
     }
+
+    /// <summary>
+    /// Gets the user role from claims
+    /// </summary>
+    protected string? GetUserRole()
+    {
+        return User.FindFirst("role")?.Value ?? User.FindFirst(ClaimTypes.Role)?.Value;
+    }
+
+    /// <summary>
+    /// Gets model state errors as a list of strings
+    /// </summary>
+    protected List<string> GetModelStateErrors()
+    {
+        return ModelState
+            .Where(x => x.Value?.Errors.Count > 0)
+            .SelectMany(x => x.Value!.Errors.Select(e => $"{x.Key}: {e.ErrorMessage}"))
+            .ToList();
+    }
+
+    /// <summary>
+    /// Gets the user's clinic ID as a Guid
+    /// </summary>
+    protected Guid? GetUserClinicId()
+    {
+        var clinicIdString = User.FindFirst("clinicId")?.Value;
+        if (Guid.TryParse(clinicIdString, out var clinicId))
+        {
+            return clinicId;
+        }
+        return null;
+    }
 }

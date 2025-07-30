@@ -1,0 +1,49 @@
+{{clinicName}} - Sistema de Gestão de Saúde
+===========================================
+
+Olá, {{userName}}!
+
+🚨 SALDO BAIXO - AÇÃO NECESSÁRIA 🚨
+
+Seu saldo atual: {{currentBalance}} crédito{{#isPlural}}s{{/isPlural}} restante{{#isPlural}}s{{/isPlural}}
+Plano: {{planName}}
+
+Seu saldo está baixo! Para continuar aproveitando todos os benefícios do seu plano de saúde, recomendamos que você renove seus créditos o quanto antes.
+
+POR QUE RENOVAR AGORA?
+✅ Continuidade no atendimento sem interrupções
+✅ Acesso a todos os parceiros da rede SingleClin  
+✅ Preços especiais e descontos exclusivos
+✅ Suporte prioritário da nossa equipe
+
+👉 RENOVAR CRÉDITOS AGORA
+Acesse: {{renewUrl}}
+
+---
+
+PRECISA DE AJUDA?
+Nossa equipe de suporte está sempre disponível para ajudá-lo.
+
+Telefone: {{supportPhone}}
+Email: {{supportEmail}}
+Suporte online: {{supportUrl}}
+
+---
+
+LINKS ÚTEIS:
+• Acessar App: {{appUrl}}
+• Central de Suporte: {{supportUrl}}  
+• Gerenciar Preferências: {{preferencesUrl}}
+
+---
+
+{{clinicName}}
+{{clinicAddress}}
+{{clinicPhone}} | {{clinicEmail}}
+
+---
+
+Você está recebendo este e-mail porque possui um plano ativo no SingleClin.
+Para gerenciar suas preferências de notificação, acesse: {{unsubscribeUrl}}
+
+© {{currentYear}} {{clinicName}}. Todos os direitos reservados.

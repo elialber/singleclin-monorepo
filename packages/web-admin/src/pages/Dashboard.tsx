@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react'
 import { 
   Grid, 
-  Paper, 
   Box, 
   Typography, 
   Card, 
   CardContent,
-  List,
-  ListItem,
-  ListItemText,
   Alert,
   FormControl,
   InputLabel,
@@ -17,9 +13,7 @@ import {
 } from '@mui/material'
 import {
   People as PeopleIcon,
-  LocalHospital as LocalHospitalIcon,
   Receipt as ReceiptIcon,
-  TrendingUp as TrendingUpIcon,
   MedicalServices as MedicalServicesIcon,
   AttachMoney as AttachMoneyIcon,
 } from '@mui/icons-material'
@@ -189,11 +183,9 @@ export default function Dashboard() {
                       <YAxis />
                       <Tooltip 
                         labelFormatter={(value) => new Date(value).toLocaleDateString('pt-BR')}
-                        formatter={[
-                          (value: number, name: string) => [
-                            name === 'count' ? formatNumber(value) : formatCurrency(value),
-                            name === 'count' ? 'Transações' : 'Valor'
-                          ]
+                        formatter={(value: number, name: string) => [
+                          name === 'count' ? formatNumber(value) : formatCurrency(value),
+                          name === 'count' ? 'Transações' : 'Valor'
                         ]}
                       />
                       <Line 
@@ -281,11 +273,9 @@ export default function Dashboard() {
                       />
                       <YAxis />
                       <Tooltip 
-                        formatter={[
-                          (value: number, name: string) => [
-                            name === 'count' ? formatNumber(value) : formatCurrency(value),
-                            name === 'count' ? 'Transações' : 'Receita'
-                          ]
+                        formatter={(value: number, name: string) => [
+                          name === 'count' ? formatNumber(value) : formatCurrency(value),
+                          name === 'count' ? 'Transações' : 'Receita'
                         ]}
                       />
                       <Bar dataKey="count" fill="#1976d2" name="count" />

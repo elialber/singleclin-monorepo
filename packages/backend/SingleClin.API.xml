@@ -256,6 +256,21 @@
             Returns a custom error response
             </summary>
         </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.GetUserRole">
+            <summary>
+            Gets the user role from claims
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.GetModelStateErrors">
+            <summary>
+            Gets model state errors as a list of strings
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.BaseController.GetUserClinicId">
+            <summary>
+            Gets the user's clinic ID as a Guid
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Controllers.HealthController">
             <summary>
             Health check endpoints documentation
@@ -272,6 +287,86 @@
             Test CORS configuration
             </summary>
             <response code="200">Returns CORS test response with headers information</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.JobsController.TriggerBalanceCheckJob">
+            <summary>
+            Manually trigger balance check job (Admin only)
+            </summary>
+            <returns>Job execution result</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.JobsController.ExecuteBalanceCheckJob">
+            <summary>
+            Execute balance check job synchronously for testing (Admin only)
+            </summary>
+            <returns>Job execution result with statistics</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.JobsController.GetBalanceCheckJobStats">
+            <summary>
+            Get balance check job statistics (Admin only)
+            </summary>
+            <returns>Job statistics</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.JobsController.UpdateBalanceCheckJobSchedule(System.String)">
+            <summary>
+            Update balance check job schedule (Admin only)
+            </summary>
+            <param name="cronExpression">New cron expression for job scheduling</param>
+            <returns>Update result</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.JobsController.DisableBalanceCheckJob">
+            <summary>
+            Disable balance check job (Admin only)
+            </summary>
+            <returns>Disable result</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.JobsController.EnableBalanceCheckJob">
+            <summary>
+            Re-enable balance check job with default schedule (Admin only)
+            </summary>
+            <returns>Enable result</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.NotificationPreferencesController.GetPreferences">
+            <summary>
+            Get current user's notification preferences
+            </summary>
+            <returns>User's notification preferences</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.NotificationPreferencesController.GetUserPreferences(System.Guid)">
+            <summary>
+            Get notification preferences for a specific user (Admin only)
+            </summary>
+            <param name="userId">User ID</param>
+            <returns>User's notification preferences</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.NotificationPreferencesController.UpdatePreferences(SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto)">
+            <summary>
+            Update current user's notification preferences
+            </summary>
+            <param name="preferences">Updated notification preferences</param>
+            <returns>Updated notification preferences</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.NotificationPreferencesController.UpdateUserPreferences(System.Guid,SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto)">
+            <summary>
+            Update notification preferences for a specific user (Admin only)
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="preferences">Updated notification preferences</param>
+            <returns>Updated notification preferences</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.NotificationPreferencesController.UpdateDeviceToken(SingleClin.API.DTOs.NotificationPreferences.UpdateDeviceTokenDto)">
+            <summary>
+            Update device token for push notifications
+            </summary>
+            <param name="deviceTokenDto">Device token and platform information</param>
+            <returns>Success confirmation</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.NotificationPreferencesController.UpdateUserDeviceToken(System.Guid,SingleClin.API.DTOs.NotificationPreferences.UpdateDeviceTokenDto)">
+            <summary>
+            Update device token for a specific user (Admin only)
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="deviceTokenDto">Device token and platform information</param>
+            <returns>Success confirmation</returns>
         </member>
         <member name="T:SingleClin.API.Controllers.PlanController">
             <summary>
@@ -401,6 +496,52 @@
             <summary>
             Check rate limiting for QR Code generation
             </summary>
+        </member>
+        <member name="T:SingleClin.API.Controllers.ReportsController">
+            <summary>
+            Controller for generating and exporting reports
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ReportsController.GetAvailableReportTypes">
+            <summary>
+            Get available report types for the current user
+            </summary>
+            <returns>List of available report types</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ReportsController.GenerateReport(SingleClin.API.DTOs.Report.ReportRequest)">
+            <summary>
+            Generate a report
+            </summary>
+            <param name="request">Report request parameters</param>
+            <returns>Generated report data</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ReportsController.GenerateUsageReport(SingleClin.API.DTOs.Report.ReportRequest)">
+            <summary>
+            Generate usage by period report
+            </summary>
+            <param name="request">Report request parameters</param>
+            <returns>Usage report data</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ReportsController.GenerateClinicRankingReport(SingleClin.API.DTOs.Report.ReportRequest)">
+            <summary>
+            Generate clinic ranking report
+            </summary>
+            <param name="request">Report request parameters</param>
+            <returns>Clinic ranking data</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ReportsController.ExportReport(SingleClin.API.DTOs.Report.ReportRequest)">
+            <summary>
+            Export a report to specified format
+            </summary>
+            <param name="request">Report request with export format</param>
+            <returns>File download</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ReportsController.ClearCache(System.Nullable{SingleClin.API.DTOs.Report.ReportType})">
+            <summary>
+            Clear report cache
+            </summary>
+            <param name="reportType">Optional report type to clear</param>
+            <returns>Success response</returns>
         </member>
         <member name="T:SingleClin.API.Controllers.TestAuthController">
             <summary>
@@ -614,6 +755,16 @@
         <member name="P:SingleClin.API.Data.ApplicationDbContext.RefreshTokens">
             <summary>
             Refresh tokens for JWT authentication
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.NotificationLogs">
+            <summary>
+            Notification logs
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.UserNotificationPreferences">
+            <summary>
+            User notification preferences
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Configurations.ApplicationUserConfiguration">
@@ -1176,6 +1327,59 @@
             User's purchased plans
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.EnablePush">
+            <summary>
+            Whether the user wants to receive push notifications
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.EnableEmail">
+            <summary>
+            Whether the user wants to receive email notifications
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.LowBalanceThreshold">
+            <summary>
+            Threshold for low balance notifications (in credits remaining)
+            Valid range: 1-5 credits
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.PreferredLanguage">
+            <summary>
+            Preferred language for notifications (ISO 639-1 code)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.EnablePromotional">
+            <summary>
+            Whether to receive promotional notifications
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.EnablePayment">
+            <summary>
+            Whether to receive payment-related notifications
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.QuietHoursStart">
+            <summary>
+            Custom quiet hours start time (24-hour format, e.g., "22:00")
+            If null, uses system default
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.QuietHoursEnd">
+            <summary>
+            Custom quiet hours end time (24-hour format, e.g., "08:00")
+            If null, uses system default
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.DeviceToken">
+            <summary>
+            Device token for push notifications (FCM token)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserNotificationPreferences.DevicePlatform">
+            <summary>
+            Device platform (iOS, Android, Web)
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.Models.UserPlan">
             <summary>
             Represents a plan purchased by a user
@@ -1485,6 +1689,240 @@
         <member name="M:SingleClin.API.DTOs.Common.PagedResultDto`1.#ctor">
             <summary>
             Default constructor
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData">
+            <summary>
+            Template data for low balance notification emails
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.UserName">
+            <summary>
+            User's name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.CurrentBalance">
+            <summary>
+            Current balance of credits
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.PlanName">
+            <summary>
+            Plan name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.ClinicName">
+            <summary>
+            Clinic name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.ClinicAddress">
+            <summary>
+            Clinic address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.ClinicPhone">
+            <summary>
+            Clinic phone
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.ClinicEmail">
+            <summary>
+            Clinic email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.SupportPhone">
+            <summary>
+            Support phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.SupportEmail">
+            <summary>
+            Support email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.RenewUrl">
+            <summary>
+            URL to renew credits
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.AppUrl">
+            <summary>
+            URL to app
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.SupportUrl">
+            <summary>
+            URL to support
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.PreferencesUrl">
+            <summary>
+            URL to manage notification preferences
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.UnsubscribeUrl">
+            <summary>
+            URL to unsubscribe/manage preferences
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.CurrentYear">
+            <summary>
+            Current year for copyright
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.IsPlural">
+            <summary>
+            Whether to use plural form for credits
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.UserId">
+            <summary>
+            User ID for tracking
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.PlanId">
+            <summary>
+            Plan ID for tracking
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData.Create(System.Guid,System.String,System.Int32,System.String,System.Guid)">
+            <summary>
+            Creates template data from notification context
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="userName">User name</param>
+            <param name="currentBalance">Current balance</param>
+            <param name="planName">Plan name</param>
+            <param name="planId">Plan ID</param>
+            <returns>Populated template data</returns>
+        </member>
+        <member name="T:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate">
+            <summary>
+            Represents a rendered email template with both HTML and text versions
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate.Subject">
+            <summary>
+            Subject line of the email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate.HtmlContent">
+            <summary>
+            HTML version of the email content
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate.TextContent">
+            <summary>
+            Plain text version of the email content
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate.TemplateName">
+            <summary>
+            Template name used for rendering
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate.RenderedAt">
+            <summary>
+            Timestamp when the template was rendered
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate.HasHtmlContent">
+            <summary>
+            Whether HTML content is available
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate.HasTextContent">
+            <summary>
+            Whether text content is available
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate.Create(System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates a rendered template instance
+            </summary>
+            <param name="templateName">Template name</param>
+            <param name="subject">Email subject</param>
+            <param name="htmlContent">HTML content</param>
+            <param name="textContent">Text content</param>
+            <returns>Rendered email template</returns>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.EnablePush">
+            <summary>
+            Whether the user wants to receive push notifications
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.EnableEmail">
+            <summary>
+            Whether the user wants to receive email notifications
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.LowBalanceThreshold">
+            <summary>
+            Threshold for low balance notifications (in credits remaining)
+            Valid range: 1-5 credits
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.PreferredLanguage">
+            <summary>
+            Preferred language for notifications (ISO 639-1 code)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.EnablePromotional">
+            <summary>
+            Whether to receive promotional notifications
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.EnablePayment">
+            <summary>
+            Whether to receive payment-related notifications
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.QuietHoursStart">
+            <summary>
+            Custom quiet hours start time (24-hour format, e.g., "22:00")
+            If null, uses system default
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.QuietHoursEnd">
+            <summary>
+            Custom quiet hours end time (24-hour format, e.g., "08:00")
+            If null, uses system default
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.DeviceToken">
+            <summary>
+            Device token for push notifications (FCM token)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesDto.DevicePlatform">
+            <summary>
+            Device platform (iOS, Android, Web)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesResponseDto.UserId">
+            <summary>
+            User ID these preferences belong to
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesResponseDto.CreatedAt">
+            <summary>
+            When the preferences were created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.NotificationPreferencesResponseDto.UpdatedAt">
+            <summary>
+            When the preferences were last updated
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.UpdateDeviceTokenDto.DeviceToken">
+            <summary>
+            Device token for push notifications (FCM token)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.NotificationPreferences.UpdateDeviceTokenDto.DevicePlatform">
+            <summary>
+            Device platform (iOS, Android, Web)
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.Plan.PlanFilterDto">
@@ -1822,6 +2260,416 @@
             Validation error information
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.Report.ClinicRankingData">
+            <summary>
+            Clinic ranking report data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ClinicRankingItem">
+            <summary>
+            Individual clinic ranking item
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ClinicMetrics">
+            <summary>
+            Clinic performance metrics
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ClinicPerformanceMetrics">
+            <summary>
+            Overall clinic performance metrics
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ClinicGrowthData">
+            <summary>
+            Clinic growth data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.PlanUtilizationData">
+            <summary>
+            Plan utilization report data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.PlanUtilizationItem">
+            <summary>
+            Individual plan utilization data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.PlanUsageMetrics">
+            <summary>
+            Plan usage metrics
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.PlanEfficiency">
+            <summary>
+            Plan efficiency metrics
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.UsageByMonth">
+            <summary>
+            Monthly usage breakdown
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.UtilizationSummary">
+            <summary>
+            Overall utilization summary
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.UtilizationPattern">
+            <summary>
+            Utilization patterns
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.PlanEfficiencyMetrics">
+            <summary>
+            Plan efficiency metrics across all plans
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ReportPeriod">
+            <summary>
+            Time period granularity for reports
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportPeriod.Daily">
+            <summary>
+            Daily aggregation
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportPeriod.Weekly">
+            <summary>
+            Weekly aggregation
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportPeriod.Monthly">
+            <summary>
+            Monthly aggregation
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportPeriod.Quarterly">
+            <summary>
+            Quarterly aggregation
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportPeriod.Yearly">
+            <summary>
+            Yearly aggregation
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportPeriod.Custom">
+            <summary>
+            Custom date range without aggregation
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ReportRequest">
+            <summary>
+            Request parameters for report generation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.Type">
+            <summary>
+            Type of report to generate
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.Period">
+            <summary>
+            Time period aggregation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.StartDate">
+            <summary>
+            Start date for the report
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.EndDate">
+            <summary>
+            End date for the report
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.ClinicIds">
+            <summary>
+            Filter by specific clinic IDs (optional)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.PlanIds">
+            <summary>
+            Filter by specific plan IDs (optional)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.ServiceTypes">
+            <summary>
+            Filter by service types (optional)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.Page">
+            <summary>
+            Page number for pagination (1-based)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.PageSize">
+            <summary>
+            Page size for pagination
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.SortBy">
+            <summary>
+            Sort field
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.SortDirection">
+            <summary>
+            Sort direction (asc/desc)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.IncludeDetails">
+            <summary>
+            Include detailed breakdown
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.ExportFormat">
+            <summary>
+            Export format (optional)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportRequest.TimeZone">
+            <summary>
+            Timezone for date calculations (IANA timezone)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Report.ReportRequest.IsValid">
+            <summary>
+            Validate date range
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ExportFormat">
+            <summary>
+            Export format options
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ExportFormat.Json">
+            <summary>
+            JSON format (default)
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ExportFormat.Excel">
+            <summary>
+            Excel format (.xlsx)
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ExportFormat.Pdf">
+            <summary>
+            PDF format
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ExportFormat.Csv">
+            <summary>
+            CSV format
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ReportResponse`1">
+            <summary>
+            Base response for all report types
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.Type">
+            <summary>
+            Report type
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.Title">
+            <summary>
+            Report title
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.Description">
+            <summary>
+            Report description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.GeneratedAt">
+            <summary>
+            Generation timestamp
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.Period">
+            <summary>
+            Report period information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.Filters">
+            <summary>
+            Applied filters
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.Data">
+            <summary>
+            Report data
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.Summary">
+            <summary>
+            Summary statistics
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.ChartData">
+            <summary>
+            Chart data for visualization
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.Pagination">
+            <summary>
+            Pagination information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.ExecutionTimeMs">
+            <summary>
+            Execution time in milliseconds
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.FromCache">
+            <summary>
+            Whether data was served from cache
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Report.ReportResponse`1.CacheExpiresAt">
+            <summary>
+            Cache expiry time
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ReportPeriodInfo">
+            <summary>
+            Report period information
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ReportFilters">
+            <summary>
+            Applied filters summary
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ReportSummary">
+            <summary>
+            Report summary statistics
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ChartData">
+            <summary>
+            Chart data for frontend visualization
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ChartDataset">
+            <summary>
+            Chart dataset
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ChartOptions">
+            <summary>
+            Chart display options
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.PaginationInfo">
+            <summary>
+            Pagination information
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ReportType">
+            <summary>
+            Types of reports available in the system
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportType.UsageByPeriod">
+            <summary>
+            Usage analysis by time period (daily, weekly, monthly)
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportType.ClinicRanking">
+            <summary>
+            Ranking of clinics by various metrics
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportType.TopServices">
+            <summary>
+            Most used services analysis
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportType.PlanUtilization">
+            <summary>
+            Plan utilization rates and efficiency
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportType.PatientActivity">
+            <summary>
+            Patient activity and retention analysis
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportType.FinancialSummary">
+            <summary>
+            Revenue and financial metrics
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Report.ReportType.TransactionAnalysis">
+            <summary>
+            Transaction details and patterns
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ServiceReportData">
+            <summary>
+            Service usage report data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ServiceUsageItem">
+            <summary>
+            Individual service usage data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ServiceDistribution">
+            <summary>
+            Service distribution analysis
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ServiceTrend">
+            <summary>
+            Service usage trends
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.TrendPoint">
+            <summary>
+            Trend data point
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ServiceInsights">
+            <summary>
+            Service insights and recommendations
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.ServiceCorrelation">
+            <summary>
+            Service correlation data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.UsageReportData">
+            <summary>
+            Usage report data structure
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.UsagePeriodData">
+            <summary>
+            Usage data for a specific period
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.UsageTrend">
+            <summary>
+            Usage trend analysis
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.UsageByClinic">
+            <summary>
+            Usage by clinic
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Report.UsageByPlan">
+            <summary>
+            Usage by plan
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Exceptions.PlanNotFoundException">
             <summary>
             Exception thrown when a plan is not found
@@ -1910,6 +2758,36 @@
         <member name="T:SingleClin.API.HealthChecks.RedisHealthCheck">
             <summary>
             Health check for Redis connection
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Jobs.BalanceCheckJob">
+            <summary>
+            Background job that checks user balances and sends notifications for low balance thresholds
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Jobs.BalanceCheckJob.ExecuteAsync">
+            <summary>
+            Executes the balance check job
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Jobs.BalanceCheckJob.GetUserPlansWithLowBalanceAsync">
+            <summary>
+            Gets user plans with low balance that may qualify for notifications
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Jobs.BalanceCheckJob.WasRecentlyNotifiedAsync(System.Guid,System.Int32)">
+            <summary>
+            Checks if user was recently notified for a specific balance level to prevent spam
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Jobs.BalanceCheckJob.GetStatsAsync">
+            <summary>
+            Gets comprehensive statistics about the balance check job execution
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Jobs.BalanceCheckJobStats">
+            <summary>
+            Statistics for balance check job execution
             </summary>
         </member>
         <member name="T:SingleClin.API.Middleware.ClinicRateLimitingMiddleware">
@@ -2099,6 +2977,41 @@
             Service for transforming and adding claims dynamically during authentication
             </summary>
         </member>
+        <member name="T:SingleClin.API.Services.EmailTemplateService">
+            <summary>
+            Service for processing and rendering email templates
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.EmailTemplateService.ProcessTemplate(System.String,System.Object)">
+            <summary>
+            Processes template content by replacing variables with actual values
+            </summary>
+            <param name="template">Template content</param>
+            <param name="data">Data object to extract values from</param>
+            <returns>Processed template content</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.EmailTemplateService.ProcessConditionalBlocks(System.String,System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Processes conditional blocks in templates
+            </summary>
+            <param name="template">Template content</param>
+            <param name="properties">Property dictionary</param>
+            <returns>Processed template</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.EmailTemplateService.GetObjectProperties(System.Object)">
+            <summary>
+            Extracts properties from an object into a dictionary
+            </summary>
+            <param name="obj">Object to extract properties from</param>
+            <returns>Dictionary of property name-value pairs</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.EmailTemplateService.GenerateLowBalanceSubject(SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData)">
+            <summary>
+            Generates subject line for low balance notifications
+            </summary>
+            <param name="templateData">Template data</param>
+            <returns>Generated subject line</returns>
+        </member>
         <member name="T:SingleClin.API.Services.FirebaseAuthService">
             <summary>
             Service for Firebase authentication operations
@@ -2173,6 +3086,46 @@
             </summary>
             <param name="userId">User ID</param>
             <returns>Dictionary of user claims</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IEmailTemplateService">
+            <summary>
+            Service for processing and rendering email templates
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IEmailTemplateService.RenderLowBalanceNotificationAsync(SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Renders a low balance notification email template
+            </summary>
+            <param name="templateData">Data to populate the template</param>
+            <param name="includeHtml">Whether to include HTML version</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Rendered email template</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IEmailTemplateService.RenderTemplateAsync(System.String,System.Object,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Renders any email template with provided data
+            </summary>
+            <param name="templateName">Template file name (without extension)</param>
+            <param name="templateData">Data to populate the template</param>
+            <param name="includeHtml">Whether to include HTML version</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Rendered email template</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IEmailTemplateService.GetHtmlTemplateAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the HTML template content
+            </summary>
+            <param name="templateName">Template name</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>HTML template content</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IEmailTemplateService.GetTextTemplateAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the plain text template content
+            </summary>
+            <param name="templateName">Template name</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Plain text template content</returns>
         </member>
         <member name="T:SingleClin.API.Services.IFirebaseAuthService">
             <summary>
@@ -2504,6 +3457,66 @@
             <param name="deviceInfo">New device information</param>
             <returns>Success status</returns>
         </member>
+        <member name="T:SingleClin.API.Services.IReportService">
+            <summary>
+            Interface for report generation service
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IReportService.GenerateReportAsync(SingleClin.API.DTOs.Report.ReportRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate a report based on the request parameters
+            </summary>
+            <param name="request">Report request parameters</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Report response with data</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IReportService.GenerateUsageReportAsync(SingleClin.API.DTOs.Report.ReportRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate usage by period report
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IReportService.GenerateClinicRankingAsync(SingleClin.API.DTOs.Report.ReportRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate clinic ranking report
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IReportService.GenerateServiceReportAsync(SingleClin.API.DTOs.Report.ReportRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate top services report
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IReportService.GeneratePlanUtilizationAsync(SingleClin.API.DTOs.Report.ReportRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate plan utilization report
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IReportService.ExportReportAsync(System.Object,SingleClin.API.DTOs.Report.ExportFormat,System.Threading.CancellationToken)">
+            <summary>
+            Export report to specified format
+            </summary>
+            <param name="reportData">Report data to export</param>
+            <param name="format">Export format</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>File content as byte array</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IReportService.GetAvailableReportTypesAsync(System.String)">
+            <summary>
+            Get available report types for user
+            </summary>
+            <param name="userRole">User role</param>
+            <returns>List of available report types</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IReportService.ClearReportCacheAsync(System.Nullable{SingleClin.API.DTOs.Report.ReportType})">
+            <summary>
+            Clear cached report data
+            </summary>
+            <param name="reportType">Optional report type to clear</param>
+        </member>
+        <member name="T:SingleClin.API.Services.ReportTypeInfo">
+            <summary>
+            Report type information
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.PlanService">
             <summary>
             Service implementation for Plan business logic
@@ -2659,6 +3672,159 @@
             <summary>
             Service for managing refresh tokens
             </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.ReportQueryBuilder`1">
+            <summary>
+            Builder pattern for constructing complex report queries
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.Include(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            Add include for eager loading
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.Where(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            Add where clause
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.WhereIf(System.Boolean,System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            Add conditional where clause
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.WithinDateRange``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.DateTime,System.DateTime)">
+            <summary>
+            Add date range filter
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.OrderBy(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            Set order by
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.OrderByDescending(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            Set order by descending
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.ThenBy(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            Add then by
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.ThenByDescending(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            Add then by descending
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.Paginate(System.Int32,System.Int32)">
+            <summary>
+            Set pagination
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.Take(System.Int32)">
+            <summary>
+            Take specific number of records
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.Skip(System.Int32)">
+            <summary>
+            Skip specific number of records
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.WithTracking">
+            <summary>
+            Enable tracking (disabled by default for reports)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.Build">
+            <summary>
+            Build the query
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.ToListAsync(System.Threading.CancellationToken)">
+            <summary>
+            Execute query and return list
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.FirstOrDefaultAsync(System.Threading.CancellationToken)">
+            <summary>
+            Execute query and return first or default
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.CountAsync(System.Threading.CancellationToken)">
+            <summary>
+            Execute query and return count
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.AnyAsync(System.Threading.CancellationToken)">
+            <summary>
+            Check if any records exist
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilder`1.Select``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Project to different type
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.ReportQueryBuilderExtensions">
+            <summary>
+            Extension methods for creating report query builders
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilderExtensions.BuildReport``1(System.Linq.IQueryable{``0})">
+            <summary>
+            Create a report query builder for the queryable
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilderExtensions.WithinPeriod(SingleClin.API.Services.ReportQueryBuilder{SingleClin.API.Data.Models.Transaction},System.DateTime,System.DateTime)">
+            <summary>
+            Filter transactions by date range
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilderExtensions.ForClinics(SingleClin.API.Services.ReportQueryBuilder{SingleClin.API.Data.Models.Transaction},System.Collections.Generic.List{System.Guid})">
+            <summary>
+            Filter by clinic IDs
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilderExtensions.ForServiceTypes(SingleClin.API.Services.ReportQueryBuilder{SingleClin.API.Data.Models.Transaction},System.Collections.Generic.List{System.String})">
+            <summary>
+            Filter by service types
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ReportQueryBuilderExtensions.IncludeRelated(SingleClin.API.Services.ReportQueryBuilder{SingleClin.API.Data.Models.Transaction})">
+            <summary>
+            Include related entities for transactions
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.ReportService">
+            <summary>
+            Service for generating various reports
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.SendGridProvider.SendLowBalanceNotificationAsync(System.String,System.String,SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData,System.Threading.CancellationToken)">
+            <summary>
+            Sends a low balance notification email using templates
+            </summary>
+            <param name="recipientEmail">Recipient email address</param>
+            <param name="recipientName">Recipient name</param>
+            <param name="templateData">Template data</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Notification response</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.SendGridProvider.SendTemplatedEmailAsync(System.String,System.String,System.String,System.Object,SingleClin.API.DTOs.Notification.NotificationType,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Sends a templated email
+            </summary>
+            <param name="recipientEmail">Recipient email</param>
+            <param name="recipientName">Recipient name</param>
+            <param name="templateName">Template name</param>
+            <param name="templateData">Template data</param>
+            <param name="notificationType">Notification type</param>
+            <param name="priority">Email priority</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Notification response</returns>
         </member>
         <member name="T:SingleClin.API.Validators.PlanRequestValidator">
             <summary>

@@ -6,6 +6,7 @@ using SingleClin.API.Filters;
 using SingleClin.API.HealthChecks;
 using SingleClin.API.Data;
 using SingleClin.API.Data.Models;
+using SingleClin.API.Jobs;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using DotNetEnv;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 namespace SingleClin.API;
 
@@ -115,6 +118,9 @@ public class Program
             options.InstanceName = builder.Configuration.GetSection("Redis:InstanceName").Value ?? "SingleClin";
         });
 
+        // Add in-memory caching for reports
+        builder.Services.AddMemoryCache();
+
         // Add Redis service for QR Code nonce management
         builder.Services.AddScoped<IRedisService, RedisService>();
 
@@ -132,6 +138,63 @@ public class Program
 
         // Add claims transformation service
         builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformationService>();
+
+        // Configure notification providers
+        builder.Services.Configure<FcmOptions>(
+            builder.Configuration.GetSection(FcmOptions.SectionName));
+        builder.Services.Configure<SendGridOptions>(
+            builder.Configuration.GetSection(SendGridOptions.SectionName));
+
+        // Add notification providers
+        builder.Services.AddScoped<IPushNotificationProvider, FcmProvider>();
+        builder.Services.AddScoped<IEmailNotificationProvider, SendGridProvider>();
+        
+        // Add email template service
+        builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+        
+        // Add notification services
+        builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+        builder.Services.AddScoped<INotificationService, NotificationService>();
+        
+        // Add notification preferences services
+        builder.Services.AddScoped<IUserNotificationPreferencesRepository, UserNotificationPreferencesRepository>();
+        builder.Services.AddScoped<INotificationPreferencesService, NotificationPreferencesService>();
+        
+        // Configure notification options
+        builder.Services.Configure<NotificationOptions>(
+            builder.Configuration.GetSection(NotificationOptions.SectionName));
+        
+        // Register notification providers collection
+        builder.Services.AddScoped<IEnumerable<INotificationProvider>>(provider =>
+            new List<INotificationProvider>
+            {
+                provider.GetRequiredService<IPushNotificationProvider>(),
+                provider.GetRequiredService<IEmailNotificationProvider>()
+            });
+
+        // Add Hangfire services
+        builder.Services.AddHangfire(configuration => configuration
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(options =>
+            {
+                options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"));
+            }));
+
+        // Add Hangfire server
+        builder.Services.AddHangfireServer(options =>
+        {
+            options.ServerName = $"SingleClin-{Environment.MachineName}";
+            options.WorkerCount = Environment.ProcessorCount; // Scale with CPU cores
+            options.Queues = new[] { "default", "notifications" }; // Separate queue for notifications
+        });
+
+        // Register background jobs
+        builder.Services.AddScoped<BalanceCheckJob>();
+
+        // Add Report Service
+        builder.Services.AddScoped<IReportService, ReportService>();
 
         // Configure authorization policies
         builder.Services.AddAuthorization(options =>
@@ -287,6 +350,14 @@ public class Program
                 c.EnableTryItOutByDefault();
                 c.ShowCommonExtensions();
             });
+            
+            // Add Hangfire Dashboard in development
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() },
+                DisplayStorageConnectionString = false,
+                DashboardTitle = "SingleClin Background Jobs"
+            });
         }
 
         app.UseHttpsRedirection();
@@ -360,6 +431,16 @@ public class Program
 
         // Configure database migrations and seeding
         await app.ConfigureDatabaseAsync();
+
+        // Schedule recurring jobs
+        var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
+        
+        // Schedule balance check job to run every 4 hours
+        recurringJobManager.AddOrUpdate<BalanceCheckJob>(
+            "balance-check-job",
+            job => job.ExecuteAsync(),
+            "0 */4 * * *", // Every 4 hours at minute 0
+            TimeZoneInfo.Local);
 
         await app.RunAsync();
     }
