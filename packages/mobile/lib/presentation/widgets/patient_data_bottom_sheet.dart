@@ -126,9 +126,10 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
         _isLoadingServices = true;
       });
 
-      // TODO(api): Get clinic ID from stored preferences and use in API call
-      // final prefs = await SharedPreferences.getInstance();
-      // final clinicId = prefs.getString('clinic_id') ?? 'clinic123';
+      // Get clinic ID from preferences for future API implementation
+      final prefs = await SharedPreferences.getInstance();
+      final clinicId = prefs.getString('clinic_id') ?? 'clinic123';
+      debugPrint('Loading services for clinic: $clinicId');
 
       // TODO(api): Replace with actual endpoint when available
       // For now, simulate API call
