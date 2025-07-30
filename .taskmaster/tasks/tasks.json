@@ -619,15 +619,15 @@
           8,
           9
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
             "title": "Configurar Dependências e Criar Tela Base do QR Code",
             "description": "Adicionar pacote qr_flutter ao projeto e criar a estrutura inicial da QRCodeScreen com navegação",
             "dependencies": [],
-            "details": "Adicionar qr_flutter: ^4.1.0 ao pubspec.yaml. Criar QRCodeScreen em /lib/presentation/screens/qr_code/. Implementar StatefulWidget básico com Scaffold. Adicionar rota no go_router para '/qr-code'. Criar botão na tela principal para navegar até QRCodeScreen. Configurar AppBar com título 'Meu QR Code' e botão de voltar.",
-            "status": "pending",
+            "details": "Adicionar qr_flutter: ^4.1.0 ao pubspec.yaml. Criar QRCodeScreen em /lib/presentation/screens/qr_code/. Implementar StatefulWidget básico com Scaffold. Adicionar rota no go_router para '/qr-code'. Criar botão na tela principal para navegar até QRCodeScreen. Configurar AppBar com título 'Meu QR Code' e botão de voltar.\n<info added on 2025-07-30T00:35:31.542Z>\n✅ Configuração de rota de navegação para tela de QR Code concluída\n\n**Implementado:**\n1. ✅ Atualizado app_router.dart para importar novo QRCodeScreen de `/presentation/screens/qr_code/qr_code_screen.dart`\n2. ✅ Modificada rota `/qr-generate` para usar `QRCodeScreen()` ao invés do antigo `QrCodeScreen()`\n3. ✅ Verificado que botão QR na tela inicial já usa `context.go(AppRoutes.qrGenerate)` para navegação\n4. ✅ Confirmado que dependência qr_flutter está instalada corretamente via `flutter pub get`\n\n**Detalhes Técnicos:**\n- Caminho da rota: `/qr-generate` (AppRoutes.qrGenerate)\n- Método de navegação: `context.go(AppRoutes.qrGenerate)` do botão QR da tela inicial\n- Import: `import 'package:singleclin_app/presentation/screens/qr_code/qr_code_screen.dart';`\n- Builder: `builder: (context, state) => const QRCodeScreen()`\n\nA infraestrutura de navegação está completa. Quando usuários tocarem no botão \"Gerar QR Code\" na tela inicial, navegarão para nosso QRCodeScreen completo com todos os componentes de UI prontos para geração de QR code.\n</info added on 2025-07-30T00:35:31.542Z>",
+            "status": "done",
             "testStrategy": "Verificar se a dependência foi instalada corretamente. Testar navegação da tela principal para QRCodeScreen. Validar se o layout básico está renderizando"
           },
           {
@@ -637,8 +637,8 @@
             "dependencies": [
               "10.1"
             ],
-            "details": "Criar QRCodeService em /lib/domain/services/ para gerar código alfanumérico único (ex: 'USR-${userId}-${timestamp}'). Implementar widget QrImageView no centro da tela com size: 280. Adicionar padding e container com bordas arredondadas. Exibir código alfanumérico abaixo do QR como Text com fontSize: 18 e fontWeight.bold. Implementar estado loading enquanto gera o código.",
-            "status": "pending",
+            "details": "Criar QRCodeService em /lib/domain/services/ para gerar código alfanumérico único (ex: 'USR-${userId}-${timestamp}'). Implementar widget QrImageView no centro da tela com size: 280. Adicionar padding e container com bordas arredondadas. Exibir código alfanumérico abaixo do QR como Text com fontSize: 18 e fontWeight.bold. Implementar estado loading enquanto gera o código.\n<info added on 2025-07-30T00:38:16.385Z>\n✅ QR code generation e display implementados com sucesso\n\n**Implementação Técnica Detalhada:**\n- Adicionado import do qr_flutter e configurado QrImageView para display real de QR codes\n- Formato único implementado: 'USR-${userId}-${timestamp}' garantindo identificação única\n- Container de 280x280px com bordas arredondadas (radius: 16px) e sombra para destaque visual\n- QR code interno de 248px (280px container - 32px padding total)\n- Nível de correção de erro: QrErrorCorrectLevel.M para leitura otimizada\n\n**Funcionalidades de Timer e Expiração:**\n- Timer.periodic implementado com atualização a cada segundo durante 5 minutos (300 segundos)\n- Formato de countdown: \"4:59\" com formatação de dois dígitos para segundos\n- Expiração automática com notificação ao usuário quando timer chega a zero\n- Limpeza automática do timer ao sair da tela via dispose()\n\n**Gerenciamento de Estados:**\n- Estado de loading com simulação de 2 segundos e CircularProgressIndicator\n- Estados distintos: isLoading, isExpired, e ativo com QR válido\n- Transições suaves entre estados com feedback visual apropriado\n\n**Correções Técnicas:**\n- Import path do AuthController corrigido de '/infrastructure/' para '/data/'\n- Propriedade userId ajustada de 'uid' para 'id' conforme modelo User\n- Adicionada validação de usuário null com navegação para login\n\n**Resultado Final:**\nTela de QR code totalmente funcional com geração de códigos únicos, contador regressivo em tempo real, tratamento de expiração e design responsivo. Interface intuitiva permite ao usuário visualizar seu QR code com tempo restante claramente indicado e receber notificação quando expirar.\n</info added on 2025-07-30T00:38:16.385Z>",
+            "status": "done",
             "testStrategy": "Verificar se o QR Code é gerado com dados únicos. Testar diferentes tamanhos de tela para responsividade. Validar se o código alfanumérico é legível"
           },
           {
@@ -649,7 +649,7 @@
               "10.2"
             ],
             "details": "Criar Timer.periodic para atualizar countdown a cada segundo. Exibir tempo restante em formato 'MM:SS' acima do QR Code. Usar CircularProgressIndicator ao redor do timer. Quando chegar a 00:00, mostrar estado 'Expirado' e desabilitar QR. Implementar botão 'Gerar Novo QR Code' que reseta timer e gera novo código. Adicionar animação de fade quando QR expira.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar se o timer decrementa corretamente. Verificar regeneração ao clicar no botão. Validar estado visual quando QR expira. Testar se timer continua ao minimizar app"
           },
           {
@@ -659,8 +659,8 @@
             "dependencies": [
               "10.3"
             ],
-            "details": "Usar screen_brightness package para aumentar brilho ao entrar na tela e restaurar ao sair. Implementar no initState() e dispose(). Adicionar Card expansível abaixo do QR com título 'Como usar'. Incluir instruções: '1. Apresente este QR Code na recepção', '2. O código expira em 5 minutos', '3. Cada uso consome 1 crédito do seu plano'. Usar ExpansionTile para mostrar/ocultar instruções.",
-            "status": "pending",
+            "details": "Usar screen_brightness package para aumentar brilho ao entrar na tela e restaurar ao sair. Implementar no initState() e dispose(). Adicionar Card expansível abaixo do QR com título 'Como usar'. Incluir instruções: '1. Apresente este QR Code na recepção', '2. O código expira em 5 minutos', '3. Cada uso consome 1 crédito do seu plano'. Usar ExpansionTile para mostrar/ocultar instruções.\n<info added on 2025-07-30T00:40:34.983Z>\n**Implementação Concluída com Sucesso:**\n\n**Controle de Brilho da Tela:**\n- ✅ Package screen_brightness: ^1.0.1 adicionado ao pubspec.yaml\n- ✅ Método _setMaxBrightness() implementado para armazenar brilho original e definir para máximo (1.0)\n- ✅ Método _restoreOriginalBrightness() criado para restaurar brilho ao sair da tela\n- ✅ Integração com ciclo de vida do Flutter (initState e dispose)\n- ✅ Tratamento de erros robusto com try-catch e fallback para resetScreenBrightness()\n- ✅ Notificação ao usuário via SnackBar quando brilho é aumentado\n\n**Seção de Instruções:**\n- ✅ ExpansionTile já implementado com layout Card\n- ✅ Título \"Como usar\" com ícone de ajuda\n- ✅ 4 instruções com ícones apropriados:\n  1. Apresentar QR Code na recepção (ícone qr_code_scanner)\n  2. Código expira em 5 minutos (ícone timer)\n  3. Cada uso consome 1 crédito (ícone credit_card)\n  4. Opção de salvar na galeria (ícone save_alt)\n\n**Características Técnicas Implementadas:**\n- Aumento automático do brilho para 1.0 ao carregar a tela\n- Preservação e restauração do nível de brilho original\n- Tratamento de erros para dispositivos sem suporte a controle de brilho\n- Notificação ao usuário sobre mudança de brilho\n- Degradação graceful em caso de falha\n- Limpeza adequada no método dispose()\n\n**Melhorias na Experiência do Usuário:**\n- Tela automaticamente mais brilhante para leitura otimizada do QR Code\n- Instruções claras ajudam usuários a entender o uso correto\n- Brilho restaurado automaticamente ao sair da tela\n- Seção expansível economiza espaço mantendo informações acessíveis\n\nA tela de QR Code agora oferece visibilidade ideal através do controle automático de brilho e orientação completa através da seção de instruções.\n</info added on 2025-07-30T00:40:34.983Z>",
+            "status": "done",
             "testStrategy": "Verificar se o brilho aumenta ao entrar e volta ao normal ao sair. Testar expansão/colapso das instruções. Validar em diferentes níveis de bateria"
           },
           {
@@ -670,8 +670,8 @@
             "dependencies": [
               "10.4"
             ],
-            "details": "Adicionar packages: screenshot e image_gallery_saver. Envolver QrImageView com Screenshot widget usando GlobalKey. Criar IconButton com ícone de download no AppBar. Implementar função para capturar screenshot e salvar na galeria. Solicitar permissão de armazenamento se necessário. Mostrar SnackBar de sucesso/erro após salvar. Adicionar analytics para rastrear uso do recurso.",
-            "status": "pending",
+            "details": "Adicionar packages: screenshot e image_gallery_saver. Envolver QrImageView com Screenshot widget usando GlobalKey. Criar IconButton com ícone de download no AppBar. Implementar função para capturar screenshot e salvar na galeria. Solicitar permissão de armazenamento se necessário. Mostrar SnackBar de sucesso/erro após salvar. Adicionar analytics para rastrear uso do recurso.\n<info added on 2025-07-30T00:42:38.379Z>\n✅ Funcionalidade de salvamento do QR Code implementada com captura de screenshot\n\n**Dependências Adicionadas:**\n1. ✅ screenshot: ^3.0.0 para captura de imagens do QR code\n2. ✅ image_gallery_saver: ^2.0.3 para salvar imagens na galeria do dispositivo\n\n**Implementação do Screenshot:**\n1. ✅ Instância ScreenshotController adicionada ao gerenciamento de estado\n2. ✅ Widget QR code envolvido com Screenshot para capacidade de captura\n3. ✅ Estilo visual mantido com bordas, sombras e padding adequado\n4. ✅ Screenshot captura container de 280x280px do QR code com estilo visual\n\n**Recursos da Funcionalidade de Salvar:**\n1. ✅ Tratamento abrangente de erros para QR codes expirados/inválidos\n2. ✅ Indicador de carregamento com CircularProgressIndicator durante processo de salvamento\n3. ✅ Captura de screenshot com validação null-safety\n4. ✅ Salvamento na galeria com nome único: 'QRCode_SingleClin_${timestamp}'\n5. ✅ Qualidade máxima (100) para imagens de QR code nítidas\n6. ✅ Feedback de sucesso com ícone de check e indicação de localização na galeria\n7. ✅ Feedback de erro com botão de ação \"Tentar novamente\" e mensagens detalhadas\n\n**Melhorias na Experiência do Usuário:**\n- Estado de carregamento mostra progresso durante operação de salvamento\n- Mensagem de sucesso inclui instrução para verificar galeria de fotos\n- Tratamento de erros fornece opção \"Tentar novamente\"\n- Previne salvamento de QR codes expirados com aviso apropriado\n- Formato profissional de nome de arquivo para fácil identificação na galeria\n\n**Implementação Técnica:**\n- ScreenshotController integrado com widget de exibição de QR existente\n- Processamento de bytes de imagem Uint8List para compatibilidade com galeria\n- ImageGallerySaver.saveImage() com salvamento específico da plataforma\n- Tratamento adequado de async/await com verificações de widget montado\n- Tratamento de exceções com mensagens amigáveis ao usuário\n\nA tela de QR code agora oferece funcionalidade completa incluindo geração, exibição, temporizador, aumento de brilho, instruções e capacidade de salvamento na galeria. Usuários podem facilmente salvar seus QR codes para uso offline ou compartilhamento.\n</info added on 2025-07-30T00:42:38.379Z>",
+            "status": "done",
             "testStrategy": "Testar salvamento em Android e iOS. Verificar se a imagem aparece na galeria. Validar fluxo de permissões. Testar mensagens de feedback ao usuário"
           }
         ]
@@ -686,7 +686,7 @@
         "dependencies": [
           8
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -694,7 +694,7 @@
             "description": "Implementar modelos de dados para transações e estrutura base do serviço de validação",
             "dependencies": [],
             "details": "Criar modelo Transaction com campos: id, userPlanId, clinicId, serviceType, qrToken, validatedAt, amount. Criar QRCodeValidationService com interface para validação. Definir DTOs para request/response da validação. Implementar estrutura de erros customizados para validação (QRExpiredError, QRAlreadyUsedError, InvalidQRError).",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Testar criação de instâncias dos modelos. Verificar validação de campos obrigatórios. Testar serialização/deserialização dos DTOs."
           },
           {
@@ -705,7 +705,7 @@
               "11.1"
             ],
             "details": "Implementar método validateQRToken que: decodifica e valida JWT usando a chave secreta, verifica claims obrigatórias (userPlanId, expiresAt, nonce), checa expiração do token, consulta Redis para verificar se nonce já foi usado. Configurar TTL no Redis igual ao tempo de expiração do QR. Retornar dados decodificados ou lançar exceção específica.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar validação com token válido, expirado e malformado. Verificar detecção de nonce já utilizado. Testar comportamento com Redis indisponível."
           },
           {
@@ -716,7 +716,7 @@
               "11.2"
             ],
             "details": "Implementar método processTransaction que: busca UserPlan pelo userPlanId, verifica se há créditos disponíveis, debita 1 crédito do saldo, cria registro Transaction com todos os dados, invalida nonce no Redis marcando como usado. Usar transação de banco de dados para garantir consistência. Implementar rollback em caso de erro.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar débito com saldo suficiente e insuficiente. Verificar atomicidade da transação. Testar rollback em caso de falha."
           },
           {
@@ -727,7 +727,7 @@
               "11.3"
             ],
             "details": "Criar controller com endpoint POST /transactions/validate-qr. Request body: {qrToken: string, clinicId: string, serviceType?: string}. Adicionar middleware de autenticação JWT para clínicas. Validar que clinicId do token corresponde à clínica autenticada. Chamar QRCodeValidationService para processar. Retornar response com dados do paciente (nome, telefone) e confirmação da transação. Implementar tratamento de erros com status codes apropriados.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar endpoint com tokens válidos e inválidos. Verificar autenticação e autorização. Testar diferentes cenários de erro e responses."
           },
           {
@@ -738,7 +738,7 @@
               "11.4"
             ],
             "details": "Implementar middleware de rate limiting usando Redis. Configurar limite de 100 validações por minuto por clinicId. Usar sliding window para contagem. Retornar status 429 (Too Many Requests) quando exceder limite. Incluir headers X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset. Criar configuração customizável por clínica se necessário. Adicionar logs para monitoramento de uso.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar limite de requisições dentro da janela. Verificar reset do contador após período. Testar headers de rate limit. Validar comportamento com múltiplas clínicas."
           }
         ]
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-30T00:20:20.999Z",
+      "updated": "2025-07-30T00:43:00.074Z",
       "description": "Tasks for master context"
     }
   }

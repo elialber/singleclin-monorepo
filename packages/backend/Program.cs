@@ -127,6 +127,9 @@ public class Program
         // Add QR Code orchestrator service
         builder.Services.AddScoped<IQRCodeService, QRCodeService>();
 
+        // Add QR Code validation service
+        builder.Services.AddScoped<IQRCodeValidationService, QRCodeValidationService>();
+
         // Add claims transformation service
         builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformationService>();
 
@@ -296,6 +299,9 @@ public class Program
 
         // Add custom JWT middleware
         app.UseMiddleware<JwtAuthenticationMiddleware>();
+
+        // Add clinic rate limiting middleware
+        app.UseMiddleware<ClinicRateLimitingMiddleware>();
 
         // Add authentication & authorization
         app.UseAuthentication();

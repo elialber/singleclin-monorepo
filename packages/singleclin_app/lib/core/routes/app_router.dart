@@ -5,6 +5,7 @@ import 'package:singleclin_app/core/routes/app_routes.dart';
 import 'package:singleclin_app/presentation/screens/screens.dart';
 import 'package:singleclin_app/presentation/screens/home_screen.dart';
 import 'package:singleclin_app/presentation/screens/theme_settings_screen.dart';
+import 'package:singleclin_app/presentation/screens/qr_code/qr_code_screen.dart';
 import 'package:singleclin_app/presentation/screens/auth/login_screen.dart' as auth;
 import 'package:singleclin_app/presentation/screens/auth/register_screen.dart' as auth;
 import 'package:singleclin_app/presentation/screens/auth/forgot_password_screen.dart' as auth;
@@ -99,7 +100,7 @@ class AppRouter {
       // QR Code routes
       GoRoute(
         path: AppRoutes.qrGenerate,
-        builder: (context, state) => const QrCodeScreen(),
+        builder: (context, state) => const QRCodeScreen(),
       ),
       GoRoute(
         path: AppRoutes.qrScan,

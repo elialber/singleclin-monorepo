@@ -91,4 +91,24 @@ public class Transaction : BaseEntity
     /// Date when the transaction was cancelled
     /// </summary>
     public DateTime? CancellationDate { get; set; }
+    
+    /// <summary>
+    /// QR Code token used for this transaction (if applicable)
+    /// </summary>
+    public string? QRToken { get; set; }
+    
+    /// <summary>
+    /// QR Code nonce for security verification
+    /// </summary>
+    public string? QRNonce { get; set; }
+    
+    /// <summary>
+    /// Service type from QR Code validation
+    /// </summary>
+    public string? ServiceType { get; set; }
+    
+    /// <summary>
+    /// Amount charged for this transaction
+    /// </summary>
+    public decimal Amount { get; set; }
 }

@@ -55,6 +55,16 @@ dependencies:
   
   # HTTP client
   dio: ^5.7.0
+  
+  # QR Code generation
+  qr_flutter: ^4.1.0
+  
+  # Screen brightness control
+  screen_brightness: ^1.0.1
+  
+  # Screenshot and image saving
+  screenshot: ^3.0.0
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:
