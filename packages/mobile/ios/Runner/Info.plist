@@ -56,11 +56,9 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleURLName</key>
-			<string>REVERSED_CLIENT_ID</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.YOUR_REVERSED_CLIENT_ID</string>
+				<string>com.googleusercontent.apps.410494012909-pn2m3j632metfv56li6q17il8r12jt9q</string>
 			</array>
 		</dict>
 	</array>
