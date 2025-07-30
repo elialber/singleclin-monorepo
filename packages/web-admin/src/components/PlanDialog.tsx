@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Dialog,
@@ -21,7 +21,7 @@ import {
 import { Close, AttachMoney } from '@mui/icons-material'
 import { Plan, CreatePlanRequest } from '@/types/plan'
 import { clinicService } from '@/services/clinic.service'
-import { useNotification } from '@/contexts/NotificationContext'
+import { useNotification } from "@/contexts/NotificationContext"
 
 interface PlanDialogProps {
   open: boolean
@@ -65,6 +65,19 @@ export default function PlanDialog({
 
   const isEdit = !!plan
 
+  const loadClinics = useCallback(async () => {
+    try {
+      setLoadingClinics(true)
+      const options = await clinicService.getClinicOptions()
+      setClinicOptions([{ id: '', name: 'Nenhuma clínica específica' }, ...options])
+    } catch (error) {
+      console.error('Error loading clinics:', error)
+      showError('Erro ao carregar clínicas')
+    } finally {
+      setLoadingClinics(false)
+    }
+  }, [showError])
+
   useEffect(() => {
     if (open) {
       loadClinics()
@@ -78,20 +91,7 @@ export default function PlanDialog({
         reset()
       }
     }
-  }, [open, plan, setValue, reset])
-
-  const loadClinics = async () => {
-    try {
-      setLoadingClinics(true)
-      const options = await clinicService.getClinicOptions()
-      setClinicOptions([{ id: '', name: 'Nenhuma clínica específica' }, ...options])
-    } catch (error) {
-      console.error('Error loading clinics:', error)
-      showError('Erro ao carregar clínicas')
-    } finally {
-      setLoadingClinics(false)
-    }
-  }
+  }, [open, plan, setValue, reset, loadClinics])
 
   const handleFormSubmit = async (data: FormData) => {
     try {

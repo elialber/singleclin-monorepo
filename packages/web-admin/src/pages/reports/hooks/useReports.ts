@@ -21,8 +21,8 @@ interface UseReportsReturn {
     planIds: string[]
     serviceTypes: string[]
   }
-  setFilters: (filters: any) => void
-  reportData: ReportResponse<any> | null
+  setFilters: (filters: { reportType: ReportType; period: ReportPeriod; startDate: Date | null; endDate: Date | null; clinicIds: string[]; planIds: string[]; serviceTypes: string[] }) => void
+  reportData: ReportResponse<unknown> | null
   loading: boolean
   error: string | null
   generateReport: () => void
@@ -40,7 +40,7 @@ export function useReports(): UseReportsReturn {
     serviceTypes: [] as string[],
   })
 
-  const [reportData, setReportData] = useState<ReportResponse<any> | null>(null)
+  const [reportData, setReportData] = useState<ReportResponse<unknown> | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const generateReportMutation = useMutation({
@@ -53,8 +53,15 @@ export function useReports(): UseReportsReturn {
       setReportData(data)
       setError(null)
     },
-    onError: (err: any) => {
-      setError(err.response?.data?.message || 'Erro ao gerar relatório')
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error && 'response' in err && 
+        typeof err.response === 'object' && err.response !== null &&
+        'data' in err.response && typeof err.response.data === 'object' &&
+        err.response.data !== null && 'message' in err.response.data &&
+        typeof err.response.data.message === 'string'
+        ? err.response.data.message
+        : 'Erro ao gerar relatório'
+      setError(errorMessage)
       setReportData(null)
     },
   })
@@ -129,8 +136,15 @@ export function useReports(): UseReportsReturn {
         link.click()
         document.body.removeChild(link)
         window.URL.revokeObjectURL(url)
-      } catch (err: any) {
-        setError(err.response?.data?.message || `Erro ao exportar para ${exportFormat.toUpperCase()}`)
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error && 'response' in err && 
+          typeof err.response === 'object' && err.response !== null &&
+          'data' in err.response && typeof err.response.data === 'object' &&
+          err.response.data !== null && 'message' in err.response.data &&
+          typeof err.response.data.message === 'string'
+          ? err.response.data.message
+          : `Erro ao exportar para ${exportFormat.toUpperCase()}`
+        setError(errorMessage)
       }
     },
     [filters]

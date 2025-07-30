@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -30,7 +30,7 @@ import {
 } from '@mui/icons-material'
 import { Plan, CreatePlanRequest, UpdatePlanRequest } from '@/types/plan'
 import { planService } from '@/services/plan.service'
-import { useNotification } from '@/contexts/NotificationContext'
+import { useNotification } from "@/contexts/NotificationContext"
 import PlanDialog from '@/components/PlanDialog'
 import ConfirmDialog from '@/components/ConfirmDialog'
 
@@ -67,9 +67,9 @@ export default function Plans() {
   // Load plans when page, search, or rowsPerPage changes
   useEffect(() => {
     loadPlans()
-  }, [page, rowsPerPage, searchDebounce])
+  }, [page, rowsPerPage, searchDebounce, loadPlans])
 
-  const loadPlans = async () => {
+  const loadPlans = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -80,14 +80,14 @@ export default function Plans() {
       })
       setPlans(response.data)
       setTotal(response.total)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading plans:', err)
       setError('Erro ao carregar planos')
       showError('Erro ao carregar planos')
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, rowsPerPage, searchDebounce, showError])
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage)
@@ -127,7 +127,7 @@ export default function Plans() {
         showSuccess('Plano criado com sucesso!')
       }
       loadPlans()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error saving plan:', err)
       const message = err.response?.data?.message || 'Erro ao salvar plano'
       showError(message)
@@ -156,7 +156,7 @@ export default function Plans() {
       showSuccess('Plano excluído com sucesso!')
       handleCloseDeleteDialog()
       loadPlans()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error deleting plan:', err)
       const message = err.response?.data?.message || 'Erro ao excluir plano'
       showError(message)
@@ -170,7 +170,7 @@ export default function Plans() {
       await planService.togglePlanStatus(plan.id)
       showSuccess(`Plano ${plan.isActive ? 'desativado' : 'ativado'} com sucesso!`)
       loadPlans()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error toggling plan status:', err)
       const message = err.response?.data?.message || 'Erro ao alterar status do plano'
       showError(message)

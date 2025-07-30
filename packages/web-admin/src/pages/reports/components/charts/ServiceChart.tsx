@@ -35,12 +35,12 @@ export default function ServiceChart({ data }: ServiceChartProps) {
     })
   )
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) => {
     if (active && payload && payload.length) {
       return (
         <Box sx={{ bgcolor: 'background.paper', p: 1, border: 1, borderColor: 'divider' }}>
           <Typography variant="body2">{label}</Typography>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index: number) => (
             <Typography key={index} variant="body2" color={entry.color}>
               {entry.name}: {entry.value}
             </Typography>

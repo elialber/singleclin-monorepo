@@ -9,7 +9,7 @@ import {
   Avatar,
 } from '@mui/material'
 import { ExitToApp } from '@mui/icons-material'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from "@/contexts/AuthContext"
 
 interface LogoutDialogProps {
   open: boolean

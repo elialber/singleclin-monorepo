@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -40,7 +40,7 @@ import {
 // Removed date-fns import due to compatibility issues
 import { Transaction, TransactionFilters } from '@/types/transaction'
 import { transactionService } from '@/services/transaction.service'
-import { useNotification } from '@/contexts/NotificationContext'
+import { useNotification } from "@/contexts/NotificationContext"
 import { useDebounce } from '@/hooks/useDebounce'
 
 const TRANSACTION_STATUS = [
@@ -76,9 +76,9 @@ export default function Transactions() {
 
   useEffect(() => {
     loadTransactions()
-  }, [debouncedFilters, page, rowsPerPage])
+  }, [debouncedFilters, page, rowsPerPage, loadTransactions])
 
-  const loadTransactions = async () => {
+  const loadTransactions = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -91,16 +91,16 @@ export default function Transactions() {
       
       setTransactions(response.data)
       setTotal(response.total)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading transactions:', err)
       setError('Erro ao carregar transações')
       showError('Erro ao carregar transações')
     } finally {
       setLoading(false)
     }
-  }
+  }, [debouncedFilters, page, rowsPerPage, showError])
 
-  const handleFilterChange = (field: keyof TransactionFilters, value: any) => {
+  const handleFilterChange = (field: keyof TransactionFilters, value: string | Date | null) => {
     setTempFilters(prev => ({
       ...prev,
       [field]: value || undefined,
@@ -139,7 +139,7 @@ export default function Transactions() {
       window.URL.revokeObjectURL(url)
       
       showSuccess(`Transações exportadas em ${format.toUpperCase()}`)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error exporting transactions:', err)
       showError('Erro ao exportar transações')
     } finally {

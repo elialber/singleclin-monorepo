@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -44,7 +44,7 @@ import {
 // Removed date-fns imports due to compatibility issues
 import { Patient, PatientFilters, PatientDetails } from '@/types/patient'
 import { patientService } from '@/services/patient.service'
-import { useNotification } from '@/contexts/NotificationContext'
+import { useNotification } from "@/contexts/NotificationContext"
 import { useDebounce } from '@/hooks/useDebounce'
 
 export default function Patients() {
@@ -77,9 +77,9 @@ export default function Patients() {
 
   useEffect(() => {
     loadPatients()
-  }, [debouncedSearch, debouncedFilters, page])
+  }, [debouncedSearch, debouncedFilters, page, loadPatients])
 
-  const loadPatients = async () => {
+  const loadPatients = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -94,21 +94,21 @@ export default function Patients() {
       setPatients(response.data)
       setTotal(response.total)
       setTotalPages(Math.ceil(response.total / itemsPerPage))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading patients:', err)
       setError('Erro ao carregar pacientes')
       showError('Erro ao carregar pacientes')
     } finally {
       setLoading(false)
     }
-  }
+  }, [debouncedFilters, debouncedSearch, page, showError])
 
   const loadPatientDetails = async (patientId: string) => {
     try {
       setLoadingDetails(true)
       const details = await patientService.getPatientDetails(patientId)
       setSelectedPatient(details)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading patient details:', err)
       showError('Erro ao carregar detalhes do paciente')
     } finally {
@@ -116,7 +116,7 @@ export default function Patients() {
     }
   }
 
-  const handleFilterChange = (field: keyof PatientFilters, value: any) => {
+  const handleFilterChange = (field: keyof PatientFilters, value: string | Date | null) => {
     setTempFilters(prev => ({
       ...prev,
       [field]: value === '' ? undefined : value,

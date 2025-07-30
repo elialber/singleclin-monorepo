@@ -68,7 +68,7 @@ export interface ReportSummary {
   totalRecords: number
   totals: Record<string, number>
   averages: Record<string, number>
-  metrics: Record<string, any>
+  metrics: Record<string, unknown>
 }
 
 export interface ChartData {
@@ -91,7 +91,7 @@ export interface ChartOptions {
   responsive?: boolean
   maintainAspectRatio?: boolean
   title?: string
-  customOptions?: Record<string, any>
+  customOptions?: Record<string, unknown>
 }
 
 export interface PaginationInfo {

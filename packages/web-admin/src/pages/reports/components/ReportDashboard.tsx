@@ -6,7 +6,7 @@ import PlanUtilizationChart from './charts/PlanUtilizationChart'
 
 interface ReportDashboardProps {
   reportType: ReportType
-  reportData: ReportResponse<any> | null
+  reportData: ReportResponse<unknown> | null
   loading: boolean
   error: string | null
   period: 'daily' | 'weekly' | 'monthly'

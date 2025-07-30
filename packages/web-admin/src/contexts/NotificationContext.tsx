@@ -15,7 +15,7 @@ interface NotificationContextData {
   showInfo: (message: string) => void
 }
 
-const NotificationContext = createContext<NotificationContextData>(
+export const NotificationContext = createContext<NotificationContextData>(
   {} as NotificationContextData,
 )
 
@@ -86,9 +86,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 export const useNotification = () => {
   const context = useContext(NotificationContext)
   if (!context) {
-    throw new Error(
-      'useNotification must be used within a NotificationProvider',
-    )
+    throw new Error('useNotification must be used within a NotificationProvider')
   }
   return context
 }
+

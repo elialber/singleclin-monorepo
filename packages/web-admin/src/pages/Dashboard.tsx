@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { 
   Grid, 
   Box, 
@@ -33,7 +33,7 @@ import {
 } from 'recharts'
 import { DashboardMetrics, ChartData } from '@/types/transaction'
 import { dashboardService } from '@/services/dashboard.service'
-import { useNotification } from '@/contexts/NotificationContext'
+import { useNotification } from "@/contexts/NotificationContext"
 import MetricCard from '@/components/MetricCard'
 import ChartSkeleton from '@/components/ChartSkeleton'
 
@@ -50,9 +50,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadDashboardData()
-  }, [period])
+  }, [period, loadDashboardData])
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -64,14 +64,14 @@ export default function Dashboard() {
       
       setMetrics(metricsData)
       setChartData(chartsData)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading dashboard data:', err)
       setError('Erro ao carregar dados do dashboard')
       showError('Erro ao carregar dados do dashboard')
     } finally {
       setLoading(false)
     }
-  }
+  }, [period, showError])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -99,7 +99,7 @@ export default function Dashboard() {
           <InputLabel>Período</InputLabel>
           <Select
             value={period}
-            onChange={(e) => setPeriod(e.target.value as any)}
+            onChange={(e) => setPeriod(e.target.value as 'week' | 'month' | 'year')}
             label="Período"
           >
             <MenuItem value="week">Semana</MenuItem>
