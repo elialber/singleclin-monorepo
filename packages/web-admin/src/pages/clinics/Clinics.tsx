@@ -28,7 +28,7 @@ import {
 } from '@mui/icons-material'
 import { Clinic, ClinicFilters } from '@/types/clinic'
 import { clinicService } from '@/services/clinic.service'
-import { useNotification } from "@/contexts/NotificationContext"
+import { useNotification } from "@/hooks/useNotification"
 
 const CLINICS_PER_PAGE = 12
 

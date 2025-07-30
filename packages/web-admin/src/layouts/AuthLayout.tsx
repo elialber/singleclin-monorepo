@@ -1,7 +1,7 @@
 import { Outlet, Navigate } from 'react-router-dom'
 import { Box, Container, Paper, Typography, useTheme } from '@mui/material'
 import { LocalHospital as LocalHospitalIcon } from '@mui/icons-material'
-import { useAuth } from "@/contexts/AuthContext"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function AuthLayout() {
   const theme = useTheme()

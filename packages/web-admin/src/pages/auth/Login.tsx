@@ -17,8 +17,8 @@ import {
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material'
-import { useAuth } from "@/contexts/AuthContext"
-import { useNotification } from "@/contexts/NotificationContext"
+import { useAuth } from "@/hooks/useAuth"
+import { useNotification } from "@/hooks/useNotification"
 
 interface LoginFormData {
   email: string

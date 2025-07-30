@@ -35,7 +35,7 @@ import {
   ExpandMore,
   MedicalServices as MedicalServicesIcon,
 } from '@mui/icons-material'
-import { useAuth } from "@/contexts/AuthContext"
+import { useAuth } from "@/hooks/useAuth"
 import LogoutDialog from '@/components/LogoutDialog'
 
 const drawerWidth = 280

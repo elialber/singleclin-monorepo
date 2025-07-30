@@ -40,7 +40,7 @@ import {
 // Removed date-fns import due to compatibility issues
 import { Transaction, TransactionFilters } from '@/types/transaction'
 import { transactionService } from '@/services/transaction.service'
-import { useNotification } from "@/contexts/NotificationContext"
+import { useNotification } from "@/hooks/useNotification"
 import { useDebounce } from '@/hooks/useDebounce'
 
 const TRANSACTION_STATUS = [

@@ -30,7 +30,7 @@ import {
 } from '@mui/icons-material'
 import { Plan, CreatePlanRequest, UpdatePlanRequest } from '@/types/plan'
 import { planService } from '@/services/plan.service'
-import { useNotification } from "@/contexts/NotificationContext"
+import { useNotification } from "@/hooks/useNotification"
 import PlanDialog from '@/components/PlanDialog'
 import ConfirmDialog from '@/components/ConfirmDialog'
 

@@ -21,7 +21,7 @@ import {
 import { Close, AttachMoney } from '@mui/icons-material'
 import { Plan, CreatePlanRequest } from '@/types/plan'
 import { clinicService } from '@/services/clinic.service'
-import { useNotification } from "@/contexts/NotificationContext"
+import { useNotification } from "@/hooks/useNotification"
 
 interface PlanDialogProps {
   open: boolean
