@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import '../../controllers/auth_controller.dart';
+
+import 'package:mobile/presentation/controllers/auth_controller.dart';
 
 /// Screen for generating and displaying temporary QR codes
-/// 
+///
 /// This screen allows patients to:
 /// - Generate temporary QR codes for clinic visits
 /// - View countdown timer for QR code expiration
@@ -25,24 +27,22 @@ class QRCodeScreen extends StatefulWidget {
 
 class _QRCodeScreenState extends State<QRCodeScreen> {
   final AuthController _authController = Get.find<AuthController>();
-  
+
   // QR Code state
   bool _isLoading = false;
   bool _isExpired = false;
   String? _qrData;
-  String? _qrToken;
-  DateTime? _expiresAt;
-  
+
   // Timer state
   int _remainingSeconds = 300; // 5 minutes default
   Timer? _countdownTimer;
-  
+
   // Brightness control
   double? _originalBrightness;
-  
+
   // Screenshot controller for saving QR code
   final ScreenshotController _screenshotController = ScreenshotController();
-  
+
   @override
   void initState() {
     super.initState();
@@ -59,10 +59,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(),
-    );
+    return Scaffold(appBar: _buildAppBar(), body: _buildBody());
   }
 
   /// Build app bar with title and actions
@@ -90,16 +87,15 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // User info section
           _buildUserInfoSection(),
           const SizedBox(height: 32),
-          
+
           // QR Code section
           _buildQRCodeSection(),
           const SizedBox(height: 32),
-          
+
           // Instructions section
           _buildInstructionsSection(),
         ],
@@ -113,10 +109,10 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).primaryColor.withOpacity(0.3),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -140,19 +136,23 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Obx(() => Text(
-            _authController.currentUser?.displayName ?? 'Usuário',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
+          Obx(
+            () => Text(
+              _authController.currentUser?.displayName ?? 'Usuário',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
-          )),
+          ),
           const SizedBox(height: 4),
-          Obx(() => Text(
-            _authController.currentUser?.email ?? '',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
+          Obx(
+            () => Text(
+              _authController.currentUser?.email ?? '',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -168,7 +168,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -179,15 +179,15 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
           // Timer section
           _buildTimerSection(),
           const SizedBox(height: 24),
-          
+
           // QR Code display
           _buildQRCodeDisplay(),
           const SizedBox(height: 16),
-          
+
           // QR Data display
           if (_qrData != null) _buildQRDataDisplay(),
           const SizedBox(height: 24),
-          
+
           // Action button
           _buildActionButton(),
         ],
@@ -200,15 +200,14 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
     if (_isLoading) {
       return const SizedBox(
         height: 60,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: Center(child: CircularProgressIndicator()),
       );
     }
 
     final minutes = _remainingSeconds ~/ 60;
     final seconds = _remainingSeconds % 60;
-    final timeText = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    final timeText =
+        '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 
     return Column(
       children: [
@@ -225,7 +224,9 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
             timeText,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: _remainingSeconds <= 60 ? Colors.red : Theme.of(context).primaryColor,
+              color: _remainingSeconds <= 60
+                  ? Colors.red
+                  : Theme.of(context).primaryColor,
             ),
           ),
           const SizedBox(height: 8),
@@ -233,7 +234,9 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
             value: _remainingSeconds / 300, // 5 minutes total
             backgroundColor: Colors.grey[300],
             valueColor: AlwaysStoppedAnimation<Color>(
-              _remainingSeconds <= 60 ? Colors.red : Theme.of(context).primaryColor,
+              _remainingSeconds <= 60
+                  ? Colors.red
+                  : Theme.of(context).primaryColor,
             ),
           ),
         ],
@@ -251,9 +254,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
           color: Colors.grey[100],
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -270,11 +271,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.qr_code_2,
-                size: 64,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.qr_code_2, size: 64, color: Colors.grey[400]),
               const SizedBox(height: 16),
               Text(
                 _isExpired ? 'QR Code Expirado' : 'Gerando QR Code...',
@@ -302,7 +299,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
           border: Border.all(color: Theme.of(context).primaryColor, width: 2),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -312,7 +309,6 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
           padding: const EdgeInsets.all(16.0),
           child: QrImageView(
             data: _qrData!,
-            version: QrVersions.auto,
             size: 248, // 280 - 32 (padding)
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,
@@ -336,9 +332,9 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         children: [
           Text(
             'Código de Referência',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.grey[600],
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: 4),
           Text(
@@ -367,8 +363,8 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         icon: Icon(_isExpired ? Icons.refresh : Icons.check_circle),
         label: Text(_isExpired ? 'Gerar Novo QR Code' : 'QR Code Ativo'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: _isExpired 
-              ? Theme.of(context).primaryColor 
+          backgroundColor: _isExpired
+              ? Theme.of(context).primaryColor
               : Colors.green,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
@@ -389,9 +385,9 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         ),
         title: Text(
           'Como usar',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         children: [
           Padding(
@@ -454,17 +450,10 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
           ),
         ),
         const SizedBox(width: 12),
-        Icon(
-          icon,
-          size: 20,
-          color: Theme.of(context).primaryColor,
-        ),
+        Icon(icon, size: 20, color: Theme.of(context).primaryColor),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
         ),
       ],
     );
@@ -474,7 +463,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
   Future<void> _generateQRCode() async {
     // Cancel any existing timer
     _countdownTimer?.cancel();
-    
+
     setState(() {
       _isLoading = true;
       _isExpired = false;
@@ -483,27 +472,24 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
     try {
       // Simulate API call delay
       await Future.delayed(const Duration(seconds: 2));
-      
+
       final userId = _authController.currentUser?.id ?? 'unknown';
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final qrData = 'USR-$userId-$timestamp';
-      
+
       setState(() {
         _qrData = qrData;
-        _qrToken = 'temp_token_$timestamp';
-        _expiresAt = DateTime.now().add(const Duration(minutes: 5));
         _remainingSeconds = 300; // 5 minutes
         _isLoading = false;
       });
 
       // Start countdown timer
       _startCountdownTimer();
-      
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -528,14 +514,15 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         setState(() {
           _isExpired = true;
           _qrData = null;
-          _qrToken = null;
         });
-        
+
         // Show expiration notification
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('QR Code expirado. Toque em "Gerar Novo QR Code" para criar um novo.'),
+              content: Text(
+                'QR Code expirado. Toque em "Gerar Novo QR Code" para criar um novo.',
+              ),
               backgroundColor: Colors.orange,
               duration: Duration(seconds: 3),
             ),
@@ -550,14 +537,16 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
     try {
       // Store original brightness level
       _originalBrightness = await ScreenBrightness().current;
-      
+
       // Set to maximum brightness (1.0)
       await ScreenBrightness().setScreenBrightness(1.0);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Brilho aumentado para melhor visualização do QR Code'),
+            content: Text(
+              'Brilho aumentado para melhor visualização do QR Code',
+            ),
             duration: Duration(seconds: 2),
             backgroundColor: Colors.green,
           ),
@@ -625,7 +614,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
 
       // Capture screenshot of QR code
       final Uint8List? imageBytes = await _screenshotController.capture();
-      
+
       if (imageBytes == null) {
         throw Exception('Falha ao capturar imagem do QR Code');
       }
@@ -638,7 +627,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
       );
 
       if (mounted) {
-        if (result['isSuccess'] == true) {
+        if ((result as Map<String, dynamic>)['isSuccess'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
@@ -658,7 +647,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                           'Verifique sua galeria de fotos',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                       ],
@@ -691,17 +680,13 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                         'Erro ao salvar QR Code',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text(
-                        e.toString(),
-                        style: const TextStyle(fontSize: 12),
-                      ),
+                      Text(e.toString(), style: const TextStyle(fontSize: 12)),
                     ],
                   ),
                 ),
               ],
             ),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
             action: SnackBarAction(
               label: 'Tentar novamente',
               textColor: Colors.white,

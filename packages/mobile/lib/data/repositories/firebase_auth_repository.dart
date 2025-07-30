@@ -1,31 +1,32 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'dart:math';
 
-import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../../core/errors/auth_exceptions.dart';
-import '../models/user_model.dart';
+import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
+import 'package:mobile/core/errors/auth_exceptions.dart';
+import 'package:mobile/domain/entities/user_entity.dart';
+import 'package:mobile/domain/repositories/auth_repository.dart';
 
 /// Firebase implementation of AuthRepository
 class FirebaseAuthRepository implements AuthRepository {
-  final FirebaseAuth _firebaseAuth;
-  final GoogleSignIn _googleSignIn;
-  
   FirebaseAuthRepository({
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
   }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
        _googleSignIn = googleSignIn ?? GoogleSignIn();
+  final FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn;
 
   @override
   Stream<UserEntity?> get authStateChanges {
     return _firebaseAuth.authStateChanges().map((User? user) {
-      if (user == null) return null;
+      if (user == null) {
+        return null;
+      }
       return _mapFirebaseUserToEntity(user);
     });
   }
@@ -36,18 +37,16 @@ class FirebaseAuthRepository implements AuthRepository {
     required String password,
   }) async {
     try {
-      final UserCredential result = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      
+      final UserCredential result = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
+
       if (result.user == null) {
         throw const EmailPasswordAuthException(
           'Sign in failed - no user returned',
           'sign-in-failed',
         );
       }
-      
+
       return _mapFirebaseUserToEntity(result.user!);
     } on FirebaseAuthException catch (e) {
       throw AuthExceptionMapper.fromFirebaseException(e);
@@ -64,7 +63,7 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
+
       if (googleUser == null) {
         throw const GoogleSignInException(
           'Google sign in was cancelled',
@@ -73,7 +72,8 @@ class FirebaseAuthRepository implements AuthRepository {
       }
 
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -82,8 +82,10 @@ class FirebaseAuthRepository implements AuthRepository {
       );
 
       // Sign in to Firebase with the Google credential
-      final UserCredential result = await _firebaseAuth.signInWithCredential(credential);
-      
+      final UserCredential result = await _firebaseAuth.signInWithCredential(
+        credential,
+      );
+
       if (result.user == null) {
         throw const GoogleSignInException(
           'Google sign in failed - no user returned',
@@ -119,14 +121,15 @@ class FirebaseAuthRepository implements AuthRepository {
       );
 
       // Create an `OAuthCredential` from the credential returned by Apple
-      final oauthCredential = OAuthProvider("apple.com").credential(
-        idToken: appleCredential.identityToken,
-        rawNonce: rawNonce,
-      );
+      final oauthCredential = OAuthProvider(
+        'apple.com',
+      ).credential(idToken: appleCredential.identityToken, rawNonce: rawNonce);
 
       // Sign in the user with Firebase
-      final UserCredential result = await _firebaseAuth.signInWithCredential(oauthCredential);
-      
+      final UserCredential result = await _firebaseAuth.signInWithCredential(
+        oauthCredential,
+      );
+
       if (result.user == null) {
         throw const AppleSignInException(
           'Apple sign in failed - no user returned',
@@ -135,10 +138,11 @@ class FirebaseAuthRepository implements AuthRepository {
       }
 
       // Update display name if provided by Apple and not already set
-      if (result.additionalUserInfo?.isNewUser == true && 
-          appleCredential.givenName != null && 
+      if (result.additionalUserInfo?.isNewUser == true &&
+          appleCredential.givenName != null &&
           appleCredential.familyName != null) {
-        final displayName = '${appleCredential.givenName} ${appleCredential.familyName}';
+        final displayName =
+            '${appleCredential.givenName} ${appleCredential.familyName}';
         await result.user!.updateDisplayName(displayName);
       }
 
@@ -165,11 +169,9 @@ class FirebaseAuthRepository implements AuthRepository {
     required String name,
   }) async {
     try {
-      final UserCredential result = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      
+      final UserCredential result = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
       if (result.user == null) {
         throw const UserRegistrationException(
           'User registration failed - no user returned',
@@ -179,7 +181,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
       // Update the user's display name
       await result.user!.updateDisplayName(name);
-      
+
       // Send email verification
       await result.user!.sendEmailVerification();
 
@@ -201,7 +203,7 @@ class FirebaseAuthRepository implements AuthRepository {
       if (await _googleSignIn.isSignedIn()) {
         await _googleSignIn.signOut();
       }
-      
+
       // Sign out from Firebase
       await _firebaseAuth.signOut();
     } on FirebaseAuthException catch (e) {
@@ -218,8 +220,10 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<UserEntity?> getCurrentUser() async {
     try {
       final User? user = _firebaseAuth.currentUser;
-      if (user == null) return null;
-      
+      if (user == null) {
+        return null;
+      }
+
       return _mapFirebaseUserToEntity(user);
     } catch (e) {
       throw GenericAuthException(
@@ -241,7 +245,7 @@ class FirebaseAuthRepository implements AuthRepository {
       if (user == null) {
         throw const UserNotAuthenticatedException();
       }
-      
+
       final token = await user.getIdToken(forceRefresh);
       if (token == null) {
         throw const TokenRetrievalException(
@@ -253,7 +257,9 @@ class FirebaseAuthRepository implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       throw AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      if (e is UserNotAuthenticatedException) rethrow;
+      if (e is UserNotAuthenticatedException) {
+        rethrow;
+      }
       throw TokenRetrievalException(
         'Failed to get ID token: ${e.toString()}',
         'token-retrieval-error',
@@ -282,12 +288,14 @@ class FirebaseAuthRepository implements AuthRepository {
       if (user == null) {
         throw const UserNotAuthenticatedException();
       }
-      
+
       await user.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
       throw AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      if (e is UserNotAuthenticatedException) rethrow;
+      if (e is UserNotAuthenticatedException) {
+        rethrow;
+      }
       throw EmailVerificationException(
         'Failed to send email verification: ${e.toString()}',
         'email-verification-error',
@@ -296,10 +304,7 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> updateProfile({
-    String? name,
-    String? photoUrl,
-  }) async {
+  Future<UserEntity> updateProfile({String? name, String? photoUrl}) async {
     try {
       final User? user = _firebaseAuth.currentUser;
       if (user == null) {
@@ -309,7 +314,7 @@ class FirebaseAuthRepository implements AuthRepository {
       if (name != null) {
         await user.updateDisplayName(name);
       }
-      
+
       if (photoUrl != null) {
         await user.updatePhotoURL(photoUrl);
       }
@@ -317,12 +322,14 @@ class FirebaseAuthRepository implements AuthRepository {
       // Reload user to get updated information
       await user.reload();
       final updatedUser = _firebaseAuth.currentUser;
-      
+
       return _mapFirebaseUserToEntity(updatedUser!);
     } on FirebaseAuthException catch (e) {
       throw AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      if (e is UserNotAuthenticatedException) rethrow;
+      if (e is UserNotAuthenticatedException) {
+        rethrow;
+      }
       throw ProfileUpdateException(
         'Failed to update profile: ${e.toString()}',
         'profile-update-error',
@@ -337,12 +344,14 @@ class FirebaseAuthRepository implements AuthRepository {
       if (user == null) {
         throw const UserNotAuthenticatedException();
       }
-      
+
       await user.delete();
     } on FirebaseAuthException catch (e) {
       throw AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      if (e is UserNotAuthenticatedException) rethrow;
+      if (e is UserNotAuthenticatedException) {
+        rethrow;
+      }
       throw AccountDeletionException(
         'Failed to delete user account: ${e.toString()}',
         'account-deletion-error',
@@ -358,7 +367,8 @@ class FirebaseAuthRepository implements AuthRepository {
       displayName: user.displayName,
       phoneNumber: user.phoneNumber,
       photoUrl: user.photoURL,
-      role: 'patient', // Default role - this should be fetched from your backend
+      role:
+          'patient', // Default role - this should be fetched from your backend
       isActive: true,
       isEmailVerified: user.emailVerified,
       createdAt: user.metadata.creationTime ?? DateTime.now(),
@@ -368,9 +378,13 @@ class FirebaseAuthRepository implements AuthRepository {
 
   /// Generate a cryptographically secure random nonce
   String _generateNonce([int length = 32]) {
-    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
   }
 
   /// Returns the sha256 hash of [input] in hex notation

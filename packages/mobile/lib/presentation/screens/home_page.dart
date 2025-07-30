@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/core/routes/app_routes.dart';
+
 import 'package:mobile/core/routes/app_router.dart';
+import 'package:mobile/core/routes/app_routes.dart';
 import 'package:mobile/presentation/controllers/home_controller.dart';
 
 /// Home page using GetX for state management
@@ -21,11 +22,7 @@ class HomePage extends StatelessWidget {
         actions: [
           // Dark mode toggle
           IconButton(
-            icon: Icon(
-              Get.isDarkMode 
-                ? Icons.light_mode 
-                : Icons.dark_mode,
-            ),
+            icon: Icon(Get.isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: controller.toggleDarkMode,
           ),
         ],
@@ -45,21 +42,20 @@ class HomePage extends StatelessWidget {
                       style: TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 8),
-                    Obx(() => Text(
-                          '${controller.counter}',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        )),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'vezes',
-                      style: TextStyle(fontSize: 16),
+                    Obx(
+                      () => Text(
+                        '${controller.counter}',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
                     ),
+                    const SizedBox(height: 8),
+                    const Text('vezes', style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Items list section
             Expanded(
               child: Card(
@@ -86,7 +82,7 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      
+
                       // Add item input
                       Row(
                         children: [
@@ -106,26 +102,28 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Items list
                       Expanded(
-                        child: Obx(() => controller.items.isEmpty
-                            ? const Center(
-                                child: Text('Nenhum item na lista'),
-                              )
-                            : ListView.builder(
-                                itemCount: controller.items.length,
-                                itemBuilder: (context, index) {
-                                  return ListTile(
-                                    title: Text(controller.items[index]),
-                                    trailing: IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      onPressed: () =>
-                                          controller.removeItem(index),
-                                    ),
-                                  );
-                                },
-                              )),
+                        child: Obx(
+                          () => controller.items.isEmpty
+                              ? const Center(
+                                  child: Text('Nenhum item na lista'),
+                                )
+                              : ListView.builder(
+                                  itemCount: controller.items.length,
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                      title: Text(controller.items[index]),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () =>
+                                            controller.removeItem(index),
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
                       ),
                     ],
                   ),
@@ -133,7 +131,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Action buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -151,7 +149,7 @@ class HomePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Navigation buttons
             Wrap(
               spacing: 8,
@@ -169,20 +167,20 @@ class HomePage extends StatelessWidget {
                   label: const Text('Perfil'),
                 ),
                 OutlinedButton.icon(
-                  onPressed: () {
-                    AppRouter.logout();
-                  },
+                  onPressed: AppRouter.logout,
                   icon: const Icon(Icons.logout),
                   label: const Text('Sair'),
                 ),
               ],
             ),
-            
+
             // Loading indicator
             const SizedBox(height: 20),
-            Obx(() => controller.isLoading
-                ? const CircularProgressIndicator()
-                : const SizedBox.shrink()),
+            Obx(
+              () => controller.isLoading
+                  ? const CircularProgressIndicator()
+                  : const SizedBox.shrink(),
+            ),
           ],
         ),
       ),

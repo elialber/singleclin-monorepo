@@ -4,12 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Dialog for manual QR code entry
 class ManualCodeDialog extends StatefulWidget {
+  const ManualCodeDialog({required this.onCodeSubmit, super.key});
   final Function(String code) onCodeSubmit;
-  
-  const ManualCodeDialog({
-    super.key,
-    required this.onCodeSubmit,
-  });
 
   @override
   State<ManualCodeDialog> createState() => _ManualCodeDialogState();
@@ -19,15 +15,15 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
   final TextEditingController _codeController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  
+
   bool _isValidating = false;
   String? _errorMessage;
   List<String> _recentCodes = [];
-  
+
   // Constants for SharedPreferences
   static const String _recentCodesKey = 'recent_manual_codes';
   static const int _maxRecentCodes = 5;
-  
+
   @override
   void initState() {
     super.initState();
@@ -37,14 +33,14 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
       _focusNode.requestFocus();
     });
   }
-  
+
   @override
   void dispose() {
     _codeController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
-  
+
   /// Load recent codes from SharedPreferences
   Future<void> _loadRecentCodes() async {
     try {
@@ -59,26 +55,26 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
       debugPrint('Error loading recent codes: $e');
     }
   }
-  
+
   /// Save code to recent codes list
   Future<void> _saveToRecentCodes(String code) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Remove if already exists to avoid duplicates
       _recentCodes.remove(code);
-      
+
       // Add to beginning of list
       _recentCodes.insert(0, code);
-      
+
       // Keep only the most recent codes
       if (_recentCodes.length > _maxRecentCodes) {
         _recentCodes = _recentCodes.take(_maxRecentCodes).toList();
       }
-      
+
       // Save to SharedPreferences
       await prefs.setStringList(_recentCodesKey, _recentCodes);
-      
+
       if (mounted) {
         setState(() {});
       }
@@ -86,46 +82,46 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
       debugPrint('Error saving recent code: $e');
     }
   }
-  
+
   /// Validate QR code format
   String? _validateCode(String? value) {
     if (value == null || value.isEmpty) {
       return 'Por favor, insira um código';
     }
-    
+
     // Remove any whitespace
     final cleanedValue = value.trim();
-    
+
     // Check if it matches the expected format: USR-{userId}-{timestamp}
     final pattern = RegExp(r'^USR-[A-Za-z0-9]+-\d+$');
     if (!pattern.hasMatch(cleanedValue)) {
       return 'Formato inválido. Exemplo: USR-ABC123-1234567890';
     }
-    
+
     // Validate parts
     final parts = cleanedValue.split('-');
     if (parts.length != 3) {
       return 'Código deve ter 3 partes separadas por hífen';
     }
-    
+
     if (parts[1].isEmpty) {
       return 'ID do usuário não pode estar vazio';
     }
-    
+
     // Validate timestamp is a number
     final timestamp = int.tryParse(parts[2]);
     if (timestamp == null) {
       return 'Timestamp inválido';
     }
-    
+
     return null;
   }
-  
+
   /// Format input text with automatic hyphens
   void _formatInput(String value) {
     // Remove all non-alphanumeric characters except hyphens
-    String cleaned = value.replaceAll(RegExp(r'[^A-Za-z0-9-]'), '');
-    
+    String cleaned = value.replaceAll(RegExp('[^A-Za-z0-9-]'), '');
+
     // Auto-add USR- prefix if not present
     if (!cleaned.startsWith('USR-') && cleaned.isNotEmpty) {
       if (cleaned.startsWith('USR')) {
@@ -134,7 +130,7 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
         cleaned = 'USR-$cleaned';
       }
     }
-    
+
     // Update controller if format changed
     if (cleaned != value) {
       _codeController.value = TextEditingValue(
@@ -143,7 +139,7 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
       );
     }
   }
-  
+
   /// Handle paste from clipboard
   Future<void> _pasteFromClipboard() async {
     try {
@@ -152,7 +148,7 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
         final pastedText = clipboardData.text!.trim();
         _codeController.text = pastedText;
         _formatInput(pastedText);
-        
+
         // Validate immediately after paste
         _formKey.currentState?.validate();
       }
@@ -168,27 +164,27 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
       }
     }
   }
-  
+
   /// Handle code submission
   Future<void> _submitCode() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    
+
     setState(() {
       _isValidating = true;
       _errorMessage = null;
     });
-    
+
     final code = _codeController.text.trim();
-    
+
     try {
       // Save to recent codes
       await _saveToRecentCodes(code);
-      
+
       // Call the callback to process the code
       widget.onCodeSubmit(code);
-      
+
       if (mounted) {
         Navigator.of(context).pop(code);
       }
@@ -201,23 +197,20 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
       }
     }
   }
-  
+
   /// Select a recent code
   void _selectRecentCode(String code) {
     _codeController.text = code;
     _formatInput(code);
     _formKey.currentState?.validate();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Row(
         children: [
-          Icon(
-            Icons.keyboard,
-            color: Theme.of(context).primaryColor,
-          ),
+          Icon(Icons.keyboard, color: Theme.of(context).primaryColor),
           const SizedBox(width: 12),
           const Text('Entrada Manual de Código'),
         ],
@@ -234,31 +227,24 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      size: 20,
-                      color: Colors.blue[700],
-                    ),
+                    Icon(Icons.info_outline, size: 20, color: Colors.blue[700]),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Digite o código QR do paciente',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.blue[700],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.blue[700]),
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               // Code input form
               Form(
                 key: _formKey,
@@ -290,20 +276,17 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
                       onFieldSubmitted: (_) => _submitCode(),
                       enabled: !_isValidating,
                     ),
-                    
+
                     // Example format
                     const SizedBox(height: 8),
                     Text(
                       'Formato: USR-[ID]-[TIMESTAMP]',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
                 ),
               ),
-              
+
               // Recent codes section
               if (_recentCodes.isNotEmpty) ...[
                 const SizedBox(height: 24),
@@ -379,7 +362,7 @@ class _ManualCodeDialogState extends State<ManualCodeDialog> {
           onPressed: _isValidating ? null : () => Navigator.of(context).pop(),
           child: const Text('Cancelar'),
         ),
-        
+
         // Submit button
         ElevatedButton.icon(
           onPressed: _isValidating ? null : _submitCode,

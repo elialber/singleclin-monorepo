@@ -5,15 +5,31 @@ class UserModel extends UserEntity {
   const UserModel({
     required super.id,
     required super.email,
+    required super.role,
+    required super.isActive,
+    required super.createdAt,
+    required super.updatedAt,
     super.displayName,
     super.phoneNumber,
     super.photoUrl,
-    required super.role,
-    required super.isActive,
     super.isEmailVerified,
-    required super.createdAt,
-    required super.updatedAt,
   });
+
+  /// Create UserModel from UserEntity
+  factory UserModel.fromEntity(UserEntity entity) {
+    return UserModel(
+      id: entity.id,
+      email: entity.email,
+      displayName: entity.displayName,
+      phoneNumber: entity.phoneNumber,
+      photoUrl: entity.photoUrl,
+      role: entity.role,
+      isActive: entity.isActive,
+      isEmailVerified: entity.isEmailVerified,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
 
   /// Create UserModel from JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -45,21 +61,5 @@ class UserModel extends UserEntity {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
-  }
-
-  /// Create UserModel from UserEntity
-  factory UserModel.fromEntity(UserEntity entity) {
-    return UserModel(
-      id: entity.id,
-      email: entity.email,
-      displayName: entity.displayName,
-      phoneNumber: entity.phoneNumber,
-      photoUrl: entity.photoUrl,
-      role: entity.role,
-      isActive: entity.isActive,
-      isEmailVerified: entity.isEmailVerified,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-    );
   }
 }

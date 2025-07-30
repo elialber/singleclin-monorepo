@@ -1,13 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../../core/constants/api_constants.dart';
-import '../../core/errors/api_exceptions.dart';
-import '../../domain/entities/user_plan_entity.dart';
-import '../../domain/entities/transaction_entity.dart';
-import '../../domain/repositories/plan_repository.dart';
-import '../models/user_plan_model.dart';
-import '../models/transaction_model.dart';
-import '../services/api_client.dart';
+
+import 'package:mobile/core/constants/api_constants.dart';
+import 'package:mobile/core/errors/api_exceptions.dart';
+import 'package:mobile/data/models/transaction_model.dart';
+import 'package:mobile/data/models/user_plan_model.dart';
+import 'package:mobile/data/services/api_client.dart';
+import 'package:mobile/domain/entities/transaction_entity.dart';
+import 'package:mobile/domain/entities/user_plan_entity.dart';
+import 'package:mobile/domain/repositories/plan_repository.dart';
 
 /// Implementation of PlanRepository using REST API
 class PlanRepositoryImpl implements PlanRepository {
@@ -31,7 +32,7 @@ class PlanRepositoryImpl implements PlanRepository {
         return null;
       }
 
-      final data = response.data[ApiConstants.dataKey];
+      final Map<String, dynamic>? data = (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] as Map<String, dynamic>?;
       if (data == null || data['current_plan'] == null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: User has no active plan');
@@ -39,12 +40,12 @@ class PlanRepositoryImpl implements PlanRepository {
         return null;
       }
 
-      final userPlan = UserPlanModel.fromJson(data['current_plan']);
-      
+      final userPlan = UserPlanModel.fromJson(data['current_plan'] as Map<String, dynamic>);
+
       if (kDebugMode) {
         print('✅ PlanRepository: Current plan loaded - ${userPlan.plan.name}');
       }
-      
+
       return userPlan.toEntity();
     } on DioException catch (e) {
       if (e.error is ApiException) {
@@ -83,7 +84,7 @@ class PlanRepositoryImpl implements PlanRepository {
         return null;
       }
 
-      final data = response.data[ApiConstants.dataKey];
+      final Map<String, dynamic>? data = (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] as Map<String, dynamic>?;
       if (data == null || data['current_plan'] == null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: User has no active plan after refresh');
@@ -91,12 +92,12 @@ class PlanRepositoryImpl implements PlanRepository {
         return null;
       }
 
-      final userPlan = UserPlanModel.fromJson(data['current_plan']);
-      
+      final userPlan = UserPlanModel.fromJson(data['current_plan'] as Map<String, dynamic>);
+
       if (kDebugMode) {
         print('✅ PlanRepository: Plan data refreshed - ${userPlan.plan.name}');
       }
-      
+
       return userPlan.toEntity();
     } on DioException catch (e) {
       if (e.error is ApiException) {
@@ -124,7 +125,9 @@ class PlanRepositoryImpl implements PlanRepository {
   }) async {
     try {
       if (kDebugMode) {
-        print('📜 PlanRepository: Fetching plan history (page: $page, limit: $limit)...');
+        print(
+          '📜 PlanRepository: Fetching plan history (page: $page, limit: $limit)...',
+        );
       }
 
       final Response response = await _apiClient.get(
@@ -135,14 +138,16 @@ class PlanRepositoryImpl implements PlanRepository {
         },
       );
 
-      if (response.data == null || response.data[ApiConstants.dataKey] == null) {
+      if (response.data == null ||
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] == null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: No transaction history data received');
         }
         return [];
       }
 
-      final List<dynamic> transactionsData = response.data[ApiConstants.dataKey];
+      final List<dynamic> transactionsData =
+          (response.data as Map<String, dynamic>)[ApiConstants.dataKey] as List<dynamic>;
       final transactions = transactionsData
           .map((json) => TransactionModel.fromJson(json).toEntity())
           .toList();
@@ -172,35 +177,37 @@ class PlanRepositoryImpl implements PlanRepository {
   }
 
   @override
-  Future<List<TransactionEntity>> getRecentTransactions({
-    int limit = 5,
-  }) async {
+  Future<List<TransactionEntity>> getRecentTransactions({int limit = 5}) async {
     try {
       if (kDebugMode) {
-        print('📝 PlanRepository: Fetching recent transactions (limit: $limit)...');
+        print(
+          '📝 PlanRepository: Fetching recent transactions (limit: $limit)...',
+        );
       }
 
       final Response response = await _apiClient.get(
         '${ApiConstants.transactionsEndpoint}/recent',
-        queryParameters: {
-          ApiConstants.limitKey: limit,
-        },
+        queryParameters: {ApiConstants.limitKey: limit},
       );
 
-      if (response.data == null || response.data[ApiConstants.dataKey] == null) {
+      if (response.data == null ||
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] == null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: No recent transactions data received');
         }
         return [];
       }
 
-      final List<dynamic> transactionsData = response.data[ApiConstants.dataKey];
+      final List<dynamic> transactionsData =
+          (response.data as Map<String, dynamic>)[ApiConstants.dataKey] as List<dynamic>;
       final transactions = transactionsData
           .map((json) => TransactionModel.fromJson(json).toEntity())
           .toList();
 
       if (kDebugMode) {
-        print('✅ PlanRepository: Loaded ${transactions.length} recent transactions');
+        print(
+          '✅ PlanRepository: Loaded ${transactions.length} recent transactions',
+        );
       }
 
       return transactions;
@@ -214,7 +221,9 @@ class PlanRepositoryImpl implements PlanRepository {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('❌ PlanRepository: Unexpected error getting recent transactions: $e');
+        print(
+          '❌ PlanRepository: Unexpected error getting recent transactions: $e',
+        );
       }
       throw GenericApiException(
         'Failed to get recent transactions: ${e.toString()}',
@@ -247,15 +256,16 @@ class PlanRepositoryImpl implements PlanRepository {
         '${ApiConstants.profileEndpoint}/statistics',
       );
 
-      if (response.data == null || response.data[ApiConstants.dataKey] == null) {
+      if (response.data == null ||
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] == null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: No statistics data received');
         }
         return {};
       }
 
-      final stats = response.data[ApiConstants.dataKey] as Map<String, dynamic>;
-      
+      final Map<String, dynamic> stats = (response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>;
+
       if (kDebugMode) {
         print('✅ PlanRepository: Plan statistics loaded');
       }

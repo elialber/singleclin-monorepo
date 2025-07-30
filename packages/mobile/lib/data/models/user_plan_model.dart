@@ -1,6 +1,6 @@
-import '../../domain/entities/user_plan_entity.dart';
-import '../../domain/entities/plan_entity.dart';
-import 'plan_model.dart';
+import 'package:mobile/data/models/plan_model.dart';
+import 'package:mobile/domain/entities/plan_entity.dart';
+import 'package:mobile/domain/entities/user_plan_entity.dart';
 
 /// User plan model for data layer with JSON serialization
 class UserPlanModel extends UserPlanEntity {
@@ -18,6 +18,23 @@ class UserPlanModel extends UserPlanEntity {
     required super.updatedAt,
   });
 
+  /// Create UserPlanModel from entity
+  factory UserPlanModel.fromEntity(UserPlanEntity entity) {
+    return UserPlanModel(
+      id: entity.id,
+      userId: entity.userId,
+      planId: entity.planId,
+      plan: entity.plan,
+      usedCredits: entity.usedCredits,
+      remainingCredits: entity.remainingCredits,
+      startDate: entity.startDate,
+      expirationDate: entity.expirationDate,
+      isActive: entity.isActive,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
   /// Create UserPlanModel from JSON
   factory UserPlanModel.fromJson(Map<String, dynamic> json) {
     return UserPlanModel(
@@ -26,12 +43,21 @@ class UserPlanModel extends UserPlanEntity {
       planId: json['plan_id'] as int? ?? json['planId'] as int,
       plan: PlanModel.fromJson(json['plan'] as Map<String, dynamic>),
       usedCredits: json['used_credits'] as int? ?? json['usedCredits'] as int,
-      remainingCredits: json['remaining_credits'] as int? ?? json['remainingCredits'] as int,
-      startDate: DateTime.parse(json['start_date'] as String? ?? json['startDate'] as String),
-      expirationDate: DateTime.parse(json['expiration_date'] as String? ?? json['expirationDate'] as String),
+      remainingCredits:
+          json['remaining_credits'] as int? ?? json['remainingCredits'] as int,
+      startDate: DateTime.parse(
+        json['start_date'] as String? ?? json['startDate'] as String,
+      ),
+      expirationDate: DateTime.parse(
+        json['expiration_date'] as String? ?? json['expirationDate'] as String,
+      ),
       isActive: json['is_active'] as bool? ?? json['isActive'] as bool? ?? true,
-      createdAt: DateTime.parse(json['created_at'] as String? ?? json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String? ?? json['updatedAt'] as String),
+      createdAt: DateTime.parse(
+        json['created_at'] as String? ?? json['createdAt'] as String,
+      ),
+      updatedAt: DateTime.parse(
+        json['updated_at'] as String? ?? json['updatedAt'] as String,
+      ),
     );
   }
 
@@ -66,23 +92,6 @@ class UserPlanModel extends UserPlanEntity {
       isActive: isActive,
       createdAt: createdAt,
       updatedAt: updatedAt,
-    );
-  }
-
-  /// Create UserPlanModel from entity
-  factory UserPlanModel.fromEntity(UserPlanEntity entity) {
-    return UserPlanModel(
-      id: entity.id,
-      userId: entity.userId,
-      planId: entity.planId,
-      plan: entity.plan,
-      usedCredits: entity.usedCredits,
-      remainingCredits: entity.remainingCredits,
-      startDate: entity.startDate,
-      expirationDate: entity.expirationDate,
-      isActive: entity.isActive,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
     );
   }
 

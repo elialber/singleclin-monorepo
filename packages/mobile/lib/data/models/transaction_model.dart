@@ -1,4 +1,4 @@
-import '../../domain/entities/transaction_entity.dart';
+import 'package:mobile/domain/entities/transaction_entity.dart';
 
 /// Transaction model for data layer with JSON serialization
 class TransactionModel extends TransactionEntity {
@@ -11,11 +11,29 @@ class TransactionModel extends TransactionEntity {
     required super.creditsUsed,
     required super.value,
     required super.status,
-    super.notes,
     required super.transactionDate,
     required super.createdAt,
     required super.updatedAt,
+    super.notes,
   });
+
+  /// Create TransactionModel from entity
+  factory TransactionModel.fromEntity(TransactionEntity entity) {
+    return TransactionModel(
+      id: entity.id,
+      userId: entity.userId,
+      clinicId: entity.clinicId,
+      clinicName: entity.clinicName,
+      serviceType: entity.serviceType,
+      creditsUsed: entity.creditsUsed,
+      value: entity.value,
+      status: entity.status,
+      notes: entity.notes,
+      transactionDate: entity.transactionDate,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
 
   /// Create TransactionModel from JSON
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
@@ -23,15 +41,24 @@ class TransactionModel extends TransactionEntity {
       id: json['id'] as int,
       userId: json['user_id'] as int? ?? json['userId'] as int,
       clinicId: json['clinic_id'] as int? ?? json['clinicId'] as int,
-      clinicName: json['clinic_name'] as String? ?? json['clinicName'] as String,
-      serviceType: json['service_type'] as String? ?? json['serviceType'] as String,
+      clinicName:
+          json['clinic_name'] as String? ?? json['clinicName'] as String,
+      serviceType:
+          json['service_type'] as String? ?? json['serviceType'] as String,
       creditsUsed: json['credits_used'] as int? ?? json['creditsUsed'] as int,
       value: (json['value'] as num).toDouble(),
       status: json['status'] as String,
       notes: json['notes'] as String?,
-      transactionDate: DateTime.parse(json['transaction_date'] as String? ?? json['transactionDate'] as String),
-      createdAt: DateTime.parse(json['created_at'] as String? ?? json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String? ?? json['updatedAt'] as String),
+      transactionDate: DateTime.parse(
+        json['transaction_date'] as String? ??
+            json['transactionDate'] as String,
+      ),
+      createdAt: DateTime.parse(
+        json['created_at'] as String? ?? json['createdAt'] as String,
+      ),
+      updatedAt: DateTime.parse(
+        json['updated_at'] as String? ?? json['updatedAt'] as String,
+      ),
     );
   }
 
@@ -68,24 +95,6 @@ class TransactionModel extends TransactionEntity {
       transactionDate: transactionDate,
       createdAt: createdAt,
       updatedAt: updatedAt,
-    );
-  }
-
-  /// Create TransactionModel from entity
-  factory TransactionModel.fromEntity(TransactionEntity entity) {
-    return TransactionModel(
-      id: entity.id,
-      userId: entity.userId,
-      clinicId: entity.clinicId,
-      clinicName: entity.clinicName,
-      serviceType: entity.serviceType,
-      creditsUsed: entity.creditsUsed,
-      value: entity.value,
-      status: entity.status,
-      notes: entity.notes,
-      transactionDate: entity.transactionDate,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
     );
   }
 

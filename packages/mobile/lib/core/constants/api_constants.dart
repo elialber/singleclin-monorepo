@@ -25,7 +25,7 @@ class ApiConstants {
   static const String plansEndpoint = '/plans';
   static const String planByIdEndpoint = '/plans';
 
-  /// User endpoints  
+  /// User endpoints
   static const String usersEndpoint = '/users';
   static const String userByIdEndpoint = '/users';
 

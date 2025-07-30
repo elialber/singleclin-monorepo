@@ -1,21 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Model for scan history item
 class ScanHistoryItem {
-  final String id;
-  final String patientName;
-  final String patientId;
-  final String serviceName;
-  final int creditCost;
-  final DateTime scanTime;
-  final String status;
-  final bool canCancel;
-
   ScanHistoryItem({
     required this.id,
     required this.patientName,
@@ -43,16 +34,24 @@ class ScanHistoryItem {
       canCancel: canCancel && json['status'] == 'active',
     );
   }
+  final String id;
+  final String patientName;
+  final String patientId;
+  final String serviceName;
+  final int creditCost;
+  final DateTime scanTime;
+  final String status;
+  final bool canCancel;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'patientName': patientName,
-        'patientId': patientId,
-        'serviceName': serviceName,
-        'creditCost': creditCost,
-        'scanTime': scanTime.toIso8601String(),
-        'status': status,
-      };
+    'id': id,
+    'patientName': patientName,
+    'patientId': patientId,
+    'serviceName': serviceName,
+    'creditCost': creditCost,
+    'scanTime': scanTime.toIso8601String(),
+    'status': status,
+  };
 }
 
 /// Screen to display scan history for the current day
@@ -67,10 +66,9 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
   final Dio _dio = Dio();
   final List<ScanHistoryItem> _scanHistory = [];
   bool _isLoading = true;
-  bool _isRefreshing = false;
   String? _error;
   late Box<Map> _cacheBox;
-  
+
   // Totals
   int _totalScans = 0;
   int _totalCredits = 0;
@@ -100,7 +98,8 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
   Future<void> _setupDio() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
-    const baseUrl = 'http://localhost:5000/api'; // TODO(api): Get from environment
+    const baseUrl =
+        'http://localhost:5000/api'; // TODO(api): Get from environment
 
     _dio.options = BaseOptions(
       baseUrl: baseUrl,
@@ -115,12 +114,13 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
 
   /// Load scan history from API or cache
   Future<void> _loadScanHistory({bool forceRefresh = false}) async {
-    if (!forceRefresh && _scanHistory.isNotEmpty) return;
+    if (!forceRefresh && _scanHistory.isNotEmpty) {
+      return;
+    }
 
     try {
       setState(() {
         _isLoading = !forceRefresh;
-        _isRefreshing = forceRefresh;
         _error = null;
       });
 
@@ -129,35 +129,37 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
         _loadFromCache();
       }
 
-      // Get clinic ID
+      // Get clinic ID (for future API calls)
       final prefs = await SharedPreferences.getInstance();
       final clinicId = prefs.getString('clinic_id') ?? 'clinic123';
-      
-      // Get today's date
+      debugPrint('Using clinic ID: $clinicId');
+
+      // Get today's date (for future API calls)
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      debugPrint('Loading scans for date: $today');
 
       // TODO(api): Replace with actual API call
-      // final response = await _dio.get('/clinics/$clinicId/scans', 
+      // final response = await _dio.get('/clinics/$clinicId/scans',
       //   queryParameters: {'date': today}
       // );
 
       // Simulate API response
       await Future.delayed(const Duration(seconds: 1));
-      
+
       final mockData = _generateMockData();
-      
+
       // Process and update data
-      _scanHistory.clear();
-      _scanHistory.addAll(mockData);
+      _scanHistory
+        ..clear()
+        ..addAll(mockData);
       _calculateTotals();
-      
+
       // Save to cache
       await _saveToCache();
 
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _isRefreshing = false;
         });
       }
     } catch (e) {
@@ -166,7 +168,6 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
         setState(() {
           _error = 'Erro ao carregar histórico: ${e.toString()}';
           _isLoading = false;
-          _isRefreshing = false;
         });
       }
     }
@@ -225,10 +226,11 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
       final cachedData = _cacheBox.get('today_scans');
       if (cachedData != null) {
         final List<dynamic> jsonList = cachedData['data'] ?? [];
-        _scanHistory.clear();
-        _scanHistory.addAll(
-          jsonList.map((json) => ScanHistoryItem.fromJson(json)).toList(),
-        );
+        _scanHistory
+          ..clear()
+          ..addAll(
+            jsonList.map((json) => ScanHistoryItem.fromJson(json)).toList(),
+          );
         _calculateTotals();
         setState(() {});
       }
@@ -277,16 +279,16 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Sim, Cancelar'),
             ),
           ],
         ),
       );
 
-      if (confirm != true) return;
+      if (confirm != true) {
+        return;
+      }
 
       // TODO(api): Implement actual cancellation
       // await _dio.delete('/scans/${item.id}');
@@ -350,9 +352,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_error != null) {
@@ -363,11 +363,9 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
       children: [
         // Totals card
         _buildTotalsCard(),
-        
+
         // Scan list
-        Expanded(
-          child: _buildScanList(),
-        ),
+        Expanded(child: _buildScanList()),
       ],
     );
   }
@@ -379,19 +377,12 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.red,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.red),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -413,7 +404,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
         gradient: LinearGradient(
           colors: [
             Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withOpacity(0.8),
+            Theme.of(context).primaryColor.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -421,7 +412,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -438,7 +429,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
           Container(
             width: 1,
             height: 40,
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
           _buildTotalItem(
             icon: Icons.credit_card,
@@ -457,11 +448,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
   }) {
     return Column(
       children: [
-        Icon(
-          icon,
-          color: Colors.white,
-          size: 28,
-        ),
+        Icon(icon, color: Colors.white, size: 28),
         const SizedBox(height: 8),
         Text(
           value,
@@ -475,7 +462,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 14,
           ),
         ),
@@ -489,18 +476,11 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.history,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.history, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'Nenhum scan realizado hoje',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -523,10 +503,12 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
   Widget _buildScanCard(ScanHistoryItem item) {
     final timeFormat = DateFormat('HH:mm');
     final isActive = item.status == 'active';
-    
+
     return Dismissible(
       key: Key(item.id),
-      direction: item.canCancel ? DismissDirection.endToStart : DismissDirection.none,
+      direction: item.canCancel
+          ? DismissDirection.endToStart
+          : DismissDirection.none,
       onDismissed: (_) => _cancelScan(item),
       background: Container(
         alignment: Alignment.centerRight,
@@ -539,11 +521,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.delete,
-              color: Colors.white,
-              size: 28,
-            ),
+            Icon(Icons.delete, color: Colors.white, size: 28),
             SizedBox(height: 4),
             Text(
               'Cancelar',
@@ -558,9 +536,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
       child: Card(
         margin: const EdgeInsets.only(bottom: 12),
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -570,9 +546,14 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
                 children: [
                   // Time
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      color: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -587,9 +568,12 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
                   // Status
                   if (!isActive)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.1),
+                        color: Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Text(
@@ -602,11 +586,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
                       ),
                     ),
                   if (item.canCancel)
-                    Icon(
-                      Icons.swipe_left,
-                      size: 20,
-                      color: Colors.grey[400],
-                    ),
+                    Icon(Icons.swipe_left, size: 20, color: Colors.grey[400]),
                 ],
               ),
               const SizedBox(height: 12),
@@ -667,7 +647,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
       ),
     );
   }
-  
+
   @override
   void dispose() {
     _cacheBox.close();

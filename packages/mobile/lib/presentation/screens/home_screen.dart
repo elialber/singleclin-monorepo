@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/routes/app_routes.dart';
-import '../../data/services/plan_service.dart';
-import '../../domain/entities/user_plan_entity.dart';
-import '../../domain/entities/transaction_entity.dart';
-import '../controllers/auth_controller.dart';
-import '../widgets/widgets.dart';
+
+import 'package:mobile/core/routes/app_routes.dart';
+import 'package:mobile/data/services/plan_service.dart';
+import 'package:mobile/domain/entities/transaction_entity.dart';
+import 'package:mobile/domain/entities/user_plan_entity.dart';
+import 'package:mobile/presentation/controllers/auth_controller.dart';
+import 'package:mobile/presentation/widgets/widgets.dart';
 
 /// Home screen with bottom navigation for the SingleClin app
-/// 
+///
 /// This screen provides the main interface for patients to:
 /// - View their plan and credit balance
 /// - Access QR code generation
@@ -22,17 +23,18 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   final AuthController _authController = Get.find<AuthController>();
   final PlanService _planService = PlanService();
   late TabController _tabController;
   int _currentIndex = 0;
-  
+
   // Plan data state
   UserPlanEntity? _currentPlan;
   bool _isLoadingPlan = false;
   bool _isUsingCachedData = false;
-  
+
   // Recent transactions state
   List<TransactionEntity> _recentTransactions = [];
   bool _isLoadingTransactions = false;
@@ -62,11 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       appBar: _buildAppBar(),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildPlanView(),
-          _buildHistoryView(),
-          _buildProfileView(),
-        ],
+        children: [_buildPlanView(), _buildHistoryView(), _buildProfileView()],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -83,26 +81,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         children: [
           const Text(
             'SingleClin',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          Obx(
+            () => Text(
+              _authController.currentUser?.displayName ?? 'Usuário',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: Colors.white70,
+              ),
             ),
           ),
-          Obx(() => Text(
-            _authController.currentUser?.displayName ?? 'Usuário',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.normal,
-              color: Colors.white70,
-            ),
-          )),
         ],
       ),
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications_outlined),
           onPressed: () {
-            // TODO: Navigate to notifications screen
+            // TODO(navigation): Navigate to notifications screen
             _showComingSoonDialog('Notificações');
           },
         ),
@@ -154,23 +151,23 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             // Welcome message
             _buildWelcomeSection(),
             const SizedBox(height: 24),
-            
+
             // Plan card - integrated with real data
             PlanCard(
               userPlan: _currentPlan,
               isLoading: _isLoadingPlan,
               onTap: () {
-                // TODO: Navigate to plan details screen
+                // TODO(navigation): Navigate to plan details screen
                 _showComingSoonDialog('Detalhes do plano');
               },
               onRefresh: _loadPlanData,
             ),
             const SizedBox(height: 24),
-            
+
             // QR Code button - will be enhanced in task 9.5
             _buildQRCodeButton(),
             const SizedBox(height: 24),
-            
+
             // Recent visits with real transaction data
             RecentVisitsCard(
               recentTransactions: _recentTransactions,
@@ -192,11 +189,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.history,
-            size: 64,
-            color: Colors.grey,
-          ),
+          Icon(Icons.history, size: 64, color: Colors.grey),
           SizedBox(height: 16),
           Text(
             'Histórico de Consultas',
@@ -210,9 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Text(
             'Em breve você poderá visualizar\nseu histórico completo de consultas',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey,
-            ),
+            style: TextStyle(color: Colors.grey),
           ),
         ],
       ),
@@ -228,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           // Profile header
           _buildProfileHeader(),
           const SizedBox(height: 24),
-          
+
           // Profile options
           _buildProfileOptions(),
         ],
@@ -244,8 +235,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).primaryColor.withOpacity(0.1),
-            Theme.of(context).primaryColor.withOpacity(0.05),
+            Theme.of(context).primaryColor.withValues(alpha: 0.1),
+            Theme.of(context).primaryColor.withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -257,28 +248,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         children: [
           const Text(
             'Bem-vindo!',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
             'Gerencie seu plano de saúde de forma simples e prática',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
           if (_isUsingCachedData) ...[
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(
-                  Icons.offline_bolt,
-                  size: 16,
-                  color: Colors.blue[600],
-                ),
+                Icon(Icons.offline_bolt, size: 16, color: Colors.blue[600]),
                 const SizedBox(width: 4),
                 Text(
                   'Dados em cache • Puxe para atualizar',
@@ -296,35 +277,42 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-
   /// Build enhanced QR Code button
   Widget _buildQRCodeButton() {
-    final hasActivePlan = _currentPlan != null && _currentPlan!.isActive && !_currentPlan!.isExpired;
-    
+    final hasActivePlan =
+        _currentPlan != null &&
+        _currentPlan!.isActive &&
+        !_currentPlan!.isExpired;
+
     return Container(
       width: double.infinity,
       height: 64,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: hasActivePlan 
-              ? [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withOpacity(0.8)]
-              : [Colors.grey, Colors.grey.withOpacity(0.8)],
+          colors: hasActivePlan
+              ? [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).primaryColor.withValues(alpha: 0.8),
+                ]
+              : [Colors.grey, Colors.grey.withValues(alpha: 0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: hasActivePlan 
-                ? Theme.of(context).primaryColor.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.3),
+            color: hasActivePlan
+                ? Theme.of(context).primaryColor.withValues(alpha: 0.3)
+                : Colors.grey.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ElevatedButton.icon(
-        onPressed: hasActivePlan ? () => context.go(AppRoutes.qrGenerate) : null,
+        onPressed: hasActivePlan
+            ? () => context.go(AppRoutes.qrGenerate)
+            : null,
         icon: Icon(
           Icons.qr_code_2,
           size: 32,
@@ -347,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 'Plano inativo',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -366,54 +354,52 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-
   /// Build profile header
   Widget _buildProfileHeader() {
-    return Obx(() => Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Theme.of(context).primaryColor,
-            backgroundImage: _authController.currentUser?.photoUrl != null
-                ? NetworkImage(_authController.currentUser!.photoUrl!)
-                : null,
-            child: _authController.currentUser?.photoUrl == null
-                ? Text(
-                    _authController.currentUser?.displayName?.substring(0, 1).toUpperCase() ?? 'U',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  )
-                : null,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _authController.currentUser?.displayName ?? 'Usuário',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return Obx(
+      () => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Theme.of(context).primaryColor,
+              backgroundImage: _authController.currentUser?.photoUrl != null
+                  ? NetworkImage(_authController.currentUser!.photoUrl!)
+                  : null,
+              child: _authController.currentUser?.photoUrl == null
+                  ? Text(
+                      _authController.currentUser?.displayName
+                              ?.substring(0, 1)
+                              .toUpperCase() ??
+                          'U',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    )
+                  : null,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            _authController.currentUser?.email ?? '',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
+            const SizedBox(height: 12),
+            Text(
+              _authController.currentUser?.displayName ?? 'Usuário',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              _authController.currentUser?.email ?? '',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   /// Build profile options
@@ -485,10 +471,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
         ),
         subtitle: Text(subtitle),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: Colors.grey[400],
-        ),
+        trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
         onTap: onTap,
       ),
     );
@@ -496,8 +479,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   /// Load plan data from API (uses cache when available)
   Future<void> _loadPlanData() async {
-    if (!mounted) return;
-    
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       _isLoadingPlan = true;
       _isUsingCachedData = false;
@@ -506,9 +491,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     try {
       // Check if we'll use cached data
       final hasCachedData = await _planService.hasCachedPlanData();
-      
+
       final plan = await _planService.getCurrentPlan();
-      
+
       if (mounted) {
         setState(() {
           _currentPlan = plan;
@@ -522,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           _isLoadingPlan = false;
           _isUsingCachedData = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao carregar dados do plano: ${e.toString()}'),
@@ -536,15 +521,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   /// Load recent transactions data
   Future<void> _loadRecentTransactions() async {
-    if (!mounted) return;
-    
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       _isLoadingTransactions = true;
     });
 
     try {
-      final transactions = await _planService.getRecentTransactions(limit: 5);
-      
+      final transactions = await _planService.getRecentTransactions();
+
       if (mounted) {
         setState(() {
           _recentTransactions = transactions;
@@ -566,16 +553,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     try {
       // Force refresh from server (bypasses cache)
       final plan = await _planService.refreshPlanData();
-      
+
       // Also refresh recent transactions
       _loadRecentTransactions();
-      
+
       if (mounted) {
         setState(() {
           _currentPlan = plan;
           _isUsingCachedData = false; // Data is fresh from server
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -584,7 +571,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    plan != null 
+                    plan != null
                         ? 'Dados atualizados com sucesso!'
                         : 'Nenhum plano ativo encontrado',
                   ),
@@ -628,7 +615,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Em Breve'),
-        content: Text('A funcionalidade "$feature" estará disponível em breve!'),
+        content: Text(
+          'A funcionalidade "$feature" estará disponível em breve!',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

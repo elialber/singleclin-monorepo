@@ -34,15 +34,11 @@ class QrCodeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Center(
-                  child: Icon(
-                    Icons.qr_code_2,
-                    size: 200,
-                    color: Colors.grey,
-                  ),
+                  child: Icon(Icons.qr_code_2, size: 200, color: Colors.grey),
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Info card
               Card(
                 child: Padding(
@@ -56,7 +52,8 @@ class QrCodeScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         '4:35',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).primaryColor,
                             ),
@@ -72,11 +69,11 @@ class QrCodeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Generate new button
               OutlinedButton.icon(
                 onPressed: () {
-                  // TODO: Generate new QR code
+                  // TODO(qr): Generate new QR code
                 },
                 icon: const Icon(Icons.refresh),
                 label: const Text('Gerar novo código'),

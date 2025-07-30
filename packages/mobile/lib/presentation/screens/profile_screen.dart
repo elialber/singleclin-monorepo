@@ -53,7 +53,7 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Current plan
             Card(
               child: ListTile(
@@ -62,14 +62,14 @@ class ProfileScreen extends StatelessWidget {
                 subtitle: const Text('Premium - 10 créditos'),
                 trailing: TextButton(
                   onPressed: () {
-                    // TODO: Navigate to plans
+                    // TODO(navigation): Navigate to plans
                   },
                   child: const Text('Alterar'),
                 ),
               ),
             ),
             const SizedBox(height: 8),
-            
+
             // Menu items
             Card(
               child: Column(
@@ -98,20 +98,18 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Logout button
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () {
-                  // TODO: Implement logout
+                  // TODO(auth): Implement logout
                   context.go(AppRoutes.login);
                 },
                 icon: const Icon(Icons.logout),
                 label: const Text('Sair'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
-                ),
+                style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
               ),
             ),
           ],

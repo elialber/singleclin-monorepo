@@ -64,23 +64,23 @@ abstract class BaseController extends GetxController {
       clearError();
 
       final result = await operation();
-      
+
       if (onSuccess != null) {
         onSuccess(result);
       }
-      
+
       return result;
     } on Exception catch (e) {
       final failure = _mapExceptionToFailure(e);
-      
+
       if (showError) {
         setError(failure);
       }
-      
+
       if (onError != null) {
         onError(failure);
       }
-      
+
       return null;
     } finally {
       if (showLoading) {
@@ -91,50 +91,27 @@ abstract class BaseController extends GetxController {
 
   /// Maps exceptions to failures
   Failure _mapExceptionToFailure(Exception e) {
-    // TODO: Add specific exception mapping
-    return UnknownFailure(
-      message: e.toString(),
-      details: e,
-    );
+    // TODO(error): Add specific exception mapping
+    return UnknownFailure(message: e.toString(), details: e);
   }
 
   /// Shows error snackbar
   void showErrorSnackbar(String message) {
-    Get.snackbar(
-      'Erro',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
-    );
+    Get.snackbar('Erro', message, snackPosition: SnackPosition.BOTTOM);
   }
 
   /// Shows success snackbar
   void showSuccessSnackbar(String message) {
-    Get.snackbar(
-      'Sucesso',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
-    );
+    Get.snackbar('Sucesso', message, snackPosition: SnackPosition.BOTTOM);
   }
 
   /// Shows info snackbar
   void showInfoSnackbar(String message) {
-    Get.snackbar(
-      'Informação',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
-    );
+    Get.snackbar('Informação', message, snackPosition: SnackPosition.BOTTOM);
   }
 
   /// Shows warning snackbar
   void showWarningSnackbar(String message) {
-    Get.snackbar(
-      'Atenção',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
-    );
+    Get.snackbar('Atenção', message, snackPosition: SnackPosition.BOTTOM);
   }
 }

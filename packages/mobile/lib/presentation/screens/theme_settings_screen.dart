@@ -12,7 +12,7 @@ class ThemeSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeController themeController = Get.find<ThemeController>();
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configurações de Tema'),
@@ -33,11 +33,13 @@ class ThemeSettingsScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Obx(() => Icon(
-                            themeController.getThemeIcon(),
-                            size: 32,
-                            color: Theme.of(context).primaryColor,
-                          )),
+                      Obx(
+                        () => Icon(
+                          themeController.getThemeIcon(),
+                          size: 32,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -50,13 +52,15 @@ class ThemeSettingsScreen extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            Obx(() => Text(
-                                  themeController.getThemeName(),
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )),
+                            Obx(
+                              () => Text(
+                                themeController.getThemeName(),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -67,17 +71,14 @@ class ThemeSettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Theme options
           const Text(
             'Escolha um tema',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          
+
           // Theme option tiles
           Obx(() {
             final options = themeController.getThemeOptions();
@@ -106,19 +107,16 @@ class ThemeSettingsScreen extends StatelessWidget {
               }).toList(),
             );
           }),
-          
+
           const SizedBox(height: 24),
-          
+
           // Color preview section
           const Text(
             'Cores do Tema',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          
+
           // Color preview grid
           Card(
             child: Padding(
@@ -137,40 +135,25 @@ class ThemeSettingsScreen extends StatelessWidget {
                     context,
                   ),
                   const SizedBox(height: 12),
-                  _buildColorRow(
-                    'Sucesso',
-                    AppColors.success,
-                    context,
-                  ),
+                  _buildColorRow('Sucesso', AppColors.success, context),
                   const SizedBox(height: 12),
-                  _buildColorRow(
-                    'Aviso',
-                    AppColors.warning,
-                    context,
-                  ),
+                  _buildColorRow('Aviso', AppColors.warning, context),
                   const SizedBox(height: 12),
-                  _buildColorRow(
-                    'Erro',
-                    AppColors.error,
-                    context,
-                  ),
+                  _buildColorRow('Erro', AppColors.error, context),
                 ],
               ),
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Preview components
           const Text(
             'Pré-visualização',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          
+
           // Button previews
           Card(
             child: Padding(
@@ -196,9 +179,9 @@ class ThemeSettingsScreen extends StatelessWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Other component previews
           Card(
             child: Padding(
@@ -229,7 +212,7 @@ class ThemeSettingsScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildColorRow(String label, Color color, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -241,9 +224,7 @@ class ThemeSettingsScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: Colors.grey.withOpacity(0.3),
-            ),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
           ),
         ),
       ],

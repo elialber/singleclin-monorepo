@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:mobile/presentation/controllers/base_controller.dart';
 
 /// Controller for managing app theme
 class ThemeController extends BaseController {
   // Storage key
   static const String _themeKey = 'theme_mode';
-  
+
   // Observable theme mode
   final Rx<ThemeMode> _themeMode = ThemeMode.system.obs;
   ThemeMode get themeMode => _themeMode.value;
-  
+
   // Check if dark mode is active
   bool get isDarkMode {
     if (_themeMode.value == ThemeMode.system) {
@@ -20,22 +21,22 @@ class ThemeController extends BaseController {
     }
     return _themeMode.value == ThemeMode.dark;
   }
-  
+
   // Check if using system theme
   bool get isSystemTheme => _themeMode.value == ThemeMode.system;
-  
+
   @override
   void onInit() {
     super.onInit();
     _loadThemeFromStorage();
   }
-  
+
   /// Load saved theme preference from storage
   Future<void> _loadThemeFromStorage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final savedTheme = prefs.getString(_themeKey);
-      
+
       if (savedTheme != null) {
         switch (savedTheme) {
           case 'light':
@@ -47,7 +48,7 @@ class ThemeController extends BaseController {
           default:
             _themeMode.value = ThemeMode.system;
         }
-        
+
         // Apply the loaded theme
         Get.changeThemeMode(_themeMode.value);
       }
@@ -56,12 +57,12 @@ class ThemeController extends BaseController {
       _themeMode.value = ThemeMode.system;
     }
   }
-  
+
   /// Save theme preference to storage
   Future<void> _saveThemeToStorage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       String themeString;
       switch (_themeMode.value) {
         case ThemeMode.light:
@@ -73,19 +74,19 @@ class ThemeController extends BaseController {
         default:
           themeString = 'system';
       }
-      
+
       await prefs.setString(_themeKey, themeString);
     } catch (e) {
       // Handle save error silently
     }
   }
-  
+
   /// Set theme mode
   Future<void> setThemeMode(ThemeMode mode) async {
     _themeMode.value = mode;
     Get.changeThemeMode(mode);
     await _saveThemeToStorage();
-    
+
     // Show confirmation
     String themeName;
     switch (mode) {
@@ -98,10 +99,10 @@ class ThemeController extends BaseController {
       default:
         themeName = 'Sistema';
     }
-    
+
     showSuccessSnackbar('Tema alterado para: $themeName');
   }
-  
+
   /// Toggle between light and dark mode
   Future<void> toggleTheme() async {
     if (isDarkMode) {
@@ -110,22 +111,22 @@ class ThemeController extends BaseController {
       await setThemeMode(ThemeMode.dark);
     }
   }
-  
+
   /// Set light theme
   Future<void> setLightTheme() async {
     await setThemeMode(ThemeMode.light);
   }
-  
+
   /// Set dark theme
   Future<void> setDarkTheme() async {
     await setThemeMode(ThemeMode.dark);
   }
-  
+
   /// Set system theme
   Future<void> setSystemTheme() async {
     await setThemeMode(ThemeMode.system);
   }
-  
+
   /// Get theme icon based on current mode
   IconData getThemeIcon() {
     switch (_themeMode.value) {
@@ -137,7 +138,7 @@ class ThemeController extends BaseController {
         return Icons.brightness_auto;
     }
   }
-  
+
   /// Get theme name for display
   String getThemeName() {
     switch (_themeMode.value) {
@@ -149,7 +150,7 @@ class ThemeController extends BaseController {
         return 'Tema do Sistema';
     }
   }
-  
+
   /// Get available theme options
   List<ThemeOption> getThemeOptions() {
     return [
@@ -180,12 +181,6 @@ class ThemeController extends BaseController {
 
 /// Theme option model
 class ThemeOption {
-  final ThemeMode mode;
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final bool isSelected;
-  
   ThemeOption({
     required this.mode,
     required this.title,
@@ -193,4 +188,9 @@ class ThemeOption {
     required this.icon,
     required this.isSelected,
   });
+  final ThemeMode mode;
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool isSelected;
 }

@@ -2,11 +2,7 @@ import 'package:equatable/equatable.dart';
 
 /// Base class for all failures in the application
 abstract class Failure extends Equatable {
-  const Failure({
-    required this.message,
-    this.code,
-    this.details,
-  });
+  const Failure({required this.message, this.code, this.details});
 
   final String message;
   final String? code;
@@ -21,11 +17,7 @@ abstract class Failure extends Equatable {
 
 /// Server failures from API responses
 class ServerFailure extends Failure {
-  const ServerFailure({
-    required super.message,
-    super.code,
-    super.details,
-  });
+  const ServerFailure({required super.message, super.code, super.details});
 }
 
 /// Network failures (no internet, timeout, etc.)
@@ -72,7 +64,7 @@ class ValidationFailure extends Failure {
     this.fieldErrors,
     super.details,
   });
-  
+
   final Map<String, List<String>>? fieldErrors;
 
   @override
@@ -108,11 +100,7 @@ class UnknownFailure extends Failure {
 
 /// Business logic failures
 class BusinessFailure extends Failure {
-  const BusinessFailure({
-    required super.message,
-    super.code,
-    super.details,
-  });
+  const BusinessFailure({required super.message, super.code, super.details});
 }
 
 /// QR Code related failures

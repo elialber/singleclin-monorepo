@@ -42,27 +42,20 @@ class HomeController extends BaseController {
   /// Increment counter
   void incrementCounter() {
     _counter.value++;
-    
+
     // Example of using executeAsync for async operations
-    executeAsync(
-      () async {
-        // Simulate API call
-        await Future.delayed(const Duration(seconds: 1));
-        return 'Counter updated to ${_counter.value}';
-      },
-      onSuccess: (result) {
-        setSuccessMessage(result);
-      },
-    );
+    executeAsync(() async {
+      // Simulate API call
+      await Future.delayed(const Duration(seconds: 1));
+      return 'Counter updated to ${_counter.value}';
+    }, onSuccess: setSuccessMessage);
   }
 
   /// Toggle dark mode using theme controller
   void toggleDarkMode() {
-    // TODO: Implement when ThemeController is available
+    // TODO(theme): Implement when ThemeController is available
     // themeController.toggleTheme();
-    Get.changeThemeMode(
-      Get.isDarkMode ? ThemeMode.light : ThemeMode.dark,
-    );
+    Get.changeThemeMode(Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
   }
 
   /// Add item to list
@@ -97,11 +90,7 @@ class HomeController extends BaseController {
 
   /// Private method to load initial data
   void _loadInitialData() {
-    _items.addAll([
-      'Exemplo 1',
-      'Exemplo 2',
-      'Exemplo 3',
-    ]);
+    _items.addAll(['Exemplo 1', 'Exemplo 2', 'Exemplo 3']);
   }
 
   /// Example of navigation with GetX
@@ -150,10 +139,7 @@ class HomeController extends BaseController {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => Get.back(),
-              child: const Text('Fechar'),
-            ),
+            ElevatedButton(onPressed: Get.back, child: const Text('Fechar')),
           ],
         ),
       ),

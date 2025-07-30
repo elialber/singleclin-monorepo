@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/auth_controller.dart';
-import '../../../core/utils/form_validators.dart';
+
+import 'package:mobile/core/utils/form_validators.dart';
+import 'package:mobile/presentation/controllers/auth_controller.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -9,14 +10,14 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.find<AuthController>();
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Esqueceu a Senha'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
+          onPressed: Get.back,
         ),
       ),
       body: SafeArea(
@@ -26,7 +27,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              
+
               // Icon and title
               Column(
                 children: [
@@ -34,7 +35,9 @@ class ForgotPasswordScreen extends StatelessWidget {
                     height: 80,
                     width: 80,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      color: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: Icon(
@@ -55,17 +58,17 @@ class ForgotPasswordScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
                       'Digite seu email abaixo e enviaremos instruções para redefinir sua senha.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.grey[600],
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 48),
-              
+
               // Reset form
               Form(
                 key: authController.forgotPasswordFormKey,
@@ -77,7 +80,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.done,
                       validator: FormValidators.validateEmail,
-                      onFieldSubmitted: (_) => authController.sendPasswordResetEmail(),
+                      onFieldSubmitted: (_) =>
+                          authController.sendPasswordResetEmail(),
                       decoration: InputDecoration(
                         labelText: 'Email',
                         hintText: 'Digite seu email cadastrado',
@@ -87,75 +91,84 @@ class ForgotPasswordScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // Error message
-                    Obx(() => authController.errorMessage != null
-                        ? Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(12),
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.red.shade200),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.error_outline, 
-                                     color: Colors.red.shade600, size: 20),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    authController.errorMessage!,
-                                    style: TextStyle(
-                                      color: Colors.red.shade600,
-                                      fontSize: 14,
+                    Obx(
+                      () => authController.errorMessage != null
+                          ? Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red.shade200),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red.shade600,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      authController.errorMessage!,
+                                      style: TextStyle(
+                                        color: Colors.red.shade600,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : const SizedBox.shrink()),
-                    
-                    // Send reset email button
-                    Obx(() => SizedBox(
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: authController.isLoading 
-                            ? null 
-                            : authController.sendPasswordResetEmail,
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: authController.isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            : const Text(
-                                'Enviar Email',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                ],
                               ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+
+                    // Send reset email button
+                    Obx(
+                      () => SizedBox(
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: authController.isLoading
+                              ? null
+                              : authController.sendPasswordResetEmail,
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: authController.isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  'Enviar Email',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
                       ),
-                    )),
+                    ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Info card
               Container(
                 padding: const EdgeInsets.all(16),
@@ -168,8 +181,11 @@ class ForgotPasswordScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, 
-                             color: Colors.blue.shade600, size: 20),
+                        Icon(
+                          Icons.info_outline,
+                          color: Colors.blue.shade600,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Informações importantes',
@@ -195,9 +211,9 @@ class ForgotPasswordScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Back to login
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

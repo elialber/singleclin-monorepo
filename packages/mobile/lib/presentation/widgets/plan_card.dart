@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/user_plan_entity.dart';
+import 'package:mobile/domain/entities/user_plan_entity.dart';
 
 /// Main plan visualization card component
-/// 
+///
 /// Displays user's current plan information including:
 /// - Plan name and description
 /// - Credit usage with progress indicator
 /// - Expiration date and status
 /// - Visual status indicators (colors)
 class PlanCard extends StatelessWidget {
-  final UserPlanEntity? userPlan;
-  final VoidCallback? onTap;
-  final VoidCallback? onRefresh;
-  final bool isLoading;
-
   const PlanCard({
     super.key,
     this.userPlan,
@@ -21,6 +16,10 @@ class PlanCard extends StatelessWidget {
     this.onRefresh,
     this.isLoading = false,
   });
+  final UserPlanEntity? userPlan;
+  final VoidCallback? onTap;
+  final VoidCallback? onRefresh;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +50,7 @@ class PlanCard extends StatelessWidget {
               SizedBox(height: 12),
               Text(
                 'Carregando plano...',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),
@@ -74,25 +70,21 @@ class PlanCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.credit_card_off,
-              size: 48,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.credit_card_off, size: 48, color: Colors.grey[400]),
             const SizedBox(height: 12),
             Text(
               'Nenhum plano ativo',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               'Você não possui um plano ativo no momento',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[500],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -124,10 +116,7 @@ class PlanCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                statusColor.withOpacity(0.1),
-                Colors.white,
-              ],
+              colors: [statusColor.withValues(alpha: 0.1), Colors.white],
             ),
           ),
           child: Column(
@@ -159,14 +148,14 @@ class PlanCard extends StatelessWidget {
                   _buildStatusChip(plan, statusColor),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Credits usage section
               _buildCreditsSection(context, plan, usagePercentage, statusColor),
-              
+
               const SizedBox(height: 16),
-              
+
               // Footer with expiration and refresh
               _buildFooterSection(context, plan),
             ],
@@ -180,7 +169,7 @@ class PlanCard extends StatelessWidget {
   Widget _buildStatusChip(UserPlanEntity plan, Color statusColor) {
     String statusText;
     IconData statusIcon;
-    
+
     if (plan.isExpired) {
       statusText = 'Expirado';
       statusIcon = Icons.error_outline;
@@ -195,18 +184,14 @@ class PlanCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.15),
+        color: statusColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: statusColor.withOpacity(0.3)),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            statusIcon,
-            size: 16,
-            color: statusColor,
-          ),
+          Icon(statusIcon, size: 16, color: statusColor),
           const SizedBox(width: 4),
           Text(
             statusText,
@@ -236,9 +221,9 @@ class PlanCard extends StatelessWidget {
           children: [
             Text(
               'Créditos Utilizados',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             Text(
               '${plan.remainingCredits}/${plan.totalCredits}',
@@ -249,9 +234,9 @@ class PlanCard extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Progress bar
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
@@ -262,23 +247,23 @@ class PlanCard extends StatelessWidget {
             minHeight: 8,
           ),
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               '${(usagePercentage * 100).toStringAsFixed(1)}% utilizado',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
             ),
             Text(
               '${plan.usedCredits} créditos usados',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
             ),
           ],
         ),
@@ -290,10 +275,10 @@ class PlanCard extends StatelessWidget {
   Widget _buildFooterSection(BuildContext context, UserPlanEntity plan) {
     final theme = Theme.of(context);
     final daysUntilExpiration = plan.daysUntilExpiration;
-    
+
     String expirationText;
     Color expirationColor;
-    
+
     if (plan.isExpired) {
       expirationText = 'Plano expirado';
       expirationColor = Colors.red;
@@ -304,7 +289,8 @@ class PlanCard extends StatelessWidget {
       expirationText = 'Expira em $daysUntilExpiration dias';
       expirationColor = Colors.amber[700]!;
     } else {
-      expirationText = 'Expira em ${plan.expirationDate.day}/${plan.expirationDate.month}/${plan.expirationDate.year}';
+      expirationText =
+          'Expira em ${plan.expirationDate.day}/${plan.expirationDate.month}/${plan.expirationDate.year}';
       expirationColor = Colors.grey[600]!;
     }
 
@@ -338,7 +324,7 @@ class PlanCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.warning_amber_outlined,
                       size: 16,
                       color: Colors.orange,
@@ -357,7 +343,7 @@ class PlanCard extends StatelessWidget {
             ],
           ),
         ),
-        
+
         // Refresh button
         IconButton(
           onPressed: onRefresh,

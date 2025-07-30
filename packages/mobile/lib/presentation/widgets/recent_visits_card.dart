@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/transaction_entity.dart';
+import 'package:mobile/domain/entities/transaction_entity.dart';
 
 /// Recent visits/transactions summary card component
-/// 
+///
 /// Displays a summary of the user's recent healthcare visits/transactions
 /// with options to view more details and navigate to full history
 class RecentVisitsCard extends StatelessWidget {
-  final List<TransactionEntity> recentTransactions;
-  final bool isLoading;
-  final VoidCallback? onViewAll;
-  final VoidCallback? onRefresh;
-
   const RecentVisitsCard({
-    super.key,
     required this.recentTransactions,
+    super.key,
     this.isLoading = false,
     this.onViewAll,
     this.onRefresh,
   });
+  final List<TransactionEntity> recentTransactions;
+  final bool isLoading;
+  final VoidCallback? onViewAll;
+  final VoidCallback? onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -57,16 +56,13 @@ class RecentVisitsCard extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               'Últimas Consultas',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         ),
-        TextButton(
-          onPressed: onViewAll,
-          child: const Text('Ver todas'),
-        ),
+        TextButton(onPressed: onViewAll, child: const Text('Ver todas')),
       ],
     );
   }
@@ -105,9 +101,9 @@ class RecentVisitsCard extends StatelessWidget {
             Text(
               'Suas consultas aparecerão aqui após serem realizadas',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[500],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
             ),
             const SizedBox(height: 16),
             TextButton.icon(
@@ -125,9 +121,9 @@ class RecentVisitsCard extends StatelessWidget {
   Widget _buildTransactionsList(BuildContext context) {
     return Column(
       children: [
-        ...recentTransactions.take(3).map((transaction) => 
-          _buildTransactionItem(context, transaction)
-        ),
+        ...recentTransactions
+            .take(3)
+            .map((transaction) => _buildTransactionItem(context, transaction)),
         if (recentTransactions.length > 3) ...[
           const SizedBox(height: 8),
           Container(
@@ -152,7 +148,10 @@ class RecentVisitsCard extends StatelessWidget {
   }
 
   /// Build individual transaction item
-  Widget _buildTransactionItem(BuildContext context, TransactionEntity transaction) {
+  Widget _buildTransactionItem(
+    BuildContext context,
+    TransactionEntity transaction,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -168,7 +167,7 @@ class RecentVisitsCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
@@ -177,9 +176,9 @@ class RecentVisitsCard extends StatelessWidget {
               size: 20,
             ),
           ),
-          
+
           const SizedBox(width: 12),
-          
+
           // Transaction details
           Expanded(
             child: Column(
@@ -187,29 +186,25 @@ class RecentVisitsCard extends StatelessWidget {
               children: [
                 Text(
                   transaction.clinicName,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   transaction.serviceType,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 12,
-                      color: Colors.grey[500],
-                    ),
+                    Icon(Icons.access_time, size: 12, color: Colors.grey[500]),
                     const SizedBox(width: 4),
                     Text(
                       transaction.formattedDate,
@@ -223,7 +218,7 @@ class RecentVisitsCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Credits used info
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -231,7 +226,9 @@ class RecentVisitsCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(transaction.status).withOpacity(0.1),
+                  color: _getStatusColor(
+                    transaction.status,
+                  ).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

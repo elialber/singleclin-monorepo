@@ -1,13 +1,14 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:audioplayers/audioplayers.dart';
-import '../../widgets/patient_data_bottom_sheet.dart';
-import '../../widgets/manual_code_dialog.dart';
-import '../../../core/routes/app_routes.dart';
+
+import 'package:mobile/core/routes/app_routes.dart';
+import 'package:mobile/presentation/widgets/manual_code_dialog.dart';
+import 'package:mobile/presentation/widgets/patient_data_bottom_sheet.dart';
 
 /// Screen for clinic staff to scan patient QR codes
-/// 
+///
 /// This screen allows clinic staff to:
 /// - Scan QR codes from patients using camera
 /// - Validate QR codes in real-time
@@ -25,21 +26,20 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
     with TickerProviderStateMixin {
   // Scanner controller
   MobileScannerController? _controller;
-  
+
   // Animation controllers
   AnimationController? _scanAnimationController;
   AnimationController? _borderAnimationController;
   Animation<Color?>? _borderColorAnimation;
-  
+
   // Audio player
   final AudioPlayer _audioPlayer = AudioPlayer();
-  
+
   // Scanner state
-  bool _isScanning = true;
   bool _isProcessing = false;
   bool _isValid = false;
   String? _lastScannedCode;
-  
+
   @override
   void initState() {
     super.initState();
@@ -60,8 +60,6 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
   void _initializeController() {
     _controller = MobileScannerController(
       detectionSpeed: DetectionSpeed.noDuplicates,
-      facing: CameraFacing.back,
-      torchEnabled: false,
     );
   }
 
@@ -79,13 +77,13 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
       vsync: this,
     );
 
-    _borderColorAnimation = ColorTween(
-      begin: Colors.white,
-      end: Colors.green,
-    ).animate(CurvedAnimation(
-      parent: _borderAnimationController!,
-      curve: Curves.easeInOut,
-    ));
+    _borderColorAnimation = ColorTween(begin: Colors.white, end: Colors.green)
+        .animate(
+          CurvedAnimation(
+            parent: _borderAnimationController!,
+            curve: Curves.easeInOut,
+          ),
+        );
   }
 
   @override
@@ -110,7 +108,11 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
       actions: [
         // Flash/torch toggle
         IconButton(
-          icon: Icon(_controller?.torchEnabled == true ? Icons.flash_on : Icons.flash_off),
+          icon: Icon(
+            _controller?.torchEnabled == true
+                ? Icons.flash_on
+                : Icons.flash_off,
+          ),
           onPressed: _toggleFlash,
           tooltip: 'Lanterna',
         ),
@@ -134,19 +136,17 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
   /// Build main body content
   Widget _buildBody() {
     if (_controller == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     return Stack(
       children: [
         // Camera scanner view
         _buildScannerView(),
-        
+
         // Overlay with scan area and instructions
         _buildScannerOverlay(),
-        
+
         // Processing indicator
         if (_isProcessing) _buildProcessingOverlay(),
       ],
@@ -163,22 +163,16 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red,
-              ),
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
               const Text(
                 'Erro ao acessar a câmera',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                error.errorDetails?.message ?? 'Verifique as permissões da câmera',
+                error.errorDetails?.message ??
+                    'Verifique as permissões da câmera',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.grey),
               ),
@@ -202,124 +196,115 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
         ShaderMask(
           shaderCallback: (rect) {
             return RadialGradient(
-              center: Alignment.center,
-              colors: [
-                Colors.transparent,
-                Colors.black.withOpacity(0.8),
-              ],
+              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
               stops: const [0.3, 1.0],
               radius: 0.8,
             ).createShader(rect);
           },
           blendMode: BlendMode.dstOut,
-          child: Container(
-            color: Colors.black.withOpacity(0.5),
-          ),
+          child: Container(color: Colors.black.withValues(alpha: 0.5)),
         ),
         // Foreground content
         Column(
-        children: [
-          const Spacer(flex: 2),
-          
-          // Scan area indicator with animated border
-          AnimatedBuilder(
-            animation: _borderColorAnimation!,
-            builder: (context, child) {
-              Color borderColor = Colors.white;
-              if (_isProcessing) {
-                borderColor = Colors.orange;
-              } else if (_isValid) {
-                borderColor = _borderColorAnimation!.value ?? Colors.green;
-              }
-              
-              return Container(
-                width: 250,
-                height: 250,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: borderColor,
-                    width: 3,
+          children: [
+            const Spacer(flex: 2),
+
+            // Scan area indicator with animated border
+            AnimatedBuilder(
+              animation: _borderColorAnimation!,
+              builder: (context, child) {
+                Color borderColor = Colors.white;
+                if (_isProcessing) {
+                  borderColor = Colors.orange;
+                } else if (_isValid) {
+                  borderColor = _borderColorAnimation!.value ?? Colors.green;
+                }
+
+                return Container(
+                  width: 250,
+                  height: 250,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: borderColor, width: 3),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Stack(
-                  children: [
-                    // Scanning line animation
-                    if (!_isProcessing && !_isValid)
-                      AnimatedBuilder(
-                        animation: _scanAnimationController!,
-                        builder: (context, child) {
-                          return Positioned(
-                            left: 0,
-                            right: 0,
-                            top: _scanAnimationController!.value * (250 - 4),
-                            child: Container(
-                              height: 4,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.blue.withOpacity(0.8),
-                                    Colors.transparent,
-                                  ],
+                  child: Stack(
+                    children: [
+                      // Scanning line animation
+                      if (!_isProcessing && !_isValid)
+                        AnimatedBuilder(
+                          animation: _scanAnimationController!,
+                          builder: (context, child) {
+                            return Positioned(
+                              left: 0,
+                              right: 0,
+                              top: _scanAnimationController!.value * (250 - 4),
+                              child: Container(
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.blue.withValues(alpha: 0.8),
+                                      Colors.transparent,
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
-          
-          const SizedBox(height: 32),
-          
-          // Instructions
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 32),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.qr_code_scanner,
-                  color: Colors.white,
-                  size: 32,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _isProcessing 
-                      ? 'Processando código...' 
-                      : 'Aponte a câmera para o QR Code do paciente',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                            );
+                          },
+                        ),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                if (_lastScannedCode != null) ...[
+                );
+              },
+            ),
+
+            const SizedBox(height: 32),
+
+            // Instructions
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.qr_code_scanner,
+                    color: Colors.white,
+                    size: 32,
+                  ),
                   const SizedBox(height: 8),
                   Text(
-                    'Último código: ${_lastScannedCode!.substring(0, 8)}...',
+                    _isProcessing
+                        ? 'Processando código...'
+                        : 'Aponte a câmera para o QR Code do paciente',
                     style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
+                    textAlign: TextAlign.center,
                   ),
+                  if (_lastScannedCode != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'Último código: ${_lastScannedCode!.substring(0, 8)}...',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          
-          const Spacer(flex: 3),
-        ],
-      ),
+
+            const Spacer(flex: 3),
+          ],
+        ),
       ],
     );
   }
@@ -327,7 +312,7 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
   /// Build processing overlay
   Widget _buildProcessingOverlay() {
     return Container(
-      color: Colors.black.withOpacity(0.3),
+      color: Colors.black.withValues(alpha: 0.3),
       child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -363,18 +348,26 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
 
   /// Handle QR code detection
   void _onQRCodeDetected(BarcodeCapture capture) {
-    if (_isProcessing) return;
+    if (_isProcessing) {
+      return;
+    }
 
     final List<Barcode> barcodes = capture.barcodes;
-    if (barcodes.isEmpty) return;
+    if (barcodes.isEmpty) {
+      return;
+    }
 
     final barcode = barcodes.first;
     final String? code = barcode.rawValue;
 
-    if (code == null || code.isEmpty) return;
+    if (code == null || code.isEmpty) {
+      return;
+    }
 
     // Avoid processing the same code multiple times
-    if (_lastScannedCode == code) return;
+    if (_lastScannedCode == code) {
+      return;
+    }
 
     setState(() {
       _isProcessing = true;
@@ -389,15 +382,15 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
     try {
       // Simulate API validation delay
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // TODO(scanner): Implement actual QR code validation
       // - Validate format (UUID)
       // - Check if code is active/not expired
       // - Fetch patient data from API
-      
+
       // For now, simulate success for demo
       final isValid = _validateQRCodeFormat(code);
-      
+
       if (mounted) {
         setState(() {
           _isProcessing = false;
@@ -408,11 +401,11 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
           // Play success sound and show green border
           _playSuccessSound();
           _borderAnimationController?.forward();
-          
+
           // Wait a moment for feedback then show patient data
           await Future.delayed(const Duration(milliseconds: 500));
           _showPatientData(code);
-          
+
           // Reset states after showing data
           setState(() {
             _isValid = false;
@@ -435,7 +428,7 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
       }
     }
   }
-  
+
   /// Play success sound
   Future<void> _playSuccessSound() async {
     try {
@@ -447,11 +440,11 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
       debugPrint('Erro ao reproduzir som de sucesso: $e');
     }
   }
-  
+
   /// Play error sound
   Future<void> _playErrorSound() async {
     try {
-      // For now, we'll simulate error sound with haptic feedback  
+      // For now, we'll simulate error sound with haptic feedback
       // TODO(audio): Add custom error sound file to assets/sounds/error.mp3
       debugPrint('Reproduzindo som de erro - QR inválido');
       // Alternative: Use HapticFeedback.heavyImpact() for tactile feedback
@@ -459,19 +452,19 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
       debugPrint('Erro ao reproduzir som de erro: $e');
     }
   }
-  
+
   /// Show error feedback with red border animation
   void _showErrorFeedback() {
     // Temporarily change border color to red
     final originalAnimation = _borderColorAnimation;
-    _borderColorAnimation = ColorTween(
-      begin: Colors.white,
-      end: Colors.red,
-    ).animate(CurvedAnimation(
-      parent: _borderAnimationController!,
-      curve: Curves.easeInOut,
-    ));
-    
+    _borderColorAnimation = ColorTween(begin: Colors.white, end: Colors.red)
+        .animate(
+          CurvedAnimation(
+            parent: _borderAnimationController!,
+            curve: Curves.easeInOut,
+          ),
+        );
+
     _borderAnimationController?.forward().then((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
@@ -514,16 +507,19 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
       }
     });
   }
-  
+
   /// Process service confirmation after user selects a service
-  Future<void> _processServiceConfirmation(String qrCode, String serviceId) async {
+  Future<void> _processServiceConfirmation(
+    String qrCode,
+    String serviceId,
+  ) async {
     try {
       // TODO(api): Implement actual API call to register the attendance
       // POST /attendances with { qrCode, serviceId, clinicId }
-      
+
       // For now, simulate success
       await Future.delayed(const Duration(seconds: 1));
-      
+
       if (mounted) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
@@ -539,7 +535,7 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
             duration: Duration(seconds: 3),
           ),
         );
-        
+
         // Close the modal and return to scanner
         Navigator.of(context).pop(true);
       }
@@ -551,7 +547,9 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
               children: [
                 const Icon(Icons.error_outline, color: Colors.white),
                 const SizedBox(width: 8),
-                Expanded(child: Text('Erro ao registrar atendimento: ${e.toString()}')),
+                Expanded(
+                  child: Text('Erro ao registrar atendimento: ${e.toString()}'),
+                ),
               ],
             ),
             backgroundColor: Colors.red,
@@ -601,7 +599,7 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
   void _openManualEntry() {
     // Pause scanner while dialog is open
     _controller?.stop();
-    
+
     showDialog(
       context: context,
       builder: (context) => ManualCodeDialog(

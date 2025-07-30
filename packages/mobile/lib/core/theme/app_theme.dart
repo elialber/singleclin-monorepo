@@ -17,19 +17,15 @@ class AppTheme {
     scaffoldBackgroundColor: AppColors.backgroundLight,
     fontFamily: fontFamily,
     useMaterial3: true,
-    
+
     // Color Scheme
     colorScheme: const ColorScheme.light(
       primary: AppColors.primaryLight,
       secondary: AppColors.secondaryLight,
-      surface: AppColors.surfaceLight,
       error: AppColors.error,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
       onSurface: AppColors.textPrimaryLight,
-      onError: Colors.white,
     ),
-    
+
     // App Bar Theme
     appBarTheme: const AppBarTheme(
       elevation: 0,
@@ -49,7 +45,7 @@ class AppTheme {
         statusBarBrightness: Brightness.light,
       ),
     ),
-    
+
     // Elevated Button Theme
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -57,9 +53,7 @@ class AppTheme {
         foregroundColor: Colors.white,
         elevation: 2,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -67,16 +61,14 @@ class AppTheme {
         ),
       ),
     ),
-    
+
     // Outlined Button Theme
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primaryLight,
         side: const BorderSide(color: AppColors.primaryLight),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -84,7 +76,7 @@ class AppTheme {
         ),
       ),
     ),
-    
+
     // Text Button Theme
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
@@ -97,7 +89,7 @@ class AppTheme {
         ),
       ),
     ),
-    
+
     // Input Decoration Theme
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -132,29 +124,24 @@ class AppTheme {
         fontSize: 16,
       ),
     ),
-    
+
     // Card Theme
     cardTheme: CardThemeData(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: AppColors.surfaceLight,
       surfaceTintColor: Colors.transparent,
     ),
-    
+
     // Icon Theme
-    iconTheme: const IconThemeData(
-      color: AppColors.iconLight,
-      size: 24,
-    ),
-    
+    iconTheme: const IconThemeData(color: AppColors.iconLight, size: 24),
+
     // Divider Theme
     dividerTheme: const DividerThemeData(
       color: AppColors.dividerLight,
       thickness: 1,
     ),
-    
+
     // Bottom Navigation Bar Theme
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: AppColors.surfaceLight,
@@ -165,26 +152,22 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
     ),
-    
+
     // Snackbar Theme
     snackBarTheme: SnackBarThemeData(
       backgroundColor: AppColors.grey900,
       contentTextStyle: const TextStyle(color: Colors.white),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       behavior: SnackBarBehavior.floating,
     ),
-    
+
     // Dialog Theme
     dialogTheme: DialogThemeData(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 8,
       backgroundColor: AppColors.surfaceLight,
     ),
-    
+
     // Floating Action Button Theme
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: AppColors.primaryLight,
@@ -192,7 +175,7 @@ class AppTheme {
       elevation: 4,
       shape: CircleBorder(),
     ),
-    
+
     // Chip Theme
     chipTheme: ChipThemeData(
       backgroundColor: AppColors.grey200,
@@ -202,11 +185,9 @@ class AppTheme {
         fontSize: 14,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
-    
+
     // Switch Theme
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) {
@@ -222,7 +203,7 @@ class AppTheme {
         return AppColors.grey300;
       }),
     ),
-    
+
     // Checkbox Theme
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {
@@ -232,11 +213,9 @@ class AppTheme {
         return Colors.transparent;
       }),
       checkColor: WidgetStateProperty.all(Colors.white),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
     ),
-    
+
     // Radio Theme
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {
@@ -255,19 +234,16 @@ class AppTheme {
     scaffoldBackgroundColor: AppColors.backgroundDark,
     fontFamily: fontFamily,
     useMaterial3: true,
-    
+
     // Color Scheme
     colorScheme: const ColorScheme.dark(
       primary: AppColors.primaryDark,
       secondary: AppColors.secondaryDark,
       surface: AppColors.surfaceDark,
       error: AppColors.error,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
       onSurface: AppColors.textPrimaryDark,
-      onError: Colors.white,
     ),
-    
+
     // App Bar Theme
     appBarTheme: const AppBarTheme(
       elevation: 0,
@@ -287,7 +263,7 @@ class AppTheme {
         statusBarBrightness: Brightness.dark,
       ),
     ),
-    
+
     // Elevated Button Theme
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -295,9 +271,7 @@ class AppTheme {
         foregroundColor: Colors.white,
         elevation: 2,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -305,16 +279,14 @@ class AppTheme {
         ),
       ),
     ),
-    
+
     // Outlined Button Theme
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primaryDark,
         side: const BorderSide(color: AppColors.primaryDark),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -322,7 +294,7 @@ class AppTheme {
         ),
       ),
     ),
-    
+
     // Text Button Theme
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
@@ -335,7 +307,7 @@ class AppTheme {
         ),
       ),
     ),
-    
+
     // Input Decoration Theme
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -370,29 +342,24 @@ class AppTheme {
         fontSize: 16,
       ),
     ),
-    
+
     // Card Theme
     cardTheme: CardThemeData(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: AppColors.surfaceDark,
       surfaceTintColor: Colors.transparent,
     ),
-    
+
     // Icon Theme
-    iconTheme: const IconThemeData(
-      color: AppColors.iconDark,
-      size: 24,
-    ),
-    
+    iconTheme: const IconThemeData(color: AppColors.iconDark, size: 24),
+
     // Divider Theme
     dividerTheme: const DividerThemeData(
       color: AppColors.dividerDark,
       thickness: 1,
     ),
-    
+
     // Bottom Navigation Bar Theme
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: AppColors.surfaceDark,
@@ -403,26 +370,22 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
     ),
-    
+
     // Snackbar Theme
     snackBarTheme: SnackBarThemeData(
       backgroundColor: AppColors.grey800,
       contentTextStyle: const TextStyle(color: Colors.white),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       behavior: SnackBarBehavior.floating,
     ),
-    
+
     // Dialog Theme
     dialogTheme: DialogThemeData(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 8,
       backgroundColor: AppColors.surfaceDark,
     ),
-    
+
     // Floating Action Button Theme
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: AppColors.primaryDark,
@@ -430,7 +393,7 @@ class AppTheme {
       elevation: 4,
       shape: CircleBorder(),
     ),
-    
+
     // Chip Theme
     chipTheme: ChipThemeData(
       backgroundColor: AppColors.grey800,
@@ -440,11 +403,9 @@ class AppTheme {
         fontSize: 14,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
-    
+
     // Switch Theme
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) {
@@ -460,7 +421,7 @@ class AppTheme {
         return AppColors.grey700;
       }),
     ),
-    
+
     // Checkbox Theme
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {
@@ -470,11 +431,9 @@ class AppTheme {
         return Colors.transparent;
       }),
       checkColor: WidgetStateProperty.all(Colors.white),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
     ),
-    
+
     // Radio Theme
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {

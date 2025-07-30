@@ -1,5 +1,19 @@
 /// Transaction entity representing a healthcare service transaction
 class TransactionEntity {
+  const TransactionEntity({
+    required this.id,
+    required this.userId,
+    required this.clinicId,
+    required this.clinicName,
+    required this.serviceType,
+    required this.creditsUsed,
+    required this.value,
+    required this.status,
+    required this.transactionDate,
+    required this.createdAt,
+    required this.updatedAt,
+    this.notes,
+  });
   final int id;
   final int userId;
   final int clinicId;
@@ -12,21 +26,6 @@ class TransactionEntity {
   final DateTime transactionDate;
   final DateTime createdAt;
   final DateTime updatedAt;
-
-  const TransactionEntity({
-    required this.id,
-    required this.userId,
-    required this.clinicId,
-    required this.clinicName,
-    required this.serviceType,
-    required this.creditsUsed,
-    required this.value,
-    required this.status,
-    this.notes,
-    required this.transactionDate,
-    required this.createdAt,
-    required this.updatedAt,
-  });
 
   /// Check if transaction is completed
   bool get isCompleted => status.toLowerCase() == 'completed';
