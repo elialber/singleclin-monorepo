@@ -1,18 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Bottom sheet widget to display patient data after successful QR scan
 class PatientDataBottomSheet extends StatefulWidget {
-  final String qrCode;
-  final Function(String serviceId) onConfirm;
-  
   const PatientDataBottomSheet({
-    super.key,
     required this.qrCode,
     required this.onConfirm,
+    super.key,
   });
+  final String qrCode;
+  final Function(String serviceId) onConfirm;
 
   @override
   State<PatientDataBottomSheet> createState() => _PatientDataBottomSheetState();
@@ -24,31 +22,32 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
   bool _isLoadingServices = true;
   bool _isProcessing = false;
   String? _error;
-  
+
   // Patient data
-  Map<String, dynamic>? _patientData;
+  late Map<String, dynamic>? _patientData;
   String? _patientName;
   String? _patientPhoto;
   String? _activePlan;
   int _remainingCredits = 0;
-  
+
   // Services data
   List<Map<String, dynamic>> _services = [];
   String? _selectedServiceId;
-  
+
   @override
   void initState() {
     super.initState();
     _setupDio();
     _loadData();
   }
-  
+
   /// Configure Dio with base URL and auth token
   Future<void> _setupDio() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
-    final baseUrl = 'http://localhost:5000/api'; // TODO: Get from environment
-    
+    const baseUrl =
+        'http://localhost:5000/api'; // TODO(config): Get from environment
+
     _dio.options = BaseOptions(
       baseUrl: baseUrl,
       headers: {
@@ -59,15 +58,12 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       receiveTimeout: const Duration(seconds: 10),
     );
   }
-  
+
   /// Load both patient data and clinic services
   Future<void> _loadData() async {
-    await Future.wait([
-      _loadPatientData(),
-      _loadClinicServices(),
-    ]);
+    await Future.wait([_loadPatientData(), _loadClinicServices()]);
   }
-  
+
   /// Load patient data from QR code
   Future<void> _loadPatientData() async {
     try {
@@ -75,25 +71,25 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
         _isLoadingPatient = true;
         _error = null;
       });
-      
+
       // Extract user ID from QR code format: USR-{userId}-{timestamp}
       final parts = widget.qrCode.split('-');
       if (parts.length < 3 || parts[0] != 'USR') {
         throw Exception('Formato de QR code inválido');
       }
-      
+
       final userId = parts[1];
-      
-      // TODO: Replace with actual endpoint when available
+
+      // TODO(api): Replace with actual endpoint when available
       // For now, simulate API call
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Simulated response
       _patientData = {
         'id': userId,
         'name': 'João Silva',
         'email': 'joao.silva@email.com',
-        'photo': null, // TODO: Add photo URL when available
+        'photo': null, // TODO(api): Add photo URL when available
         'activePlan': {
           'id': 'plan123',
           'name': 'Plano Premium',
@@ -101,13 +97,14 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
           'totalCredits': 20,
         },
       };
-      
+
       if (mounted) {
         setState(() {
-          _patientName = _patientData!['name'];
-          _patientPhoto = _patientData!['photo'];
-          _activePlan = _patientData!['activePlan']?['name'];
-          _remainingCredits = _patientData!['activePlan']?['remainingCredits'] ?? 0;
+          _patientName = (_patientData! as Map<String, dynamic>)['name'] as String?;
+          _patientPhoto = (_patientData! as Map<String, dynamic>)['photo'] as String?;
+          final activePlanData = (_patientData! as Map<String, dynamic>)['activePlan'] as Map<String, dynamic>?;
+          _activePlan = activePlanData?['name'] as String?;
+          _remainingCredits = (activePlanData?['remainingCredits'] as int?) ?? 0;
           _isLoadingPatient = false;
         });
       }
@@ -120,22 +117,23 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       }
     }
   }
-  
+
   /// Load available services from clinic
   Future<void> _loadClinicServices() async {
     try {
       setState(() {
         _isLoadingServices = true;
       });
-      
+
       // Get clinic ID from stored preferences
       final prefs = await SharedPreferences.getInstance();
-      final clinicId = prefs.getString('clinic_id') ?? 'clinic123'; // TODO: Get actual clinic ID
-      
-      // TODO: Replace with actual endpoint when available
+      // TODO(config): Get actual clinic ID
+      prefs.getString('clinic_id') ?? 'clinic123';
+
+      // TODO(api): Replace with actual endpoint when available
       // For now, simulate API call
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Simulated response
       _services = [
         {
@@ -163,7 +161,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
           'description': 'Exame de ultrassom',
         },
       ];
-      
+
       if (mounted) {
         setState(() {
           _isLoadingServices = false;
@@ -182,23 +180,25 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       }
     }
   }
-  
+
   /// Get selected service details
   Map<String, dynamic>? get _selectedService {
-    if (_selectedServiceId == null) return null;
+    if (_selectedServiceId == null) {
+      return null;
+    }
     return _services.firstWhere(
       (s) => s['id'] == _selectedServiceId,
       orElse: () => {},
     );
   }
-  
+
   /// Handle service selection
   void _onServiceChanged(String? serviceId) {
     setState(() {
       _selectedServiceId = serviceId;
     });
   }
-  
+
   /// Handle attendance confirmation
   Future<void> _confirmAttendance() async {
     if (_selectedServiceId == null) {
@@ -210,12 +210,14 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       );
       return;
     }
-    
+
     final selectedService = _selectedService;
-    if (selectedService == null) return;
-    
+    if (selectedService == null) {
+      return;
+    }
+
     final creditCost = selectedService['creditCost'] as int;
-    
+
     // Check if patient has enough credits
     if (_remainingCredits < creditCost) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -229,15 +231,15 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       );
       return;
     }
-    
+
     setState(() {
       _isProcessing = true;
     });
-    
+
     try {
       // Call the onConfirm callback with selected service
       await widget.onConfirm(_selectedServiceId!);
-      
+
       if (mounted) {
         Navigator.of(context).pop(true); // Return success
       }
@@ -255,7 +257,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -276,7 +278,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.all(20),
@@ -285,10 +287,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
               children: [
                 const Text(
                   'Dados do Paciente',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -297,28 +296,26 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
               ],
             ),
           ),
-          
+
           // Content
-          Expanded(
-            child: _buildContent(),
-          ),
-          
+          Expanded(child: _buildContent()),
+
           // Bottom actions
           _buildBottomActions(),
         ],
       ),
     );
   }
-  
+
   Widget _buildContent() {
     if (_error != null) {
       return _buildErrorState();
     }
-    
+
     if (_isLoadingPatient || _isLoadingServices) {
       return _buildLoadingState();
     }
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -327,7 +324,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
           // Patient info card
           _buildPatientCard(),
           const SizedBox(height: 24),
-          
+
           // Service selection
           _buildServiceSelection(),
           const SizedBox(height: 20),
@@ -335,7 +332,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       ),
     );
   }
-  
+
   Widget _buildLoadingState() {
     return const Center(
       child: Column(
@@ -345,16 +342,13 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
           SizedBox(height: 16),
           Text(
             'Carregando dados...',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildErrorState() {
     return Center(
       child: Padding(
@@ -362,19 +356,12 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.red,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.red),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -387,13 +374,11 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       ),
     );
   }
-  
+
   Widget _buildPatientCard() {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -401,9 +386,11 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
             // Patient photo
             CircleAvatar(
               radius: 40,
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-              backgroundImage: _patientPhoto != null 
-                  ? NetworkImage(_patientPhoto!) 
+              backgroundColor: Theme.of(
+                context,
+              ).primaryColor.withValues(alpha: 0.1),
+              backgroundImage: _patientPhoto != null
+                  ? NetworkImage(_patientPhoto!)
                   : null,
               child: _patientPhoto == null
                   ? Text(
@@ -417,7 +404,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                   : null,
             ),
             const SizedBox(width: 16),
-            
+
             // Patient info
             Expanded(
               child: Column(
@@ -434,10 +421,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                   if (_activePlan != null) ...[
                     Text(
                       _activePlan!,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 8),
                   ],
@@ -447,9 +431,9 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: _remainingCredits > 0 
-                          ? Colors.green.withOpacity(0.1)
-                          : Colors.red.withOpacity(0.1),
+                      color: _remainingCredits > 0
+                          ? Colors.green.withValues(alpha: 0.1)
+                          : Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -458,8 +442,8 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                         Icon(
                           Icons.credit_card,
                           size: 16,
-                          color: _remainingCredits > 0 
-                              ? Colors.green 
+                          color: _remainingCredits > 0
+                              ? Colors.green
                               : Colors.red,
                         ),
                         const SizedBox(width: 4),
@@ -468,8 +452,8 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: _remainingCredits > 0 
-                                ? Colors.green 
+                            color: _remainingCredits > 0
+                                ? Colors.green
                                 : Colors.red,
                           ),
                         ),
@@ -484,20 +468,17 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       ),
     );
   }
-  
+
   Widget _buildServiceSelection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Selecione o serviço',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
-        
+
         // Service dropdown
         Container(
           decoration: BoxDecoration(
@@ -513,7 +494,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
               items: _services.map((service) {
                 final creditCost = service['creditCost'] as int;
                 final canAfford = _remainingCredits >= creditCost;
-                
+
                 return DropdownMenuItem<String>(
                   value: service['id'],
                   child: Row(
@@ -547,9 +528,11 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: canAfford 
-                              ? Theme.of(context).primaryColor.withOpacity(0.1)
-                              : Colors.grey.withOpacity(0.1),
+                          color: canAfford
+                              ? Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.1)
+                              : Colors.grey.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -557,7 +540,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: canAfford 
+                            color: canAfford
                                 ? Theme.of(context).primaryColor
                                 : Colors.grey,
                           ),
@@ -571,33 +554,27 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
             ),
           ),
         ),
-        
+
         // Selected service details
         if (_selectedService != null) ...[
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.05),
+              color: Colors.blue.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Colors.blue.withOpacity(0.2),
-              ),
+              border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.info_outline,
-                  color: Colors.blue[700],
-                  size: 20,
-                ),
+                Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Custo do serviço: ${_selectedService!['creditCost']} crédito${_selectedService!['creditCost'] > 1 ? 's' : ''}',
+                        'Custo do serviço: ${(_selectedService!['creditCost'] as int)} crédito${(_selectedService!['creditCost'] as int) > 1 ? 's' : ''}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -606,10 +583,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                       const SizedBox(height: 4),
                       Text(
                         'Créditos após atendimento: ${_remainingCredits - (_selectedService!['creditCost'] as int)}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -621,7 +595,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
       ],
     );
   }
-  
+
   Widget _buildBottomActions() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -629,7 +603,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             offset: const Offset(0, -2),
             blurRadius: 10,
           ),
@@ -640,7 +614,9 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: _isProcessing ? null : () => Navigator.of(context).pop(),
+                onPressed: _isProcessing
+                    ? null
+                    : () => Navigator.of(context).pop(),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -667,7 +643,9 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       )
                     : const Text('Confirmar Atendimento'),

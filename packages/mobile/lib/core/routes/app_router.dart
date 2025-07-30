@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mobile/core/routes/app_routes.dart';
-import 'package:mobile/presentation/screens/auth/forgot_password_screen.dart' as auth;
+import 'package:mobile/presentation/screens/auth/forgot_password_screen.dart'
+    as auth;
 import 'package:mobile/presentation/screens/auth/login_screen.dart' as auth;
 import 'package:mobile/presentation/screens/auth/register_screen.dart' as auth;
 import 'package:mobile/presentation/screens/clinic/clinic_scanner_screen.dart';
@@ -37,7 +38,7 @@ class AppRouter {
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     observers: observers,
-    
+
     // Redirect logic for protected routes
     redirect: (BuildContext context, GoRouterState state) {
       final bool loggedIn = isAuthenticated.value;
@@ -51,7 +52,8 @@ class AppRouter {
       }
 
       // If logged in and trying to access login/register, redirect to home
-      if (loggedIn && (location == AppRoutes.login || location == AppRoutes.register)) {
+      if (loggedIn &&
+          (location == AppRoutes.login || location == AppRoutes.register)) {
         return AppRoutes.home;
       }
 
@@ -189,18 +191,12 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Erro'),
-      ),
+      appBar: AppBar(title: const Text('Erro')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             const Text(
               'Ops! Algo deu errado.',
@@ -275,7 +271,7 @@ class TransactionHistoryScreen extends StatelessWidget {
 
 class TransactionDetailsScreen extends StatelessWidget {
   const TransactionDetailsScreen({required this.transactionId, super.key});
-  
+
   final String transactionId;
 
   @override

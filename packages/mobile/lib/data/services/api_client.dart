@@ -1,23 +1,23 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../interceptors/auth_interceptor.dart';
-import '../interceptors/logging_interceptor.dart';
-import '../../core/constants/api_constants.dart';
+
+import 'package:mobile/core/constants/api_constants.dart';
+import 'package:mobile/data/interceptors/auth_interceptor.dart';
+import 'package:mobile/data/interceptors/logging_interceptor.dart';
 
 /// HTTP client service using Dio with authentication and logging
-/// 
+///
 /// This service provides a configured Dio instance with automatic
 /// JWT authentication, request/response logging, and error handling.
 class ApiClient {
-  static ApiClient? _instance;
-  late final Dio _dio;
-
   /// Private constructor for singleton pattern
   ApiClient._() {
     _dio = Dio();
     _setupInterceptors();
     _configureOptions();
   }
+  static ApiClient? _instance;
+  late final Dio _dio;
 
   /// Get singleton instance
   static ApiClient get instance {
@@ -30,15 +30,10 @@ class ApiClient {
   /// Setup interceptors in correct order
   void _setupInterceptors() {
     _dio.interceptors.clear();
-    
+
     // 1. Logging interceptor (first to log everything)
-    _dio.interceptors.add(LoggingInterceptor(
-      enabled: kDebugMode,
-      logRequestBody: true,
-      logResponseBody: true,
-      maxLogLength: 1000,
-    ));
-    
+    _dio.interceptors.add(LoggingInterceptor(logRequestBody: true));
+
     // 2. Auth interceptor (adds tokens and handles auth errors)
     _dio.interceptors.add(AuthInterceptor());
   }
@@ -48,26 +43,23 @@ class ApiClient {
     _dio.options = BaseOptions(
       // Base URL from constants
       baseUrl: ApiConstants.baseUrl,
-      
+
       // Timeouts
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
       sendTimeout: const Duration(seconds: 30),
-      
+
       // Headers
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'User-Agent': 'SingleClin-Mobile/${ApiConstants.appVersion}',
       },
-      
-      // Response type
-      responseType: ResponseType.json,
-      
+
       // Follow redirects
       followRedirects: true,
       maxRedirects: 3,
-      
+
       // Validate status codes
       validateStatus: (status) {
         // Accept all status codes to handle them in interceptors
@@ -241,7 +233,7 @@ class ApiClient {
     if (sendTimeout != null) {
       _dio.options.sendTimeout = sendTimeout;
     }
-    
+
     if (kDebugMode) {
       print('🔄 API timeouts updated');
     }

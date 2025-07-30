@@ -1,31 +1,33 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../domain/entities/user_plan_entity.dart';
-import '../../domain/entities/transaction_entity.dart';
-import '../models/user_plan_model.dart';
-import '../models/transaction_model.dart';
+
+import 'package:mobile/data/models/transaction_model.dart';
+import 'package:mobile/data/models/user_plan_model.dart';
+import 'package:mobile/domain/entities/transaction_entity.dart';
+import 'package:mobile/domain/entities/user_plan_entity.dart';
 
 /// Local cache service for storing plan and transaction data
-/// 
+///
 /// This service provides caching functionality to:
 /// - Store user plan data locally for offline access
 /// - Cache recent transactions
 /// - Manage cache expiration and refresh
 /// - Provide fallback data when API is unavailable
 class CacheService {
+  CacheService._();
   static const String _planCacheKey = 'cached_user_plan';
   static const String _planCacheTimeKey = 'cached_user_plan_time';
   static const String _transactionsCacheKey = 'cached_recent_transactions';
-  static const String _transactionsCacheTimeKey = 'cached_recent_transactions_time';
-  
+  static const String _transactionsCacheTimeKey =
+      'cached_recent_transactions_time';
+
   // Cache expiration time in minutes
   static const int _planCacheExpirationMinutes = 30; // 30 minutes
   static const int _transactionsCacheExpirationMinutes = 15; // 15 minutes
 
   static CacheService? _instance;
   static CacheService get instance => _instance ??= CacheService._();
-  
-  CacheService._();
 
   SharedPreferences? _prefs;
 
@@ -74,7 +76,7 @@ class CacheService {
       // Check if cache is expired
       final currentTime = DateTime.now().millisecondsSinceEpoch;
       final cacheAge = currentTime - cacheTime;
-      final cacheExpirationTime = _planCacheExpirationMinutes * 60 * 1000;
+      const cacheExpirationTime = _planCacheExpirationMinutes * 60 * 1000;
 
       if (cacheAge > cacheExpirationTime) {
         // Cache expired, remove it
@@ -103,7 +105,7 @@ class CacheService {
 
       final currentTime = DateTime.now().millisecondsSinceEpoch;
       final cacheAge = currentTime - cacheTime;
-      final cacheExpirationTime = _planCacheExpirationMinutes * 60 * 1000;
+      const cacheExpirationTime = _planCacheExpirationMinutes * 60 * 1000;
 
       return cacheAge <= cacheExpirationTime;
     } catch (e) {
@@ -125,11 +127,13 @@ class CacheService {
   // Transaction Data Caching
 
   /// Cache recent transactions data
-  Future<void> cacheRecentTransactions(List<TransactionEntity> transactions) async {
+  Future<void> cacheRecentTransactions(
+    List<TransactionEntity> transactions,
+  ) async {
     try {
       final prefs = await _preferences;
       final transactionModels = transactions
-          .map((transaction) => TransactionModel.fromEntity(transaction))
+          .map(TransactionModel.fromEntity)
           .toList();
       final transactionsJson = json.encode(
         transactionModels.map((model) => model.toJson()).toList(),
@@ -157,7 +161,8 @@ class CacheService {
       // Check if cache is expired
       final currentTime = DateTime.now().millisecondsSinceEpoch;
       final cacheAge = currentTime - cacheTime;
-      final cacheExpirationTime = _transactionsCacheExpirationMinutes * 60 * 1000;
+      const cacheExpirationTime =
+          _transactionsCacheExpirationMinutes * 60 * 1000;
 
       if (cacheAge > cacheExpirationTime) {
         // Cache expired, remove it
@@ -167,7 +172,11 @@ class CacheService {
 
       final transactionsData = json.decode(transactionsJson) as List<dynamic>;
       return transactionsData
-          .map((data) => TransactionModel.fromJson(data as Map<String, dynamic>).toEntity())
+          .map(
+            (data) => TransactionModel.fromJson(
+              data as Map<String, dynamic>,
+            ).toEntity(),
+          )
           .toList();
     } catch (e) {
       print('🗂️ Cache: Failed to get cached transactions data: $e');
@@ -187,7 +196,8 @@ class CacheService {
 
       final currentTime = DateTime.now().millisecondsSinceEpoch;
       final cacheAge = currentTime - cacheTime;
-      final cacheExpirationTime = _transactionsCacheExpirationMinutes * 60 * 1000;
+      const cacheExpirationTime =
+          _transactionsCacheExpirationMinutes * 60 * 1000;
 
       return cacheAge <= cacheExpirationTime;
     } catch (e) {
@@ -219,15 +229,17 @@ class CacheService {
     final prefs = await _preferences;
     final planCacheTime = prefs.getInt(_planCacheTimeKey);
     final transactionsCacheTime = prefs.getInt(_transactionsCacheTimeKey);
-    
+
     return {
       'plan_cache_valid': await isPlanCacheValid(),
-      'plan_cache_time': planCacheTime != null 
+      'plan_cache_time': planCacheTime != null
           ? DateTime.fromMillisecondsSinceEpoch(planCacheTime).toIso8601String()
           : null,
       'transactions_cache_valid': await isTransactionsCacheValid(),
       'transactions_cache_time': transactionsCacheTime != null
-          ? DateTime.fromMillisecondsSinceEpoch(transactionsCacheTime).toIso8601String()
+          ? DateTime.fromMillisecondsSinceEpoch(
+              transactionsCacheTime,
+            ).toIso8601String()
           : null,
     };
   }

@@ -1,4 +1,4 @@
-import '../../domain/entities/plan_entity.dart';
+import 'package:mobile/domain/entities/plan_entity.dart';
 
 /// Plan model for data layer with JSON serialization
 class PlanModel extends PlanEntity {
@@ -14,18 +14,39 @@ class PlanModel extends PlanEntity {
     required super.updatedAt,
   });
 
+  /// Create PlanModel from entity
+  factory PlanModel.fromEntity(PlanEntity entity) {
+    return PlanModel(
+      id: entity.id,
+      name: entity.name,
+      description: entity.description,
+      totalCredits: entity.totalCredits,
+      price: entity.price,
+      validityDays: entity.validityDays,
+      isActive: entity.isActive,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
   /// Create PlanModel from JSON
   factory PlanModel.fromJson(Map<String, dynamic> json) {
     return PlanModel(
       id: json['id'] as int,
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
-      totalCredits: json['total_credits'] as int? ?? json['totalCredits'] as int,
+      totalCredits:
+          json['total_credits'] as int? ?? json['totalCredits'] as int,
       price: (json['price'] as num).toDouble(),
-      validityDays: json['validity_days'] as int? ?? json['validityDays'] as int,
+      validityDays:
+          json['validity_days'] as int? ?? json['validityDays'] as int,
       isActive: json['is_active'] as bool? ?? json['isActive'] as bool? ?? true,
-      createdAt: DateTime.parse(json['created_at'] as String? ?? json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String? ?? json['updatedAt'] as String),
+      createdAt: DateTime.parse(
+        json['created_at'] as String? ?? json['createdAt'] as String,
+      ),
+      updatedAt: DateTime.parse(
+        json['updated_at'] as String? ?? json['updatedAt'] as String,
+      ),
     );
   }
 
@@ -56,21 +77,6 @@ class PlanModel extends PlanEntity {
       isActive: isActive,
       createdAt: createdAt,
       updatedAt: updatedAt,
-    );
-  }
-
-  /// Create PlanModel from entity
-  factory PlanModel.fromEntity(PlanEntity entity) {
-    return PlanModel(
-      id: entity.id,
-      name: entity.name,
-      description: entity.description,
-      totalCredits: entity.totalCredits,
-      price: entity.price,
-      validityDays: entity.validityDays,
-      isActive: entity.isActive,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
     );
   }
 

@@ -1,20 +1,19 @@
-import '../../domain/entities/user_plan_entity.dart';
-import '../../domain/entities/transaction_entity.dart';
-import '../../domain/repositories/plan_repository.dart';
-import '../repositories/plan_repository_impl.dart';
-import 'cache_service.dart';
+import 'package:mobile/data/repositories/plan_repository_impl.dart';
+import 'package:mobile/data/services/cache_service.dart';
+import 'package:mobile/domain/entities/transaction_entity.dart';
+import 'package:mobile/domain/entities/user_plan_entity.dart';
+import 'package:mobile/domain/repositories/plan_repository.dart';
 
 /// Service class to wrap PlanRepository for dependency injection
-/// 
+///
 /// This service acts as a single source of truth for plan-related
 /// operations across the app, providing a clean interface for
 /// the presentation layer to interact with plan data.
 class PlanService {
+  PlanService({PlanRepository? planRepository})
+    : _planRepository = planRepository ?? PlanRepositoryImpl();
   final PlanRepository _planRepository;
   final CacheService _cacheService = CacheService.instance;
-
-  PlanService({PlanRepository? planRepository})
-      : _planRepository = planRepository ?? PlanRepositoryImpl();
 
   /// Get current active plan for the authenticated user
   /// Uses cached data if available and valid, otherwise fetches from API
@@ -49,7 +48,7 @@ class PlanService {
   Future<UserPlanEntity?> refreshPlanData() async {
     // Clear cache to force fresh data
     await _cacheService.clearPlanCache();
-    
+
     try {
       final plan = await _planRepository.refreshPlanData();
       if (plan != null) {
@@ -66,20 +65,16 @@ class PlanService {
     int page = 1,
     int limit = 20,
   }) async {
-    return await _planRepository.getPlanHistory(
-      page: page,
-      limit: limit,
-    );
+    return _planRepository.getPlanHistory(page: page, limit: limit);
   }
 
   /// Get recent transactions (last 3-5 transactions)
   /// Uses cached data if available and valid, otherwise fetches from API
-  Future<List<TransactionEntity>> getRecentTransactions({
-    int limit = 5,
-  }) async {
+  Future<List<TransactionEntity>> getRecentTransactions({int limit = 5}) async {
     // Check if we have valid cached data
     if (await _cacheService.isTransactionsCacheValid()) {
-      final cachedTransactions = await _cacheService.getCachedRecentTransactions();
+      final cachedTransactions = await _cacheService
+          .getCachedRecentTransactions();
       if (cachedTransactions.isNotEmpty) {
         return cachedTransactions.take(limit).toList();
       }
@@ -87,14 +82,17 @@ class PlanService {
 
     // Fetch from API and cache the result
     try {
-      final transactions = await _planRepository.getRecentTransactions(limit: limit);
+      final transactions = await _planRepository.getRecentTransactions(
+        limit: limit,
+      );
       if (transactions.isNotEmpty) {
         await _cacheService.cacheRecentTransactions(transactions);
       }
       return transactions;
     } catch (e) {
       // If API fails, try to return cached data even if expired
-      final cachedTransactions = await _cacheService.getCachedRecentTransactions();
+      final cachedTransactions = await _cacheService
+          .getCachedRecentTransactions();
       if (cachedTransactions.isNotEmpty) {
         return cachedTransactions.take(limit).toList();
       }
@@ -104,12 +102,12 @@ class PlanService {
 
   /// Check if user has an active plan
   Future<bool> hasActivePlan() async {
-    return await _planRepository.hasActivePlan();
+    return _planRepository.hasActivePlan();
   }
 
   /// Get plan statistics (total spent, credits used, etc.)
   Future<Map<String, dynamic>> getPlanStatistics() async {
-    return await _planRepository.getPlanStatistics();
+    return _planRepository.getPlanStatistics();
   }
 
   // Cache Management Methods
@@ -126,16 +124,16 @@ class PlanService {
 
   /// Check if plan data is cached and valid
   Future<bool> hasCachedPlanData() async {
-    return await _cacheService.isPlanCacheValid();
+    return _cacheService.isPlanCacheValid();
   }
 
   /// Check if transactions data is cached and valid
   Future<bool> hasCachedTransactionsData() async {
-    return await _cacheService.isTransactionsCacheValid();
+    return _cacheService.isTransactionsCacheValid();
   }
 
   /// Get cache information for debugging
   Future<Map<String, dynamic>> getCacheInfo() async {
-    return await _cacheService.getCacheInfo();
+    return _cacheService.getCacheInfo();
   }
 }

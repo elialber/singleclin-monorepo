@@ -1,27 +1,27 @@
 import 'dart:async';
-import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../repositories/firebase_auth_repository.dart';
+
+import 'package:mobile/data/repositories/firebase_auth_repository.dart';
+import 'package:mobile/domain/entities/user_entity.dart';
+import 'package:mobile/domain/repositories/auth_repository.dart';
 
 /// Service class to wrap AuthRepository for dependency injection
-/// 
+///
 /// This service acts as a single source of truth for authentication
 /// operations across the app, providing a clean interface for
 /// the presentation layer to interact with authentication logic.
 class AuthService {
-  final AuthRepository _authRepository;
-  
-  // Stream controller to manage auth state across the app
-  final StreamController<UserEntity?> _authStateController = 
-      StreamController<UserEntity?>.broadcast();
-
   AuthService({AuthRepository? authRepository})
-      : _authRepository = authRepository ?? FirebaseAuthRepository() {
+    : _authRepository = authRepository ?? FirebaseAuthRepository() {
     // Listen to auth state changes and broadcast them
     _authRepository.authStateChanges.listen((user) {
       _authStateController.add(user);
     });
   }
+  final AuthRepository _authRepository;
+
+  // Stream controller to manage auth state across the app
+  final StreamController<UserEntity?> _authStateController =
+      StreamController<UserEntity?>.broadcast();
 
   /// Stream of authentication state changes
   Stream<UserEntity?> get authStateChanges => _authStateController.stream;
@@ -31,20 +31,17 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    return await _authRepository.signInWithEmail(
-      email: email,
-      password: password,
-    );
+    return _authRepository.signInWithEmail(email: email, password: password);
   }
 
   /// Sign in with Google account
   Future<UserEntity> signInWithGoogle() async {
-    return await _authRepository.signInWithGoogle();
+    return _authRepository.signInWithGoogle();
   }
 
   /// Sign in with Apple ID
   Future<UserEntity> signInWithApple() async {
-    return await _authRepository.signInWithApple();
+    return _authRepository.signInWithApple();
   }
 
   /// Create a new user account
@@ -53,11 +50,7 @@ class AuthService {
     required String password,
     required String name,
   }) async {
-    return await _authRepository.signUp(
-      email: email,
-      password: password,
-      name: name,
-    );
+    return _authRepository.signUp(email: email, password: password, name: name);
   }
 
   /// Sign out the current user
@@ -67,17 +60,17 @@ class AuthService {
 
   /// Get the currently authenticated user
   Future<UserEntity?> getCurrentUser() async {
-    return await _authRepository.getCurrentUser();
+    return _authRepository.getCurrentUser();
   }
 
   /// Check if a user is currently authenticated
   Future<bool> isAuthenticated() async {
-    return await _authRepository.isAuthenticated();
+    return _authRepository.isAuthenticated();
   }
 
   /// Get the current user's ID token
   Future<String> getIdToken({bool forceRefresh = false}) async {
-    return await _authRepository.getIdToken(forceRefresh: forceRefresh);
+    return _authRepository.getIdToken(forceRefresh: forceRefresh);
   }
 
   /// Send password reset email
@@ -91,14 +84,8 @@ class AuthService {
   }
 
   /// Update user profile information
-  Future<UserEntity> updateProfile({
-    String? name,
-    String? photoUrl,
-  }) async {
-    return await _authRepository.updateProfile(
-      name: name,
-      photoUrl: photoUrl,
-    );
+  Future<UserEntity> updateProfile({String? name, String? photoUrl}) async {
+    return _authRepository.updateProfile(name: name, photoUrl: photoUrl);
   }
 
   /// Delete the current user account

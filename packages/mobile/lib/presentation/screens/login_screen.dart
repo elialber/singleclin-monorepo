@@ -9,9 +9,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
+      appBar: AppBar(title: const Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -32,10 +30,10 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 48),
-            
+
             // Email field
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 labelText: 'E-mail',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.email),
@@ -43,10 +41,10 @@ class LoginScreen extends StatelessWidget {
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
-            
+
             // Password field
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 labelText: 'Senha',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.lock),
@@ -54,14 +52,14 @@ class LoginScreen extends StatelessWidget {
               obscureText: true,
             ),
             const SizedBox(height: 24),
-            
+
             // Login button
             SizedBox(
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Implement login logic
+                  // TODO(auth): Implement login logic
                   // For now, navigate to home
                   context.go(AppRoutes.home);
                 },
@@ -69,7 +67,7 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Register link
             TextButton(
               onPressed: () {

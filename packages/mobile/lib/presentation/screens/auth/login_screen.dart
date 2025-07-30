@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/auth_controller.dart';
-import '../../../core/utils/form_validators.dart';
+
+import 'package:mobile/core/utils/form_validators.dart';
+import 'package:mobile/presentation/controllers/auth_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -9,7 +10,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.find<AuthController>();
-    
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -18,7 +19,7 @@ class LoginScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 60),
-              
+
               // Logo and welcome text
               Column(
                 children: [
@@ -46,15 +47,15 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Faça login em sua conta',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 48),
-              
+
               // Login form
               Form(
                 key: authController.loginFormKey,
@@ -75,28 +76,31 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Password field
-                    Obx(() => TextFormField(
-                      controller: authController.passwordController,
-                      obscureText: true,
-                      textInputAction: TextInputAction.done,
-                      validator: FormValidators.validatePassword,
-                      onFieldSubmitted: (_) => authController.signInWithEmail(),
-                      decoration: InputDecoration(
-                        labelText: 'Senha',
-                        hintText: 'Digite sua senha',
-                        prefixIcon: const Icon(Icons.lock_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    Obx(
+                      () => TextFormField(
+                        controller: authController.passwordController,
+                        obscureText: true,
+                        textInputAction: TextInputAction.done,
+                        validator: FormValidators.validatePassword,
+                        onFieldSubmitted: (_) =>
+                            authController.signInWithEmail(),
+                        decoration: InputDecoration(
+                          labelText: 'Senha',
+                          hintText: 'Digite sua senha',
+                          prefixIcon: const Icon(Icons.lock_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
-                    )),
-                    
+                    ),
+
                     const SizedBox(height: 8),
-                    
+
                     // Forgot password link
                     Align(
                       alignment: Alignment.centerRight,
@@ -110,75 +114,84 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Error message
-                    Obx(() => authController.errorMessage != null
-                        ? Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(12),
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.red.shade200),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.error_outline, 
-                                     color: Colors.red.shade600, size: 20),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    authController.errorMessage!,
-                                    style: TextStyle(
-                                      color: Colors.red.shade600,
-                                      fontSize: 14,
+                    Obx(
+                      () => authController.errorMessage != null
+                          ? Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red.shade200),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red.shade600,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      authController.errorMessage!,
+                                      style: TextStyle(
+                                        color: Colors.red.shade600,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : const SizedBox.shrink()),
-                    
-                    // Login button
-                    Obx(() => SizedBox(
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: authController.isLoading 
-                            ? null 
-                            : authController.signInWithEmail,
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: authController.isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            : const Text(
-                                'Entrar',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                ],
                               ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+
+                    // Login button
+                    Obx(
+                      () => SizedBox(
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: authController.isLoading
+                              ? null
+                              : authController.signInWithEmail,
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: authController.isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  'Entrar',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
                       ),
-                    )),
+                    ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Divider
               Row(
                 children: [
@@ -187,68 +200,69 @@ class LoginScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       'ou',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
                     ),
                   ),
                   const Expanded(child: Divider()),
                 ],
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Social login buttons
               Column(
                 children: [
                   // Google Sign In
-                  Obx(() => SizedBox(
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      onPressed: authController.isLoading 
-                          ? null 
-                          : authController.signInWithGoogle,
-                      icon: Image.asset(
-                        'assets/icons/google.png',
-                        height: 20,
-                        width: 20,
-                        errorBuilder: (context, error, stackTrace) => 
-                            const Icon(Icons.g_mobiledata, size: 24),
-                      ),
-                      label: const Text('Continuar com Google'),
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  )),
-                  
-                  const SizedBox(height: 12),
-                  
-                  // Apple Sign In (only show on iOS)
-                  if (GetPlatform.isIOS)
-                    Obx(() => SizedBox(
+                  Obx(
+                    () => SizedBox(
                       height: 48,
                       child: OutlinedButton.icon(
-                        onPressed: authController.isLoading 
-                            ? null 
-                            : authController.signInWithApple,
-                        icon: const Icon(Icons.apple, size: 20),
-                        label: const Text('Continuar com Apple'),
+                        onPressed: authController.isLoading
+                            ? null
+                            : authController.signInWithGoogle,
+                        icon: Image.asset(
+                          'assets/icons/google.png',
+                          height: 20,
+                          width: 20,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.g_mobiledata, size: 24),
+                        ),
+                        label: const Text('Continuar com Google'),
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       ),
-                    )),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Apple Sign In (only show on iOS)
+                  if (GetPlatform.isIOS)
+                    Obx(
+                      () => SizedBox(
+                        height: 48,
+                        child: OutlinedButton.icon(
+                          onPressed: authController.isLoading
+                              ? null
+                              : authController.signInWithApple,
+                          icon: const Icon(Icons.apple, size: 20),
+                          label: const Text('Continuar com Apple'),
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Register link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

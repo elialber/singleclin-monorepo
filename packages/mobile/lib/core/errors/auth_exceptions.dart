@@ -32,7 +32,7 @@ class UserRegistrationException extends AuthException {
 /// Exception thrown when user is not authenticated
 class UserNotAuthenticatedException extends AuthException {
   const UserNotAuthenticatedException()
-      : super('User is not authenticated', 'user-not-authenticated');
+    : super('User is not authenticated', 'user-not-authenticated');
 }
 
 /// Exception thrown when token retrieval fails
@@ -73,8 +73,36 @@ class AccountDeletionException extends AuthException {
 /// Utility class for creating auth exceptions from Firebase error codes
 class AuthExceptionMapper {
   static AuthException fromFirebaseException(dynamic exception) {
-    final String code = exception?.code ?? 'unknown';
-    final String message = exception?.message ?? 'An unknown error occurred';
+    String code = 'unknown';
+    String message = 'An unknown error occurred';
+    
+    try {
+      // Try to access code and message properties safely
+      if (exception != null) {
+        // Use reflection-safe approach for accessing properties
+        final String exceptionString = exception.toString();
+        if (exceptionString.contains('code:')) {
+          final codeMatch = RegExp(r'code:\s*([^,\s}]+)').firstMatch(exceptionString);
+          if (codeMatch != null) {
+            code = codeMatch.group(1) ?? 'unknown';
+          }
+        }
+        if (exceptionString.contains('message:')) {
+          final messageMatch = RegExp(r'message:\s*([^,}]+)').firstMatch(exceptionString);
+          if (messageMatch != null) {
+            message = messageMatch.group(1)?.trim() ?? 'An unknown error occurred';
+          } else {
+            message = exceptionString;
+          }
+        } else {
+          message = exceptionString;
+        }
+      }
+    } catch (e) {
+      // If accessing properties fails, use default values
+      code = 'unknown';
+      message = exception?.toString() ?? 'An unknown error occurred';
+    }
 
     switch (code) {
       case 'weak-password':
@@ -88,10 +116,7 @@ class AuthExceptionMapper {
           code,
         );
       case 'user-not-found':
-        return EmailPasswordAuthException(
-          'No user found for that email',
-          code,
-        );
+        return EmailPasswordAuthException('No user found for that email', code);
       case 'wrong-password':
         return EmailPasswordAuthException(
           'Wrong password provided for that user',
@@ -113,35 +138,23 @@ class AuthExceptionMapper {
           code,
         );
       case 'operation-not-allowed':
-        return EmailPasswordAuthException(
-          'Operation not allowed',
-          code,
-        );
+        return EmailPasswordAuthException('Operation not allowed', code);
       case 'account-exists-with-different-credential':
         return GoogleSignInException(
           'Account exists with different credential',
           code,
         );
       case 'invalid-credential':
-        return GoogleSignInException(
-          'Invalid credential provided',
-          code,
-        );
+        return GoogleSignInException('Invalid credential provided', code);
       case 'credential-already-in-use':
         return GoogleSignInException(
           'Credential is already associated with another user account',
           code,
         );
       case 'sign_in_canceled':
-        return GoogleSignInException(
-          'Sign in was canceled by user',
-          code,
-        );
+        return GoogleSignInException('Sign in was canceled by user', code);
       case 'network-error':
-        return EmailPasswordAuthException(
-          'Network error occurred',
-          code,
-        );
+        return EmailPasswordAuthException('Network error occurred', code);
       case 'requires-recent-login':
         return ProfileUpdateException(
           'This operation requires recent authentication',

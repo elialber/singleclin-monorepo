@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
-import '../models/user_model.dart';
-import '../../core/constants/api_constants.dart';
-import '../../core/errors/api_exceptions.dart';
-import 'api_client.dart';
+
+import 'package:mobile/core/constants/api_constants.dart';
+import 'package:mobile/core/errors/api_exceptions.dart';
+import 'package:mobile/data/models/user_model.dart';
+import 'package:mobile/data/services/api_client.dart';
 
 /// User API service for backend communication
-/// 
+///
 /// This service demonstrates how to use the ApiClient with automatic
 /// JWT authentication for user-related API operations.
 class UserApiService {
@@ -22,7 +23,7 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson(response.data[ApiConstants.dataKey]);
+      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -42,10 +43,16 @@ class UserApiService {
   }) async {
     try {
       final Map<String, dynamic> data = {};
-      
-      if (displayName != null) data['displayName'] = displayName;
-      if (phoneNumber != null) data['phoneNumber'] = phoneNumber;
-      if (photoUrl != null) data['photoUrl'] = photoUrl;
+
+      if (displayName != null) {
+        data['displayName'] = displayName;
+      }
+      if (phoneNumber != null) {
+        data['phoneNumber'] = phoneNumber;
+      }
+      if (photoUrl != null) {
+        data['photoUrl'] = photoUrl;
+      }
 
       final Response response = await _apiClient.put(
         ApiConstants.updateProfileEndpoint,
@@ -56,7 +63,7 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson(response.data[ApiConstants.dataKey]);
+      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -76,10 +83,7 @@ class UserApiService {
     try {
       await _apiClient.post(
         ApiConstants.changePasswordEndpoint,
-        data: {
-          'currentPassword': currentPassword,
-          'newPassword': newPassword,
-        },
+        data: {'currentPassword': currentPassword, 'newPassword': newPassword},
       );
     } on DioException catch (e) {
       if (e.error is ApiException) {
@@ -97,9 +101,7 @@ class UserApiService {
     try {
       await _apiClient.delete(
         ApiConstants.deleteAccountEndpoint,
-        data: {
-          'password': password,
-        },
+        data: {'password': password},
       );
     } on DioException catch (e) {
       if (e.error is ApiException) {
@@ -125,7 +127,7 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson(response.data[ApiConstants.dataKey]);
+      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -148,7 +150,7 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson(response.data[ApiConstants.dataKey]);
+      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -189,14 +191,13 @@ class UserApiService {
         queryParameters: queryParameters,
       );
 
-      if (response.data == null || response.data[ApiConstants.dataKey] == null) {
+      if (response.data == null ||
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] == null) {
         throw const GenericApiException('No users data received', 'no_data');
       }
 
-      final List<dynamic> usersData = response.data[ApiConstants.dataKey];
-      return usersData
-          .map((userData) => UserModel.fromJson(userData))
-          .toList();
+      final List<dynamic> usersData = (response.data as Map<String, dynamic>)[ApiConstants.dataKey] as List<dynamic>;
+      return usersData.map((userData) => UserModel.fromJson(userData as Map<String, dynamic>)).toList();
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -234,7 +235,7 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson(response.data[ApiConstants.dataKey]);
+      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;

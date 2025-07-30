@@ -2,6 +2,18 @@ import 'package:equatable/equatable.dart';
 
 /// User entity in the domain layer
 class UserEntity extends Equatable {
+  const UserEntity({
+    required this.id,
+    required this.email,
+    required this.role,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+    this.displayName,
+    this.phoneNumber,
+    this.photoUrl,
+    this.isEmailVerified = false,
+  });
   final String id;
   final String email;
   final String? displayName;
@@ -13,30 +25,17 @@ class UserEntity extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const UserEntity({
-    required this.id,
-    required this.email,
-    this.displayName,
-    this.phoneNumber,
-    this.photoUrl,
-    required this.role,
-    required this.isActive,
-    this.isEmailVerified = false,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
   @override
   List<Object?> get props => [
-        id,
-        email,
-        displayName,
-        phoneNumber,
-        photoUrl,
-        role,
-        isActive,
-        isEmailVerified,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    email,
+    displayName,
+    phoneNumber,
+    photoUrl,
+    role,
+    isActive,
+    isEmailVerified,
+    createdAt,
+    updatedAt,
+  ];
 }

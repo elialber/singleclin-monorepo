@@ -41,7 +41,7 @@ class ApiValidationException extends ApiException {
   /// Extract validation errors from response data
   static Map<String, List<String>> extractValidationErrors(dynamic data) {
     final Map<String, List<String>> errors = {};
-    
+
     if (data is Map<String, dynamic>) {
       // Laravel/Standard validation error format
       if (data.containsKey('errors') && data['errors'] is Map) {
@@ -58,8 +58,8 @@ class ApiValidationException extends ApiException {
       else if (data.containsKey('details') && data['details'] is List) {
         final List<dynamic> details = data['details'];
         for (final detail in details) {
-          if (detail is Map<String, dynamic> && 
-              detail.containsKey('field') && 
+          if (detail is Map<String, dynamic> &&
+              detail.containsKey('field') &&
               detail.containsKey('message')) {
             final String field = detail['field'];
             final String message = detail['message'];
@@ -68,7 +68,7 @@ class ApiValidationException extends ApiException {
         }
       }
     }
-    
+
     return errors;
   }
 }
@@ -100,34 +100,34 @@ class ApiExceptionLocalizer {
     switch (exception) {
       case ApiTimeoutException _:
         return 'Tempo limite excedido. Verifique sua conexão com a internet.';
-      
+
       case ApiBadRequestException _:
         return 'Dados inválidos. Verifique as informações enviadas.';
-      
+
       case ApiUnauthorizedException _:
         return 'Não autorizado. Faça login novamente.';
-      
+
       case ApiForbiddenException _:
         return 'Acesso negado. Você não tem permissão para esta operação.';
-      
+
       case ApiNotFoundException _:
         return 'Recurso não encontrado.';
-      
+
       case ApiValidationException _:
         return 'Dados inválidos. Corrija os campos destacados.';
-      
+
       case ApiTooManyRequestsException _:
         return 'Muitas tentativas. Tente novamente em alguns minutos.';
-      
+
       case ApiServerException _:
         return 'Erro no servidor. Tente novamente mais tarde.';
-      
+
       case ApiConnectionException _:
         return 'Erro de conexão. Verifique sua internet.';
-      
+
       default:
-        return exception.message.isNotEmpty 
-            ? exception.message 
+        return exception.message.isNotEmpty
+            ? exception.message
             : 'Erro inesperado. Tente novamente.';
     }
   }
@@ -140,9 +140,9 @@ class ApiExceptionLocalizer {
   /// Check if error is retryable
   static bool isRetryable(ApiException exception) {
     return exception is ApiTimeoutException ||
-           exception is ApiConnectionException ||
-           exception is ApiServerException ||
-           exception is ApiTooManyRequestsException;
+        exception is ApiConnectionException ||
+        exception is ApiServerException ||
+        exception is ApiTooManyRequestsException;
   }
 
   /// Get retry delay for retryable errors
@@ -151,13 +151,13 @@ class ApiExceptionLocalizer {
       case ApiTimeoutException _:
       case ApiConnectionException _:
         return const Duration(seconds: 2);
-      
+
       case ApiServerException _:
         return const Duration(seconds: 5);
-      
+
       case ApiTooManyRequestsException _:
         return const Duration(minutes: 1);
-      
+
       default:
         return const Duration(seconds: 1);
     }
