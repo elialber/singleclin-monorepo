@@ -372,6 +372,36 @@
             <response code="401">Unauthorized</response>
             <response code="403">Forbidden - Admin role required</response>
         </member>
+        <member name="T:SingleClin.API.Controllers.QRCodeController">
+            <summary>
+            Controller for QR Code generation and validation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.QRCodeController.GenerateQRCode(SingleClin.API.DTOs.QRCode.QRCodeGenerateRequestDto)">
+            <summary>
+            Generate a new QR Code for the authenticated user
+            </summary>
+            <param name="request">QR Code generation parameters</param>
+            <returns>QR Code data with embedded JWT token</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.QRCodeController.ValidateQRCode(System.String)">
+            <summary>
+            Validate a QR Code token (for clinic use)
+            </summary>
+            <param name="token">JWT token from QR Code</param>
+            <returns>Token validation result with user plan information</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.QRCodeController.GetMetrics">
+            <summary>
+            Get QR Code generation metrics (admin only)
+            </summary>
+            <returns>QR Code generation statistics</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.QRCodeController.CheckRateLimit(System.String)">
+            <summary>
+            Check rate limiting for QR Code generation
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Controllers.TestAuthController">
             <summary>
             Test controller to demonstrate authorization attributes
@@ -492,6 +522,39 @@
             Optional description of the item
             </summary>
             <example>This is a test item description</example>
+        </member>
+        <member name="T:SingleClin.API.Controllers.TransactionController">
+            <summary>
+            Controller for transaction management and QR Code validation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.ValidateQRCode(SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto)">
+            <summary>
+            Validate QR Code and process transaction (clinic use)
+            </summary>
+            <param name="request">QR Code validation request</param>
+            <returns>Validation result with patient and transaction information</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.ParseQRCode(System.String)">
+            <summary>
+            Parse QR Code token without processing transaction (preview)
+            </summary>
+            <param name="qrToken">QR Code token to parse</param>
+            <returns>Token information for preview</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.GetClinicTransactions(System.Int32,System.Int32)">
+            <summary>
+            Get transactions for the authenticated clinic
+            </summary>
+            <param name="page">Page number (default: 1)</param>
+            <param name="pageSize">Page size (default: 20, max: 100)</param>
+            <returns>Paginated list of transactions</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.GetAuthenticatedClinicId">
+            <summary>
+            Get authenticated clinic ID from JWT claims
+            </summary>
+            <returns>Clinic ID if found, empty GUID otherwise</returns>
         </member>
         <member name="T:SingleClin.API.Data.AppDbContext">
             <summary>
@@ -1043,6 +1106,26 @@
             Date when the transaction was cancelled
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.QRToken">
+            <summary>
+            QR Code token used for this transaction (if applicable)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.QRNonce">
+            <summary>
+            QR Code nonce for security verification
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.ServiceType">
+            <summary>
+            Service type from QR Code validation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Transaction.Amount">
+            <summary>
+            Amount charged for this transaction
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.Models.User">
             <summary>
             Represents a user in the system
@@ -1056,6 +1139,16 @@
         <member name="P:SingleClin.API.Data.Models.User.Role">
             <summary>
             User's role in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.FirstName">
+            <summary>
+            User's first name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.LastName">
+            <summary>
+            User's last name
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.Models.User.DisplayName">
@@ -1151,6 +1244,21 @@
         <member name="P:SingleClin.API.Data.Models.UserPlan.Transactions">
             <summary>
             Transactions made using this plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.CreditsUsed">
+            <summary>
+            Gets the number of credits used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.ExpiresAt">
+            <summary>
+            Gets the expiration date (alias for ExpirationDate)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.UserPlan.IsExpired">
+            <summary>
+            Checks if the plan is expired
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Seeders.RoleSeeder">
@@ -1564,6 +1672,156 @@
             Calculated price per credit
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.QRCode.QRCodeGenerateRequestDto">
+            <summary>
+            Request DTO for QR Code generation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateRequestDto.Size">
+            <summary>
+            QR Code size in pixels (optional, default: 300)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateRequestDto.ExpirationMinutes">
+            <summary>
+            QR Code expiration in minutes (optional, default: 30)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.QRCode.QRCodeGenerateResponseDto">
+            <summary>
+            Response DTO for QR Code generation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateResponseDto.Success">
+            <summary>
+            Indicates if QR Code generation was successful
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateResponseDto.QRCode">
+            <summary>
+            QR Code image as Data URL (base64 encoded PNG)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateResponseDto.Token">
+            <summary>
+            JWT token embedded in the QR Code
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateResponseDto.Nonce">
+            <summary>
+            Unique nonce for this QR Code
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateResponseDto.ExpiresAt">
+            <summary>
+            QR Code expiration timestamp (UTC)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateResponseDto.GeneratedAt">
+            <summary>
+            QR Code generation timestamp (UTC)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeGenerateResponseDto.ErrorMessage">
+            <summary>
+            Error message if generation failed
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto">
+            <summary>
+            Request DTO for QR Code validation by clinics
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto.QRToken">
+            <summary>
+            JWT token extracted from QR Code
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto.ClinicId">
+            <summary>
+            ID of the clinic performing the validation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto.ServiceType">
+            <summary>
+            Type of service being provided (optional)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto.ServiceDescription">
+            <summary>
+            Service description or additional notes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto.Amount">
+            <summary>
+            Amount to charge for this service (optional, defaults to 1 credit)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto">
+            <summary>
+            Response DTO for QR Code validation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto.Success">
+            <summary>
+            Indicates if validation was successful
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto.TransactionId">
+            <summary>
+            Transaction ID created for this validation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto.TransactionCode">
+            <summary>
+            Transaction code for reference
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto.Patient">
+            <summary>
+            Patient information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto.UserPlan">
+            <summary>
+            User plan information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto.Transaction">
+            <summary>
+            Transaction details
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto.ValidatedAt">
+            <summary>
+            Validation timestamp (UTC)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.QRCode.QRCodeValidateResponseDto.Error">
+            <summary>
+            Error information if validation failed
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.QRCode.PatientInfo">
+            <summary>
+            Patient information for QR validation response
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.QRCode.UserPlanInfo">
+            <summary>
+            User plan information for QR validation response
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.QRCode.TransactionInfo">
+            <summary>
+            Transaction information for QR validation response
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.QRCode.ValidationError">
+            <summary>
+            Validation error information
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Exceptions.PlanNotFoundException">
             <summary>
             Exception thrown when a plan is not found
@@ -1582,6 +1840,41 @@
         <member name="T:SingleClin.API.Exceptions.InvalidPlanOperationException">
             <summary>
             Exception thrown when attempting to perform invalid operations on plans
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.QRCodeValidationException">
+            <summary>
+            Base exception for QR Code validation errors
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.QRExpiredException">
+            <summary>
+            Exception thrown when QR Code token is expired
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.QRAlreadyUsedException">
+            <summary>
+            Exception thrown when QR Code has already been used
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.InvalidQRException">
+            <summary>
+            Exception thrown when QR Code token is invalid or malformed
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.InsufficientCreditsException">
+            <summary>
+            Exception thrown when user plan has insufficient credits
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.InvalidUserPlanException">
+            <summary>
+            Exception thrown when user plan is not found or inactive
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Exceptions.UnauthorizedClinicException">
+            <summary>
+            Exception thrown when clinic is not authorized for the operation
             </summary>
         </member>
         <member name="T:SingleClin.API.Extensions.DatabaseExtensions">
@@ -1612,6 +1905,61 @@
         <member name="T:SingleClin.API.HealthChecks.FirebaseHealthCheck">
             <summary>
             Health check for Firebase Admin SDK connectivity
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.HealthChecks.RedisHealthCheck">
+            <summary>
+            Health check for Redis connection
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Middleware.ClinicRateLimitingMiddleware">
+            <summary>
+            Rate limiting middleware for clinic QR Code validation endpoints
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.ClinicRateLimitingMiddleware.ShouldApplyRateLimit(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Check if rate limiting should be applied to this request
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.ClinicRateLimitingMiddleware.GetClinicIdFromContext(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Extract clinic ID from JWT claims
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.ClinicRateLimitingMiddleware.CheckRateLimitAsync(System.String)">
+            <summary>
+            Check if the clinic has exceeded the rate limit
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.ClinicRateLimitingMiddleware.UpdateRateLimitAsync(System.String,SingleClin.API.Middleware.RateLimitInfo)">
+            <summary>
+            Update the rate limit counter
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.ClinicRateLimitingMiddleware.GetRateLimitConfig(System.String)">
+            <summary>
+            Get rate limit configuration for clinic
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.ClinicRateLimitingMiddleware.GetRateLimitKey(System.String)">
+            <summary>
+            Generate Redis key for rate limiting
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.ClinicRateLimitingMiddleware.AddRateLimitHeaders(Microsoft.AspNetCore.Http.HttpContext,SingleClin.API.Middleware.RateLimitInfo)">
+            <summary>
+            Add rate limit headers to response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.ClinicRateLimitingMiddleware.HandleRateLimitExceeded(Microsoft.AspNetCore.Http.HttpContext,SingleClin.API.Middleware.RateLimitInfo)">
+            <summary>
+            Handle rate limit exceeded response
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Middleware.RateLimitInfo">
+            <summary>
+            Rate limit information for a clinic
             </summary>
         </member>
         <member name="T:SingleClin.API.Migrations.InitialCreate">
@@ -1929,6 +2277,176 @@
             <param name="excludeId">Plan ID to exclude from uniqueness checks (for updates)</param>
             <returns>List of validation errors</returns>
         </member>
+        <member name="M:SingleClin.API.Services.IPlanService.GetUserPlanByIdAsync(System.Guid)">
+            <summary>
+            Get user plan by ID
+            </summary>
+            <param name="id">User plan ID</param>
+            <returns>User plan with related data</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IQRCodeGeneratorService">
+            <summary>
+            Interface for QR Code image generation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeGeneratorService.GenerateQRCode(System.String,System.Int32)">
+            <summary>
+            Generate QR Code as Data URL from JWT token
+            </summary>
+            <param name="token">JWT token to embed in QR Code</param>
+            <param name="size">QR Code size in pixels (default: 300)</param>
+            <returns>QR Code as Data URL string</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeGeneratorService.GenerateQRCodeBytes(System.String,System.Int32)">
+            <summary>
+            Generate QR Code as byte array from JWT token
+            </summary>
+            <param name="token">JWT token to embed in QR Code</param>
+            <param name="size">QR Code size in pixels (default: 300)</param>
+            <returns>QR Code as PNG byte array</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.QRCodePayload">
+            <summary>
+            QR Code payload structure
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.IQRCodeService">
+            <summary>
+            Interface for QR Code orchestration service
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeService.GenerateQRCodeAsync(System.Guid,System.String,System.Int32,System.Int32)">
+            <summary>
+            Generate complete QR Code for a user plan
+            </summary>
+            <param name="userPlanId">User plan ID</param>
+            <param name="userId">User ID</param>
+            <param name="size">QR Code size in pixels</param>
+            <param name="expirationMinutes">Token expiration in minutes</param>
+            <returns>Complete QR Code data</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeService.ValidateUserPlanAsync(System.Guid)">
+            <summary>
+            Validate user plan before QR Code generation
+            </summary>
+            <param name="userPlanId">User plan ID to validate</param>
+            <returns>True if plan is valid for QR Code generation</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeService.GetMetricsAsync">
+            <summary>
+            Get QR Code generation metrics
+            </summary>
+            <returns>QR Code generation statistics</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.QRCodeResult">
+            <summary>
+            QR Code generation result
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.QRCodeMetrics">
+            <summary>
+            QR Code generation metrics
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.IQRCodeTokenService">
+            <summary>
+            Interface for QR Code token generation and validation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeTokenService.GenerateTokenAsync(System.Guid,System.String,System.Int32)">
+            <summary>
+            Generate a JWT token for QR Code with unique nonce
+            </summary>
+            <param name="userPlanId">User plan ID for the token</param>
+            <param name="userId">User ID for the token</param>
+            <param name="expirationMinutes">Token expiration in minutes (default: 30)</param>
+            <returns>JWT token string and nonce for QR Code</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeTokenService.ValidateAndConsumeTokenAsync(System.String)">
+            <summary>
+            Validate and consume a QR Code token
+            </summary>
+            <param name="token">JWT token to validate</param>
+            <returns>QR token claims if valid, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeTokenService.ParseTokenAsync(System.String)">
+            <summary>
+            Extract claims from token without consuming the nonce
+            </summary>
+            <param name="token">JWT token to parse</param>
+            <returns>QR token claims if valid, null otherwise</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.QRTokenClaims">
+            <summary>
+            QR Code token claims data
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.IQRCodeValidationService">
+            <summary>
+            Interface for QR Code validation service
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeValidationService.ValidateQRCodeAsync(SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto)">
+            <summary>
+            Validate QR Code token and process transaction
+            </summary>
+            <param name="request">Validation request with QR token and clinic info</param>
+            <returns>Validation result with transaction details</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeValidationService.ParseQRCodeTokenAsync(System.String)">
+            <summary>
+            Parse QR Code token without consuming nonce (for preview/validation)
+            </summary>
+            <param name="qrToken">QR Code token to parse</param>
+            <returns>Token claims if valid, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IQRCodeValidationService.IsClinicAuthorizedAsync(System.Guid)">
+            <summary>
+            Check if clinic is authorized to validate QR codes
+            </summary>
+            <param name="clinicId">Clinic ID to validate</param>
+            <returns>True if clinic is authorized</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IRedisService">
+            <summary>
+            Interface for Redis operations for QR Code nonce management
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IRedisService.StoreNonceAsync(System.String,System.String,System.Int32)">
+            <summary>
+            Store a nonce with expiration for QR Code generation
+            </summary>
+            <param name="nonce">Unique nonce identifier</param>
+            <param name="userData">User data associated with the nonce</param>
+            <param name="expirationMinutes">Expiration time in minutes (default: 30)</param>
+            <returns>True if stored successfully</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRedisService.ConsumeNonceAsync(System.String)">
+            <summary>
+            Retrieve and consume (remove) a nonce from Redis
+            </summary>
+            <param name="nonce">Nonce to retrieve and consume</param>
+            <returns>User data if nonce exists and is valid, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRedisService.NonceExistsAsync(System.String)">
+            <summary>
+            Check if a nonce exists without consuming it
+            </summary>
+            <param name="nonce">Nonce to check</param>
+            <returns>True if nonce exists and is valid</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRedisService.GenerateNonce">
+            <summary>
+            Generate a new unique nonce
+            </summary>
+            <returns>Unique nonce string</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IRedisService.IsConnectedAsync">
+            <summary>
+            Check Redis connection health
+            </summary>
+            <returns>True if connected to Redis</returns>
+        </member>
         <member name="T:SingleClin.API.Services.IRefreshTokenService">
             <summary>
             Service interface for refresh token management
@@ -1989,6 +2507,152 @@
         <member name="T:SingleClin.API.Services.PlanService">
             <summary>
             Service implementation for Plan business logic
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.PlanService.GetUserPlanByIdAsync(System.Guid)">
+            <summary>
+            Get user plan by ID
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.QRCodeGeneratorService">
+            <summary>
+            Service for generating QR Code images from JWT tokens
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeGeneratorService.GenerateQRCode(System.String,System.Int32)">
+            <summary>
+            Generate QR Code as Data URL from JWT token
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeGeneratorService.GenerateQRCodeBytes(System.String,System.Int32)">
+            <summary>
+            Generate QR Code as byte array from JWT token
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeGeneratorService.CalculatePixelsPerModule(System.Int32)">
+            <summary>
+            Calculate pixels per module based on desired size
+            QR Codes have different numbers of modules based on data length
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.QRCodeService">
+            <summary>
+            Orchestrator service for QR Code generation workflow
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeService.GenerateQRCodeAsync(System.Guid,System.String,System.Int32,System.Int32)">
+            <summary>
+            Generate complete QR Code for a user plan
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeService.ValidateUserPlanAsync(System.Guid)">
+            <summary>
+            Validate user plan before QR Code generation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeService.GetMetricsAsync">
+            <summary>
+            Get QR Code generation metrics
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeService.RecordMetrics(System.Boolean)">
+            <summary>
+            Record QR Code generation metrics
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeService.CacheValidationResult(System.String,System.Boolean)">
+            <summary>
+            Cache plan validation result
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.QRCodeTokenService">
+            <summary>
+            Service for generating and validating QR Code JWT tokens
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeTokenService.GenerateTokenAsync(System.Guid,System.String,System.Int32)">
+            <summary>
+            Generate a JWT token for QR Code with unique nonce
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeTokenService.ValidateAndConsumeTokenAsync(System.String)">
+            <summary>
+            Validate and consume a QR Code token
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeTokenService.ParseTokenAsync(System.String)">
+            <summary>
+            Extract claims from token without consuming the nonce
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeTokenService.GetSecurityKey">
+            <summary>
+            Get the security key for JWT signing/validation
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.QRCodeValidationService">
+            <summary>
+            Service for validating QR Code tokens and processing transactions
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeValidationService.ValidateQRCodeAsync(SingleClin.API.DTOs.QRCode.QRCodeValidateRequestDto)">
+            <summary>
+            Validate QR Code token and process transaction
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeValidationService.ParseQRCodeTokenAsync(System.String)">
+            <summary>
+            Parse QR Code token without consuming nonce
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeValidationService.IsClinicAuthorizedAsync(System.Guid)">
+            <summary>
+            Check if clinic is authorized to validate QR codes
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeValidationService.GenerateTransactionCode">
+            <summary>
+            Generate unique transaction code
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.QRCodeValidationService.CreateErrorDetails(SingleClin.API.Exceptions.QRCodeValidationException)">
+            <summary>
+            Create error details dictionary from exception
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.RedisService">
+            <summary>
+            Redis service implementation for QR Code nonce management
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.RedisService.StoreNonceAsync(System.String,System.String,System.Int32)">
+            <summary>
+            Store a nonce with expiration for QR Code generation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.RedisService.ConsumeNonceAsync(System.String)">
+            <summary>
+            Retrieve and consume (remove) a nonce from Redis
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.RedisService.NonceExistsAsync(System.String)">
+            <summary>
+            Check if a nonce exists without consuming it
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.RedisService.GenerateNonce">
+            <summary>
+            Generate a new unique nonce using cryptographically secure random bytes
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.RedisService.IsConnectedAsync">
+            <summary>
+            Check Redis connection health
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.RedisService.GetNonceKey(System.String)">
+            <summary>
+            Get the full Redis key for a nonce
             </summary>
         </member>
         <member name="T:SingleClin.API.Services.RefreshTokenService">

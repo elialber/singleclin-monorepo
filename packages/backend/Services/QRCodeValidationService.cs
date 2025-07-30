@@ -4,7 +4,6 @@ using SingleClin.API.Data.Models;
 using SingleClin.API.Data.Models.Enums;
 using SingleClin.API.DTOs.QRCode;
 using SingleClin.API.Exceptions;
-using System.Transactions;
 
 namespace SingleClin.API.Services;
 
@@ -87,7 +86,7 @@ public class QRCodeValidationService : IQRCodeValidationService
                     Code = GenerateTransactionCode(),
                     UserPlanId = userPlan.Id,
                     ClinicId = request.ClinicId,
-                    Status = TransactionStatus.Completed,
+                    Status = TransactionStatus.Validated,
                     CreditsUsed = creditsRequired,
                     ServiceDescription = request.ServiceDescription ?? request.ServiceType ?? "QR Code Service",
                     ValidationDate = DateTime.UtcNow,
@@ -103,7 +102,7 @@ public class QRCodeValidationService : IQRCodeValidationService
                 _context.Transactions.Add(transactionRecord);
 
                 // Debit credits from user plan
-                userPlan.CreditsUsed += creditsRequired;
+                userPlan.CreditsRemaining -= creditsRequired;
                 userPlan.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();

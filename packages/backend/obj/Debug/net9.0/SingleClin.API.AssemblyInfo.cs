@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SingleClin.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+754ecf8fca206089043b447fb90382c243551f09")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6eb84a3d8b0536e919a7c7a6e0f954e49bb2187a")]
 [assembly: System.Reflection.AssemblyProductAttribute("SingleClin.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SingleClin.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

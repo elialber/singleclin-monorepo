@@ -71,4 +71,19 @@ public class UserPlan : BaseEntity
     /// Transactions made using this plan
     /// </summary>
     public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+
+    /// <summary>
+    /// Gets the number of credits used
+    /// </summary>
+    public int CreditsUsed => Credits - CreditsRemaining;
+
+    /// <summary>
+    /// Gets the expiration date (alias for ExpirationDate)
+    /// </summary>
+    public DateTime ExpiresAt => ExpirationDate;
+
+    /// <summary>
+    /// Checks if the plan is expired
+    /// </summary>
+    public bool IsExpired => DateTime.UtcNow > ExpirationDate;
 }

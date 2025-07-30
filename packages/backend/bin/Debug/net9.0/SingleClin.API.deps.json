@@ -16,8 +16,10 @@
           "Microsoft.AspNetCore.OpenApi": "9.0.7",
           "Microsoft.EntityFrameworkCore.Design": "9.0.7",
           "Microsoft.EntityFrameworkCore.Tools": "9.0.7",
+          "Microsoft.Extensions.Caching.StackExchangeRedis": "9.0.7",
           "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "9.0.7",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
+          "QRCoder": "1.6.0",
           "Swashbuckle.AspNetCore": "9.0.3",
           "Swashbuckle.AspNetCore.Annotations": "9.0.3"
         },
@@ -595,6 +597,20 @@
           }
         }
       },
+      "Microsoft.Extensions.Caching.StackExchangeRedis/9.0.7": {
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "9.0.7",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
+          "Microsoft.Extensions.Options": "9.0.7",
+          "StackExchange.Redis": "2.7.27"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll": {
+            "assemblyVersion": "9.0.7.0",
+            "fileVersion": "9.0.725.31702"
+          }
+        }
+      },
       "Microsoft.Extensions.Configuration/1.1.2": {
         "dependencies": {
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
@@ -954,6 +970,25 @@
           }
         }
       },
+      "Pipelines.Sockets.Unofficial/2.2.8": {
+        "dependencies": {
+          "System.IO.Pipelines": "7.0.0"
+        },
+        "runtime": {
+          "lib/net5.0/Pipelines.Sockets.Unofficial.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "2.2.8.1080"
+          }
+        }
+      },
+      "QRCoder/1.6.0": {
+        "runtime": {
+          "lib/net6.0/QRCoder.dll": {
+            "assemblyVersion": "1.6.0.0",
+            "fileVersion": "1.6.0.0"
+          }
+        }
+      },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {},
       "runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {},
       "runtime.fedora.24-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {},
@@ -1014,6 +1049,18 @@
           "lib/netstandard2.1/Sprache.dll": {
             "assemblyVersion": "2.3.1.0",
             "fileVersion": "2.3.1.0"
+          }
+        }
+      },
+      "StackExchange.Redis/2.7.27": {
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
+          "Pipelines.Sockets.Unofficial": "2.2.8"
+        },
+        "runtime": {
+          "lib/net6.0/StackExchange.Redis.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.7.27.49176"
           }
         }
       },
@@ -1988,6 +2035,13 @@
       "path": "microsoft.extensions.caching.memory/9.0.7",
       "hashPath": "microsoft.extensions.caching.memory.9.0.7.nupkg.sha512"
     },
+    "Microsoft.Extensions.Caching.StackExchangeRedis/9.0.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-sZLFm5KOY+wq2kc7RXrnk9NXLTOSKQFYUx55EEgc7hxcJ3lMduSjKbq5WxzjykSTqOT3LTo7dQFeQ7mZfvghXQ==",
+      "path": "microsoft.extensions.caching.stackexchangeredis/9.0.7",
+      "hashPath": "microsoft.extensions.caching.stackexchangeredis.9.0.7.nupkg.sha512"
+    },
     "Microsoft.Extensions.Configuration/1.1.2": {
       "type": "package",
       "serviceable": true,
@@ -2212,6 +2266,20 @@
       "path": "npgsql.entityframeworkcore.postgresql/9.0.4",
       "hashPath": "npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512"
     },
+    "Pipelines.Sockets.Unofficial/2.2.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ==",
+      "path": "pipelines.sockets.unofficial/2.2.8",
+      "hashPath": "pipelines.sockets.unofficial.2.2.8.nupkg.sha512"
+    },
+    "QRCoder/1.6.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-XmPA81eo+oRxBuyVdswsSkTGTE1d3thfF11Z1PdD7oB56A6HU4G4AAOdySmGRMb/cljwlFTMWUtosGEnwpS6GA==",
+      "path": "qrcoder/1.6.0",
+      "hashPath": "qrcoder.1.6.0.nupkg.sha512"
+    },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {
       "type": "package",
       "serviceable": true,
@@ -2330,6 +2398,13 @@
       "sha512": "sha512-Q+mXeiTxiUYG3lKYF6TS82/SyB4F2613Q1yXTMwg4jWGHEEVC3yrzHtNcI4B3qnDI0+eJsezGJ0V+cToUytHWw==",
       "path": "sprache/2.3.1",
       "hashPath": "sprache.2.3.1.nupkg.sha512"
+    },
+    "StackExchange.Redis/2.7.27": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Uqc2OQHglqj9/FfGQ6RkKFkZfHySfZlfmbCl+hc+u2I/IqunfelQ7QJi7ZhvAJxUtu80pildVX6NPLdDaUffOw==",
+      "path": "stackexchange.redis/2.7.27",
+      "hashPath": "stackexchange.redis.2.7.27.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/9.0.3": {
       "type": "package",

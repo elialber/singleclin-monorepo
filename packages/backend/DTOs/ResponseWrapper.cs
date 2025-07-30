@@ -72,6 +72,24 @@ public class ResponseWrapper<T>
             Errors = errors
         };
     }
+
+    // Alias methods for backward compatibility
+    public static ResponseWrapper<T> CreateSuccess(T data, string? message = null, int statusCode = 200)
+    {
+        return SuccessResponse(data, message, statusCode);
+    }
+
+    public static ResponseWrapper<T> CreateFailure(string message, T? data = default, int statusCode = 400, List<string>? errors = null)
+    {
+        return new ResponseWrapper<T>
+        {
+            Success = false,
+            Data = data,
+            Message = message,
+            StatusCode = statusCode,
+            Errors = errors ?? new List<string>()
+        };
+    }
 }
 
 // Non-generic version for responses without data
@@ -92,6 +110,30 @@ public class ResponseWrapper : ResponseWrapper<object>
         return new ResponseWrapper
         {
             Success = false,
+            Message = message,
+            StatusCode = statusCode,
+            Errors = errors ?? new List<string>()
+        };
+    }
+
+    // Alias methods for backward compatibility
+    public static ResponseWrapper CreateSuccess(object? data = null, string? message = null, int statusCode = 200)
+    {
+        return new ResponseWrapper
+        {
+            Success = true,
+            Data = data,
+            Message = message ?? "Operation completed successfully",
+            StatusCode = statusCode
+        };
+    }
+
+    public new static ResponseWrapper CreateFailure(string message, object? data = null, int statusCode = 400, List<string>? errors = null)
+    {
+        return new ResponseWrapper
+        {
+            Success = false,
+            Data = data,
             Message = message,
             StatusCode = statusCode,
             Errors = errors ?? new List<string>()

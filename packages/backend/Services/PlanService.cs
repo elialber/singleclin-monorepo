@@ -3,6 +3,8 @@ using SingleClin.API.DTOs.Common;
 using SingleClin.API.Repositories;
 using SingleClin.API.Data.Models;
 using SingleClin.API.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using SingleClin.API.Data;
 
 namespace SingleClin.API.Services;
 
@@ -13,11 +15,13 @@ public class PlanService : IPlanService
 {
     private readonly IPlanRepository _planRepository;
     private readonly ILogger<PlanService> _logger;
+    private readonly ApplicationDbContext _context;
 
-    public PlanService(IPlanRepository planRepository, ILogger<PlanService> logger)
+    public PlanService(IPlanRepository planRepository, ILogger<PlanService> logger, ApplicationDbContext context)
     {
         _planRepository = planRepository;
         _logger = logger;
+        _context = context;
     }
 
     public async Task<PagedResultDto<PlanResponseDto>> GetAllAsync(PlanFilterDto filter)
@@ -210,5 +214,16 @@ public class PlanService : IPlanService
             CreatedAt = plan.CreatedAt,
             UpdatedAt = plan.UpdatedAt
         };
+    }
+
+    /// <summary>
+    /// Get user plan by ID
+    /// </summary>
+    public async Task<UserPlan?> GetUserPlanByIdAsync(Guid id)
+    {
+        return await _context.UserPlans
+            .Include(up => up.Plan)
+            .Include(up => up.User)
+            .FirstOrDefaultAsync(up => up.Id == id);
     }
 }

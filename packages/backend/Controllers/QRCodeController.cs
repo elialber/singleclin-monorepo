@@ -18,6 +18,7 @@ public class QRCodeController : BaseController
 {
     private readonly IQRCodeService _qrCodeService;
     private readonly IQRCodeTokenService _qrCodeTokenService;
+    private readonly IPlanService _planService;
     private readonly ILogger<QRCodeController> _logger;
 
     // Rate limiting: Track QR code generation per user
@@ -28,10 +29,12 @@ public class QRCodeController : BaseController
     public QRCodeController(
         IQRCodeService qrCodeService,
         IQRCodeTokenService qrCodeTokenService,
+        IPlanService planService,
         ILogger<QRCodeController> logger)
     {
         _qrCodeService = qrCodeService;
         _qrCodeTokenService = qrCodeTokenService;
+        _planService = planService;
         _logger = logger;
     }
 
@@ -61,14 +64,14 @@ public class QRCodeController : BaseController
             if (string.IsNullOrEmpty(userId))
             {
                 _logger.LogWarning("QR Code generation attempted without valid user ID");
-                return Unauthorized(ResponseWrapper<object>.Failure("User not authenticated"));
+                return Unauthorized(ResponseWrapper<object>.CreateFailure("User not authenticated"));
             }
 
             // Check rate limiting
             if (!CheckRateLimit(userId))
             {
                 _logger.LogWarning("Rate limit exceeded for user {UserId}", userId);
-                return StatusCode(429, ResponseWrapper<object>.Failure(
+                return StatusCode(429, ResponseWrapper<object>.CreateFailure(
                     $"Rate limit exceeded. Maximum {MaxQRCodesPerMinute} QR codes per minute allowed"));
             }
 
@@ -81,7 +84,7 @@ public class QRCodeController : BaseController
             if (!userPlan)
             {
                 _logger.LogWarning("User {UserId} has no valid plan for QR Code generation", userId);
-                return Forbid(ResponseWrapper<object>.Failure("No valid plan found or plan is inactive").ToString());
+                return Forbid(ResponseWrapper<object>.CreateFailure("No valid plan found or plan is inactive").ToString());
             }
 
             // Generate QR Code using orchestrator service
@@ -103,7 +106,7 @@ public class QRCodeController : BaseController
                     ErrorMessage = qrCodeResult.ErrorMessage
                 };
 
-                return BadRequest(ResponseWrapper<QRCodeGenerateResponseDto>.Failure(
+                return BadRequest(ResponseWrapper<QRCodeGenerateResponseDto>.CreateFailure(
                     qrCodeResult.ErrorMessage ?? "QR Code generation failed", errorResponse));
             }
 
@@ -121,7 +124,7 @@ public class QRCodeController : BaseController
             _logger.LogInformation("QR Code generated successfully for user {UserId} with nonce {Nonce}", 
                 userId, qrCodeResult.Nonce);
 
-            return Ok(ResponseWrapper<QRCodeGenerateResponseDto>.Success(response));
+            return Ok(ResponseWrapper<QRCodeGenerateResponseDto>.CreateSuccess(response));
         }
         catch (Exception ex)
         {
@@ -133,7 +136,7 @@ public class QRCodeController : BaseController
                 ErrorMessage = "Failed to generate QR Code"
             };
 
-            return StatusCode(500, ResponseWrapper<QRCodeGenerateResponseDto>.Failure(
+            return StatusCode(500, ResponseWrapper<QRCodeGenerateResponseDto>.CreateFailure(
                 "Internal server error", errorResponse));
         }
     }
@@ -159,14 +162,14 @@ public class QRCodeController : BaseController
             var claims = await _qrCodeTokenService.ValidateAndConsumeTokenAsync(token);
             if (claims == null)
             {
-                return BadRequest(ResponseWrapper<object>.Failure("Invalid or expired QR Code token"));
+                return BadRequest(ResponseWrapper<object>.CreateFailure("Invalid or expired QR Code token"));
             }
 
             // Get user plan details for clinic
             var userPlan = await _planService.GetUserPlanByIdAsync(claims.UserPlanId);
             if (userPlan == null)
             {
-                return BadRequest(ResponseWrapper<object>.Failure("User plan not found"));
+                return BadRequest(ResponseWrapper<object>.CreateFailure("User plan not found"));
             }
 
             var result = new
@@ -192,12 +195,12 @@ public class QRCodeController : BaseController
             _logger.LogInformation("QR Code token validated and consumed for user plan {UserPlanId}", 
                 claims.UserPlanId);
 
-            return Ok(ResponseWrapper<object>.Success(result));
+            return Ok(ResponseWrapper<object>.CreateSuccess(result));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to validate QR Code token");
-            return StatusCode(500, ResponseWrapper<object>.Failure("Internal server error"));
+            return StatusCode(500, ResponseWrapper<object>.CreateFailure("Internal server error"));
         }
     }
 
@@ -218,12 +221,12 @@ public class QRCodeController : BaseController
         try
         {
             var metrics = await _qrCodeService.GetMetricsAsync();
-            return Ok(ResponseWrapper<QRCodeMetrics>.Success(metrics));
+            return Ok(ResponseWrapper<QRCodeMetrics>.CreateSuccess(metrics));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to retrieve QR Code metrics");
-            return StatusCode(500, ResponseWrapper<object>.Failure("Internal server error"));
+            return StatusCode(500, ResponseWrapper<object>.CreateFailure("Internal server error"));
         }
     }
 
