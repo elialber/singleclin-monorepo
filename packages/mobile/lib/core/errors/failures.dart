@@ -2,15 +2,15 @@ import 'package:equatable/equatable.dart';
 
 /// Base class for all failures in the application
 abstract class Failure extends Equatable {
-  final String message;
-  final String? code;
-  final dynamic details;
-
   const Failure({
     required this.message,
     this.code,
     this.details,
   });
+
+  final String message;
+  final String? code;
+  final dynamic details;
 
   @override
   List<Object?> get props => [message, code, details];
@@ -66,14 +66,14 @@ class AuthorizationFailure extends Failure {
 
 /// Validation failures for input data
 class ValidationFailure extends Failure {
-  final Map<String, List<String>>? fieldErrors;
-
   const ValidationFailure({
     super.message = 'Dados inválidos',
     super.code = 'VALIDATION_ERROR',
     this.fieldErrors,
     super.details,
   });
+  
+  final Map<String, List<String>>? fieldErrors;
 
   @override
   List<Object?> get props => [...super.props, fieldErrors];

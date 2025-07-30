@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'data/services/token_refresh_service.dart';
-import 'presentation/controllers/auth_controller.dart';
+
+import 'package:mobile/data/services/token_refresh_service.dart';
+import 'package:mobile/presentation/controllers/auth_controller.dart';
 
 /// Test widget to verify token refresh and session persistence functionality
 class TokenRefreshTestWidget extends StatefulWidget {
@@ -305,13 +307,13 @@ class TokenRefreshUsageExample {
       }
       
       // Use token for API call
-      print('Making API call with token: ${token.substring(0, 20)}...');
+      debugPrint('Making API call with token: ${token.substring(0, 20)}...');
       
       // Your API call logic here
       // await apiClient.get('/protected-endpoint', headers: {'Authorization': 'Bearer $token'});
       
     } catch (e) {
-      print('API call failed: $e');
+      debugPrint('API call failed: $e');
       // Handle authentication failure
     }
   }
@@ -323,7 +325,7 @@ class TokenRefreshUsageExample {
       final isExpiring = await _authController.isTokenExpiringSoon();
       
       if (isExpiring) {
-        print('Token expiring soon, refreshing...');
+        debugPrint('Token expiring soon, refreshing...');
         final newToken = await _authController.refreshToken();
         
         if (newToken == null) {
@@ -332,10 +334,10 @@ class TokenRefreshUsageExample {
       }
       
       // Proceed with critical operation
-      print('Performing critical operation with valid token');
+      debugPrint('Performing critical operation with valid token');
       
     } catch (e) {
-      print('Critical operation failed: $e');
+      debugPrint('Critical operation failed: $e');
     }
   }
 }

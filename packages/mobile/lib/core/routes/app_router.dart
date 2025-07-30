@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:mobile/core/routes/app_routes.dart';
-import 'package:mobile/presentation/screens/screens.dart';
-import 'package:mobile/presentation/screens/home_screen.dart';
-import 'package:mobile/presentation/screens/theme_settings_screen.dart';
-import 'package:mobile/presentation/screens/qr_code/qr_code_screen.dart';
-import 'package:mobile/presentation/screens/clinic/clinic_scanner_screen.dart';
-import 'package:mobile/presentation/screens/clinic/scan_history_screen.dart';
+import 'package:mobile/presentation/screens/auth/forgot_password_screen.dart' as auth;
 import 'package:mobile/presentation/screens/auth/login_screen.dart' as auth;
 import 'package:mobile/presentation/screens/auth/register_screen.dart' as auth;
-import 'package:mobile/presentation/screens/auth/forgot_password_screen.dart' as auth;
+import 'package:mobile/presentation/screens/clinic/clinic_scanner_screen.dart';
+import 'package:mobile/presentation/screens/clinic/scan_history_screen.dart';
+import 'package:mobile/presentation/screens/qr_code/qr_code_screen.dart';
+import 'package:mobile/presentation/screens/screens.dart';
+import 'package:mobile/presentation/screens/theme_settings_screen.dart';
 
 /// App router configuration with GoRouter
 class AppRouter {
@@ -163,11 +163,13 @@ class AppRouter {
   );
 
   // Helper methods
-  static void setAuthenticated(bool value) {
+  static bool get authenticated => isAuthenticated.value;
+  static set authenticated(bool value) {
     isAuthenticated.value = value;
   }
 
-  static void setUserType(String? type) {
+  static String? get currentUserType => userType.value;
+  static set currentUserType(String? type) {
     userType.value = type;
   }
 
@@ -180,9 +182,9 @@ class AppRouter {
 
 /// Error screen widget
 class ErrorScreen extends StatelessWidget {
-  final Exception? error;
-
   const ErrorScreen({this.error, super.key});
+
+  final Exception? error;
 
   @override
   Widget build(BuildContext context) {
@@ -272,9 +274,9 @@ class TransactionHistoryScreen extends StatelessWidget {
 }
 
 class TransactionDetailsScreen extends StatelessWidget {
-  final String transactionId;
-  
   const TransactionDetailsScreen({required this.transactionId, super.key});
+  
+  final String transactionId;
 
   @override
   Widget build(BuildContext context) {

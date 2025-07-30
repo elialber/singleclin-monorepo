@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'data/services/plan_service.dart';
 import 'domain/entities/user_plan_entity.dart';
@@ -180,7 +181,7 @@ class _PlanRepositoryTestWidgetState extends State<PlanRepositoryTestWidget> {
   Future<void> _testCurrentPlan() async {
     setState(() {
       _isRunning = true;
-      _testResults = 'Testing current plan retrieval...\\n\\n';
+      _testResults = r'Testing current plan retrieval...\n\n';
     });
 
     try {
@@ -204,23 +205,23 @@ class _PlanRepositoryTestWidgetState extends State<PlanRepositoryTestWidget> {
         _appendResult('Days until expiration: ${plan.daysUntilExpiration}');
         _appendResult('Status color: ${plan.statusColor}');
         _appendResult('Is running low: ${plan.isRunningLow}');
-        _appendResult('Is expired: ${plan.isExpired}\\n');
+        _appendResult(r'Is expired: ${plan.isExpired}\n');
       } else {
         _appendResult('⚠️ No active plan found');
-        _appendResult('User may not have a plan or plan is expired\\n');
+        _appendResult(r'User may not have a plan or plan is expired\n');
       }
       
       // Test has active plan
       _appendResult('🧪 Test: Has Active Plan');
       final hasActive = await _planService.hasActivePlan();
-      _appendResult('Has active plan: $hasActive\\n');
+      _appendResult(r'Has active plan: $hasActive\n');
       
     } on ApiException catch (e) {
       _appendResult('❌ API Exception: ${e.message}');
       _appendResult('Code: ${e.code}');
-      _appendResult('Localized: ${ApiExceptionLocalizer.getLocalizedMessage(e)}\\n');
+      _appendResult(r'Localized: ${ApiExceptionLocalizer.getLocalizedMessage(e)}\n');
     } catch (e) {
-      _appendResult('❌ Unexpected error: $e\\n');
+      _appendResult(r'❌ Unexpected error: $e\n');
     } finally {
       setState(() {
         _isRunning = false;
@@ -232,7 +233,7 @@ class _PlanRepositoryTestWidgetState extends State<PlanRepositoryTestWidget> {
   Future<void> _testRecentTransactions() async {
     setState(() {
       _isRunning = true;
-      _testResults = 'Testing recent transactions retrieval...\\n\\n';
+      _testResults = r'Testing recent transactions retrieval...\n\n';
     });
 
     try {
@@ -246,7 +247,7 @@ class _PlanRepositoryTestWidgetState extends State<PlanRepositoryTestWidget> {
       
       if (transactions.isNotEmpty) {
         _appendResult('✅ Recent transactions retrieved successfully');
-        _appendResult('Found ${transactions.length} transactions:\\n');
+        _appendResult(r'Found ${transactions.length} transactions:\n');
         
         for (int i = 0; i < transactions.length; i++) {
           final transaction = transactions[i];
@@ -255,17 +256,17 @@ class _PlanRepositoryTestWidgetState extends State<PlanRepositoryTestWidget> {
           _appendResult('   Credits: ${transaction.creditsUsed}');
           _appendResult('   Date: ${transaction.formattedDate}');
           _appendResult('   Status: ${transaction.status}');
-          _appendResult('   Value: R\$ ${transaction.value.toStringAsFixed(2)}\\n');
+          _appendResult(r'   Value: R$ ${transaction.value.toStringAsFixed(2)}\n');
         }
       } else {
-        _appendResult('⚠️ No recent transactions found\\n');
+        _appendResult(r'⚠️ No recent transactions found\n');
       }
       
     } on ApiException catch (e) {
       _appendResult('❌ API Exception: ${e.message}');
-      _appendResult('Code: ${e.code}\\n');
+      _appendResult(r'Code: ${e.code}\n');
     } catch (e) {
-      _appendResult('❌ Unexpected error: $e\\n');
+      _appendResult(r'❌ Unexpected error: $e\n');
     } finally {
       setState(() {
         _isRunning = false;
@@ -277,7 +278,7 @@ class _PlanRepositoryTestWidgetState extends State<PlanRepositoryTestWidget> {
   Future<void> _testRefreshPlan() async {
     setState(() {
       _isRunning = true;
-      _testResults = 'Testing plan data refresh...\\n\\n';
+      _testResults = r'Testing plan data refresh...\n\n';
     });
 
     try {
@@ -292,9 +293,9 @@ class _PlanRepositoryTestWidgetState extends State<PlanRepositoryTestWidget> {
         
         _appendResult('✅ Plan data refreshed successfully');
         _appendResult('Updated Plan: ${plan.plan.name}');
-        _appendResult('Updated Credits: ${plan.remainingCredits}/${plan.totalCredits}\\n');
+        _appendResult(r'Updated Credits: ${plan.remainingCredits}/${plan.totalCredits}\n');
       } else {
-        _appendResult('⚠️ No plan data received after refresh\\n');
+        _appendResult(r'⚠️ No plan data received after refresh\n');
       }
       
     } on ApiException catch (e) {
@@ -404,24 +405,24 @@ class PlanServiceUsageExample {
       final plan = await _planService.getCurrentPlan();
       
       if (plan != null) {
-        print('User Plan: ${plan.plan.name}');
-        print('Credits: ${plan.remainingCredits}/${plan.totalCredits}');
-        print('Usage: ${(plan.usagePercentage * 100).toStringAsFixed(1)}%');
+        debugPrint('User Plan: ${plan.plan.name}');
+        debugPrint('Credits: ${plan.remainingCredits}/${plan.totalCredits}');
+        debugPrint('Usage: ${(plan.usagePercentage * 100).toStringAsFixed(1)}%');
         
         // Check if user is running low on credits
         if (plan.isRunningLow) {
-          print('⚠️ User is running low on credits!');
+          debugPrint('⚠️ User is running low on credits!');
         }
         
         // Check if plan is expiring soon
         if (plan.daysUntilExpiration <= 30) {
-          print('⚠️ Plan expires in ${plan.daysUntilExpiration} days');
+          debugPrint('⚠️ Plan expires in ${plan.daysUntilExpiration} days');
         }
       } else {
-        print('User has no active plan');
+        debugPrint('User has no active plan');
       }
     } catch (e) {
-      print('Error loading user plan: $e');
+      debugPrint('Error loading user plan: $e');
     }
   }
 
@@ -430,24 +431,24 @@ class PlanServiceUsageExample {
     try {
       final transactions = await _planService.getRecentTransactions(limit: 3);
       
-      print('Recent Transactions:');
+      debugPrint('Recent Transactions:');
       for (final transaction in transactions) {
-        print('- ${transaction.clinicName}: ${transaction.creditsUsed} credits (${transaction.formattedDate})');
+        debugPrint('- ${transaction.clinicName}: ${transaction.creditsUsed} credits (${transaction.formattedDate})');
       }
     } catch (e) {
-      print('Error loading recent transactions: $e');
+      debugPrint('Error loading recent transactions: $e');
     }
   }
 
   /// Example: Refresh plan data with loading state
   Future<UserPlanEntity?> refreshPlanWithLoading() async {
     try {
-      print('Refreshing plan data...');
+      debugPrint('Refreshing plan data...');
       final plan = await _planService.refreshPlanData();
-      print('Plan data refreshed successfully');
+      debugPrint('Plan data refreshed successfully');
       return plan;
     } catch (e) {
-      print('Error refreshing plan data: $e');
+      debugPrint('Error refreshing plan data: $e');
       return null;
     }
   }

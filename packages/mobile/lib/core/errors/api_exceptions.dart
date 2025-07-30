@@ -97,32 +97,32 @@ class GenericApiException extends ApiException {
 class ApiExceptionLocalizer {
   /// Get localized error message for API exceptions
   static String getLocalizedMessage(ApiException exception) {
-    switch (exception.runtimeType) {
-      case ApiTimeoutException:
+    switch (exception) {
+      case ApiTimeoutException _:
         return 'Tempo limite excedido. Verifique sua conexão com a internet.';
       
-      case ApiBadRequestException:
+      case ApiBadRequestException _:
         return 'Dados inválidos. Verifique as informações enviadas.';
       
-      case ApiUnauthorizedException:
+      case ApiUnauthorizedException _:
         return 'Não autorizado. Faça login novamente.';
       
-      case ApiForbiddenException:
+      case ApiForbiddenException _:
         return 'Acesso negado. Você não tem permissão para esta operação.';
       
-      case ApiNotFoundException:
+      case ApiNotFoundException _:
         return 'Recurso não encontrado.';
       
-      case ApiValidationException:
+      case ApiValidationException _:
         return 'Dados inválidos. Corrija os campos destacados.';
       
-      case ApiTooManyRequestsException:
+      case ApiTooManyRequestsException _:
         return 'Muitas tentativas. Tente novamente em alguns minutos.';
       
-      case ApiServerException:
+      case ApiServerException _:
         return 'Erro no servidor. Tente novamente mais tarde.';
       
-      case ApiConnectionException:
+      case ApiConnectionException _:
         return 'Erro de conexão. Verifique sua internet.';
       
       default:
@@ -147,15 +147,15 @@ class ApiExceptionLocalizer {
 
   /// Get retry delay for retryable errors
   static Duration getRetryDelay(ApiException exception) {
-    switch (exception.runtimeType) {
-      case ApiTimeoutException:
-      case ApiConnectionException:
+    switch (exception) {
+      case ApiTimeoutException _:
+      case ApiConnectionException _:
         return const Duration(seconds: 2);
       
-      case ApiServerException:
+      case ApiServerException _:
         return const Duration(seconds: 5);
       
-      case ApiTooManyRequestsException:
+      case ApiTooManyRequestsException _:
         return const Duration(minutes: 1);
       
       default:
