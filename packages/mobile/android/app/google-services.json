@@ -1,45 +1,45 @@
 {
   "project_info": {
-    "project_number": "YOUR_PROJECT_NUMBER",
+    "project_number": "410494012909",
     "project_id": "singleclin-app",
-    "storage_bucket": "singleclin-app.appspot.com"
+    "storage_bucket": "singleclin-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:YOUR_PROJECT_NUMBER:android:YOUR_APP_ID",
+        "mobilesdk_app_id": "1:410494012909:android:5fd99356c7a2d222d6ebe4",
         "android_client_info": {
           "package_name": "br.com.singleclin.singleclin_app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "YOUR_OAUTH_CLIENT_ID.apps.googleusercontent.com",
+          "client_id": "410494012909-2fvk7dqr603optvjbaedij68o88kd7r5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "br.com.singleclin.singleclin_app",
-            "certificate_hash": "YOUR_SHA1_CERTIFICATE_HASH"
+            "certificate_hash": "736db1b44d75667387532ca0578f593817acce12"
           }
         },
         {
-          "client_id": "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+          "client_id": "410494012909-mg81h4npeh17jf74r85e1mprrcn62ile.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "YOUR_ANDROID_API_KEY"
+          "current_key": "AIzaSyAdZpsqqHWwCDv-eOeE42JR2YnJAIY1ZKc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+              "client_id": "410494012909-mg81h4npeh17jf74r85e1mprrcn62ile.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
+              "client_id": "410494012909-pn2m3j632metfv56li6q17il8r12jt9q.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "br.com.singleclin.singleclinApp"
