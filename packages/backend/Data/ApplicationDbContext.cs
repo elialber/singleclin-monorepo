@@ -39,6 +39,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     /// Refresh tokens for JWT authentication
     /// </summary>
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    
+    /// <summary>
+    /// Notification logs
+    /// </summary>
+    public DbSet<NotificationLog> NotificationLogs => Set<NotificationLog>();
+    
+    /// <summary>
+    /// User notification preferences
+    /// </summary>
+    public DbSet<UserNotificationPreferences> UserNotificationPreferences => Set<UserNotificationPreferences>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

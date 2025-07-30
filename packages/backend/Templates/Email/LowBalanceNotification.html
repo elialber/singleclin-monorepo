@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Saldo Baixo - SingleClin</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Client-specific styles */
+        .ReadMsgBody { width: 100%; }
+        .ExternalClass { width: 100%; }
+        .ExternalClass * { line-height: 100%; }
+        body { margin: 0; padding: 0; width: 100% !important; height: 100% !important; }
+        table { border-collapse: collapse; }
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        
+        /* Main styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333333;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .logo {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-decoration: none;
+        }
+        
+        .tagline {
+            color: #e8eaff;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        /* Content */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        
+        .alert-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .alert-icon {
+            font-size: 48px;
+            color: #f39c12;
+            margin-bottom: 15px;
+        }
+        
+        .balance-info {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e17055;
+            margin-bottom: 10px;
+        }
+        
+        .plan-info {
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+        
+        /* CTA Button */
+        .cta-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        /* Benefits section */
+        .benefits {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        
+        .benefits h3 {
+            color: #333333;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+        
+        .benefit-icon {
+            color: #27ae60;
+            font-size: 18px;
+            margin-right: 12px;
+            min-width: 20px;
+        }
+        
+        .benefit-text {
+            color: #555555;
+            font-size: 14px;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #2c3e50;
+            padding: 30px;
+            color: #bdc3c7;
+            text-align: center;
+        }
+        
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        
+        .footer-link {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        .footer-text {
+            font-size: 12px;
+            line-height: 1.5;
+            margin-top: 15px;
+        }
+        
+        .unsubscribe {
+            color: #95a5a6;
+            font-size: 11px;
+            margin-top: 15px;
+        }
+        
+        .unsubscribe a {
+            color: #95a5a6;
+            text-decoration: underline;
+        }
+        
+        /* Mobile responsiveness */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .header,
+            .content,
+            .footer {
+                padding: 20px !important;
+            }
+            
+            .logo {
+                font-size: 24px;
+            }
+            
+            .greeting {
+                font-size: 16px;
+            }
+            
+            .balance-info {
+                font-size: 20px;
+            }
+            
+            .cta-button {
+                padding: 12px 25px;
+                font-size: 14px;
+            }
+            
+            .benefit-item {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            
+            .benefit-icon {
+                margin-bottom: 5px;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .email-container {
+                background-color: #1a1a1a;
+            }
+            
+            .content {
+                background-color: #1a1a1a;
+                color: #e0e0e0;
+            }
+            
+            .greeting,
+            .message {
+                color: #e0e0e0;
+            }
+            
+            .benefits {
+                background-color: #2a2a2a;
+            }
+            
+            .benefits h3 {
+                color: #e0e0e0;
+            }
+            
+            .benefit-text {
+                color: #cccccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">{{clinicName}}</div>
+            <p class="tagline">Sistema de Gestão de Saúde</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <div class="greeting">
+                Olá, {{userName}}! 👋
+            </div>
+            
+            <div class="alert-box">
+                <div class="alert-icon">⚠️</div>
+                <div class="balance-info">
+                    {{currentBalance}} crédito{{#isPlural}}s{{/isPlural}} restante{{#isPlural}}s{{/isPlural}}
+                </div>
+                <div class="plan-info">
+                    Plano: {{planName}}
+                </div>
+            </div>
+            
+            <div class="message">
+                Seu saldo está baixo! Para continuar aproveitando todos os benefícios do seu plano de saúde, 
+                recomendamos que você renove seus créditos o quanto antes.
+            </div>
+            
+            <div class="benefits">
+                <h3>Por que renovar agora?</h3>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span class="benefit-text">Continuidade no atendimento sem interrupções</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span class="benefit-text">Acesso a todos os parceiros da rede SingleClin</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span class="benefit-text">Preços especiais e descontos exclusivos</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span class="benefit-text">Suporte prioritário da nossa equipe</span>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{renewUrl}}" class="cta-button">
+                    Renovar Créditos Agora
+                </a>
+            </div>
+            
+            <div class="message">
+                <strong>Precisa de ajuda?</strong><br>
+                Nossa equipe de suporte está sempre disponível para ajudá-lo. Entre em contato conosco 
+                através do telefone <strong>{{supportPhone}}</strong> ou email <strong>{{supportEmail}}</strong>.
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="{{appUrl}}" class="footer-link">Acessar App</a>
+                <a href="{{supportUrl}}" class="footer-link">Suporte</a>
+                <a href="{{preferencesUrl}}" class="footer-link">Preferências</a>
+            </div>
+            
+            <div class="footer-text">
+                <strong>{{clinicName}}</strong><br>
+                {{clinicAddress}}<br>
+                {{clinicPhone}} | {{clinicEmail}}
+            </div>
+            
+            <div class="unsubscribe">
+                Você está recebendo este e-mail porque possui um plano ativo no SingleClin.<br>
+                <a href="{{unsubscribeUrl}}">Gerenciar preferências de notificação</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

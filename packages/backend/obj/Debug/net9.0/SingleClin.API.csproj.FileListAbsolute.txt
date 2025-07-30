@@ -173,3 +173,10 @@
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Pipelines.Sockets.Unofficial.dll
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/QRCoder.dll
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/StackExchange.Redis.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/SendGrid.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/StarkbankEcdsa.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Dapper.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Hangfire.AspNetCore.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Hangfire.Core.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Hangfire.NetCore.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Hangfire.PostgreSql.dll
