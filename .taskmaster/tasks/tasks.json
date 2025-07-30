@@ -830,8 +830,8 @@
             "title": "Configurar projeto React com TypeScript e Material-UI",
             "description": "Criar estrutura base do projeto React com TypeScript, configurar Material-UI como biblioteca de componentes e estabelecer arquitetura de pastas",
             "dependencies": [],
-            "details": "Executar create-react-app com template TypeScript. Instalar @mui/material, @mui/icons-material e @emotion/react. Criar estrutura de pastas: /src/components (componentes reutilizáveis), /src/pages (páginas da aplicação), /src/services (integração com API), /src/utils (funções auxiliares), /src/types (interfaces TypeScript). Configurar tema customizado do Material-UI com cores da marca. Adicionar configurações de ESLint e Prettier para padronização de código.",
-            "status": "in-progress",
+            "details": "Executar create-react-app com template TypeScript. Instalar @mui/material, @mui/icons-material e @emotion/react. Criar estrutura de pastas: /src/components (componentes reutilizáveis), /src/pages (páginas da aplicação), /src/services (integração com API), /src/utils (funções auxiliares), /src/types (interfaces TypeScript). Configurar tema customizado do Material-UI com cores da marca. Adicionar configurações de ESLint e Prettier para padronização de código.\n<info added on 2025-07-30T09:57:04.317Z>\nConfiguração base concluída com sucesso:\n- Criado package.json com React 18, TypeScript 5, Material-UI 5, React Router 6, React Query, Axios, Zustand\n- Configurado Vite como bundler para desenvolvimento rápido\n- Configurado TypeScript com paths aliases\n- Configurado ESLint e Prettier\n- Criada estrutura de pastas: components, pages, services, hooks, utils, types, store, styles, layouts\n- Criado tema customizado do Material-UI\n- Implementados contextos de Auth e Notification\n- Configurado sistema de rotas com proteção\n- Criados serviços base para API\n- Estrutura pronta para desenvolvimento\n</info added on 2025-07-30T09:57:04.317Z>",
+            "status": "done",
             "testStrategy": "Verificar se o projeto compila sem erros. Testar renderização de componentes Material-UI básicos. Validar configuração do TypeScript e auto-complete funcionando"
           },
           {
@@ -841,8 +841,8 @@
             "dependencies": [
               "13.1"
             ],
-            "details": "Implementar componente Layout com Material-UI Drawer para sidebar. Criar menu de navegação com ícones: Dashboard, Planos, Clínicas, Transações, Pacientes. Configurar React Router v6 com rotas protegidas. Implementar ResponsiveDrawer que alterna entre permanente (desktop) e temporário (mobile). Adicionar AppBar com título da página atual, avatar do usuário e botão de logout. Criar contexto de navegação para gerenciar estado da sidebar. Implementar breadcrumbs para navegação secundária.",
-            "status": "pending",
+            "details": "Implementar componente Layout com Material-UI Drawer para sidebar. Criar menu de navegação com ícones: Dashboard, Planos, Clínicas, Transações, Pacientes. Configurar React Router v6 com rotas protegidas. Implementar ResponsiveDrawer que alterna entre permanente (desktop) e temporário (mobile). Adicionar AppBar com título da página atual, avatar do usuário e botão de logout. Criar contexto de navegação para gerenciar estado da sidebar. Implementar breadcrumbs para navegação secundária.\n<info added on 2025-07-30T10:03:54.393Z>\nImplementação concluída com todos os requisitos atendidos:\n\n**Componentes Criados:**\n- DashboardLayout: Layout principal com Material-UI Drawer responsivo\n- AuthLayout: Layout dedicado para páginas de autenticação (login/registro)\n- ResponsiveDrawer: Comportamento adaptativo - permanente em desktop, temporário em mobile\n- ProfileMenu: Menu dropdown no header com opções de perfil, configurações e logout\n- StatsCard: Componente reutilizável para exibir estatísticas no dashboard\n\n**Páginas Implementadas:**\n- Login: Formulário funcional com validação usando react-hook-form e yup\n- Dashboard: Cards de estatísticas (Planos Ativos, Clínicas Parceiras, Transações, Pacientes) e áreas para gráficos\n- Planos: Tabela completa com dados mockados, ações de editar/excluir e botão de novo plano\n- Clínicas, Transações, Pacientes, Configurações: Páginas placeholder com estrutura básica\n\n**Sistema de Roteamento:**\n- React Router v6 configurado com rotas públicas (/login) e protegidas\n- Componente ProtectedRoute para validação de autenticação\n- Navegação funcional entre todas as seções via sidebar\n- Redirecionamento automático de / para /login ou /dashboard baseado em autenticação\n\n**Recursos de UI/UX:**\n- Tema Material-UI customizado com cores primárias e secundárias\n- Transições suaves no drawer e navegação\n- Ícones contextuais para cada seção do menu\n- Header dinâmico mostrando título da página atual\n- Avatar do usuário com iniciais\n- Breakpoints responsivos configurados (xs, sm, md, lg, xl)\n- Drawer com largura de 240px e comportamento consistente\n</info added on 2025-07-30T10:03:54.393Z>",
+            "status": "done",
             "testStrategy": "Testar responsividade em diferentes tamanhos de tela. Verificar navegação entre todas as rotas. Validar persistência do estado da sidebar. Testar comportamento em mobile vs desktop"
           },
           {
@@ -853,7 +853,7 @@
               "13.2"
             ],
             "details": "Criar página de Login com formulário Material-UI. Implementar AuthContext com useContext para gerenciar estado de autenticação global. Configurar axios com interceptors para adicionar token JWT em todas requisições. Criar HOC ProtectedRoute para envolver rotas que necessitam autenticação. Implementar refresh token automático. Adicionar localStorage/sessionStorage para persistir sessão. Configurar redirect automático para login quando não autenticado. Implementar loading state durante verificação de autenticação.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar fluxo completo de login/logout. Verificar persistência de sessão ao recarregar página. Validar redirecionamento de rotas protegidas. Testar expiração e renovação de token"
           },
           {
@@ -864,7 +864,7 @@
               "13.3"
             ],
             "details": "Página Planos: criar DataGrid do Material-UI com colunas (nome, créditos, preço, ações). Implementar modal/drawer para criar/editar plano com validação de formulário usando react-hook-form. Adicionar confirmação antes de deletar. Página Clínicas: implementar lista com cards ou tabela mostrando informações da clínica. Adicionar filtros por nome, tipo e localização. Implementar paginação server-side. Criar serviços no axios para todas operações CRUD. Adicionar feedback visual com Snackbar para ações bem-sucedidas/erros.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Testar todas operações CRUD de planos. Verificar validações de formulário. Testar filtros e paginação de clínicas. Validar tratamento de erros da API"
           },
           {
@@ -875,7 +875,7 @@
               "13.4"
             ],
             "details": "Dashboard: integrar biblioteca de gráficos (recharts ou Chart.js). Criar cards com métricas: total de pacientes, transações do mês, planos mais usados, clínicas mais ativas. Implementar gráficos: linha (transações por dia), pizza (distribuição por plano), barras (clínicas top 10). Página Transações: criar tabela com filtros por data, clínica, paciente. Adicionar exportação para CSV/Excel. Página Pacientes: implementar busca por nome/CPF/email. Mostrar detalhes: plano atual, histórico de visitas, informações de contato. Adicionar skeleton loaders durante carregamento de dados.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Verificar renderização correta dos gráficos com dados reais. Testar todos os filtros de transações. Validar busca de pacientes e exibição de detalhes. Testar exportação de dados"
           }
         ]
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-30T09:52:11.363Z",
+      "updated": "2025-07-30T11:35:54.080Z",
       "description": "Tasks for master context"
     }
   }
