@@ -91,19 +91,35 @@ public class QRCodeController : BaseController
                 request.Size ?? 300,
                 request.ExpirationMinutes ?? 30);
 
+            // Check if QR Code generation was successful
+            if (!qrCodeResult.Success)
+            {
+                _logger.LogWarning("QR Code generation failed for user {UserId}: {ErrorMessage}", 
+                    userId, qrCodeResult.ErrorMessage);
+                
+                var errorResponse = new QRCodeGenerateResponseDto
+                {
+                    Success = false,
+                    ErrorMessage = qrCodeResult.ErrorMessage
+                };
+
+                return BadRequest(ResponseWrapper<QRCodeGenerateResponseDto>.Failure(
+                    qrCodeResult.ErrorMessage ?? "QR Code generation failed", errorResponse));
+            }
+
             // Create response
             var response = new QRCodeGenerateResponseDto
             {
-                Success = true,
-                QRCode = qrCodeDataUrl,
-                Token = token,
-                Nonce = nonce,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(request.ExpirationMinutes ?? 30),
-                GeneratedAt = DateTime.UtcNow
+                Success = qrCodeResult.Success,
+                QRCode = qrCodeResult.QRCodeDataUrl,
+                Token = qrCodeResult.Token,
+                Nonce = qrCodeResult.Nonce,
+                ExpiresAt = qrCodeResult.ExpiresAt,
+                GeneratedAt = qrCodeResult.GeneratedAt
             };
 
             _logger.LogInformation("QR Code generated successfully for user {UserId} with nonce {Nonce}", 
-                userId, nonce);
+                userId, qrCodeResult.Nonce);
 
             return Ok(ResponseWrapper<QRCodeGenerateResponseDto>.Success(response));
         }
@@ -181,6 +197,32 @@ public class QRCodeController : BaseController
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to validate QR Code token");
+            return StatusCode(500, ResponseWrapper<object>.Failure("Internal server error"));
+        }
+    }
+
+    /// <summary>
+    /// Get QR Code generation metrics (admin only)
+    /// </summary>
+    /// <returns>QR Code generation statistics</returns>
+    [HttpGet("metrics")]
+    [Authorize(Policy = "RequireAdminRole")]
+    [SwaggerOperation(
+        Summary = "Get QR Code Metrics",
+        Description = "Get QR Code generation statistics (admin only)"
+    )]
+    [SwaggerResponse(200, "Metrics retrieved successfully")]
+    [SwaggerResponse(403, "Insufficient permissions")]
+    public async Task<ActionResult<ResponseWrapper<QRCodeMetrics>>> GetMetrics()
+    {
+        try
+        {
+            var metrics = await _qrCodeService.GetMetricsAsync();
+            return Ok(ResponseWrapper<QRCodeMetrics>.Success(metrics));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve QR Code metrics");
             return StatusCode(500, ResponseWrapper<object>.Failure("Internal server error"));
         }
     }
