@@ -196,6 +196,9 @@ public class Program
         // Add Report Service
         builder.Services.AddScoped<IReportService, ReportService>();
 
+        // Add Export Service
+        builder.Services.AddScoped<IExportService, ExportService>();
+
         // Configure authorization policies
         builder.Services.AddAuthorization(options =>
         {

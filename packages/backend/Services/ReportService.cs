@@ -287,18 +287,196 @@ namespace SingleClin.API.Services
             ReportRequest request, 
             CancellationToken cancellationToken = default)
         {
-            // Implementation similar to above methods
-            // This is a placeholder for the service report generation
-            throw new NotImplementedException("Service report generation will be implemented in the next iteration");
+            var stopwatch = Stopwatch.StartNew();
+            var cacheKey = GenerateCacheKey(request);
+
+            // Try to get from cache
+            if (_cache.TryGetValue<ReportResponse<ServiceReportData>>(cacheKey, out var cachedReport))
+            {
+                _logger.LogInformation("Returning cached service report");
+                cachedReport!.FromCache = true;
+                return cachedReport;
+            }
+
+            try
+            {
+                _logger.LogInformation("Generating service report from database");
+
+                // Build base query
+                var transactionsQuery = _context.Transactions
+                    .AsNoTracking()
+                    .Include(t => t.Clinic)
+                    .Include(t => t.UserPlan)
+                    .ThenInclude(up => up.User)
+                    .Where(t => t.CreatedAt >= request.StartDate && 
+                               t.CreatedAt <= request.EndDate &&
+                               t.Status == Data.Models.Enums.TransactionStatus.Validated);
+
+                // Apply filters
+                if (request.ClinicIds?.Any() == true)
+                {
+                    transactionsQuery = transactionsQuery.Where(t => request.ClinicIds.Contains(t.ClinicId));
+                }
+
+                // Get service usage data
+                var topServices = await GetTopServicesAsync(transactionsQuery, cancellationToken);
+
+                // Get service distribution
+                var distribution = await GetServiceDistributionAsync(transactionsQuery, cancellationToken);
+
+                // Get service trends
+                var trends = await GetServiceTrendsAsync(transactionsQuery, request, cancellationToken);
+
+                // Generate insights
+                var insights = GenerateServiceInsights(topServices, trends, distribution);
+
+                // Build response
+                var response = new ReportResponse<ServiceReportData>
+                {
+                    Type = ReportType.TopServices,
+                    Title = "Service Usage Analysis",
+                    Description = $"Service usage analysis from {request.StartDate:yyyy-MM-dd} to {request.EndDate:yyyy-MM-dd}",
+                    Period = new ReportPeriodInfo
+                    {
+                        StartDate = request.StartDate,
+                        EndDate = request.EndDate,
+                        Period = request.Period,
+                        TimeZone = request.TimeZone
+                    },
+                    Data = new ServiceReportData
+                    {
+                        TopServices = topServices,
+                        Distribution = distribution,
+                        Trends = trends,
+                        Insights = insights
+                    },
+                    Summary = new ReportSummary
+                    {
+                        TotalRecords = topServices.Sum(s => s.UsageCount),
+                        Totals = new Dictionary<string, decimal>
+                        {
+                            ["TotalServices"] = distribution.TotalUniqueServices,
+                            ["TotalUsageCount"] = topServices.Sum(s => s.UsageCount),
+                            ["TotalCreditsUsed"] = topServices.Sum(s => s.TotalCreditsUsed),
+                            ["UniquePatients"] = topServices.Sum(s => s.UniquePatients)
+                        },
+                        Averages = new Dictionary<string, decimal>
+                        {
+                            ["AverageCreditsPerService"] = topServices.Any() ? 
+                                topServices.Average(s => s.AverageCreditsPerUse) : 0,
+                            ["AverageUsagePerService"] = topServices.Any() ? 
+                                (decimal)topServices.Average(s => s.UsageCount) : 0
+                        }
+                    },
+                    ChartData = GenerateServiceChartData(topServices.Take(10).ToList()),
+                    ExecutionTimeMs = stopwatch.ElapsedMilliseconds,
+                    FromCache = false,
+                    CacheExpiresAt = DateTime.UtcNow.Add(_cacheOptions.AbsoluteExpirationRelativeToNow!.Value)
+                };
+
+                // Cache the result
+                _cache.Set(cacheKey, response, _cacheOptions);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating service report");
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+            }
         }
 
         public async Task<ReportResponse<PlanUtilizationData>> GeneratePlanUtilizationAsync(
             ReportRequest request, 
             CancellationToken cancellationToken = default)
         {
-            // Implementation similar to above methods
-            // This is a placeholder for the plan utilization report generation
-            throw new NotImplementedException("Plan utilization report generation will be implemented in the next iteration");
+            var stopwatch = Stopwatch.StartNew();
+            var cacheKey = GenerateCacheKey(request);
+
+            // Try to get from cache
+            if (_cache.TryGetValue<ReportResponse<PlanUtilizationData>>(cacheKey, out var cachedReport))
+            {
+                _logger.LogInformation("Returning cached plan utilization report");
+                cachedReport!.FromCache = true;
+                return cachedReport;
+            }
+
+            try
+            {
+                _logger.LogInformation("Generating plan utilization report from database");
+
+                // Get plan utilization data
+                var planData = await GetPlanUtilizationDataAsync(request, cancellationToken);
+
+                // Calculate summary metrics
+                var summary = CalculateUtilizationSummary(planData);
+
+                // Identify utilization patterns
+                var patterns = IdentifyUtilizationPatterns(planData);
+
+                // Calculate efficiency metrics
+                var efficiency = CalculatePlanEfficiencyMetrics(planData);
+
+                // Build response
+                var response = new ReportResponse<PlanUtilizationData>
+                {
+                    Type = ReportType.PlanUtilization,
+                    Title = "Plan Utilization Analysis",
+                    Description = $"Plan utilization analysis from {request.StartDate:yyyy-MM-dd} to {request.EndDate:yyyy-MM-dd}",
+                    Period = new ReportPeriodInfo
+                    {
+                        StartDate = request.StartDate,
+                        EndDate = request.EndDate,
+                        Period = request.Period,
+                        TimeZone = request.TimeZone
+                    },
+                    Data = new PlanUtilizationData
+                    {
+                        Plans = planData,
+                        Summary = summary,
+                        Patterns = patterns,
+                        Efficiency = efficiency
+                    },
+                    Summary = new ReportSummary
+                    {
+                        TotalRecords = planData.Count,
+                        Totals = new Dictionary<string, decimal>
+                        {
+                            ["TotalPlans"] = planData.Count,
+                            ["TotalActiveUsers"] = planData.Sum(p => p.Usage.ActiveUsers),
+                            ["TotalCreditsUsed"] = planData.Sum(p => p.Usage.TotalCreditsUsed),
+                            ["TotalCreditsWasted"] = planData.Sum(p => p.Usage.TotalCreditsExpired)
+                        },
+                        Averages = new Dictionary<string, decimal>
+                        {
+                            ["AverageUtilizationRate"] = summary.OverallUtilizationRate,
+                            ["AverageEfficiency"] = efficiency.AverageCreditEfficiency
+                        }
+                    },
+                    ChartData = GeneratePlanUtilizationChartData(planData),
+                    ExecutionTimeMs = stopwatch.ElapsedMilliseconds,
+                    FromCache = false,
+                    CacheExpiresAt = DateTime.UtcNow.Add(_cacheOptions.AbsoluteExpirationRelativeToNow!.Value)
+                };
+
+                // Cache the result
+                _cache.Set(cacheKey, response, _cacheOptions);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating plan utilization report");
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+            }
         }
 
         public async Task<byte[]> ExportReportAsync(
@@ -840,6 +1018,697 @@ namespace SingleClin.API.Services
                     Title = "Top 10 Clínicas por Performance"
                 }
             };
+        }
+
+        private async Task<List<ServiceUsageItem>> GetTopServicesAsync(
+            IQueryable<Transaction> query, 
+            CancellationToken cancellationToken)
+        {
+            var totalTransactions = await query.CountAsync(cancellationToken);
+
+            var serviceData = await query
+                .Where(t => !string.IsNullOrEmpty(t.ServiceType))
+                .GroupBy(t => t.ServiceType)
+                .Select(g => new
+                {
+                    ServiceType = g.Key,
+                    UsageCount = g.Count(),
+                    TotalCreditsUsed = g.Sum(t => t.CreditsUsed),
+                    UniquePatients = g.Select(t => t.UserPlan.UserId).Distinct().Count(),
+                    TopClinics = g.GroupBy(t => new { t.ClinicId, t.Clinic.Name })
+                        .OrderByDescending(cg => cg.Count())
+                        .Take(3)
+                        .Select(cg => cg.Key.Name)
+                        .ToList()
+                })
+                .OrderByDescending(s => s.UsageCount)
+                .ToListAsync(cancellationToken);
+
+            // Calculate market share and growth
+            var result = serviceData.Select(s => new ServiceUsageItem
+            {
+                ServiceType = s.ServiceType!,
+                ServiceName = GetServiceDisplayName(s.ServiceType!),
+                Category = GetServiceCategory(s.ServiceType!),
+                UsageCount = s.UsageCount,
+                TotalCreditsUsed = s.TotalCreditsUsed,
+                AverageCreditsPerUse = s.UsageCount > 0 ? (decimal)s.TotalCreditsUsed / s.UsageCount : 0,
+                MarketShare = totalTransactions > 0 ? (decimal)s.UsageCount / totalTransactions * 100 : 0,
+                UniquePatients = s.UniquePatients,
+                TopClinics = s.TopClinics,
+                GrowthRate = 0 // TODO: Calculate based on previous period
+            }).ToList();
+
+            return result;
+        }
+
+        private async Task<ServiceDistribution> GetServiceDistributionAsync(
+            IQueryable<Transaction> query, 
+            CancellationToken cancellationToken)
+        {
+            var services = await query
+                .Where(t => !string.IsNullOrEmpty(t.ServiceType))
+                .Select(t => t.ServiceType)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            var categoryCounts = services
+                .GroupBy(s => GetServiceCategory(s!))
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var totalServices = services.Count;
+            var categoryPercentages = categoryCounts
+                .ToDictionary(kv => kv.Key, kv => totalServices > 0 ? (decimal)kv.Value / totalServices * 100 : 0);
+
+            // Calculate concentration index (simplified Herfindahl index)
+            var serviceUsageCounts = await query
+                .Where(t => !string.IsNullOrEmpty(t.ServiceType))
+                .GroupBy(t => t.ServiceType)
+                .Select(g => g.Count())
+                .ToListAsync(cancellationToken);
+
+            var totalUsage = serviceUsageCounts.Sum();
+            var concentrationIndex = 0m;
+            if (totalUsage > 0)
+            {
+                foreach (var count in serviceUsageCounts)
+                {
+                    var marketShare = (decimal)count / totalUsage;
+                    concentrationIndex += marketShare * marketShare;
+                }
+            }
+
+            return new ServiceDistribution
+            {
+                ByCategory = categoryCounts,
+                CategoryPercentages = categoryPercentages,
+                ByPriceRange = new Dictionary<string, int>(), // TODO: Implement if price data available
+                TotalUniqueServices = totalServices,
+                ConcentrationIndex = concentrationIndex
+            };
+        }
+
+        private async Task<List<ServiceTrend>> GetServiceTrendsAsync(
+            IQueryable<Transaction> query, 
+            ReportRequest request,
+            CancellationToken cancellationToken)
+        {
+            // Get top 5 services for trend analysis
+            var topServices = await query
+                .Where(t => !string.IsNullOrEmpty(t.ServiceType))
+                .GroupBy(t => t.ServiceType)
+                .OrderByDescending(g => g.Count())
+                .Take(5)
+                .Select(g => g.Key)
+                .ToListAsync(cancellationToken);
+
+            var trends = new List<ServiceTrend>();
+
+            foreach (var service in topServices)
+            {
+                var trendData = await GetServiceTrendData(query, service!, request, cancellationToken);
+                
+                // Calculate trend direction
+                var trendDirection = "stable";
+                var projectedGrowth = 0m;
+
+                if (trendData.Count >= 2)
+                {
+                    var firstHalf = trendData.Take(trendData.Count / 2).Average(t => t.Count);
+                    var secondHalf = trendData.Skip(trendData.Count / 2).Average(t => t.Count);
+                    
+                    if (secondHalf > firstHalf * 1.1)
+                        trendDirection = "up";
+                    else if (secondHalf < firstHalf * 0.9)
+                        trendDirection = "down";
+
+                    // Simple linear projection
+                    if (trendData.Count >= 3)
+                    {
+                        var lastThree = trendData.TakeLast(3).Select(t => t.Count).ToList();
+                        var avgGrowth = (lastThree[2] - lastThree[0]) / 2.0m;
+                        projectedGrowth = (decimal)(lastThree[2] + avgGrowth);
+                    }
+                }
+
+                trends.Add(new ServiceTrend
+                {
+                    ServiceType = service!,
+                    TrendData = trendData,
+                    TrendDirection = trendDirection,
+                    ProjectedGrowth = projectedGrowth
+                });
+            }
+
+            return trends;
+        }
+
+        private async Task<List<TrendPoint>> GetServiceTrendData(
+            IQueryable<Transaction> query,
+            string serviceType,
+            ReportRequest request,
+            CancellationToken cancellationToken)
+        {
+            var serviceQuery = query.Where(t => t.ServiceType == serviceType);
+
+            // Group by period based on request
+            switch (request.Period)
+            {
+                case ReportPeriod.Daily:
+                    return await serviceQuery
+                        .GroupBy(t => t.CreatedAt.Date)
+                        .Select(g => new TrendPoint
+                        {
+                            Date = g.Key,
+                            Count = g.Count(),
+                            Value = g.Sum(t => t.CreditsUsed)
+                        })
+                        .OrderBy(t => t.Date)
+                        .ToListAsync(cancellationToken);
+
+                case ReportPeriod.Weekly:
+                    var weeklyData = await serviceQuery
+                        .GroupBy(t => new 
+                        { 
+                            Year = t.CreatedAt.Year,
+                            Week = ((t.CreatedAt.DayOfYear - ((int)t.CreatedAt.DayOfWeek + 6) % 7 + 9) / 7)
+                        })
+                        .Select(g => new
+                        {
+                            Year = g.Key.Year,
+                            Week = g.Key.Week,
+                            Count = g.Count(),
+                            Value = g.Sum(t => t.CreditsUsed),
+                            MinDate = g.Min(t => t.CreatedAt)
+                        })
+                        .ToListAsync(cancellationToken);
+
+                    return weeklyData.Select(d => new TrendPoint
+                    {
+                        Date = d.MinDate,
+                        Count = d.Count,
+                        Value = d.Value
+                    }).OrderBy(t => t.Date).ToList();
+
+                case ReportPeriod.Monthly:
+                default:
+                    return await serviceQuery
+                        .GroupBy(t => new { t.CreatedAt.Year, t.CreatedAt.Month })
+                        .Select(g => new TrendPoint
+                        {
+                            Date = new DateTime(g.Key.Year, g.Key.Month, 1),
+                            Count = g.Count(),
+                            Value = g.Sum(t => t.CreditsUsed)
+                        })
+                        .OrderBy(t => t.Date)
+                        .ToListAsync(cancellationToken);
+            }
+        }
+
+        private ServiceInsights GenerateServiceInsights(
+            List<ServiceUsageItem> topServices, 
+            List<ServiceTrend> trends,
+            ServiceDistribution distribution)
+        {
+            var insights = new ServiceInsights();
+
+            // Identify emerging services (high growth rate)
+            insights.EmergingServices = topServices
+                .Where(s => s.GrowthRate > 20)
+                .OrderByDescending(s => s.GrowthRate)
+                .Take(3)
+                .Select(s => s.ServiceType)
+                .ToList();
+
+            // Identify declining services
+            insights.DecliningServices = topServices
+                .Where(s => s.GrowthRate < -10)
+                .OrderBy(s => s.GrowthRate)
+                .Take(3)
+                .Select(s => s.ServiceType)
+                .ToList();
+
+            // Calculate seasonality scores (simplified)
+            foreach (var trend in trends)
+            {
+                if (trend.TrendData.Count >= 4)
+                {
+                    var variance = CalculateVariance(trend.TrendData.Select(t => (double)t.Count).ToList());
+                    var mean = trend.TrendData.Average(t => t.Count);
+                    var seasonalityScore = mean > 0 ? (decimal)(variance / mean) : 0;
+                    insights.SeasonalPatterns[trend.ServiceType] = seasonalityScore;
+                }
+            }
+
+            // Generate recommendations
+            insights.Recommendations = GenerateServiceRecommendations(topServices, distribution, insights);
+
+            return insights;
+        }
+
+        private List<string> GenerateServiceRecommendations(
+            List<ServiceUsageItem> topServices,
+            ServiceDistribution distribution,
+            ServiceInsights insights)
+        {
+            var recommendations = new List<string>();
+
+            // High concentration recommendation
+            if (distribution.ConcentrationIndex > 0.5m)
+            {
+                recommendations.Add("Service usage is highly concentrated. Consider promoting underutilized services.");
+            }
+
+            // Emerging services recommendation
+            if (insights.EmergingServices.Any())
+            {
+                recommendations.Add($"Services showing high growth: {string.Join(", ", insights.EmergingServices.Take(3))}. Consider increasing capacity.");
+            }
+
+            // Declining services recommendation
+            if (insights.DecliningServices.Any())
+            {
+                recommendations.Add($"Services showing decline: {string.Join(", ", insights.DecliningServices.Take(3))}. Review service quality or pricing.");
+            }
+
+            // Efficiency recommendation
+            var highCreditServices = topServices.Where(s => s.AverageCreditsPerUse > 5).ToList();
+            if (highCreditServices.Any())
+            {
+                recommendations.Add($"High-credit services: {string.Join(", ", highCreditServices.Take(3).Select(s => s.ServiceType))}. Monitor for appropriate usage.");
+            }
+
+            return recommendations;
+        }
+
+        private async Task<List<PlanUtilizationItem>> GetPlanUtilizationDataAsync(
+            ReportRequest request,
+            CancellationToken cancellationToken)
+        {
+            var plans = await _context.Plans
+                .AsNoTracking()
+                .Include(p => p.UserPlans)
+                .ThenInclude(up => up.Transactions)
+                .Where(p => p.IsActive)
+                .ToListAsync(cancellationToken);
+
+            var utilizationData = new List<PlanUtilizationItem>();
+
+            foreach (var plan in plans)
+            {
+                var userPlans = plan.UserPlans
+                    .Where(up => up.CreatedAt <= request.EndDate);
+
+                var activeUserPlans = userPlans
+                    .Where(up => up.Transactions.Any(t => 
+                        t.CreatedAt >= request.StartDate && 
+                        t.CreatedAt <= request.EndDate));
+
+                var transactions = userPlans
+                    .SelectMany(up => up.Transactions)
+                    .Where(t => t.CreatedAt >= request.StartDate && 
+                               t.CreatedAt <= request.EndDate);
+
+                var totalCreditsUsed = transactions.Sum(t => t.CreditsUsed);
+                var totalCreditsAvailable = userPlans.Sum(up => up.Credits);
+                var totalCreditsExpired = userPlans
+                    .Where(up => up.ExpiresAt < DateTime.UtcNow && up.ExpiresAt >= request.StartDate)
+                    .Sum(up => up.CreditsRemaining);
+
+                // Calculate monthly breakdown
+                var monthlyBreakdown = await GetMonthlyBreakdown(plan.Id, request, cancellationToken);
+
+                // Calculate average time between uses
+                var transactionDates = transactions
+                    .OrderBy(t => t.CreatedAt)
+                    .Select(t => t.CreatedAt)
+                    .ToList();
+
+                var avgTimeBetweenUses = TimeSpan.Zero;
+                if (transactionDates.Count > 1)
+                {
+                    var totalTime = TimeSpan.Zero;
+                    for (int i = 1; i < transactionDates.Count; i++)
+                    {
+                        totalTime += transactionDates[i] - transactionDates[i - 1];
+                    }
+                    avgTimeBetweenUses = TimeSpan.FromMilliseconds(totalTime.TotalMilliseconds / (transactionDates.Count - 1));
+                }
+
+                var usage = new PlanUsageMetrics
+                {
+                    ActiveUsers = activeUserPlans.Count(),
+                    TotalUsers = userPlans.Count(),
+                    TotalCreditsUsed = totalCreditsUsed,
+                    TotalCreditsExpired = totalCreditsExpired,
+                    TotalCreditsAvailable = totalCreditsAvailable,
+                    AverageCreditsPerUser = activeUserPlans.Any() ? 
+                        (decimal)totalCreditsUsed / activeUserPlans.Count() : 0,
+                    AverageTimeBetweenUses = avgTimeBetweenUses
+                };
+
+                // Calculate efficiency metrics
+                var efficiency = CalculatePlanEfficiency(plan, userPlans.ToList(), usage);
+
+                utilizationData.Add(new PlanUtilizationItem
+                {
+                    PlanId = plan.Id,
+                    PlanName = plan.Name,
+                    TotalCredits = plan.Credits,
+                    Price = plan.Price,
+                    Usage = usage,
+                    Efficiency = efficiency,
+                    MonthlyBreakdown = monthlyBreakdown
+                });
+            }
+
+            return utilizationData;
+        }
+
+        private PlanEfficiency CalculatePlanEfficiency(Plan plan, List<UserPlan> userPlans, PlanUsageMetrics usage)
+        {
+            var efficiency = new PlanEfficiency();
+
+            // Credit efficiency (used vs expired)
+            var totalCreditsIssued = usage.TotalCreditsUsed + usage.TotalCreditsExpired + 
+                                   userPlans.Where(up => up.ExpiresAt > DateTime.UtcNow).Sum(up => up.CreditsRemaining);
+            
+            efficiency.CreditEfficiency = totalCreditsIssued > 0 ? 
+                (decimal)usage.TotalCreditsUsed / totalCreditsIssued * 100 : 0;
+
+            // Value per credit
+            efficiency.ValuePerCredit = usage.TotalCreditsUsed > 0 ? 
+                plan.Price / usage.TotalCreditsUsed : 0;
+
+            // Churn rate (simplified - users who didn't renew)
+            var expiredUserPlans = userPlans.Where(up => up.ExpiresAt < DateTime.UtcNow).ToList();
+            if (expiredUserPlans.Any())
+            {
+                var renewedCount = expiredUserPlans.Count(up => 
+                    userPlans.Any(up2 => up2.UserId == up.UserId && up2.CreatedAt > up.ExpiresAt));
+                
+                efficiency.RenewalRate = (decimal)renewedCount / expiredUserPlans.Count * 100;
+                efficiency.ChurnRate = 100 - efficiency.RenewalRate;
+            }
+
+            // Average days to full utilization
+            var fullyUtilizedPlans = userPlans
+                .Where(up => up.CreditsRemaining == 0)
+                .ToList();
+
+            if (fullyUtilizedPlans.Any())
+            {
+                var totalDays = fullyUtilizedPlans
+                    .Select(up => (up.UpdatedAt - up.CreatedAt).TotalDays)
+                    .Average();
+                
+                efficiency.AverageDaysToFullUtilization = (int)totalDays;
+            }
+
+            // ROI calculation (simplified)
+            efficiency.ROI = efficiency.CreditEfficiency * efficiency.RenewalRate / 100;
+
+            return efficiency;
+        }
+
+        private async Task<List<UsageByMonth>> GetMonthlyBreakdown(
+            Guid planId,
+            ReportRequest request,
+            CancellationToken cancellationToken)
+        {
+            var monthlyData = await _context.Transactions
+                .AsNoTracking()
+                .Where(t => t.UserPlan.PlanId == planId &&
+                           t.CreatedAt >= request.StartDate &&
+                           t.CreatedAt <= request.EndDate)
+                .GroupBy(t => new { t.CreatedAt.Year, t.CreatedAt.Month })
+                .Select(g => new UsageByMonth
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    MonthName = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMMM"),
+                    CreditsUsed = g.Sum(t => t.CreditsUsed),
+                    ActiveUsers = g.Select(t => t.UserPlan.UserId).Distinct().Count()
+                })
+                .OrderBy(m => m.Year).ThenBy(m => m.Month)
+                .ToListAsync(cancellationToken);
+
+            return monthlyData;
+        }
+
+        private UtilizationSummary CalculateUtilizationSummary(List<PlanUtilizationItem> planData)
+        {
+            var summary = new UtilizationSummary();
+
+            if (!planData.Any())
+                return summary;
+
+            // Overall utilization rate
+            var totalCreditsUsed = planData.Sum(p => p.Usage.TotalCreditsUsed);
+            var totalCreditsAvailable = planData.Sum(p => p.Usage.TotalCreditsAvailable);
+            summary.OverallUtilizationRate = totalCreditsAvailable > 0 ? 
+                (decimal)totalCreditsUsed / totalCreditsAvailable * 100 : 0;
+
+            // Average utilization per plan
+            summary.AverageUtilizationPerPlan = planData.Average(p => p.Usage.UtilizationRate * 100);
+
+            // Most/least efficient plans
+            var orderedByEfficiency = planData.OrderByDescending(p => p.Efficiency.CreditEfficiency).ToList();
+            summary.MostEfficientPlan = orderedByEfficiency.FirstOrDefault()?.PlanName ?? "N/A";
+            summary.LeastEfficientPlan = orderedByEfficiency.LastOrDefault()?.PlanName ?? "N/A";
+
+            // Waste metrics
+            summary.TotalCreditsWasted = planData.Sum(p => p.Usage.TotalCreditsExpired);
+            var totalCreditsIssued = totalCreditsUsed + summary.TotalCreditsWasted + 
+                                   planData.Sum(p => p.Usage.TotalCreditsAvailable - p.Usage.TotalCreditsUsed);
+            summary.WastePercentage = totalCreditsIssued > 0 ? 
+                summary.TotalCreditsWasted / totalCreditsIssued * 100 : 0;
+
+            // Utilization by plan type
+            summary.UtilizationByPlanType = planData
+                .GroupBy(p => p.TotalCredits <= 10 ? "Basic" : p.TotalCredits <= 50 ? "Standard" : "Premium")
+                .ToDictionary(g => g.Key, g => g.Average(p => p.Usage.UtilizationRate * 100));
+
+            return summary;
+        }
+
+        private List<UtilizationPattern> IdentifyUtilizationPatterns(List<PlanUtilizationItem> planData)
+        {
+            var patterns = new List<UtilizationPattern>();
+
+            // Pattern 1: Underutilization
+            var underutilizedPlans = planData.Where(p => p.Usage.UtilizationRate < 0.5m).ToList();
+            if (underutilizedPlans.Any())
+            {
+                patterns.Add(new UtilizationPattern
+                {
+                    PatternName = "Underutilization",
+                    Description = "Plans with less than 50% credit utilization",
+                    AffectedPlans = underutilizedPlans.Select(p => p.PlanId).ToList(),
+                    AffectedUsers = underutilizedPlans.Sum(p => p.Usage.TotalUsers),
+                    Recommendation = "Consider smaller plan options or usage reminders"
+                });
+            }
+
+            // Pattern 2: Early depletion
+            var earlyDepletionPlans = planData.Where(p => 
+                p.Efficiency.AverageDaysToFullUtilization > 0 && 
+                p.Efficiency.AverageDaysToFullUtilization < 20).ToList();
+            
+            if (earlyDepletionPlans.Any())
+            {
+                patterns.Add(new UtilizationPattern
+                {
+                    PatternName = "Early Depletion",
+                    Description = "Plans exhausted in less than 20 days",
+                    AffectedPlans = earlyDepletionPlans.Select(p => p.PlanId).ToList(),
+                    AffectedUsers = earlyDepletionPlans.Sum(p => p.Usage.ActiveUsers),
+                    Recommendation = "Consider larger plan options or usage limits"
+                });
+            }
+
+            // Pattern 3: Inactive users
+            var inactivePlans = planData.Where(p => 
+                p.Usage.ActivationRate < 0.7m && p.Usage.TotalUsers > 10).ToList();
+            
+            if (inactivePlans.Any())
+            {
+                patterns.Add(new UtilizationPattern
+                {
+                    PatternName = "Low Activation",
+                    Description = "Plans with less than 70% user activation",
+                    AffectedPlans = inactivePlans.Select(p => p.PlanId).ToList(),
+                    AffectedUsers = inactivePlans.Sum(p => p.Usage.TotalUsers - p.Usage.ActiveUsers),
+                    Recommendation = "Implement onboarding campaigns or activation incentives"
+                });
+            }
+
+            // Pattern 4: High churn
+            var highChurnPlans = planData.Where(p => p.Efficiency.ChurnRate > 30).ToList();
+            if (highChurnPlans.Any())
+            {
+                patterns.Add(new UtilizationPattern
+                {
+                    PatternName = "High Churn",
+                    Description = "Plans with more than 30% churn rate",
+                    AffectedPlans = highChurnPlans.Select(p => p.PlanId).ToList(),
+                    AffectedUsers = highChurnPlans.Sum(p => p.Usage.TotalUsers),
+                    Recommendation = "Review plan value proposition and user satisfaction"
+                });
+            }
+
+            return patterns;
+        }
+
+        private PlanEfficiencyMetrics CalculatePlanEfficiencyMetrics(List<PlanUtilizationItem> planData)
+        {
+            var metrics = new PlanEfficiencyMetrics();
+
+            if (!planData.Any())
+                return metrics;
+
+            // Average credit efficiency
+            metrics.AverageCreditEfficiency = planData.Average(p => p.Efficiency.CreditEfficiency);
+
+            // Optimal utilization threshold (based on data)
+            var efficientPlans = planData
+                .Where(p => p.Efficiency.RenewalRate > 70 && p.Efficiency.ChurnRate < 20)
+                .ToList();
+            
+            metrics.OptimalUtilizationThreshold = efficientPlans.Any() ? 
+                efficientPlans.Average(p => p.Usage.UtilizationRate * 100) : 75m;
+
+            // Underutilized plans
+            metrics.UnderutilizedPlans = planData
+                .Where(p => p.Usage.UtilizationRate < 0.5m)
+                .Select(p => p.PlanName)
+                .ToList();
+
+            // Overutilized plans
+            metrics.OverutilizedPlans = planData
+                .Where(p => p.Efficiency.AverageDaysToFullUtilization > 0 && 
+                           p.Efficiency.AverageDaysToFullUtilization < 15)
+                .Select(p => p.PlanName)
+                .ToList();
+
+            // Efficiency trends (simplified - comparing to previous metrics if available)
+            metrics.EfficiencyTrends = planData
+                .ToDictionary(p => p.PlanName, p => 
+                    p.Efficiency.CreditEfficiency > metrics.AverageCreditEfficiency ? 1m : -1m);
+
+            return metrics;
+        }
+
+        private ChartData GenerateServiceChartData(List<ServiceUsageItem> topServices)
+        {
+            return new ChartData
+            {
+                ChartType = "bar",
+                Labels = topServices.Select(s => s.ServiceName).ToList(),
+                Datasets = new List<ChartDataset>
+                {
+                    new ChartDataset
+                    {
+                        Label = "Uso do Serviço",
+                        Data = topServices.Select(s => (decimal)s.UsageCount).ToList(),
+                        BackgroundColor = "#2196f3",
+                        BorderColor = "#1976d2",
+                        BorderWidth = 1
+                    },
+                    new ChartDataset
+                    {
+                        Label = "Créditos Utilizados",
+                        Data = topServices.Select(s => (decimal)s.TotalCreditsUsed).ToList(),
+                        BackgroundColor = "#4caf50",
+                        BorderColor = "#388e3c",
+                        BorderWidth = 1
+                    }
+                },
+                Options = new ChartOptions
+                {
+                    Responsive = true,
+                    MaintainAspectRatio = false,
+                    Title = "Top Serviços por Utilização"
+                }
+            };
+        }
+
+        private ChartData GeneratePlanUtilizationChartData(List<PlanUtilizationItem> planData)
+        {
+            return new ChartData
+            {
+                ChartType = "doughnut",
+                Labels = planData.Select(p => p.PlanName).ToList(),
+                Datasets = new List<ChartDataset>
+                {
+                    new ChartDataset
+                    {
+                        Label = "Taxa de Utilização",
+                        Data = planData.Select(p => Math.Round(p.Usage.UtilizationRate * 100, 2)).ToList(),
+                        BackgroundColor = GenerateColors(planData.Count),
+                        BorderColor = "#ffffff",
+                        BorderWidth = 2
+                    }
+                },
+                Options = new ChartOptions
+                {
+                    Responsive = true,
+                    MaintainAspectRatio = false,
+                    Title = "Utilização de Planos (%)"
+                }
+            };
+        }
+
+        private string GetServiceDisplayName(string serviceType)
+        {
+            // Map internal service types to display names
+            return serviceType switch
+            {
+                "consultation" => "Consulta",
+                "exam" => "Exame",
+                "procedure" => "Procedimento",
+                "therapy" => "Terapia",
+                _ => serviceType
+            };
+        }
+
+        private string GetServiceCategory(string serviceType)
+        {
+            // Categorize services
+            return serviceType switch
+            {
+                "consultation" => "Consultas",
+                "exam" or "lab_test" => "Exames",
+                "procedure" or "surgery" => "Procedimentos",
+                "therapy" or "physiotherapy" => "Terapias",
+                _ => "Outros"
+            };
+        }
+
+        private double CalculateVariance(List<double> values)
+        {
+            if (values.Count < 2)
+                return 0;
+
+            var mean = values.Average();
+            var variance = values.Sum(v => Math.Pow(v - mean, 2)) / values.Count;
+            return variance;
+        }
+
+        private List<string> GenerateColors(int count)
+        {
+            var colors = new[]
+            {
+                "#2196f3", "#4caf50", "#ff9800", "#f44336", "#9c27b0",
+                "#00bcd4", "#8bc34a", "#ffc107", "#e91e63", "#673ab7"
+            };
+
+            var result = new List<string>();
+            for (int i = 0; i < count; i++)
+            {
+                result.Add(colors[i % colors.Length]);
+            }
+            return result;
         }
 
         #endregion
