@@ -483,7 +483,7 @@
           3,
           5
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -535,7 +535,7 @@
               "8.4"
             ],
             "details": "Criar QRCodeService com método principal generateQRCode(userPlanId). Orquestrar: chamar QRCodeTokenService.generateToken(), depois QRCodeGeneratorService.generateQRCode(). Adicionar logging de auditoria para cada QR gerado. Implementar métricas: total de QR codes gerados, taxa de erro. Criar método validateUserPlan() para verificar se plano está ativo antes de gerar. Adicionar cache temporário de 1 minuto para evitar regeneração desnecessária.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Testar fluxo completo de geração. Verificar logs de auditoria. Validar rejeição para plano inativo. Testar cache temporário. Verificar métricas sendo registradas."
           }
         ]
@@ -686,7 +686,7 @@
         "dependencies": [
           8
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -694,7 +694,7 @@
             "description": "Implementar modelos de dados para transações e estrutura base do serviço de validação",
             "dependencies": [],
             "details": "Criar modelo Transaction com campos: id, userPlanId, clinicId, serviceType, qrToken, validatedAt, amount. Criar QRCodeValidationService com interface para validação. Definir DTOs para request/response da validação. Implementar estrutura de erros customizados para validação (QRExpiredError, QRAlreadyUsedError, InvalidQRError).",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Testar criação de instâncias dos modelos. Verificar validação de campos obrigatórios. Testar serialização/deserialização dos DTOs."
           },
           {
@@ -1019,7 +1019,7 @@
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-30T00:16:37.156Z",
+      "updated": "2025-07-30T00:20:20.999Z",
       "description": "Tasks for master context"
     }
   }
