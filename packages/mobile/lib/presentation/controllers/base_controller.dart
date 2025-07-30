@@ -17,7 +17,7 @@ abstract class BaseController extends GetxController {
   String? get successMessage => _successMessage.value;
 
   /// Sets loading state
-  void setLoading(bool value) {
+  set loading(bool value) {
     _isLoading.value = value;
   }
 
@@ -59,7 +59,7 @@ abstract class BaseController extends GetxController {
   }) async {
     try {
       if (showLoading) {
-        setLoading(true);
+        loading = true;
       }
       clearError();
 
@@ -84,14 +84,31 @@ abstract class BaseController extends GetxController {
       return null;
     } finally {
       if (showLoading) {
-        setLoading(false);
+        loading = false;
       }
     }
   }
 
   /// Maps exceptions to failures
   Failure _mapExceptionToFailure(Exception e) {
-    // TODO(error): Add specific exception mapping
+    // Handle specific exception types
+    if (e.toString().contains('SocketException')) {
+      return const NetworkFailure();
+    } else if (e.toString().contains('TimeoutException')) {
+      return const TimeoutFailure();
+    } else if (e.toString().contains('FormatException')) {
+      return ValidationFailure(message: 'Formato de dados inválido', details: e);
+    } else if (e.toString().contains('unauthorized') || 
+               e.toString().contains('401')) {
+      return const AuthorizationFailure();
+    } else if (e.toString().contains('forbidden') || 
+               e.toString().contains('403')) {
+      return const AuthorizationFailure(message: 'Acesso negado');
+    } else if (e.toString().contains('not found') || 
+               e.toString().contains('404')) {
+      return const NotFoundFailure();
+    }
+    
     return UnknownFailure(message: e.toString(), details: e);
   }
 
