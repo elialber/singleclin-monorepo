@@ -108,6 +108,19 @@ public class Program
         builder.Services.AddScoped<IPlanRepository, PlanRepository>();
         builder.Services.AddScoped<IPlanService, PlanService>();
 
+        // Add Redis caching
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetSection("Redis:ConnectionString").Value;
+            options.InstanceName = builder.Configuration.GetSection("Redis:InstanceName").Value ?? "SingleClin";
+        });
+
+        // Add Redis service for QR Code nonce management
+        builder.Services.AddScoped<IRedisService, RedisService>();
+
+        // Add QR Code token service
+        builder.Services.AddScoped<IQRCodeTokenService, QRCodeTokenService>();
+
         // Add claims transformation service
         builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformationService>();
 
@@ -240,6 +253,9 @@ public class Program
             .AddCheck<SingleClin.API.HealthChecks.FirebaseHealthCheck>("firebase", 
                 failureStatus: HealthStatus.Degraded,
                 tags: new[] { "firebase", "auth" })
+            .AddCheck<SingleClin.API.HealthChecks.RedisHealthCheck>("redis",
+                failureStatus: HealthStatus.Degraded,
+                tags: new[] { "redis", "cache", "ready" })
             .AddDbContextCheck<ApplicationDbContext>("database",
                 failureStatus: HealthStatus.Unhealthy,
                 tags: new[] { "database", "ready" });

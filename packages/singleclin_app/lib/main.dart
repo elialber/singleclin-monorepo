@@ -7,12 +7,17 @@ import 'package:singleclin_app/core/routes/routes.dart';
 import 'package:singleclin_app/core/theme/theme.dart';
 import 'data/services/token_refresh_service.dart';
 import 'data/services/app_lifecycle_observer.dart';
+import 'data/services/cache_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Firebase
   await Firebase.initializeApp();
+  
+  // Initialize cache service first
+  final cacheService = CacheService.instance;
+  await cacheService.init();
   
   // Initialize token refresh service and lifecycle observer
   final tokenRefreshService = TokenRefreshService();
@@ -23,6 +28,7 @@ void main() async {
   lifecycleObserver.initialize();
   
   // Register services for dependency injection
+  Get.put<CacheService>(cacheService, permanent: true);
   Get.put<TokenRefreshService>(tokenRefreshService, permanent: true);
   Get.put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
   
