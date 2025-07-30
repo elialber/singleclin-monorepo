@@ -28,7 +28,15 @@ interface ReportFiltersProps {
     planIds: string[]
     serviceTypes: string[]
   }
-  onFiltersChange: (filters: any) => void
+  onFiltersChange: (filters: {
+    reportType: ReportType
+    period: ReportPeriod
+    startDate: Date | null
+    endDate: Date | null
+    clinicIds: string[]
+    planIds: string[]
+    serviceTypes: string[]
+  }) => void
   onGenerateReport: () => void
   onExportReport: (format: 'excel' | 'pdf') => void
   loading?: boolean
@@ -66,7 +74,7 @@ export default function ReportFilters({
   services = [],
 }: ReportFiltersProps) {
   const handleChange = (field: string) => (
-    event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<any>
+    event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string | number>
   ) => {
     onFiltersChange({
       ...filters,

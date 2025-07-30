@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -28,7 +28,7 @@ import {
 } from '@mui/icons-material'
 import { Clinic, ClinicFilters } from '@/types/clinic'
 import { clinicService } from '@/services/clinic.service'
-import { useNotification } from '@/contexts/NotificationContext'
+import { useNotification } from "@/contexts/NotificationContext"
 
 const CLINICS_PER_PAGE = 12
 
@@ -62,9 +62,9 @@ export default function Clinics() {
   // Load clinics when page or filters change
   useEffect(() => {
     loadClinics()
-  }, [page, filtersDebounce])
+  }, [page, filtersDebounce, loadClinics])
 
-  const loadClinics = async () => {
+  const loadClinics = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -78,20 +78,20 @@ export default function Clinics() {
       setClinics(response.data)
       setTotal(response.total)
       setTotalPages(Math.ceil(response.total / CLINICS_PER_PAGE))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading clinics:', err)
       setError('Erro ao carregar clínicas')
       showError('Erro ao carregar clínicas')
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, filtersDebounce, showError])
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage)
   }
 
-  const handleFilterChange = (field: keyof ClinicFilters, value: any) => {
+  const handleFilterChange = (field: keyof ClinicFilters, value: string) => {
     setFilters(prev => ({ ...prev, [field]: value }))
     setPage(1) // Reset to first page when filters change
   }
@@ -253,7 +253,7 @@ export default function Clinics() {
                       <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                         <Chip
                           label={getTypeLabel(clinic.type)}
-                          color={getTypeColor(clinic.type) as any}
+                          color={getTypeColor(clinic.type) as 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'}
                           size="small"
                         />
                         <Chip

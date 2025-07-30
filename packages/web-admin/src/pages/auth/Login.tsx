@@ -17,8 +17,8 @@ import {
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material'
-import { useAuth } from '@/contexts/AuthContext'
-import { useNotification } from '@/contexts/NotificationContext'
+import { useAuth } from "@/contexts/AuthContext"
+import { useNotification } from "@/contexts/NotificationContext"
 
 interface LoginFormData {
   email: string
@@ -52,7 +52,7 @@ export default function Login() {
       setError('')
       await login(data.email, data.password)
       showSuccess('Login realizado com sucesso!')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Login error:', err)
       
       let message = 'Erro ao fazer login. Tente novamente.'
