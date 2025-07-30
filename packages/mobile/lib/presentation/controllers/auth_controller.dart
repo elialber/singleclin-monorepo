@@ -1,18 +1,20 @@
-import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../data/services/auth_service.dart';
-import '../../data/services/user_api_service.dart';
-import '../../data/services/token_refresh_service.dart';
-import '../../domain/entities/user_entity.dart';
-import '../../core/errors/auth_exceptions.dart';
-import '../../core/errors/api_exceptions.dart';
+import 'package:get/get.dart';
+
+import 'package:mobile/core/errors/api_exceptions.dart';
+import 'package:mobile/core/errors/auth_exceptions.dart';
+import 'package:mobile/data/services/auth_service.dart';
+import 'package:mobile/data/services/token_refresh_service.dart';
+import 'package:mobile/data/services/user_api_service.dart';
+import 'package:mobile/domain/entities/user_entity.dart';
 
 /// Controller for managing authentication state and UI interactions
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
   final UserApiService _userApiService = UserApiService();
-  final TokenRefreshService _tokenRefreshService = Get.find<TokenRefreshService>();
+  final TokenRefreshService _tokenRefreshService =
+      Get.find<TokenRefreshService>();
 
   // Observable states
   final _isLoading = false.obs;
@@ -159,7 +161,9 @@ class AuthController extends GetxController {
       await _authService.sendPasswordResetEmail(
         email: forgotEmailController.text.trim(),
       );
-      _showSuccessMessage('Email de recuperação enviado! Verifique sua caixa de entrada.');
+      _showSuccessMessage(
+        'Email de recuperação enviado! Verifique sua caixa de entrada.',
+      );
       forgotEmailController.clear();
       Get.back(); // Return to login screen
     } on AuthException catch (e) {
@@ -259,7 +263,6 @@ class AuthController extends GetxController {
       backgroundColor: Colors.green.shade100,
       colorText: Colors.green.shade800,
       icon: const Icon(Icons.check_circle, color: Colors.green),
-      duration: const Duration(seconds: 3),
     );
   }
 
@@ -329,7 +332,7 @@ class AuthController extends GetxController {
         photoUrl: user.photoUrl,
         isEmailVerified: user.isEmailVerified,
       );
-      
+
       if (kDebugMode) {
         print('✅ User synced with backend successfully');
       }
