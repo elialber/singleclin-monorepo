@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
@@ -555,7 +557,7 @@ class _HomeScreenState extends State<HomeScreen>
       final plan = await _planService.refreshPlanData();
 
       // Also refresh recent transactions
-      _loadRecentTransactions();
+      unawaited(_loadRecentTransactions());
 
       if (mounted) {
         setState(() {

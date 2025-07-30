@@ -32,7 +32,7 @@ class ApiClient {
     _dio.interceptors.clear();
 
     // 1. Logging interceptor (first to log everything)
-    _dio.interceptors.add(LoggingInterceptor(logRequestBody: true));
+    _dio.interceptors.add(LoggingInterceptor());
 
     // 2. Auth interceptor (adds tokens and handles auth errors)
     _dio.interceptors.add(AuthInterceptor());

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mobile/data/models/transaction_model.dart';
@@ -27,7 +28,8 @@ class CacheService {
   static const int _transactionsCacheExpirationMinutes = 15; // 15 minutes
 
   static CacheService? _instance;
-  static CacheService get instance => _instance ??= CacheService._();
+  factory CacheService() => _instance ??= CacheService._();
+  static CacheService get instance => CacheService();
 
   SharedPreferences? _prefs;
 
@@ -58,7 +60,7 @@ class CacheService {
       await prefs.setInt(_planCacheTimeKey, currentTime);
     } catch (e) {
       // Silently fail cache operations to not affect app functionality
-      print('🗂️ Cache: Failed to cache plan data: $e');
+      debugPrint('🗂️ Cache: Failed to cache plan data: $e');
     }
   }
 
@@ -88,7 +90,7 @@ class CacheService {
       final planModel = UserPlanModel.fromJson(planData);
       return planModel.toEntity();
     } catch (e) {
-      print('🗂️ Cache: Failed to get cached plan data: $e');
+      debugPrint('🗂️ Cache: Failed to get cached plan data: $e');
       return null;
     }
   }
@@ -120,7 +122,7 @@ class CacheService {
       await prefs.remove(_planCacheKey);
       await prefs.remove(_planCacheTimeKey);
     } catch (e) {
-      print('🗂️ Cache: Failed to clear plan cache: $e');
+      debugPrint('🗂️ Cache: Failed to clear plan cache: $e');
     }
   }
 
@@ -143,7 +145,7 @@ class CacheService {
       await prefs.setString(_transactionsCacheKey, transactionsJson);
       await prefs.setInt(_transactionsCacheTimeKey, currentTime);
     } catch (e) {
-      print('🗂️ Cache: Failed to cache transactions data: $e');
+      debugPrint('🗂️ Cache: Failed to cache transactions data: $e');
     }
   }
 
@@ -179,7 +181,7 @@ class CacheService {
           )
           .toList();
     } catch (e) {
-      print('🗂️ Cache: Failed to get cached transactions data: $e');
+      debugPrint('🗂️ Cache: Failed to get cached transactions data: $e');
       return [];
     }
   }
@@ -212,7 +214,7 @@ class CacheService {
       await prefs.remove(_transactionsCacheKey);
       await prefs.remove(_transactionsCacheTimeKey);
     } catch (e) {
-      print('🗂️ Cache: Failed to clear transactions cache: $e');
+      debugPrint('🗂️ Cache: Failed to clear transactions cache: $e');
     }
   }
 

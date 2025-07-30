@@ -29,9 +29,10 @@ void main() async {
   lifecycleObserver.initialize();
 
   // Register services for dependency injection
-  Get.put<CacheService>(cacheService, permanent: true);
-  Get.put<TokenRefreshService>(tokenRefreshService, permanent: true);
-  Get.put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
+  Get
+    ..put<CacheService>(cacheService, permanent: true)
+    ..put<TokenRefreshService>(tokenRefreshService, permanent: true)
+    ..put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
 
   runApp(const MyApp());
 }

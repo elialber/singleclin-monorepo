@@ -71,8 +71,9 @@ class ThemeController extends BaseController {
         case ThemeMode.dark:
           themeString = 'dark';
           break;
-        default:
+        case ThemeMode.system:
           themeString = 'system';
+          break;
       }
 
       await prefs.setString(_themeKey, themeString);
@@ -96,8 +97,9 @@ class ThemeController extends BaseController {
       case ThemeMode.dark:
         themeName = 'Escuro';
         break;
-      default:
+      case ThemeMode.system:
         themeName = 'Sistema';
+        break;
     }
 
     showSuccessSnackbar('Tema alterado para: $themeName');
@@ -134,7 +136,7 @@ class ThemeController extends BaseController {
         return Icons.light_mode;
       case ThemeMode.dark:
         return Icons.dark_mode;
-      default:
+      case ThemeMode.system:
         return Icons.brightness_auto;
     }
   }
@@ -146,7 +148,7 @@ class ThemeController extends BaseController {
         return 'Tema Claro';
       case ThemeMode.dark:
         return 'Tema Escuro';
-      default:
+      case ThemeMode.system:
         return 'Tema do Sistema';
     }
   }

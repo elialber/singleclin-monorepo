@@ -214,7 +214,6 @@ class AuthInterceptor extends Interceptor {
         );
 
       case DioExceptionType.unknown:
-      default:
         return ApiConnectionException(
           err.message ?? 'An unknown error occurred',
           'unknown_error',

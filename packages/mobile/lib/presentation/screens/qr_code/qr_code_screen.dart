@@ -311,9 +311,10 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
             data: _qrData!,
             size: 248, // 280 - 32 (padding)
             backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            eyeStyle: const QrEyeStyle(color: Colors.black),
+            dataModuleStyle: const QrDataModuleStyle(color: Colors.black),
             errorCorrectionLevel: QrErrorCorrectLevel.M,
-            padding: const EdgeInsets.all(0),
+            padding: EdgeInsets.zero,
           ),
         ),
       ),

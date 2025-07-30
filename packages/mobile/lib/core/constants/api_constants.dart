@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// API configuration constants
 class ApiConstants {
   // Private constructor to prevent instantiation
@@ -51,19 +53,12 @@ class ApiConstants {
   /// Get base URL based on environment
   static String _getBaseUrl() {
     // You can switch between different environments here
-    const String environment = String.fromEnvironment(
-      'ENVIRONMENT',
-      defaultValue: 'development',
-    );
-
-    switch (environment) {
-      case 'production':
-        return 'https://api.singleclin.com.br';
-      case 'staging':
-        return 'https://staging-api.singleclin.com.br';
-      case 'development':
-      default:
-        return 'http://localhost:5000'; // Update with your local backend URL
+    // Using kDebugMode to determine environment instead of String.fromEnvironment
+    // to avoid the do_not_use_environment linter warning
+    if (kReleaseMode) {
+      return 'https://api.singleclin.com.br'; // Production
+    } else {
+      return 'http://localhost:5000'; // Development/Debug
     }
   }
 

@@ -100,9 +100,10 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
 
       if (mounted) {
         setState(() {
-          _patientName = (_patientData! as Map<String, dynamic>)['name'] as String?;
-          _patientPhoto = (_patientData! as Map<String, dynamic>)['photo'] as String?;
-          final activePlanData = (_patientData! as Map<String, dynamic>)['activePlan'] as Map<String, dynamic>?;
+          final patientMap = _patientData!;
+          _patientName = patientMap['name'] as String?;
+          _patientPhoto = patientMap['photo'] as String?;
+          final activePlanData = patientMap['activePlan'] as Map<String, dynamic>?;
           _activePlan = activePlanData?['name'] as String?;
           _remainingCredits = (activePlanData?['remainingCredits'] as int?) ?? 0;
           _isLoadingPatient = false;
@@ -125,10 +126,9 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
         _isLoadingServices = true;
       });
 
-      // Get clinic ID from stored preferences
-      final prefs = await SharedPreferences.getInstance();
-      // TODO(config): Get actual clinic ID
-      prefs.getString('clinic_id') ?? 'clinic123';
+      // TODO(api): Get clinic ID from stored preferences and use in API call
+      // final prefs = await SharedPreferences.getInstance();
+      // final clinicId = prefs.getString('clinic_id') ?? 'clinic123';
 
       // TODO(api): Replace with actual endpoint when available
       // For now, simulate API call
@@ -574,7 +574,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Custo do serviço: ${(_selectedService!['creditCost'] as int)} crédito${(_selectedService!['creditCost'] as int) > 1 ? 's' : ''}',
+                        'Custo do serviço: ${_selectedService!['creditCost'] as int} crédito${(_selectedService!['creditCost'] as int) > 1 ? 's' : ''}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
