@@ -9,11 +9,10 @@ class InitialBinding extends Bindings {
     // Core services that should be available throughout the app
     // These are initialized lazily (only when needed) to save memory
     
-    // Theme controller - needs to be available immediately
-    Get.put<ThemeController>(ThemeController());
-    
-    // Authentication controller - needs to be available immediately
-    Get.put<AuthController>(AuthController());
+    // Controllers that need to be available immediately
+    Get
+      ..put<ThemeController>(ThemeController())
+      ..put<AuthController>(AuthController());
     
     // Example: Local storage service
     // Get.lazyPut<StorageService>(() => StorageService());

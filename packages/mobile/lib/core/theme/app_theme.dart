@@ -28,7 +28,6 @@ class AppTheme {
       onSecondary: Colors.white,
       onSurface: AppColors.textPrimaryLight,
       onError: Colors.white,
-      brightness: Brightness.light,
     ),
     
     // App Bar Theme
@@ -197,7 +196,7 @@ class AppTheme {
     // Chip Theme
     chipTheme: ChipThemeData(
       backgroundColor: AppColors.grey200,
-      selectedColor: AppColors.primaryLight.withOpacity(0.2),
+      selectedColor: AppColors.primaryLight.withValues(alpha: 0.2),
       labelStyle: const TextStyle(
         color: AppColors.textPrimaryLight,
         fontSize: 14,
@@ -218,7 +217,7 @@ class AppTheme {
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return AppColors.primaryLight.withOpacity(0.5);
+          return AppColors.primaryLight.withValues(alpha: 0.5);
         }
         return AppColors.grey300;
       }),
@@ -267,7 +266,6 @@ class AppTheme {
       onSecondary: Colors.white,
       onSurface: AppColors.textPrimaryDark,
       onError: Colors.white,
-      brightness: Brightness.dark,
     ),
     
     // App Bar Theme
@@ -436,7 +434,7 @@ class AppTheme {
     // Chip Theme
     chipTheme: ChipThemeData(
       backgroundColor: AppColors.grey800,
-      selectedColor: AppColors.primaryDark.withOpacity(0.2),
+      selectedColor: AppColors.primaryDark.withValues(alpha: 0.2),
       labelStyle: const TextStyle(
         color: AppColors.textPrimaryDark,
         fontSize: 14,
@@ -457,7 +455,7 @@ class AppTheme {
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return AppColors.primaryDark.withOpacity(0.5);
+          return AppColors.primaryDark.withValues(alpha: 0.5);
         }
         return AppColors.grey700;
       }),
