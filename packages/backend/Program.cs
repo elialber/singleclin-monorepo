@@ -121,6 +121,12 @@ public class Program
         // Add QR Code token service
         builder.Services.AddScoped<IQRCodeTokenService, QRCodeTokenService>();
 
+        // Add QR Code generator service
+        builder.Services.AddScoped<IQRCodeGeneratorService, QRCodeGeneratorService>();
+
+        // Add QR Code orchestrator service
+        builder.Services.AddScoped<IQRCodeService, QRCodeService>();
+
         // Add claims transformation service
         builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformationService>();
 
