@@ -68,14 +68,14 @@ public class TransactionController : BaseController
                 _logger.LogInformation("QR Code validation successful - Transaction: {TransactionCode}, Clinic: {ClinicId}", 
                     result.TransactionCode, request.ClinicId);
                 
-                return Ok(ResponseWrapper<QRCodeValidateResponseDto>.Success(result, "QR Code validated successfully"));
+                return Ok(ResponseWrapper<QRCodeValidateResponseDto>.CreateSuccess(result, "QR Code validated successfully"));
             }
             else
             {
                 _logger.LogWarning("QR Code validation failed for clinic {ClinicId}: {ErrorCode} - {ErrorMessage}", 
                     request.ClinicId, result.Error?.Code, result.Error?.Message);
                 
-                return BadRequest(ResponseWrapper<QRCodeValidateResponseDto>.Failure(
+                return BadRequest(ResponseWrapper<QRCodeValidateResponseDto>.CreateFailure(
                     result.Error?.Message ?? "QR Code validation failed", result));
             }
         }
@@ -94,7 +94,7 @@ public class TransactionController : BaseController
                 ValidatedAt = DateTime.UtcNow
             };
 
-            return StatusCode(500, ResponseWrapper<QRCodeValidateResponseDto>.Failure(
+            return StatusCode(500, ResponseWrapper<QRCodeValidateResponseDto>.CreateFailure(
                 "Internal server error", errorResult));
         }
     }
@@ -120,7 +120,7 @@ public class TransactionController : BaseController
             var claims = await _qrValidationService.ParseQRCodeTokenAsync(qrToken);
             if (claims == null)
             {
-                return BadRequest(ResponseWrapper<object>.Failure("Invalid or expired QR Code token"));
+                return BadRequest(ResponseWrapper<object>.CreateFailure("Invalid or expired QR Code token"));
             }
 
             var result = new
@@ -135,12 +135,12 @@ public class TransactionController : BaseController
                 tokenType = claims.TokenType
             };
 
-            return Ok(ResponseWrapper<object>.Success(result));
+            return Ok(ResponseWrapper<object>.CreateSuccess(result));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to parse QR Code token");
-            return StatusCode(500, ResponseWrapper<object>.Failure("Internal server error"));
+            return StatusCode(500, ResponseWrapper<object>.CreateFailure("Internal server error"));
         }
     }
 
@@ -185,12 +185,12 @@ public class TransactionController : BaseController
                 transactions = new object[0]
             };
 
-            return Ok(ResponseWrapper<object>.Success(result));
+            return Ok(ResponseWrapper<object>.CreateSuccess(result));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to retrieve clinic transactions");
-            return StatusCode(500, ResponseWrapper<object>.Failure("Internal server error"));
+            return StatusCode(500, ResponseWrapper<object>.CreateFailure("Internal server error"));
         }
     }
 

@@ -50,19 +50,22 @@ From `packages/shared/src/types/`:
 
 ### Monorepo Management
 ```bash
-# Install all dependencies
+# Note: Monorepo npm workspaces setup is pending (Task 1)
+# For now, manage each package individually
+
+# Install all dependencies (when npm workspaces is configured)
 npm install
 
-# Build all packages
+# Build all packages (when npm workspaces is configured)
 npm run build:all
 
-# Run tests across all packages  
+# Run tests across all packages (when npm workspaces is configured)
 npm run test:all
 
-# Lint all code
+# Lint all code (when npm workspaces is configured)
 npm run lint:all
 
-# Clean build artifacts
+# Clean build artifacts (when npm workspaces is configured)
 npm run clean:all
 ```
 

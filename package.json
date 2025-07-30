@@ -1,0 +1,27 @@
+{
+  "name": "singleclin",
+  "version": "1.0.0",
+  "description": "SingleClin Healthcare Management System - Monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build:all": "npm run build --workspaces",
+    "test:all": "npm run test --workspaces",
+    "lint:all": "npm run lint --workspaces",
+    "clean:all": "npm run clean --workspaces",
+    "dev:shared": "npm run dev -w @singleclin/shared",
+    "dev:web-admin": "npm run dev -w @singleclin/web-admin",
+    "build:shared": "npm run build -w @singleclin/shared",
+    "build:web-admin": "npm run build -w @singleclin/web-admin"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

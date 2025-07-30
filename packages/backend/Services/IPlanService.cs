@@ -65,4 +65,11 @@ public interface IPlanService
     /// <param name="excludeId">Plan ID to exclude from uniqueness checks (for updates)</param>
     /// <returns>List of validation errors</returns>
     Task<List<string>> ValidateAsync(PlanRequestDto planRequest, Guid? excludeId = null);
+
+    /// <summary>
+    /// Get user plan by ID
+    /// </summary>
+    /// <param name="id">User plan ID</param>
+    /// <returns>User plan with related data</returns>
+    Task<Data.Models.UserPlan?> GetUserPlanByIdAsync(Guid id);
 }

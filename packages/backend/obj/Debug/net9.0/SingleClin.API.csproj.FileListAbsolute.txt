@@ -169,3 +169,7 @@
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/FluentValidation.dll
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/FluentValidation.AspNetCore.dll
 /Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/FluentValidation.DependencyInjectionExtensions.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/Pipelines.Sockets.Unofficial.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/QRCoder.dll
+/Users/elialber/Development/Repos/SingleClin/packages/backend/bin/Debug/net9.0/StackExchange.Redis.dll
