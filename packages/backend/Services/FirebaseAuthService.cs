@@ -1,6 +1,7 @@
 using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
+using System.IO;
 
 namespace SingleClin.API.Services;
 
@@ -11,76 +12,18 @@ public class FirebaseAuthService : IFirebaseAuthService
 {
     private readonly ILogger<FirebaseAuthService> _logger;
     private readonly IConfiguration _configuration;
-    private readonly bool _isConfigured;
 
     public FirebaseAuthService(ILogger<FirebaseAuthService> logger, IConfiguration configuration)
     {
         _logger = logger;
         _configuration = configuration;
-        _isConfigured = InitializeFirebase();
     }
 
     /// <summary>
     /// Check if Firebase is properly configured
     /// </summary>
-    public bool IsConfigured => _isConfigured;
+    public bool IsConfigured => FirebaseApp.DefaultInstance != null;
 
-    private bool InitializeFirebase()
-    {
-        try
-        {
-            // Check if already initialized
-            if (FirebaseApp.DefaultInstance != null)
-            {
-                return true;
-            }
-
-            var projectId = _configuration["Firebase:ProjectId"];
-            if (string.IsNullOrEmpty(projectId))
-            {
-                _logger.LogWarning("Firebase ProjectId not configured. Social login will not be available.");
-                return false;
-            }
-
-            var serviceAccountPath = _configuration["Firebase:ServiceAccountKeyPath"];
-            GoogleCredential credential;
-
-            if (!string.IsNullOrEmpty(serviceAccountPath) && File.Exists(serviceAccountPath))
-            {
-                // Use service account file if provided
-                credential = GoogleCredential.FromFile(serviceAccountPath);
-                _logger.LogInformation("Firebase initialized with service account file");
-            }
-            else
-            {
-                try
-                {
-                    // Try to use application default credentials (for cloud environments)
-                    credential = GoogleCredential.GetApplicationDefault();
-                    _logger.LogInformation("Firebase initialized with application default credentials");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Failed to get application default credentials. Social login will not be available.");
-                    return false;
-                }
-            }
-
-            FirebaseApp.Create(new AppOptions
-            {
-                Credential = credential,
-                ProjectId = projectId
-            });
-
-            _logger.LogInformation("Firebase Admin SDK initialized successfully for project: {ProjectId}", projectId);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to initialize Firebase Admin SDK");
-            return false;
-        }
-    }
 
     public async Task<FirebaseToken?> VerifyIdTokenAsync(string idToken)
     {
@@ -191,14 +134,20 @@ public class FirebaseAuthService : IFirebaseAuthService
 
     public async Task<UserRecord?> CreateUserAsync(string email, string password, string? displayName = null, bool emailVerified = false)
     {
+        _logger.LogInformation("CreateUserAsync called - Email: {Email}, DisplayName: {DisplayName}", email, displayName);
+        _logger.LogInformation("Firebase IsConfigured: {IsConfigured}, FirebaseApp.DefaultInstance: {HasInstance}", 
+            IsConfigured, FirebaseApp.DefaultInstance != null);
+        
         if (!IsConfigured)
         {
-            _logger.LogWarning("Firebase is not configured. Cannot create user.");
+            _logger.LogError("Firebase is not configured! Cannot create user.");
             return null;
         }
 
         try
         {
+            _logger.LogInformation("Creating user in Firebase Authentication...");
+            
             var args = new UserRecordArgs
             {
                 Email = email,
@@ -212,19 +161,32 @@ public class FirebaseAuthService : IFirebaseAuthService
                 args.DisplayName = displayName;
             }
 
+            _logger.LogInformation("Calling Firebase CreateUserAsync with args: Email={Email}, DisplayName={DisplayName}, EmailVerified={EmailVerified}", 
+                args.Email, args.DisplayName, args.EmailVerified);
+            
             var userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(args);
-            _logger.LogInformation("Successfully created Firebase user: {Uid}, Email: {Email}", userRecord.Uid, email);
+            
+            _logger.LogInformation("Firebase user created successfully! UID: {Uid}, Email: {Email}", 
+                userRecord.Uid, userRecord.Email);
+            
             return userRecord;
         }
         catch (FirebaseAuthException ex)
         {
-            _logger.LogWarning(ex, "Failed to create Firebase user: {Email}. Error Code: {ErrorCode}, Message: {Message}", 
-                email, ex.ErrorCode, ex.Message);
+            _logger.LogError(ex, "Firebase Authentication Error - Code: {ErrorCode}, Message: {Message}, Email: {Email}", 
+                ex.ErrorCode, ex.Message, email);
+            
+            // Log more details about the error
+            if (ex.Message.Contains("EMAIL_EXISTS") || ex.Message.Contains("already exists"))
+            {
+                _logger.LogWarning("User with email {Email} already exists in Firebase", email);
+            }
+            
             return null;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error creating Firebase user: {Email}", email);
+            _logger.LogError(ex, "Unexpected error creating Firebase user for email: {Email}", email);
             return null;
         }
     }
