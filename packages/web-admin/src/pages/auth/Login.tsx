@@ -28,7 +28,6 @@ interface LoginFormData {
 }
 
 import { GoogleLoginButton } from '@/components/GoogleLoginButton'
-import { LoginDebugger } from '@/components/LoginDebugger'
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth()
@@ -217,8 +216,6 @@ export default function Login() {
         </Typography>
       </Box>
 
-      {/* Debug component - remove after fixing login issues */}
-      {import.meta.env.DEV && <LoginDebugger />}
     </Box>
   )
 }
