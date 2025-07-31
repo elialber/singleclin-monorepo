@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, Link } from 'react-router-dom'
 import {
@@ -14,61 +14,60 @@ import {
 import {
   Email as EmailIcon,
   Lock as LockIcon,
+  Person as PersonIcon,
   Visibility,
   VisibilityOff,
-  Google as GoogleIcon,
 } from '@mui/icons-material'
-import { Divider } from '@mui/material'
 import { useAuth } from "@/hooks/useAuth"
 import { useNotification } from "@/hooks/useNotification"
 
-interface LoginFormData {
+interface RegisterFormData {
+  fullName: string
   email: string
   password: string
+  confirmPassword: string
 }
 
-import { GoogleLoginButton } from '@/components/GoogleLoginButton'
-
-export default function Login() {
-  const { login, isAuthenticated } = useAuth()
+export default function Register() {
+  const { register: registerUser } = useAuth()
   const { showError, showSuccess } = useNotification()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
-  } = useForm<LoginFormData>()
+  } = useForm<RegisterFormData>()
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard')
-    }
-  }, [isAuthenticated, navigate])
+  const password = watch('password')
 
-  const handleLogin = async (data: LoginFormData) => {
+  const handleRegister = async (data: RegisterFormData) => {
     try {
       setIsLoading(true)
       setError('')
-      await login(data.email, data.password)
-      showSuccess('Login realizado com sucesso!')
+      await registerUser(data.email, data.password, data.fullName)
+      showSuccess('Conta criada com sucesso! Faça login para continuar.')
+      navigate('/login')
     } catch (err: any) {
-      console.error('Login error:', err)
+      console.error('Register error:', err)
       
-      let message = 'Erro ao fazer login. Tente novamente.'
+      let message = 'Erro ao criar conta. Tente novamente.'
       
-      if (err.response?.status === 401) {
-        message = 'Email ou senha incorretos'
-      } else if (err.response?.status === 403) {
-        message = 'Acesso negado. Verifique suas permissões.'
-      } else if (err.response?.data?.message) {
-        message = err.response.data.message
-      } else if (err.response?.data?.detail) {
-        message = err.response.data.detail
+      if (err.response?.status === 400) {
+        if (err.response?.data?.detail === 'Email already registered') {
+          message = 'Este email já está cadastrado'
+        } else if (err.response?.data?.errors) {
+          // Handle validation errors
+          const errors = err.response.data.errors
+          message = Object.values(errors).flat().join(', ')
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message
+        }
       } else if (err.message) {
         message = err.message
       }
@@ -80,11 +79,10 @@ export default function Login() {
     }
   }
 
-
   return (
-    <Box component="form" onSubmit={handleSubmit(handleLogin)} sx={{ mt: 1 }}>
+    <Box component="form" onSubmit={handleSubmit(handleRegister)} sx={{ mt: 1 }}>
       <Typography component="h2" variant="h5" align="center" sx={{ mb: 3 }}>
-        Faça login em sua conta
+        Criar nova conta
       </Typography>
 
       {error && (
@@ -101,10 +99,35 @@ export default function Login() {
         margin="normal"
         required
         fullWidth
+        id="fullName"
+        label="Nome completo"
+        autoComplete="name"
+        autoFocus
+        error={!!errors.fullName}
+        helperText={errors.fullName?.message}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <PersonIcon color="action" />
+            </InputAdornment>
+          ),
+        }}
+        {...register('fullName', {
+          required: 'Nome é obrigatório',
+          minLength: {
+            value: 3,
+            message: 'Nome deve ter no mínimo 3 caracteres',
+          },
+        })}
+      />
+
+      <TextField
+        margin="normal"
+        required
+        fullWidth
         id="email"
         label="Email"
         autoComplete="email"
-        autoFocus
         error={!!errors.email}
         helperText={errors.email?.message}
         InputProps={{
@@ -130,7 +153,7 @@ export default function Login() {
         label="Senha"
         type={showPassword ? 'text' : 'password'}
         id="password"
-        autoComplete="current-password"
+        autoComplete="new-password"
         error={!!errors.password}
         helperText={errors.password?.message}
         InputProps={{
@@ -154,9 +177,47 @@ export default function Login() {
         {...register('password', {
           required: 'Senha é obrigatória',
           minLength: {
-            value: 6,
-            message: 'Senha deve ter no mínimo 6 caracteres',
+            value: 8,
+            message: 'Senha deve ter no mínimo 8 caracteres',
           },
+          pattern: {
+            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+            message: 'Senha deve conter maiúsculas, minúsculas, números e caracteres especiais',
+          },
+        })}
+      />
+
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        label="Confirmar senha"
+        type={showConfirmPassword ? 'text' : 'password'}
+        id="confirmPassword"
+        autoComplete="new-password"
+        error={!!errors.confirmPassword}
+        helperText={errors.confirmPassword?.message}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <LockIcon color="action" />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                edge="end"
+              >
+                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+        {...register('confirmPassword', {
+          required: 'Confirmação de senha é obrigatória',
+          validate: value => value === password || 'As senhas não coincidem',
         })}
       />
 
@@ -170,36 +231,20 @@ export default function Login() {
         {isLoading ? (
           <CircularProgress size={24} color="inherit" />
         ) : (
-          'Entrar'
+          'Criar conta'
         )}
       </Button>
 
-      <Divider sx={{ my: 2 }}>ou</Divider>
-
-      <GoogleLoginButton />
-
       <Box sx={{ mt: 2, textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary">
-          Esqueceu sua senha?{' '}
-          <Button
-            variant="text"
-            size="small"
-            sx={{ textTransform: 'none' }}
-            disabled
-          >
-            Recuperar senha
-          </Button>
-        </Typography>
-        
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Não tem uma conta?{' '}
-          <Link to="/register" style={{ textDecoration: 'none' }}>
+          Já tem uma conta?{' '}
+          <Link to="/login" style={{ textDecoration: 'none' }}>
             <Button
               variant="text"
               size="small"
               sx={{ textTransform: 'none' }}
             >
-              Criar conta
+              Fazer login
             </Button>
           </Link>
         </Typography>

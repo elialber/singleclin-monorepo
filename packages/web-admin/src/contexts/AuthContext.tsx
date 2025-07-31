@@ -140,6 +140,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const register = async (email: string, password: string, fullName: string) => {
+    try {
+      const result = await authService.register(email, password, fullName)
+      
+      // Store tokens and user data
+      authService.setTokens(result.accessToken, result.refreshToken)
+      localStorage.setItem('@SingleClin:user', JSON.stringify(result.user))
+      
+      setUser(result.user)
+      navigate('/dashboard')
+    } catch (error) {
+      // Clear any partial data on registration failure
+      authService.clearTokens()
+      throw error
+    }
+  }
+
   const logout = async () => {
     try {
       await authService.logout()
@@ -173,6 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         login,
         loginWithGoogle,
+        register,
         logout,
         refreshUser,
       }}
