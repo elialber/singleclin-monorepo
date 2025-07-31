@@ -17,6 +17,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check for redirect result first
     const checkRedirectResult = async () => {
       try {
+        // Only check for redirect result if we don't have tokens
+        const hasTokens = authService.getAccessToken() && authService.getRefreshToken()
+        if (hasTokens) {
+          return
+        }
+        
         setIsLoading(true)
         const redirectResult = await getGoogleRedirectResult()
         
@@ -35,21 +41,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!isSubscribed) return
       
       if (firebaseUser) {
-        try {
-          // If we have a Firebase user, sync with backend
-          const token = await firebaseUser.getIdToken()
-          const result = await authService.loginWithGoogle()
-          
-          authService.setTokens(result.accessToken, result.refreshToken)
-          localStorage.setItem('@SingleClin:user', JSON.stringify(result.user))
-          setUser(result.user)
-          
-          // Only navigate if we're on the login page
-          if (window.location.pathname === '/login') {
-            navigate('/dashboard')
+        // If we have a Firebase user but no stored tokens, it might be from a redirect
+        const accessToken = authService.getAccessToken()
+        if (!accessToken) {
+          // This is likely a Google redirect result, handle it
+          try {
+            const token = await firebaseUser.getIdToken()
+            const response = await authService.loginWithGoogle()
+            
+            authService.setTokens(response.accessToken, response.refreshToken)
+            localStorage.setItem('@SingleClin:user', JSON.stringify(response.user))
+            setUser(response.user)
+            
+            // Only navigate if we're on the login page
+            if (window.location.pathname === '/login') {
+              navigate('/dashboard')
+            }
+          } catch (error) {
+            console.error('Error syncing Firebase user with backend:', error)
+            await loadStoredUser()
           }
-        } catch (error) {
-          console.error('Error syncing Firebase user with backend:', error)
+        } else {
+          // We already have tokens, just load the stored user
           await loadStoredUser()
         }
       } else {
@@ -74,6 +87,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedUser = localStorage.getItem('@SingleClin:user')
 
       if (!accessToken || !refreshToken) {
+        // If no tokens but Firebase user exists, sign out from Firebase
+        const { logOut } = await import('@/services/firebaseAuth')
+        await logOut()
         setIsLoading(false)
         return
       }
@@ -94,8 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('@SingleClin:user', JSON.stringify(refreshResult.user))
         setUser(refreshResult.user)
       } catch (refreshError) {
-        // Refresh failed, clear everything
+        // Refresh failed, clear everything including Firebase
         authService.clearTokens()
+        const { logOut } = await import('@/services/firebaseAuth')
+        await logOut()
         console.error('Failed to refresh token:', refreshError)
       }
     } catch (error) {

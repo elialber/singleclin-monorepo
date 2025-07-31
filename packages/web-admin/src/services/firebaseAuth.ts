@@ -26,9 +26,34 @@ export const signInWithEmail = async (
   email: string,
   password: string
 ): Promise<FirebaseAuthResult> => {
-  const result = await signInWithEmailAndPassword(auth, email, password);
-  const token = await getIdToken(result.user);
-  return { user: result.user, token };
+  try {
+    console.log('Attempting Firebase authentication for:', email);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    console.log('Firebase authentication successful, getting ID token...');
+    const token = await getIdToken(result.user);
+    console.log('ID token obtained successfully');
+    return { user: result.user, token };
+  } catch (error: any) {
+    console.error('Firebase authentication error:', {
+      code: error.code,
+      message: error.message,
+      email,
+      customData: error.customData,
+    });
+    
+    // Provide better error messages
+    if (error.code === 'auth/invalid-credential') {
+      throw new Error('Email ou senha incorretos. Verifique suas credenciais.');
+    } else if (error.code === 'auth/user-not-found') {
+      throw new Error('Usuário não encontrado. Verifique o email digitado.');
+    } else if (error.code === 'auth/wrong-password') {
+      throw new Error('Senha incorreta. Tente novamente.');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Muitas tentativas de login. Tente novamente mais tarde.');
+    }
+    
+    throw error;
+  }
 };
 
 // Sign in with Google

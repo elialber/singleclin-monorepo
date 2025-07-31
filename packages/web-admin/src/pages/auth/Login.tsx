@@ -28,6 +28,7 @@ interface LoginFormData {
 }
 
 import { GoogleLoginButton } from '@/components/GoogleLoginButton'
+import { LoginDebugger } from '@/components/LoginDebugger'
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth()
@@ -61,7 +62,18 @@ export default function Login() {
       
       let message = 'Erro ao fazer login. Tente novamente.'
       
-      if (err.response?.status === 401) {
+      // Handle Firebase specific errors
+      if (err.message?.includes('Email ou senha incorretos')) {
+        message = 'Email ou senha incorretos. Verifique suas credenciais.'
+      } else if (err.message?.includes('Usuário não encontrado')) {
+        message = 'Usuário não encontrado. Verifique o email digitado.'
+      } else if (err.message?.includes('Senha incorreta')) {
+        message = 'Senha incorreta. Tente novamente.'
+      } else if (err.message?.includes('Muitas tentativas')) {
+        message = 'Muitas tentativas de login. Tente novamente mais tarde.'
+      } else if (err.message?.includes('Endpoint de autenticação não encontrado')) {
+        message = 'Erro de conexão com o servidor. Verifique se o backend está rodando.'
+      } else if (err.response?.status === 401) {
         message = 'Email ou senha incorretos'
       } else if (err.response?.status === 403) {
         message = 'Acesso negado. Verifique suas permissões.'
@@ -204,6 +216,9 @@ export default function Login() {
           </Link>
         </Typography>
       </Box>
+
+      {/* Debug component - remove after fixing login issues */}
+      {import.meta.env.DEV && <LoginDebugger />}
     </Box>
   )
 }

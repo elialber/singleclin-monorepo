@@ -48,10 +48,6 @@ export default function Dashboard() {
   
   const { showError } = useNotification()
 
-  useEffect(() => {
-    loadDashboardData()
-  }, [period, loadDashboardData])
-
   const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true)
@@ -72,6 +68,10 @@ export default function Dashboard() {
       setLoading(false)
     }
   }, [period, showError])
+
+  useEffect(() => {
+    loadDashboardData()
+  }, [period, loadDashboardData])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -180,7 +180,8 @@ export default function Dashboard() {
                           day: 'numeric' 
                         })}
                       />
-                      <YAxis />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
                       <Tooltip 
                         labelFormatter={(value) => new Date(value).toLocaleDateString('pt-BR')}
                         formatter={(value: number, name: string) => [
@@ -194,6 +195,7 @@ export default function Dashboard() {
                         stroke="#1976d2" 
                         strokeWidth={2}
                         dot={{ fill: '#1976d2' }}
+                        yAxisId="left"
                       />
                       <Line 
                         type="monotone" 
