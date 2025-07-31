@@ -9,6 +9,7 @@ import AuthLayout from '@/layouts/AuthLayout'
 
 // Pages
 import Login from '@/pages/auth/Login'
+import Register from '@/pages/auth/Register'
 import Dashboard from '@/pages/Dashboard'
 import Plans from '@/pages/plans/Plans'
 import Clinics from '@/pages/clinics/Clinics'
@@ -23,6 +24,7 @@ export default function Router() {
       {/* Public routes */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Route>
 
       {/* Private routes */}

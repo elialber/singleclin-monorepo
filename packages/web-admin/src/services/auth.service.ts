@@ -58,8 +58,8 @@ export const authService = {
     const firebaseResult = await signInWithEmail(email, password)
     
     // Then authenticate with our backend using the Firebase token
-    const response = await api.post<AuthResponse>('/auth/login/firebase', {
-      firebaseToken: firebaseResult.token,
+    const response = await api.post<AuthResponse>('/auth/firebase', {
+      idToken: firebaseResult.token,
     })
     return transformAuthResponse(response.data)
   },
@@ -68,62 +68,32 @@ export const authService = {
     // Authenticate with Google via Firebase
     const firebaseResult = await signInWithGoogle()
     
-    try {
-      // Try to authenticate with our backend using the Firebase token
-      const response = await api.post<AuthResponse>('/auth/login/firebase', {
-        firebaseToken: firebaseResult.token,
-      })
-      return transformAuthResponse(response.data)
-    } catch (error) {
-      // Temporary fallback for development - simulate successful login
-      console.warn('Backend Firebase endpoint not ready, using development fallback')
-      
-      // Create a mock user from Firebase data
-      const mockUser: User = {
-        id: firebaseResult.user.uid,
-        email: firebaseResult.user.email || '',
-        firstName: firebaseResult.user.displayName?.split(' ')[0] || '',
-        lastName: firebaseResult.user.displayName?.split(' ').slice(1).join(' ') || '',
-        fullName: firebaseResult.user.displayName || firebaseResult.user.email || '',
-        role: 'admin', // Default role for development
-        isActive: true,
-        isEmailVerified: firebaseResult.user.emailVerified,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      
-      // Return mock tokens for development
-      return {
-        user: mockUser,
-        accessToken: firebaseResult.token, // Use Firebase token temporarily
-        refreshToken: firebaseResult.token,
-        expiresIn: 3600,
-      }
-    }
-  },
-
-  async register(email: string, password: string, fullName: string): Promise<LoginResult> {
-    // Create user in Firebase
-    const firebaseResult = await createFirebaseUser(email, password, fullName)
-    
-    // Then register with our backend using the Firebase token
-    const response = await api.post<AuthResponse>('/auth/register/firebase', {
-      firebaseToken: firebaseResult.token,
-      fullName,
+    // Authenticate with our backend using the Firebase token
+    const response = await api.post<AuthResponse>('/auth/firebase', {
+      idToken: firebaseResult.token,
     })
     return transformAuthResponse(response.data)
   },
 
-  async refreshToken(refreshToken: string): Promise<LoginResult> {
-    // Get fresh Firebase token first
-    const firebaseToken = await getCurrentUserToken()
-    if (!firebaseToken) {
-      throw new Error('No Firebase user authenticated')
-    }
+  async register(email: string, password: string, fullName: string): Promise<LoginResult> {
+    // Register with our backend (which will create the user in Firebase)
+    const response = await api.post<AuthResponse>('/auth/register', {
+      email,
+      password,
+      confirmPassword: password,
+      fullName,
+      birthDate: '1990-01-01', // Default birthdate for now
+    })
+    
+    // After successful registration, sign in to Firebase to get the Firebase user
+    await signInWithEmail(email, password)
+    
+    return transformAuthResponse(response.data)
+  },
 
+  async refreshToken(refreshToken: string): Promise<LoginResult> {
     const response = await api.post<AuthResponse>('/auth/refresh', {
       refreshToken,
-      firebaseToken,
       deviceInfo: navigator.userAgent,
     })
     return transformAuthResponse(response.data)
