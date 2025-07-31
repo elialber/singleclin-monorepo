@@ -34,6 +34,7 @@ import {
   ExpandLess,
   ExpandMore,
   MedicalServices as MedicalServicesIcon,
+  ManageAccounts as ManageAccountsIcon,
 } from '@mui/icons-material'
 import { useAuth } from "@/hooks/useAuth"
 import LogoutDialog from '@/components/LogoutDialog'
@@ -67,6 +68,11 @@ const menuItems: MenuItem[] = [
     text: 'Pacientes',
     icon: <PeopleIcon />,
     path: '/patients',
+  },
+  {
+    text: 'Usuários',
+    icon: <ManageAccountsIcon />,
+    path: '/users',
   },
   {
     text: 'Transações',
