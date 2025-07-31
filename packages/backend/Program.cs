@@ -377,6 +377,9 @@ public class Program
         // Add custom JWT middleware
         app.UseMiddleware<JwtAuthenticationMiddleware>();
 
+        // Add Firebase authentication middleware
+        app.UseFirebaseAuthentication();
+
         // Add clinic rate limiting middleware
         app.UseMiddleware<ClinicRateLimitingMiddleware>();
 

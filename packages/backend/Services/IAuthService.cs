@@ -66,4 +66,12 @@ public interface IAuthService
     /// <param name="userId">User ID</param>
     /// <returns>Dictionary of user claims</returns>
     Task<Dictionary<string, string>> GetUserClaimsAsync(Guid userId);
+
+    /// <summary>
+    /// Authenticate a user with Firebase token
+    /// </summary>
+    /// <param name="firebaseLoginDto">Firebase login data</param>
+    /// <param name="ipAddress">Client IP address</param>
+    /// <returns>Authentication response with tokens</returns>
+    Task<(bool Success, AuthResponseDto? Response, string? Error)> FirebaseLoginAsync(FirebaseLoginDto firebaseLoginDto, string? ipAddress = null);
 }

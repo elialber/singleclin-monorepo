@@ -19,7 +19,6 @@ import {
   Google as GoogleIcon,
 } from '@mui/icons-material'
 import { Divider } from '@mui/material'
-import { signInWithGoogleRedirect } from '@/services/firebaseAuthRedirect'
 import { useAuth } from "@/hooks/useAuth"
 import { useNotification } from "@/hooks/useNotification"
 
@@ -28,9 +27,10 @@ interface LoginFormData {
   password: string
 }
 
+import { GoogleLoginButton } from '@/components/GoogleLoginButton'
+
 export default function Login() {
   const { login, isAuthenticated } = useAuth()
-  const { loginWithGoogle } = useAuth() // Assumindo que vamos adicionar este método
   const { showError, showSuccess } = useNotification()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
@@ -80,33 +80,6 @@ export default function Login() {
     }
   }
 
-  const handleGoogleLogin = async () => {
-    try {
-      setIsLoading(true)
-      setError('')
-      await loginWithGoogle()
-      showSuccess('Login realizado com sucesso!')
-    } catch (err: unknown) {
-      console.error('Google login error:', err)
-      
-      let message = 'Erro ao fazer login com Google. Tente novamente.'
-      
-      if (err.message) {
-        message = err.message
-      }
-      
-      setError(message)
-      showError(message)
-      
-      // If popup failed, try redirect method
-      if (message.includes('popup')) {
-        showError('Usando método alternativo de login...')
-        await signInWithGoogleRedirect()
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   return (
     <Box component="form" onSubmit={handleSubmit(handleLogin)} sx={{ mt: 1 }}>
@@ -203,16 +176,7 @@ export default function Login() {
 
       <Divider sx={{ my: 2 }}>ou</Divider>
 
-      <Button
-        fullWidth
-        variant="outlined"
-        onClick={handleGoogleLogin}
-        disabled={isLoading}
-        startIcon={<GoogleIcon />}
-        sx={{ mb: 2, py: 1.5 }}
-      >
-        Entrar com Google
-      </Button>
+      <GoogleLoginButton />
 
       <Box sx={{ mt: 2, textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary">

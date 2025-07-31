@@ -51,4 +51,9 @@ public class AuthResponseDto
     /// Indicates if this is the user's first login
     /// </summary>
     public bool IsFirstLogin { get; set; }
+
+    /// <summary>
+    /// Indicates if the user's email is verified
+    /// </summary>
+    public bool IsEmailVerified { get; set; }
 }

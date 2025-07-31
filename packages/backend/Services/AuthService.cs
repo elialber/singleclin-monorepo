@@ -96,6 +96,41 @@ public class AuthService : IAuthService
                 return (false, null, errors);
             }
 
+            // Create user in Firebase if Firebase is configured
+            if (_firebaseAuthService.IsConfigured)
+            {
+                try
+                {
+                    var firebaseUser = await _firebaseAuthService.CreateUserAsync(
+                        registerDto.Email,
+                        registerDto.Password,
+                        registerDto.FullName,
+                        false // Email not verified yet
+                    );
+
+                    if (firebaseUser != null)
+                    {
+                        // Update user with Firebase UID
+                        user.FirebaseUid = firebaseUser.Uid;
+                        await _userManager.UpdateAsync(user);
+                        _logger.LogInformation("Created user in Firebase: {Email}, UID: {FirebaseUid}", registerDto.Email, firebaseUser.Uid);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to create user in Firebase: {Email}. User created locally only.", registerDto.Email);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error creating user in Firebase: {Email}. User created locally only.", registerDto.Email);
+                    // Continue with local user creation - Firebase is optional
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Firebase not configured. User created locally only: {Email}", registerDto.Email);
+            }
+
             // Add role claim
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", user.Role.ToString()));
             
@@ -540,5 +575,124 @@ public class AuthService : IAuthService
             "qr.generate", "qr.view",
             "transactions.read", "services.book"
         };
+    }
+
+    public async Task<(bool Success, AuthResponseDto? Response, string? Error)> FirebaseLoginAsync(FirebaseLoginDto firebaseLoginDto, string? ipAddress = null)
+    {
+        try
+        {
+            // Validate Firebase token and get user info
+            var firebaseToken = await _firebaseAuthService.VerifyIdTokenAsync(firebaseLoginDto.FirebaseToken);
+            if (firebaseToken == null)
+            {
+                return (false, null, "Invalid Firebase token");
+            }
+
+            // Get email from token claims
+            var email = firebaseToken.Claims.ContainsKey("email") ? firebaseToken.Claims["email"].ToString() : null;
+            if (string.IsNullOrEmpty(email))
+            {
+                return (false, null, "Email not found in Firebase token");
+            }
+
+            // Check if user exists in our database
+            var user = await _userManager.FindByEmailAsync(email);
+            bool isNewUser = false;
+
+            if (user == null)
+            {
+                // Get additional user info from Firebase if creating new user
+                var firebaseUser = await _firebaseAuthService.GetUserAsync(firebaseToken.Uid);
+                
+                // Create new user from Firebase data
+                isNewUser = true;
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = firebaseUser?.DisplayName ?? email.Split('@')[0],
+                    Role = Data.Enums.UserRole.Patient, // Default role for Firebase users
+                    EmailConfirmed = firebaseUser?.EmailVerified ?? false,
+                    CreatedAt = DateTime.UtcNow,
+                    LastLoginAt = DateTime.UtcNow,
+                    IsActive = true,
+                    FirebaseUid = firebaseToken.Uid
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    _logger.LogWarning("Failed to create user from Firebase: {Email}, Errors: {Errors}", email, errors);
+                    return (false, null, $"Failed to create user: {errors}");
+                }
+
+                // Add role claim
+                var roleClaim = new System.Security.Claims.Claim("role", user.Role.ToString());
+                await _userManager.AddClaimAsync(user, roleClaim);
+            }
+            else
+            {
+                // Update existing user
+                user.LastLoginAt = DateTime.UtcNow;
+                if (string.IsNullOrEmpty(user.FirebaseUid))
+                {
+                    user.FirebaseUid = firebaseToken.Uid;
+                }
+                
+                // Get additional info from Firebase if needed
+                if (!user.EmailConfirmed)
+                {
+                    var firebaseUser = await _firebaseAuthService.GetUserAsync(firebaseToken.Uid);
+                    if (firebaseUser?.EmailVerified == true)
+                    {
+                        user.EmailConfirmed = true;
+                    }
+                }
+                
+                await _userManager.UpdateAsync(user);
+            }
+
+            // Check if user is active
+            if (!user.IsActive)
+            {
+                _logger.LogWarning("Inactive user attempted to login: {Email}", user.Email);
+                return (false, null, "Account is inactive");
+            }
+
+            // Generate tokens
+            var accessToken = _jwtService.GenerateAccessToken(user);
+            var refreshToken = _jwtService.GenerateRefreshToken();
+            var expiresIn = Convert.ToInt32(_configuration["JWT:AccessTokenExpiresInMinutes"] ?? "60") * 60; // Convert to seconds
+            
+            // Create and store refresh token
+            var refreshTokenEntity = await _refreshTokenService.CreateRefreshTokenAsync(
+                user.Id, 
+                ipAddress, 
+                firebaseLoginDto.DeviceInfo,
+                Convert.ToInt32(_configuration["JWT:RefreshTokenExpiresInDays"] ?? "7")
+            );
+
+            _logger.LogInformation("Firebase login successful for user: {Email}, IsNewUser: {IsNewUser}", user.Email, isNewUser);
+
+            return (true, new AuthResponseDto
+            {
+                UserId = user.Id,
+                Email = user.Email!,
+                FullName = user.FullName ?? "",
+                Role = user.Role,
+                ClinicId = user.ClinicId,
+                AccessToken = accessToken,
+                RefreshToken = refreshTokenEntity.Token,
+                ExpiresIn = expiresIn,
+                IsEmailVerified = user.EmailConfirmed,
+                IsFirstLogin = isNewUser
+            }, null);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during Firebase login");
+            return (false, null, "An error occurred during Firebase login");
+        }
     }
 }
