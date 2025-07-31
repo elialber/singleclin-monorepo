@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using SingleClin.API.DTOs.Common;
 
 namespace SingleClin.API.DTOs.Report
 {
@@ -94,29 +95,4 @@ namespace SingleClin.API.DTOs.Report
         }
     }
 
-    /// <summary>
-    /// Export format options
-    /// </summary>
-    public enum ExportFormat
-    {
-        /// <summary>
-        /// JSON format (default)
-        /// </summary>
-        Json,
-
-        /// <summary>
-        /// Excel format (.xlsx)
-        /// </summary>
-        Excel,
-
-        /// <summary>
-        /// PDF format
-        /// </summary>
-        Pdf,
-
-        /// <summary>
-        /// CSV format
-        /// </summary>
-        Csv
-    }
 }

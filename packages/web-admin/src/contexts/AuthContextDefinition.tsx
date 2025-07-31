@@ -6,6 +6,7 @@ interface AuthContextData {
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
+  loginWithGoogle: () => Promise<void>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
 }

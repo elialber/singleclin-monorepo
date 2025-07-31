@@ -16,6 +16,7 @@ import 'package:mobile/domain/entities/user_plan_entity.dart';
 /// - Manage cache expiration and refresh
 /// - Provide fallback data when API is unavailable
 class CacheService {
+  factory CacheService() => _instance ??= CacheService._();
   CacheService._();
   static const String _planCacheKey = 'cached_user_plan';
   static const String _planCacheTimeKey = 'cached_user_plan_time';
@@ -28,7 +29,6 @@ class CacheService {
   static const int _transactionsCacheExpirationMinutes = 15; // 15 minutes
 
   static CacheService? _instance;
-  factory CacheService() => _instance ??= CacheService._();
   static CacheService get instance => CacheService();
 
   SharedPreferences? _prefs;

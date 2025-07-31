@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using SingleClin.API.Data;
 using SingleClin.API.Data.Models;
 using SingleClin.API.DTOs.Report;
+using SingleClin.API.DTOs.Common;
 using System.Diagnostics;
 
 namespace SingleClin.API.Services

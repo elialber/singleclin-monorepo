@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { authService } from '@/services/auth.service'
 import { User } from '@/types/user'
 import { AuthContext } from './AuthContextDefinition'
+import { onAuthStateChange } from '@/services/firebaseAuth'
+import { getGoogleRedirectResult } from '@/services/firebaseAuthRedirect'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -10,7 +12,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 
   useEffect(() => {
-    loadStoredUser()
+    // Check for redirect result first
+    const checkRedirectResult = async () => {
+      try {
+        const redirectResult = await getGoogleRedirectResult()
+        if (redirectResult) {
+          // Handle redirect login
+          const result = await authService.loginWithGoogle()
+          authService.setTokens(result.accessToken, result.refreshToken)
+          localStorage.setItem('@SingleClin:user', JSON.stringify(result.user))
+          setUser(result.user)
+          navigate('/dashboard')
+          return
+        }
+      } catch (error) {
+        console.error('Redirect login error:', error)
+      }
+      
+      // If no redirect result, proceed with normal flow
+      loadStoredUser()
+    }
+
+    // Subscribe to Firebase auth state changes
+    const unsubscribe = onAuthStateChange(async (firebaseUser) => {
+      if (firebaseUser) {
+        await loadStoredUser()
+      } else {
+        setUser(null)
+        setIsLoading(false)
+      }
+    })
+
+    // Check redirect result and initial load
+    checkRedirectResult()
+
+    return () => unsubscribe()
   }, [])
 
   const loadStoredUser = async () => {
@@ -69,6 +105,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const loginWithGoogle = async () => {
+    try {
+      const result = await authService.loginWithGoogle()
+      
+      // Store tokens and user data
+      authService.setTokens(result.accessToken, result.refreshToken)
+      localStorage.setItem('@SingleClin:user', JSON.stringify(result.user))
+      
+      setUser(result.user)
+      navigate('/dashboard')
+    } catch (error) {
+      // Clear any partial data on login failure
+      authService.clearTokens()
+      throw error
+    }
+  }
+
   const logout = async () => {
     try {
       await authService.logout()
@@ -101,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAuthenticated: !!user,
         login,
+        loginWithGoogle,
         logout,
         refreshUser,
       }}

@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:mobile/core/routes/app_routes.dart';
 import 'package:mobile/presentation/widgets/manual_code_dialog.dart';
 import 'package:mobile/presentation/widgets/patient_data_bottom_sheet.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 /// Screen for clinic staff to scan patient QR codes
 ///

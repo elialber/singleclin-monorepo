@@ -64,10 +64,10 @@ dependencies:
   
   # Screenshot and image saving
   screenshot: ^3.0.0
-  image_gallery_saver: ^2.0.3
+  # image_gallery_saver: ^2.0.3  # Temporariamente comentado devido a problemas de namespace
   
   # QR Code scanner
-  mobile_scanner: ^5.1.1
+  # mobile_scanner: ^3.5.7  # Temporariamente comentado devido a conflitos de versão
   
   # Audio player for scanner feedback
   audioplayers: ^6.1.0

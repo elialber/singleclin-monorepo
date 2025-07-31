@@ -6,6 +6,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SingleClin.API.DTOs.Export;
 using SingleClin.API.DTOs.Report;
+using SingleClin.API.DTOs.Common;
 using System.Globalization;
 using System.Reflection;
 

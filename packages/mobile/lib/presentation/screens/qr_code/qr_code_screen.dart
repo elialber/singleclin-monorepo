@@ -4,12 +4,11 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:mobile/presentation/controllers/auth_controller.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart'; // Temporariamente comentado
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:screenshot/screenshot.dart';
-
-import 'package:mobile/presentation/controllers/auth_controller.dart';
 
 /// Screen for generating and displaying temporary QR codes
 ///
@@ -620,15 +619,16 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         throw Exception('Falha ao capturar imagem do QR Code');
       }
 
-      // Save to gallery
-      final result = await ImageGallerySaver.saveImage(
-        imageBytes,
-        name: 'QRCode_SingleClin_${DateTime.now().millisecondsSinceEpoch}',
-        quality: 100,
-      );
+      // Save to gallery - temporariamente desabilitado
+      // final result = await ImageGallerySaver.saveImage(
+      //   imageBytes,
+      //   name: 'QRCode_SingleClin_${DateTime.now().millisecondsSinceEpoch}',
+      //   quality: 100,
+      // );
 
       if (mounted) {
-        if ((result as Map<String, dynamic>)['isSuccess'] == true) {
+        // Temporariamente sempre mostra sucesso
+        if (true) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(

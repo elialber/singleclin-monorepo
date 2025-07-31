@@ -7,8 +7,8 @@ import 'package:mobile/presentation/screens/auth/forgot_password_screen.dart'
     as auth;
 import 'package:mobile/presentation/screens/auth/login_screen.dart' as auth;
 import 'package:mobile/presentation/screens/auth/register_screen.dart' as auth;
-import 'package:mobile/presentation/screens/clinic/clinic_scanner_screen.dart';
-import 'package:mobile/presentation/screens/clinic/scan_history_screen.dart';
+// import 'package:mobile/presentation/screens/clinic/clinic_scanner_screen.dart'; // Temporariamente comentado
+// import 'package:mobile/presentation/screens/clinic/scan_history_screen.dart'; // Temporariamente comentado
 import 'package:mobile/presentation/screens/qr_code/qr_code_screen.dart';
 import 'package:mobile/presentation/screens/screens.dart';
 import 'package:mobile/presentation/screens/theme_settings_screen.dart';
@@ -149,11 +149,11 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.clinicQrScanner,
-        builder: (context, state) => const ClinicScannerScreen(),
+        builder: (context, state) => const ClinicScannerPlaceholder(), // Temporário
       ),
       GoRoute(
         path: AppRoutes.clinicScanHistory,
-        builder: (context, state) => const ScanHistoryScreen(),
+        builder: (context, state) => const ScanHistoryPlaceholder(), // Temporário
       ),
 
       // Error routes
@@ -382,6 +382,44 @@ class NotFoundScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// Placeholders temporários para telas que usam mobile_scanner
+class ClinicScannerPlaceholder extends StatelessWidget {
+  const ClinicScannerPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Scanner QR - Clínica')),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.qr_code_scanner, size: 64),
+            SizedBox(height: 16),
+            Text('Scanner temporariamente desabilitado'),
+            SizedBox(height: 8),
+            Text('(Conflito de dependências)', style: TextStyle(color: Colors.grey)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScanHistoryPlaceholder extends StatelessWidget {
+  const ScanHistoryPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Histórico de Scans')),
+      body: const Center(
+        child: Text('Histórico de scans temporariamente desabilitado'),
       ),
     );
   }
