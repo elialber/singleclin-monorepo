@@ -714,6 +714,41 @@
             </summary>
             <returns>Clinic ID if found, empty GUID otherwise</returns>
         </member>
+        <member name="M:SingleClin.API.Controllers.UserController.GetUsers(SingleClin.API.DTOs.User.UserFilterDto)">
+            <summary>
+            Get paginated list of users with filtering and sorting
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.GetUser(System.Guid)">
+            <summary>
+            Get user by ID
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.CreateUser(SingleClin.API.DTOs.User.CreateUserDto)">
+            <summary>
+            Create new user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.UpdateUser(System.Guid,SingleClin.API.DTOs.User.UpdateUserDto)">
+            <summary>
+            Update user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.DeleteUser(System.Guid)">
+            <summary>
+            Delete user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.ResetPassword(System.Guid)">
+            <summary>
+            Reset user password
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.ToggleStatus(System.Guid,SingleClin.API.DTOs.User.ToggleStatusDto)">
+            <summary>
+            Toggle user active status
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.AppDbContext">
             <summary>
             Main database context for the SingleClin application
@@ -2747,6 +2782,241 @@
             Usage by plan
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.User.CreateUserDto">
+            <summary>
+            DTO for creating a new user
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.CreateUserDto.Email">
+            <summary>
+            User email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.CreateUserDto.FirstName">
+            <summary>
+            User first name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.CreateUserDto.LastName">
+            <summary>
+            User last name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.CreateUserDto.Role">
+            <summary>
+            User role
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.CreateUserDto.PhoneNumber">
+            <summary>
+            User phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.CreateUserDto.ClinicId">
+            <summary>
+            Associated clinic ID (for clinic users)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.CreateUserDto.Password">
+            <summary>
+            User password
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.User.ToggleStatusDto">
+            <summary>
+            DTO for toggling user status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.ToggleStatusDto.IsActive">
+            <summary>
+            New active status
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.User.UpdateUserDto">
+            <summary>
+            DTO for updating user information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.FirstName">
+            <summary>
+            User first name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.LastName">
+            <summary>
+            User last name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.PhoneNumber">
+            <summary>
+            User phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.IsActive">
+            <summary>
+            Whether the user is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.Role">
+            <summary>
+            User role (only administrators can change)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.ClinicId">
+            <summary>
+            Associated clinic ID
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.User.UserFilterDto">
+            <summary>
+            DTO for filtering users
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.Search">
+            <summary>
+            Search term (searches in name, email, phone)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.Role">
+            <summary>
+            Filter by role
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.IsActive">
+            <summary>
+            Filter by active status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.IsEmailVerified">
+            <summary>
+            Filter by email verification status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.ClinicId">
+            <summary>
+            Filter by clinic ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.CreatedAfter">
+            <summary>
+            Filter by creation date (after)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.CreatedBefore">
+            <summary>
+            Filter by creation date (before)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.SortBy">
+            <summary>
+            Sort by field
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.SortOrder">
+            <summary>
+            Sort order
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.Page">
+            <summary>
+            Page number (1-based)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserFilterDto.Limit">
+            <summary>
+            Items per page
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.User.UserListResponseDto">
+            <summary>
+            Response DTO for user list endpoint to match frontend expectations
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserListResponseDto.Data">
+            <summary>
+            List of users
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserListResponseDto.Total">
+            <summary>
+            Total number of users
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserListResponseDto.Page">
+            <summary>
+            Current page number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserListResponseDto.Limit">
+            <summary>
+            Items per page
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.User.UserResponseDto">
+            <summary>
+            User response DTO
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.Id">
+            <summary>
+            User ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.Email">
+            <summary>
+            User email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.FirstName">
+            <summary>
+            User first name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.LastName">
+            <summary>
+            User last name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.FullName">
+            <summary>
+            User full name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.Role">
+            <summary>
+            User role
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.IsActive">
+            <summary>
+            Whether the user is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.IsEmailVerified">
+            <summary>
+            Whether the user's email is verified
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.PhoneNumber">
+            <summary>
+            User phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.ClinicId">
+            <summary>
+            Associated clinic ID (for clinic users)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.CreatedAt">
+            <summary>
+            When the user was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UserResponseDto.UpdatedAt">
+            <summary>
+            When the user was last updated
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Exceptions.PlanNotFoundException">
             <summary>
             Exception thrown when a plan is not found
@@ -3694,6 +3964,56 @@
             Report type information
             </summary>
         </member>
+        <member name="T:SingleClin.API.Services.IUserService">
+            <summary>
+            Interface for user management service
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.GetUsersAsync(SingleClin.API.DTOs.User.UserFilterDto)">
+            <summary>
+            Get paginated list of users with filtering
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.GetUserByIdAsync(System.Guid)">
+            <summary>
+            Get user by ID
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.CreateUserAsync(SingleClin.API.DTOs.User.CreateUserDto)">
+            <summary>
+            Create new user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.UpdateUserAsync(System.Guid,SingleClin.API.DTOs.User.UpdateUserDto)">
+            <summary>
+            Update user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.DeleteUserAsync(System.Guid)">
+            <summary>
+            Delete user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.ToggleUserStatusAsync(System.Guid,System.Boolean)">
+            <summary>
+            Toggle user active status
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.SendPasswordResetEmailAsync(System.Guid)">
+            <summary>
+            Send password reset email
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.CanAccessUserAsync(System.Guid,System.Guid,System.Boolean)">
+            <summary>
+            Check if current user can access specified user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.CanAccessClinicAsync(System.Guid,System.Guid,System.Boolean)">
+            <summary>
+            Check if current user can access specified clinic
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.PlanService">
             <summary>
             Service implementation for Plan business logic
@@ -4002,6 +4322,11 @@
             <param name="priority">Email priority</param>
             <param name="cancellationToken">Cancellation token</param>
             <returns>Notification response</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.UserService">
+            <summary>
+            Service for managing users
+            </summary>
         </member>
         <member name="T:SingleClin.API.Validators.PlanRequestValidator">
             <summary>

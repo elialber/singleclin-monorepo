@@ -203,6 +203,9 @@ public class Program
         // Add Export Service
         builder.Services.AddScoped<IExportService, ExportService>();
 
+        // Add User Service
+        builder.Services.AddScoped<IUserService, UserService>();
+
         // Configure authorization policies
         builder.Services.AddAuthorization(options =>
         {
