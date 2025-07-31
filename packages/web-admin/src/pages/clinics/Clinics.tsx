@@ -51,19 +51,7 @@ export default function Clinics() {
 
   const { showError } = useNotification()
 
-  // Debounce filters
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setFiltersDebounce(filters)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [filters])
-
-  // Load clinics when page or filters change
-  useEffect(() => {
-    loadClinics()
-  }, [page, filtersDebounce, loadClinics])
-
+  // Define loadClinics before using it
   const loadClinics = useCallback(async () => {
     try {
       setLoading(true)
@@ -86,6 +74,19 @@ export default function Clinics() {
       setLoading(false)
     }
   }, [page, filtersDebounce, showError])
+
+  // Debounce filters
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFiltersDebounce(filters)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [filters])
+
+  // Load clinics when page or filters change
+  useEffect(() => {
+    loadClinics()
+  }, [page, filtersDebounce, loadClinics])
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage)

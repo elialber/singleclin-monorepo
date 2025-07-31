@@ -75,10 +75,7 @@ export default function Patients() {
   const debouncedSearch = useDebounce(search, 500)
   const debouncedFilters = useDebounce(filters, 300)
 
-  useEffect(() => {
-    loadPatients()
-  }, [debouncedSearch, debouncedFilters, page, loadPatients])
-
+  // Define loadPatients before using it
   const loadPatients = useCallback(async () => {
     try {
       setLoading(true)
@@ -102,6 +99,10 @@ export default function Patients() {
       setLoading(false)
     }
   }, [debouncedFilters, debouncedSearch, page, showError])
+
+  useEffect(() => {
+    loadPatients()
+  }, [debouncedSearch, debouncedFilters, page, loadPatients])
 
   const loadPatientDetails = async (patientId: string) => {
     try {

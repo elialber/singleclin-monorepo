@@ -56,19 +56,7 @@ export default function Plans() {
 
   const { showSuccess, showError } = useNotification()
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchDebounce(search)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [search])
-
-  // Load plans when page, search, or rowsPerPage changes
-  useEffect(() => {
-    loadPlans()
-  }, [page, rowsPerPage, searchDebounce, loadPlans])
-
+  // Define loadPlans before using it
   const loadPlans = useCallback(async () => {
     try {
       setLoading(true)
@@ -88,6 +76,19 @@ export default function Plans() {
       setLoading(false)
     }
   }, [page, rowsPerPage, searchDebounce, showError])
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchDebounce(search)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [search])
+
+  // Load plans when page, search, or rowsPerPage changes
+  useEffect(() => {
+    loadPlans()
+  }, [page, rowsPerPage, searchDebounce, loadPlans])
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage)
