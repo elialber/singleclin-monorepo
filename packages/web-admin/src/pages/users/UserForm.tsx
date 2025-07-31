@@ -13,8 +13,28 @@ import {
   FormControlLabel,
   InputAdornment,
   IconButton,
+  Card,
+  CardContent,
+  Divider,
+  Chip,
+  Avatar,
+  Alert,
+  LinearProgress,
+  useTheme,
+  alpha,
 } from '@mui/material'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { 
+  Visibility, 
+  VisibilityOff,
+  Person,
+  Email,
+  Phone,
+  Badge,
+  Business,
+  Security,
+  CheckCircle,
+  Warning,
+} from '@mui/icons-material'
 import { User, UserRole } from '@/types/user'
 import { useForm, Controller } from 'react-hook-form'
 import { useState } from 'react'
@@ -45,6 +65,7 @@ const roleOptions: Array<{ value: UserRole; label: string }> = [
 ]
 
 export default function UserForm({ user, onSubmit, clinics = [] }: UserFormProps) {
+  const theme = useTheme()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   
@@ -52,9 +73,10 @@ export default function UserForm({ user, onSubmit, clinics = [] }: UserFormProps
     control,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isValid, dirtyFields },
     setValue,
   } = useForm<UserFormData>({
+    mode: 'onChange',
     defaultValues: {
       email: user?.email || '',
       firstName: user?.firstName || '',
@@ -70,9 +92,29 @@ export default function UserForm({ user, onSubmit, clinics = [] }: UserFormProps
 
   const selectedRole = watch('role')
   const password = watch('password')
+  const firstName = watch('firstName')
+  const lastName = watch('lastName')
+  const email = watch('email')
 
   // Show clinic field only for clinic roles
   const showClinicField = ['ClinicOrigin', 'ClinicPartner'].includes(selectedRole)
+  
+  // Calculate form completion progress
+  const getFormProgress = () => {
+    const requiredFields = ['firstName', 'lastName', 'email', 'role']
+    if (!user) requiredFields.push('password', 'confirmPassword')
+    if (showClinicField) requiredFields.push('clinicId')
+    
+    const completedFields = requiredFields.filter(field => {
+      const value = watch(field as keyof UserFormData)
+      return value && value.toString().trim() !== ''
+    })
+    
+    return (completedFields.length / requiredFields.length) * 100
+  }
+
+  const formProgress = getFormProgress()
+  const fullName = `${firstName} ${lastName}`.trim()
 
   useEffect(() => {
     // Clear clinic field when switching to non-clinic role
@@ -103,218 +145,399 @@ export default function UserForm({ user, onSubmit, clinics = [] }: UserFormProps
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
       <Stack spacing={3}>
-        <Typography variant="h6">
-          {user ? 'Editar Usuário' : 'Novo Usuário'}
-        </Typography>
-
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <Controller
-            name="firstName"
-            control={control}
-            rules={{ required: 'Nome é obrigatório' }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Nome"
-                fullWidth
-                error={!!errors.firstName}
-                helperText={errors.firstName?.message}
-              />
-            )}
-          />
-
-          <Controller
-            name="lastName"
-            control={control}
-            rules={{ required: 'Sobrenome é obrigatório' }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Sobrenome"
-                fullWidth
-                error={!!errors.lastName}
-                helperText={errors.lastName?.message}
-              />
-            )}
-          />
-        </Stack>
-
-        <Controller
-          name="email"
-          control={control}
-          rules={{
-            required: 'Email é obrigatório',
-            validate: validateEmail,
-          }}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Email"
-              type="email"
-              fullWidth
-              error={!!errors.email}
-              helperText={errors.email?.message}
-              disabled={!!user} // Email cannot be changed
-            />
-          )}
-        />
-
-        <Controller
-          name="phoneNumber"
-          control={control}
-          rules={{ validate: validatePhone }}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Telefone"
-              fullWidth
-              placeholder="(00) 00000-0000"
-              error={!!errors.phoneNumber}
-              helperText={errors.phoneNumber?.message}
-              onChange={(e) => {
-                const formatted = formatPhone(e.target.value)
-                field.onChange(formatted)
-              }}
-            />
-          )}
-        />
-
-        <Controller
-          name="role"
-          control={control}
-          rules={{ required: 'Perfil é obrigatório' }}
-          render={({ field }) => (
-            <FormControl fullWidth error={!!errors.role}>
-              <InputLabel>Perfil</InputLabel>
-              <Select {...field} label="Perfil">
-                {roleOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.role && (
-                <FormHelperText>{errors.role.message}</FormHelperText>
-              )}
-            </FormControl>
-          )}
-        />
-
-        {showClinicField && (
-          <Controller
-            name="clinicId"
-            control={control}
-            rules={{
-              required: showClinicField ? 'Clínica é obrigatória para este perfil' : false,
-            }}
-            render={({ field }) => (
-              <FormControl fullWidth error={!!errors.clinicId}>
-                <InputLabel>Clínica</InputLabel>
-                <Select {...field} label="Clínica">
-                  <MenuItem value="">
-                    <em>Selecione uma clínica</em>
-                  </MenuItem>
-                  {clinics.map((clinic) => (
-                    <MenuItem key={clinic.id} value={clinic.id}>
-                      {clinic.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.clinicId && (
-                  <FormHelperText>{errors.clinicId.message}</FormHelperText>
-                )}
-              </FormControl>
-            )}
-          />
-        )}
-
-        {!user && (
-          <>
-            <Controller
-              name="password"
-              control={control}
-              rules={{
-                required: !user ? 'Senha é obrigatória' : false,
-                minLength: {
-                  value: 6,
-                  message: 'Senha deve ter no mínimo 6 caracteres',
+        {/* Header with Progress */}
+        <Card variant="outlined" sx={{ bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
+          <CardContent sx={{ pb: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+              <Avatar
+                sx={{
+                  width: 48,
+                  height: 48,
+                  bgcolor: theme.palette.primary.main,
+                }}
+              >
+                {fullName ? fullName.charAt(0).toUpperCase() : <Person />}
+              </Avatar>
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="h6" fontWeight={600}>
+                  {user ? 'Editar Usuário' : 'Novo Usuário'}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {fullName || 'Complete os dados do usuário'}
+                </Typography>
+              </Box>
+              <Box sx={{ minWidth: 80 }}>
+                <Typography variant="caption" color="textSecondary" display="block">
+                  Progresso
+                </Typography>
+                <Typography variant="body2" fontWeight={600}>
+                  {Math.round(formProgress)}%
+                </Typography>
+              </Box>
+            </Stack>
+            
+            <LinearProgress
+              variant="determinate"
+              value={formProgress}
+              sx={{
+                height: 6,
+                borderRadius: 3,
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 3,
                 },
               }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Senha"
-                  type={showPassword ? 'text' : 'password'}
-                  fullWidth
-                  error={!!errors.password}
-                  helperText={errors.password?.message}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              )}
             />
+            
+            {formProgress === 100 && isValid && (
+              <Alert
+                severity="success"
+                icon={<CheckCircle />}
+                sx={{ mt: 2, py: 0.5 }}
+              >
+                Formulário completo e válido
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
 
-            <Controller
-              name="confirmPassword"
-              control={control}
-              rules={{
-                required: !user ? 'Confirmação de senha é obrigatória' : false,
-                validate: (value) =>
-                  !password || value === password || 'As senhas não coincidem',
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Confirmar Senha"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  fullWidth
-                  error={!!errors.confirmPassword}
-                  helperText={errors.confirmPassword?.message}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          edge="end"
-                        >
-                          {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
+        {/* Personal Information Section */}
+        <Card variant="outlined">
+          <CardContent>
+            <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+              <Person color="primary" />
+              <Typography variant="h6" fontWeight={600}>
+                Informações Pessoais
+              </Typography>
+            </Stack>
+
+            <Stack spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <Controller
+                  name="firstName"
+                  control={control}
+                  rules={{ required: 'Nome é obrigatório' }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Nome"
+                      fullWidth
+                      error={!!errors.firstName}
+                      helperText={errors.firstName?.message}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person color="disabled" fontSize="small" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="lastName"
+                  control={control}
+                  rules={{ required: 'Sobrenome é obrigatório' }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Sobrenome"
+                      fullWidth
+                      error={!!errors.lastName}
+                      helperText={errors.lastName?.message}
+                    />
+                  )}
+                />
+              </Stack>
+
+              <Controller
+                name="email"
+                control={control}
+                rules={{
+                  required: 'Email é obrigatório',
+                  validate: validateEmail,
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Email"
+                    type="email"
+                    fullWidth
+                    error={!!errors.email}
+                    helperText={errors.email?.message || (user ? 'Email não pode ser alterado' : '')}
+                    disabled={!!user}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Email color="disabled" fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+
+              <Controller
+                name="phoneNumber"
+                control={control}
+                rules={{ validate: validatePhone }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Telefone (opcional)"
+                    fullWidth
+                    placeholder="(00) 00000-0000"
+                    error={!!errors.phoneNumber}
+                    helperText={errors.phoneNumber?.message}
+                    onChange={(e) => {
+                      const formatted = formatPhone(e.target.value)
+                      field.onChange(formatted)
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Phone color="disabled" fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </Stack>
+          </CardContent>
+        </Card>
+
+        {/* Role and Clinic Section */}
+        <Card variant="outlined">
+          <CardContent>
+            <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+              <Badge color="primary" />
+              <Typography variant="h6" fontWeight={600}>
+                Perfil e Permissões
+              </Typography>
+            </Stack>
+            
+            <Stack spacing={2}>
+
+              <Controller
+                name="role"
+                control={control}
+                rules={{ required: 'Perfil é obrigatório' }}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.role}>
+                    <InputLabel>Perfil do Usuário</InputLabel>
+                    <Select {...field} label="Perfil do Usuário">
+                      {roleOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            <Chip
+                              size="small"
+                              label={option.label}
+                              color={
+                                option.value === 'Administrator' ? 'error' :
+                                option.value === 'ClinicOrigin' ? 'warning' :
+                                option.value === 'ClinicPartner' ? 'info' : 'success'
+                              }
+                              sx={{ minWidth: 100 }}
+                            />
+                          </Stack>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.role && (
+                      <FormHelperText>{errors.role.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+
+              {showClinicField && (
+                <Controller
+                  name="clinicId"
+                  control={control}
+                  rules={{
+                    required: showClinicField ? 'Clínica é obrigatória para este perfil' : false,
                   }}
+                  render={({ field }) => (
+                    <FormControl fullWidth error={!!errors.clinicId}>
+                      <InputLabel>Clínica Associada</InputLabel>
+                      <Select {...field} label="Clínica Associada">
+                        <MenuItem value="">
+                          <em>Selecione uma clínica</em>
+                        </MenuItem>
+                        {clinics.map((clinic) => (
+                          <MenuItem key={clinic.id} value={clinic.id}>
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                              <Business fontSize="small" color="disabled" />
+                              <Typography>{clinic.name}</Typography>
+                            </Stack>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.clinicId && (
+                        <FormHelperText>{errors.clinicId.message}</FormHelperText>
+                      )}
+                    </FormControl>
+                  )}
                 />
               )}
-            />
-          </>
+
+              {showClinicField && (
+                <Alert severity="info" icon={<Business />}>
+                  <Typography variant="body2">
+                    Este usuário terá acesso específico à clínica selecionada
+                  </Typography>
+                </Alert>
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
+
+        {/* Security Section */}
+        {!user && (
+          <Card variant="outlined">
+            <CardContent>
+              <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                <Security color="primary" />
+                <Typography variant="h6" fontWeight={600}>
+                  Segurança
+                </Typography>
+              </Stack>
+              
+              <Stack spacing={2}>
+                <Controller
+                  name="password"
+                  control={control}
+                  rules={{
+                    required: !user ? 'Senha é obrigatória' : false,
+                    minLength: {
+                      value: 6,
+                      message: 'Senha deve ter no mínimo 6 caracteres',
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Senha"
+                      type={showPassword ? 'text' : 'password'}
+                      fullWidth
+                      error={!!errors.password}
+                      helperText={errors.password?.message || 'Mínimo 6 caracteres'}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Security color="disabled" fontSize="small" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                            >
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="confirmPassword"
+                  control={control}
+                  rules={{
+                    required: !user ? 'Confirmação de senha é obrigatória' : false,
+                    validate: (value) =>
+                      !password || value === password || 'As senhas não coincidem',
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Confirmar Senha"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      fullWidth
+                      error={!!errors.confirmPassword}
+                      helperText={errors.confirmPassword?.message}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              edge="end"
+                            >
+                              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+
+                <Alert severity="info" sx={{ mt: 1 }}>
+                  <Typography variant="body2">
+                    A senha será enviada por email para o usuário junto com as instruções de primeiro acesso.
+                  </Typography>
+                </Alert>
+              </Stack>
+            </CardContent>
+          </Card>
         )}
 
+        {/* Status Section - Only for editing */}
         {user && (
-          <Controller
-            name="isActive"
-            control={control}
-            render={({ field }) => (
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={field.value}
-                    onChange={field.onChange}
-                    color="primary"
-                  />
-                }
-                label="Usuário ativo"
+          <Card variant="outlined">
+            <CardContent>
+              <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                <CheckCircle color="primary" />
+                <Typography variant="h6" fontWeight={600}>
+                  Status do Usuário
+                </Typography>
+              </Stack>
+              
+              <Controller
+                name="isActive"
+                control={control}
+                render={({ field }) => (
+                  <Stack spacing={2}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={field.value}
+                          onChange={field.onChange}
+                          color="primary"
+                        />
+                      }
+                      label={
+                        <Stack>
+                          <Typography variant="body1" fontWeight={500}>
+                            Usuário ativo
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            {field.value 
+                              ? 'O usuário pode fazer login e usar o sistema' 
+                              : 'O usuário não pode fazer login no sistema'
+                            }
+                          </Typography>
+                        </Stack>
+                      }
+                    />
+                    
+                    {!field.value && (
+                      <Alert severity="warning" icon={<Warning />}>
+                        <Typography variant="body2">
+                          Usuários inativos não podem acessar o sistema e não recebem notificações.
+                        </Typography>
+                      </Alert>
+                    )}
+                  </Stack>
+                )}
               />
-            )}
-          />
+            </CardContent>
+          </Card>
         )}
       </Stack>
     </Box>

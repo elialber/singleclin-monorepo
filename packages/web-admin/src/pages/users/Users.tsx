@@ -1,73 +1,47 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Box,
-  Card,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Chip,
-  Button,
-  Tooltip,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Typography,
   Stack,
-  Skeleton,
-  Alert,
+  Grid,
+  Fade,
+  Container,
 } from '@mui/material'
-import {
-  Search,
-  Add,
-  Edit,
-  Delete,
-  FilterList,
-  Refresh,
-  PersonOff,
-  Person,
-  Lock,
-} from '@mui/icons-material'
 import { useNotification } from '@/hooks/useNotification'
-import { userService, UserFilters } from '@/services/user.service'
+import { userService } from '@/services/user.service'
+import { clinicService } from '@/services/clinic.service'
 import { User, UserRole } from '@/types/user'
 import { useDebounce } from '@/hooks/useDebounce'
 import UserDialog from './UserDialog'
 import ConfirmDialog from '@/components/ConfirmDialog'
-
-const roleLabels: Record<UserRole, string> = {
-  Administrator: 'Administrador',
-  ClinicOrigin: 'Clínica Origem',
-  ClinicPartner: 'Clínica Parceira',
-  Patient: 'Paciente',
-}
-
-const roleColors: Record<UserRole, 'error' | 'warning' | 'info' | 'success'> = {
-  Administrator: 'error',
-  ClinicOrigin: 'warning',
-  ClinicPartner: 'info',
-  Patient: 'success',
-}
+import UserDashboard from './components/UserDashboard'
+import UserFilters, { UserFilters as UserFiltersType } from './components/UserFilters'
+import UserTable from './components/UserTable'
+import UserCard from './components/UserCard'
 
 export default function Users() {
   const { showNotification } = useNotification()
   const [users, setUsers] = useState<User[]>([])
+  const [clinics, setClinics] = useState<Array<{ id: string; name: string }>>([])
   const [loading, setLoading] = useState(true)
+  const [dashboardLoading, setDashboardLoading] = useState(true)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [totalCount, setTotalCount] = useState(0)
-  const [filters, setFilters] = useState<UserFilters>({
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
+  const [sortBy, setSortBy] = useState('fullName')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  
+  const [filters, setFilters] = useState<UserFiltersType>({
     search: '',
     role: '',
     isActive: undefined,
+    isEmailVerified: undefined,
+    clinicId: undefined,
+    createdAfter: undefined,
+    createdBefore: undefined,
   })
+  
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -81,7 +55,12 @@ export default function Users() {
 
   useEffect(() => {
     loadUsers()
-  }, [page, rowsPerPage, debouncedSearch, filters.role, filters.isActive])
+  }, [page, rowsPerPage, debouncedSearch, filters, sortBy, sortOrder])
+
+  useEffect(() => {
+    loadClinics()
+    loadDashboardData()
+  }, [])
 
   const loadUsers = async () => {
     try {
@@ -92,6 +71,12 @@ export default function Users() {
         search: debouncedSearch,
         role: filters.role || undefined,
         isActive: filters.isActive,
+        isEmailVerified: filters.isEmailVerified,
+        clinicId: filters.clinicId,
+        createdAfter: filters.createdAfter,
+        createdBefore: filters.createdBefore,
+        sortBy,
+        sortOrder,
       })
       setUsers(response.data)
       setTotalCount(response.total)
@@ -103,17 +88,45 @@ export default function Users() {
     }
   }
 
-  const handleChangePage = (_: unknown, newPage: number) => {
+  const loadClinics = async () => {
+    try {
+      const response = await clinicService.getClinics({ limit: 100 })
+      setClinics(response.data.map(c => ({ id: c.id, name: c.name })))
+    } catch (error) {
+      console.error('Error loading clinics:', error)
+    }
+  }
+
+  const loadDashboardData = async () => {
+    try {
+      setDashboardLoading(true)
+      // Dashboard data would be loaded here
+      // For now, we'll simulate the loading
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    } catch (error) {
+      console.error('Error loading dashboard data:', error)
+    } finally {
+      setDashboardLoading(false)
+    }
+  }
+
+  const handleChangePage = (newPage: number) => {
     setPage(newPage)
   }
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10))
+  const handleChangeRowsPerPage = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage)
     setPage(0)
   }
 
-  const handleFilterChange = (field: keyof UserFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [field]: value }))
+  const handleFiltersChange = (newFilters: UserFiltersType) => {
+    setFilters(newFilters)
+    setPage(0)
+  }
+
+  const handleSortChange = (newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+    setSortBy(newSortBy)
+    setSortOrder(newSortOrder)
     setPage(0)
   }
 
@@ -173,247 +186,206 @@ export default function Users() {
     })
   }
 
+  const handleBulkAction = async (action: string, userIds: string[]) => {
+    try {
+      switch (action) {
+        case 'activate':
+          await Promise.all(userIds.map(id => userService.toggleUserStatus(id, true)))
+          showNotification(`${userIds.length} usuários ativados com sucesso`, 'success')
+          break
+        case 'deactivate':
+          await Promise.all(userIds.map(id => userService.toggleUserStatus(id, false)))
+          showNotification(`${userIds.length} usuários desativados com sucesso`, 'success')
+          break
+        case 'delete':
+          await Promise.all(userIds.map(id => userService.deleteUser(id)))
+          showNotification(`${userIds.length} usuários excluídos com sucesso`, 'success')
+          break
+      }
+      loadUsers()
+    } catch (error) {
+      showNotification('Erro ao executar ação em lote', 'error')
+    }
+  }
+
   const handleDialogClose = (shouldReload?: boolean) => {
     setDialogOpen(false)
     setSelectedUser(null)
     if (shouldReload) {
       loadUsers()
+      loadDashboardData() // Reload dashboard when users change
     }
   }
 
-  const clearFilters = () => {
-    setFilters({
-      search: '',
-      role: '',
-      isActive: undefined,
-    })
-    setPage(0)
-  }
+  // Calculate dashboard statistics
+  const dashboardStats = useMemo(() => {
+    const stats = {
+      total: totalCount,
+      active: 0,
+      inactive: 0,
+      new: 0, // Users created in last 7 days
+      byRole: {
+        Administrator: 0,
+        ClinicOrigin: 0,
+        ClinicPartner: 0,
+        Patient: 0,
+      } as Record<UserRole, number>,
+      recentUsers: users.slice(0, 5),
+      trends: {
+        totalChange: 5.2, // Mock data - would come from API
+        activeChange: 3.1, // Mock data - would come from API
+      }
+    }
 
-  const hasActiveFilters = filters.search || filters.role || filters.isActive !== undefined
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+    users.forEach(user => {
+      if (user.isActive) stats.active++
+      else stats.inactive++
+      
+      if (new Date(user.createdAt) > sevenDaysAgo) {
+        stats.new++
+      }
+      
+      stats.byRole[user.role]++
+    })
+
+    return stats
+  }, [users, totalCount])
+
+  // Create clinic map for faster lookups
+  const clinicsMap = useMemo(() => {
+    const map = new Map<string, string>()
+    clinics.forEach(clinic => {
+      map.set(clinic.id, clinic.name)
+    })
+    return map
+  }, [clinics])
 
   return (
-    <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
-          Usuários
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={handleAddUser}
-        >
-          Novo Usuário
-        </Button>
-      </Stack>
-
-      <Card>
-        <Box p={2}>
-          <Stack spacing={2}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                fullWidth
-                placeholder="Buscar por nome, email ou telefone..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel>Perfil</InputLabel>
-                <Select
-                  value={filters.role || ''}
-                  label="Perfil"
-                  onChange={(e) => handleFilterChange('role', e.target.value)}
-                >
-                  <MenuItem value="">Todos</MenuItem>
-                  {Object.entries(roleLabels).map(([value, label]) => (
-                    <MenuItem key={value} value={value}>
-                      {label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl sx={{ minWidth: 150 }}>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={filters.isActive === undefined ? '' : filters.isActive.toString()}
-                  label="Status"
-                  onChange={(e) =>
-                    handleFilterChange(
-                      'isActive',
-                      e.target.value === '' ? undefined : e.target.value === 'true'
-                    )
-                  }
-                >
-                  <MenuItem value="">Todos</MenuItem>
-                  <MenuItem value="true">Ativos</MenuItem>
-                  <MenuItem value="false">Inativos</MenuItem>
-                </Select>
-              </FormControl>
-              {hasActiveFilters && (
-                <Button
-                  variant="outlined"
-                  onClick={clearFilters}
-                  startIcon={<FilterList />}
-                >
-                  Limpar
-                </Button>
-              )}
-              <IconButton onClick={loadUsers} title="Recarregar">
-                <Refresh />
-              </IconButton>
-            </Stack>
+    <Container maxWidth="xl">
+      <Fade in timeout={600}>
+        <Box>
+          {/* Page Header */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
+            <Box>
+              <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
+                Gerenciamento de Usuários
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                Gerencie usuários do sistema, suas permissões e acesso às clínicas
+              </Typography>
+            </Box>
           </Stack>
-        </Box>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nome</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Perfil</TableCell>
-                <TableCell>Telefone</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Criado em</TableCell>
-                <TableCell align="right">Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                Array.from(new Array(5)).map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                    <TableCell><Skeleton /></TableCell>
-                  </TableRow>
-                ))
-              ) : users.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    <Alert severity="info" sx={{ justifyContent: 'center' }}>
-                      Nenhum usuário encontrado
-                    </Alert>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                users.map((user) => (
-                  <TableRow key={user.id} hover>
-                    <TableCell>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography variant="body2">{user.fullName}</Typography>
-                        {!user.isEmailVerified && (
-                          <Chip label="Email não verificado" size="small" color="warning" />
-                        )}
-                      </Stack>
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={roleLabels[user.role]}
-                        size="small"
-                        color={roleColors[user.role]}
+          {/* Dashboard Overview */}
+          <UserDashboard stats={dashboardStats} loading={dashboardLoading} />
+
+          {/* Filters */}
+          <UserFilters
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onRefresh={loadUsers}
+            onAddUser={handleAddUser}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortChange={handleSortChange}
+            totalCount={totalCount}
+            loading={loading}
+            clinics={clinics}
+          />
+
+          {/* Content */}
+          {viewMode === 'table' ? (
+            <UserTable
+              users={users}
+              loading={loading}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              totalCount={totalCount}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+              onEditUser={handleEditUser}
+              onDeleteUser={handleDeleteUser}
+              onToggleStatus={handleToggleStatus}
+              onResetPassword={handleResetPassword}
+              onBulkAction={handleBulkAction}
+              clinicsMap={clinicsMap}
+            />
+          ) : (
+            <Box>
+              <Grid container spacing={3}>
+                {loading ? (
+                  Array.from(new Array(rowsPerPage)).map((_, index) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                      <Box sx={{ height: 280, bgcolor: 'grey.100', borderRadius: 1 }} />
+                    </Grid>
+                  ))
+                ) : users.length === 0 ? (
+                  <Grid item xs={12}>
+                    <Box sx={{ textAlign: 'center', py: 6 }}>
+                      <Typography variant="h6" color="textSecondary" gutterBottom>
+                        Nenhum usuário encontrado
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Tente ajustar os filtros ou criar um novo usuário
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ) : (
+                  users.map((user) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={user.id}>
+                      <UserCard
+                        user={user}
+                        onEdit={handleEditUser}
+                        onDelete={handleDeleteUser}
+                        onToggleStatus={handleToggleStatus}
+                        onResetPassword={handleResetPassword}
+                        clinicName={user.clinicId ? clinicsMap.get(user.clinicId) : undefined}
                       />
-                    </TableCell>
-                    <TableCell>{user.phoneNumber || '-'}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={user.isActive ? 'Ativo' : 'Inativo'}
-                        size="small"
-                        color={user.isActive ? 'success' : 'default'}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {new Date(user.createdAt).toLocaleDateString('pt-BR')}
-                    </TableCell>
-                    <TableCell align="right">
-                      <Stack direction="row" spacing={1} justifyContent="flex-end">
-                        <Tooltip title="Editar">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEditUser(user)}
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={user.isActive ? 'Desativar' : 'Ativar'}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleToggleStatus(user)}
-                          >
-                            {user.isActive ? (
-                              <PersonOff fontSize="small" />
-                            ) : (
-                              <Person fontSize="small" />
-                            )}
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Resetar senha">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleResetPassword(user)}
-                          >
-                            <Lock fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Excluir">
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleDeleteUser(user)}
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))
+                    </Grid>
+                  ))
+                )}
+              </Grid>
+
+              {/* Pagination for Cards View */}
+              {!loading && users.length > 0 && (
+                <Stack direction="row" justifyContent="center" mt={4}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Página {page + 1} de {Math.ceil(totalCount / rowsPerPage)}
+                    </Typography>
+                    <Stack direction="row" spacing={1}>
+                      {/* Pagination controls would go here */}
+                    </Stack>
+                  </Box>
+                </Stack>
               )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            </Box>
+          )}
 
-        <TablePagination
-          component="div"
-          count={totalCount}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Linhas por página:"
-          labelDisplayedRows={({ from, to, count }) =>
-            `${from}-${to} de ${count !== -1 ? count : `mais de ${to}`}`
-          }
-        />
-      </Card>
+          {/* Dialogs */}
+          <UserDialog
+            open={dialogOpen}
+            user={selectedUser}
+            onClose={handleDialogClose}
+          />
 
-      <UserDialog
-        open={dialogOpen}
-        user={selectedUser}
-        onClose={handleDialogClose}
-      />
-
-      <ConfirmDialog
-        open={confirmDialog.open}
-        title={confirmDialog.title}
-        message={confirmDialog.message}
-        onConfirm={() => {
-          confirmDialog.onConfirm()
-          setConfirmDialog({ ...confirmDialog, open: false })
-        }}
-        onCancel={() => setConfirmDialog({ ...confirmDialog, open: false })}
-      />
-    </Box>
+          <ConfirmDialog
+            open={confirmDialog.open}
+            title={confirmDialog.title}
+            message={confirmDialog.message}
+            onConfirm={() => {
+              confirmDialog.onConfirm()
+              setConfirmDialog({ ...confirmDialog, open: false })
+            }}
+            onCancel={() => setConfirmDialog({ ...confirmDialog, open: false })}
+          />
+        </Box>
+      </Fade>
+    </Container>
   )
 }
