@@ -49,6 +49,11 @@ public class ApplicationUser : IdentityUser<Guid>
     public DateTime? LastLoginAt { get; set; }
     
     /// <summary>
+    /// Firebase UID for users authenticated via Firebase
+    /// </summary>
+    public string? FirebaseUid { get; set; }
+    
+    /// <summary>
     /// Refresh tokens for JWT authentication
     /// </summary>
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();

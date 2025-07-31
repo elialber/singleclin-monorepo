@@ -12,42 +12,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 
   useEffect(() => {
+    let isSubscribed = true
+    
     // Check for redirect result first
     const checkRedirectResult = async () => {
       try {
+        setIsLoading(true)
         const redirectResult = await getGoogleRedirectResult()
-        if (redirectResult) {
-          // Handle redirect login
-          const result = await authService.loginWithGoogle()
-          authService.setTokens(result.accessToken, result.refreshToken)
-          localStorage.setItem('@SingleClin:user', JSON.stringify(result.user))
-          setUser(result.user)
-          navigate('/dashboard')
-          return
+        
+        if (redirectResult && isSubscribed) {
+          console.log('Processing Google redirect login...')
+          // Handle redirect login - the auth state change will trigger automatically
+          // No need to manually call loginWithGoogle here
         }
       } catch (error) {
-        console.error('Redirect login error:', error)
+        console.error('Redirect result error:', error)
       }
-      
-      // If no redirect result, proceed with normal flow
-      loadStoredUser()
     }
 
     // Subscribe to Firebase auth state changes
     const unsubscribe = onAuthStateChange(async (firebaseUser) => {
+      if (!isSubscribed) return
+      
       if (firebaseUser) {
-        await loadStoredUser()
+        try {
+          // If we have a Firebase user, sync with backend
+          const token = await firebaseUser.getIdToken()
+          const result = await authService.loginWithGoogle()
+          
+          authService.setTokens(result.accessToken, result.refreshToken)
+          localStorage.setItem('@SingleClin:user', JSON.stringify(result.user))
+          setUser(result.user)
+          
+          // Only navigate if we're on the login page
+          if (window.location.pathname === '/login') {
+            navigate('/dashboard')
+          }
+        } catch (error) {
+          console.error('Error syncing Firebase user with backend:', error)
+          await loadStoredUser()
+        }
       } else {
-        setUser(null)
-        setIsLoading(false)
+        // No Firebase user, try to load from stored tokens
+        await loadStoredUser()
       }
     })
 
     // Check redirect result and initial load
     checkRedirectResult()
 
-    return () => unsubscribe()
-  }, [])
+    return () => {
+      isSubscribed = false
+      unsubscribe()
+    }
+  }, [navigate])
 
   const loadStoredUser = async () => {
     try {

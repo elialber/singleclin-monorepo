@@ -108,6 +108,16 @@
             <response code="200">User claims retrieved successfully</response>
             <response code="401">Not authenticated</response>
         </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.FirebaseLogin(SingleClin.API.DTOs.Auth.FirebaseLoginDto)">
+            <summary>
+            Login with Firebase authentication token
+            </summary>
+            <param name="firebaseLoginDto">Firebase login information</param>
+            <returns>Authentication response with tokens</returns>
+            <response code="200">Firebase login successful</response>
+            <response code="400">Invalid Firebase token</response>
+            <response code="401">Firebase authentication failed</response>
+        </member>
         <member name="M:SingleClin.API.Controllers.AuthController.SocialLogin(SingleClin.API.DTOs.Auth.SocialLoginDto)">
             <summary>
             Login with social provider (Google or Apple)
@@ -884,6 +894,11 @@
             Date when the user last logged in
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.Models.ApplicationUser.FirebaseUid">
+            <summary>
+            Firebase UID for users authenticated via Firebase
+            </summary>
+        </member>
         <member name="P:SingleClin.API.Data.Models.ApplicationUser.RefreshTokens">
             <summary>
             Refresh tokens for JWT authentication
@@ -1535,6 +1550,31 @@
         <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.IsFirstLogin">
             <summary>
             Indicates if this is the user's first login
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.AuthResponseDto.IsEmailVerified">
+            <summary>
+            Indicates if the user's email is verified
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Auth.FirebaseLoginDto">
+            <summary>
+            Data transfer object for Firebase authentication
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.FirebaseLoginDto.FirebaseToken">
+            <summary>
+            Firebase ID token obtained from Firebase Auth
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.FirebaseLoginDto.DeviceInfo">
+            <summary>
+            Device information for tracking
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.FirebaseLoginDto.RememberMe">
+            <summary>
+            Whether to remember the login (create long-lived refresh token)
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.Auth.LoginDto">
@@ -2877,6 +2917,21 @@
             Rate limit information for a clinic
             </summary>
         </member>
+        <member name="T:SingleClin.API.Middleware.FirebaseAuthenticationMiddleware">
+            <summary>
+            Middleware to validate Firebase tokens and convert them to internal JWT tokens
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Middleware.FirebaseAuthenticationMiddlewareExtensions">
+            <summary>
+            Extension methods for Firebase authentication middleware
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Middleware.FirebaseAuthenticationMiddlewareExtensions.UseFirebaseAuthentication(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds Firebase authentication middleware to the pipeline
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Migrations.InitialCreate">
             <inheritdoc />
         </member>
@@ -2923,6 +2978,18 @@
             <inheritdoc />
         </member>
         <member name="M:SingleClin.API.Migrations.ApplicationDb.FixPendingChanges.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.AddFirebaseUidToUser">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddFirebaseUidToUser.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddFirebaseUidToUser.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddFirebaseUidToUser.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
         <member name="T:SingleClin.API.Repositories.IPlanRepository">
@@ -3141,6 +3208,14 @@
             <param name="userId">User ID</param>
             <returns>Dictionary of user claims</returns>
         </member>
+        <member name="M:SingleClin.API.Services.IAuthService.FirebaseLoginAsync(SingleClin.API.DTOs.Auth.FirebaseLoginDto,System.String)">
+            <summary>
+            Authenticate a user with Firebase token
+            </summary>
+            <param name="firebaseLoginDto">Firebase login data</param>
+            <param name="ipAddress">Client IP address</param>
+            <returns>Authentication response with tokens</returns>
+        </member>
         <member name="T:SingleClin.API.Services.IEmailTemplateService">
             <summary>
             Service for processing and rendering email templates
@@ -3240,6 +3315,34 @@
             Check if Firebase is properly configured
             </summary>
             <returns>True if Firebase is configured, false otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IFirebaseAuthService.CreateUserAsync(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Create a new user in Firebase Authentication
+            </summary>
+            <param name="email">User email</param>
+            <param name="password">User password</param>
+            <param name="displayName">User display name</param>
+            <param name="emailVerified">Whether email is verified</param>
+            <returns>Created user record</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IFirebaseAuthService.UpdateUserAsync(System.String,System.String,System.String,System.String,System.Nullable{System.Boolean})">
+            <summary>
+            Update a user in Firebase Authentication
+            </summary>
+            <param name="uid">Firebase user ID</param>
+            <param name="email">New email (optional)</param>
+            <param name="password">New password (optional)</param>
+            <param name="displayName">New display name (optional)</param>
+            <param name="emailVerified">New email verified status (optional)</param>
+            <returns>Updated user record</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IFirebaseAuthService.GetUserByEmailAsync(System.String)">
+            <summary>
+            Get user by email from Firebase
+            </summary>
+            <param name="email">User email</param>
+            <returns>User record if found, null otherwise</returns>
         </member>
         <member name="T:SingleClin.API.Services.IPlanService">
             <summary>

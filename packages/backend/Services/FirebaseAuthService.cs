@@ -188,4 +188,120 @@ public class FirebaseAuthService : IFirebaseAuthService
             return false;
         }
     }
+
+    public async Task<UserRecord?> CreateUserAsync(string email, string password, string? displayName = null, bool emailVerified = false)
+    {
+        if (!IsConfigured)
+        {
+            _logger.LogWarning("Firebase is not configured. Cannot create user.");
+            return null;
+        }
+
+        try
+        {
+            var args = new UserRecordArgs
+            {
+                Email = email,
+                Password = password,
+                EmailVerified = emailVerified,
+                Disabled = false
+            };
+
+            if (!string.IsNullOrEmpty(displayName))
+            {
+                args.DisplayName = displayName;
+            }
+
+            var userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(args);
+            _logger.LogInformation("Successfully created Firebase user: {Uid}, Email: {Email}", userRecord.Uid, email);
+            return userRecord;
+        }
+        catch (FirebaseAuthException ex)
+        {
+            _logger.LogWarning(ex, "Failed to create Firebase user: {Email}", email);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error creating Firebase user: {Email}", email);
+            return null;
+        }
+    }
+
+    public async Task<UserRecord?> UpdateUserAsync(string uid, string? email = null, string? password = null, string? displayName = null, bool? emailVerified = null)
+    {
+        if (!IsConfigured)
+        {
+            _logger.LogWarning("Firebase is not configured. Cannot update user.");
+            return null;
+        }
+
+        try
+        {
+            var args = new UserRecordArgs
+            {
+                Uid = uid
+            };
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                args.Email = email;
+            }
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                args.Password = password;
+            }
+
+            if (!string.IsNullOrEmpty(displayName))
+            {
+                args.DisplayName = displayName;
+            }
+
+            if (emailVerified.HasValue)
+            {
+                args.EmailVerified = emailVerified.Value;
+            }
+
+            var userRecord = await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
+            _logger.LogInformation("Successfully updated Firebase user: {Uid}", uid);
+            return userRecord;
+        }
+        catch (FirebaseAuthException ex)
+        {
+            _logger.LogWarning(ex, "Failed to update Firebase user: {Uid}", uid);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error updating Firebase user: {Uid}", uid);
+            return null;
+        }
+    }
+
+    public async Task<UserRecord?> GetUserByEmailAsync(string email)
+    {
+        if (!IsConfigured)
+        {
+            _logger.LogWarning("Firebase is not configured. Cannot get user by email.");
+            return null;
+        }
+
+        try
+        {
+            var user = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(email);
+            _logger.LogInformation("Successfully retrieved Firebase user by email: {Email}", email);
+            return user;
+        }
+        catch (FirebaseAuthException ex)
+        {
+            _logger.LogWarning(ex, "Failed to get Firebase user by email: {Email}", email);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error getting Firebase user by email: {Email}", email);
+            return null;
+        }
+    }
 }

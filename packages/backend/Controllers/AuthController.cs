@@ -296,6 +296,58 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Login with Firebase authentication token
+    /// </summary>
+    /// <param name="firebaseLoginDto">Firebase login information</param>
+    /// <returns>Authentication response with tokens</returns>
+    /// <response code="200">Firebase login successful</response>
+    /// <response code="400">Invalid Firebase token</response>
+    /// <response code="401">Firebase authentication failed</response>
+    [HttpPost("login/firebase")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> FirebaseLogin([FromBody] FirebaseLoginDto firebaseLoginDto)
+    {
+        try
+        {
+            var ipAddress = GetIpAddress();
+            var result = await _authService.FirebaseLoginAsync(firebaseLoginDto, ipAddress);
+
+            if (!result.Success)
+            {
+                return result.Error?.Contains("Invalid token") ?? false
+                    ? Unauthorized(new ProblemDetails
+                    {
+                        Title = "Authentication Failed",
+                        Detail = result.Error,
+                        Status = StatusCodes.Status401Unauthorized
+                    })
+                    : BadRequest(new ProblemDetails
+                    {
+                        Title = "Firebase Login Failed",
+                        Detail = result.Error,
+                        Status = StatusCodes.Status400BadRequest
+                    });
+            }
+
+            _logger.LogInformation("Firebase login successful: {Email}", result.Response!.Email);
+            return Ok(result.Response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during Firebase login");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "Firebase Login Error",
+                Detail = "An unexpected error occurred during Firebase login",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    /// <summary>
     /// Login with social provider (Google or Apple)
     /// </summary>
     /// <param name="socialLoginDto">Social login information</param>
