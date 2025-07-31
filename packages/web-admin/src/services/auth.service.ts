@@ -54,14 +54,88 @@ const transformAuthResponse = (authResponse: AuthResponse): LoginResult => {
 
 export const authService = {
   async login(email: string, password: string): Promise<LoginResult> {
-    // First authenticate with Firebase
-    const firebaseResult = await signInWithEmail(email, password)
-    
-    // Then authenticate with our backend using the Firebase token
-    const response = await api.post<AuthResponse>('/auth/firebase', {
-      idToken: firebaseResult.token,
-    })
-    return transformAuthResponse(response.data)
+    try {
+      console.log('Starting login process for:', email)
+      
+      // First authenticate with Firebase
+      const firebaseResult = await signInWithEmail(email, password)
+      console.log('Firebase authentication successful, got token')
+      
+      // Then authenticate with our backend using the Firebase token
+      console.log('Sending token to backend...')
+      const response = await api.post<AuthResponse>('/auth/login/firebase', {
+        firebaseToken: firebaseResult.token,
+        deviceInfo: navigator.userAgent,
+        rememberMe: true
+      })
+      
+      console.log('Backend authentication successful:', {
+        userId: response.data.userId,
+        email: response.data.email,
+        role: response.data.role
+      })
+      
+      return transformAuthResponse(response.data)
+    } catch (error: any) {
+      console.error('Login error details:', {
+        code: error.code,
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        email,
+      })
+      
+      // Check if it's a backend error
+      if (error.response) {
+        console.error('Backend error:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        })
+        
+        if (error.response.status === 400 || error.response.status === 401) {
+          throw new Error(error.response.data?.detail || error.response.data?.message || 'Erro na autenticação com o servidor')
+        } else if (error.response.status === 404) {
+          throw new Error('Endpoint de autenticação não encontrado. Verifique se o backend está rodando.')
+        } else if (error.response.status >= 500) {
+          throw new Error('Erro no servidor. Tente novamente mais tarde.')
+        }
+      }
+      
+      // If Firebase login fails, it might be a timing issue after registration
+      // Try with multiple retry attempts
+      if (error.code === 'auth/invalid-credential' || 
+          error.code === 'auth/user-not-found' ||
+          error.code === 'auth/wrong-password') {
+        
+        console.log('Firebase login failed, will retry with increasing delays...')
+        
+        // Try up to 3 times with increasing delays
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          try {
+            const delay = attempt * 2000 // 2s, 4s, 6s
+            console.log(`Retry attempt ${attempt} after ${delay}ms delay...`)
+            await new Promise(resolve => setTimeout(resolve, delay))
+            
+            const firebaseResult = await signInWithEmail(email, password)
+            const response = await api.post<AuthResponse>('/auth/login/firebase', {
+              firebaseToken: firebaseResult.token,
+              deviceInfo: navigator.userAgent,
+              rememberMe: true
+            })
+            return transformAuthResponse(response.data)
+          } catch (retryError: any) {
+            console.error(`Retry attempt ${attempt} failed:`, retryError.code)
+            if (attempt === 3) {
+              // Last attempt failed, throw the original error
+              throw error
+            }
+            // Continue to next attempt
+          }
+        }
+      }
+      throw error
+    }
   },
 
   async loginWithGoogle(): Promise<LoginResult> {
@@ -69,8 +143,10 @@ export const authService = {
     const firebaseResult = await signInWithGoogle()
     
     // Authenticate with our backend using the Firebase token
-    const response = await api.post<AuthResponse>('/auth/firebase', {
-      idToken: firebaseResult.token,
+    const response = await api.post<AuthResponse>('/auth/login/firebase', {
+      firebaseToken: firebaseResult.token,
+      deviceInfo: navigator.userAgent,
+      rememberMe: true
     })
     return transformAuthResponse(response.data)
   },
@@ -84,9 +160,6 @@ export const authService = {
       fullName,
       birthDate: '1990-01-01', // Default birthdate for now
     })
-    
-    // After successful registration, sign in to Firebase to get the Firebase user
-    await signInWithEmail(email, password)
     
     return transformAuthResponse(response.data)
   },
