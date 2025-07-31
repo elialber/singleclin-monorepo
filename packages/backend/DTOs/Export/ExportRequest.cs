@@ -1,4 +1,5 @@
 using SingleClin.API.DTOs.Report;
+using SingleClin.API.DTOs.Common;
 
 namespace SingleClin.API.DTOs.Export
 {
@@ -17,15 +18,6 @@ namespace SingleClin.API.DTOs.Export
     }
 
     /// <summary>
-    /// Export format options
-    /// </summary>
-    public enum ExportFormat
-    {
-        Excel,
-        PDF
-    }
-
-    /// <summary>
     /// Export options
     /// </summary>
     public class ExportOptions
@@ -36,25 +28,5 @@ namespace SingleClin.API.DTOs.Export
         public bool IncludeFilters { get; set; } = true;
         public PaperSize PaperSize { get; set; } = PaperSize.A4;
         public PaperOrientation Orientation { get; set; } = PaperOrientation.Portrait;
-    }
-
-    /// <summary>
-    /// Paper size options
-    /// </summary>
-    public enum PaperSize
-    {
-        A4,
-        Letter,
-        Legal,
-        A3
-    }
-
-    /// <summary>
-    /// Paper orientation options
-    /// </summary>
-    public enum PaperOrientation
-    {
-        Portrait,
-        Landscape
     }
 }

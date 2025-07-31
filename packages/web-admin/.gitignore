@@ -33,3 +33,7 @@ dist-ssr
 # Coverage
 coverage
 .nyc_output
+
+# Firebase service account
+firebase-service-account.json
+*.serviceAccountKey.json

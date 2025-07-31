@@ -80,21 +80,19 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Password field
-                    Obx(
-                      () => TextFormField(
-                        controller: authController.passwordController,
-                        obscureText: true,
-                        textInputAction: TextInputAction.done,
-                        validator: FormValidators.validatePassword,
-                        onFieldSubmitted: (_) =>
-                            authController.signInWithEmail(),
-                        decoration: InputDecoration(
-                          labelText: 'Senha',
-                          hintText: 'Digite sua senha',
-                          prefixIcon: const Icon(Icons.lock_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    TextFormField(
+                      controller: authController.passwordController,
+                      obscureText: true,
+                      textInputAction: TextInputAction.done,
+                      validator: FormValidators.validatePassword,
+                      onFieldSubmitted: (_) =>
+                          authController.signInWithEmail(),
+                      decoration: InputDecoration(
+                        labelText: 'Senha',
+                        hintText: 'Digite sua senha',
+                        prefixIcon: const Icon(Icons.lock_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),

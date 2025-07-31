@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SingleClin.API.DTOs;
 using SingleClin.API.DTOs.Export;
 using SingleClin.API.DTOs.Report;
+using SingleClin.API.DTOs.Common;
 using SingleClin.API.Services;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -287,8 +288,8 @@ namespace SingleClin.API.Controllers
                 // Export to requested format
                 ExportResponse exportResponse = request.Format switch
                 {
-                    SingleClin.API.DTOs.Export.ExportFormat.Excel => await _exportService.ExportToExcelAsync((dynamic)reportData, request),
-                    SingleClin.API.DTOs.Export.ExportFormat.PDF => await _exportService.ExportToPdfAsync((dynamic)reportData, request),
+                    ExportFormat.Excel => await _exportService.ExportToExcelAsync((dynamic)reportData, request),
+                    ExportFormat.Pdf => await _exportService.ExportToPdfAsync((dynamic)reportData, request),
                     _ => throw new NotSupportedException($"Export format {request.Format} is not supported")
                 };
 
@@ -391,7 +392,7 @@ namespace SingleClin.API.Controllers
 
                 var exportRequest = new ExportRequest
                 {
-                    Format = SingleClin.API.DTOs.Export.ExportFormat.Excel,
+                    Format = ExportFormat.Excel,
                     StartDate = request.StartDate,
                     EndDate = request.EndDate,
                     TimeZone = request.TimeZone,

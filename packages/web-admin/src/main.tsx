@@ -6,6 +6,9 @@ import { CssBaseline } from '@mui/material'
 import App from './App'
 import './styles/global.css'
 
+// Initialize Firebase
+import './config/firebase'
+
 // Create a query client
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -1642,6 +1642,41 @@
             User's full name (optional, used if not provided by social provider)
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.Common.ExportFormat">
+            <summary>
+            Export format options
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Common.ExportFormat.Json">
+            <summary>
+            JSON format (default)
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Common.ExportFormat.Excel">
+            <summary>
+            Excel format (.xlsx)
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Common.ExportFormat.Pdf">
+            <summary>
+            PDF format
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.DTOs.Common.ExportFormat.Csv">
+            <summary>
+            CSV format
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Common.PaperSize">
+            <summary>
+            Paper size options for PDF exports
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Common.PaperOrientation">
+            <summary>
+            Paper orientation options for PDF exports
+            </summary>
+        </member>
         <member name="T:SingleClin.API.DTOs.Common.PagedResultDto`1">
             <summary>
             Generic paginated result data transfer object
@@ -1859,24 +1894,9 @@
             Export request model
             </summary>
         </member>
-        <member name="T:SingleClin.API.DTOs.Export.ExportFormat">
-            <summary>
-            Export format options
-            </summary>
-        </member>
         <member name="T:SingleClin.API.DTOs.Export.ExportOptions">
             <summary>
             Export options
-            </summary>
-        </member>
-        <member name="T:SingleClin.API.DTOs.Export.PaperSize">
-            <summary>
-            Paper size options
-            </summary>
-        </member>
-        <member name="T:SingleClin.API.DTOs.Export.PaperOrientation">
-            <summary>
-            Paper orientation options
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.Export.ExportResponse">
@@ -2482,31 +2502,6 @@
             Validate date range
             </summary>
         </member>
-        <member name="T:SingleClin.API.DTOs.Report.ExportFormat">
-            <summary>
-            Export format options
-            </summary>
-        </member>
-        <member name="F:SingleClin.API.DTOs.Report.ExportFormat.Json">
-            <summary>
-            JSON format (default)
-            </summary>
-        </member>
-        <member name="F:SingleClin.API.DTOs.Report.ExportFormat.Excel">
-            <summary>
-            Excel format (.xlsx)
-            </summary>
-        </member>
-        <member name="F:SingleClin.API.DTOs.Report.ExportFormat.Pdf">
-            <summary>
-            PDF format
-            </summary>
-        </member>
-        <member name="F:SingleClin.API.DTOs.Report.ExportFormat.Csv">
-            <summary>
-            CSV format
-            </summary>
-        </member>
         <member name="T:SingleClin.API.DTOs.Report.ReportResponse`1">
             <summary>
             Base response for all report types
@@ -2916,6 +2911,18 @@
             <inheritdoc />
         </member>
         <member name="M:SingleClin.API.Migrations.ApplicationDb.AddLastLoginAtToApplicationUser.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.FixPendingChanges">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.FixPendingChanges.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.FixPendingChanges.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.FixPendingChanges.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
         <member name="T:SingleClin.API.Repositories.IPlanRepository">
@@ -3557,7 +3564,7 @@
             Generate plan utilization report
             </summary>
         </member>
-        <member name="M:SingleClin.API.Services.IReportService.ExportReportAsync(System.Object,SingleClin.API.DTOs.Report.ExportFormat,System.Threading.CancellationToken)">
+        <member name="M:SingleClin.API.Services.IReportService.ExportReportAsync(System.Object,SingleClin.API.DTOs.Common.ExportFormat,System.Threading.CancellationToken)">
             <summary>
             Export report to specified format
             </summary>

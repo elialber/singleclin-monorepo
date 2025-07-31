@@ -40,17 +40,18 @@ class PlanCard extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       elevation: 4,
       child: Container(
-        height: 200,
-        padding: const EdgeInsets.all(20),
+        constraints: const BoxConstraints(minHeight: 160), // Consistente com o outro card
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 12),
               Text(
                 'Carregando plano...',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 12, color: Colors.grey), // Fonte menor para iOS
               ),
             ],
           ),
@@ -65,31 +66,45 @@ class PlanCard extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       elevation: 4,
       child: Container(
-        height: 200,
-        padding: const EdgeInsets.all(20),
+        constraints: const BoxConstraints(minHeight: 160), // Altura mínima ainda menor
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Padding mais compacto
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribuição uniforme
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.credit_card_off, size: 48, color: Colors.grey[400]),
-            const SizedBox(height: 12),
+            Icon(Icons.credit_card_off, size: 36, color: Colors.grey[400]), // Ícone ainda menor
             Text(
               'Nenhum plano ativo',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith( // titleSmall para iOS
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Você não possui um plano ativo no momento',
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
+            Flexible( // Permite flexibilidade no texto
+              child: Text(
+                'Você não possui um plano ativo\nno momento',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[500],
+                  fontSize: 12, // Fonte ainda menor
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: onRefresh,
-              child: const Text('Atualizar'),
+            SizedBox( // Botão compacto
+              height: 32, // Altura ainda menor
+              child: ElevatedButton(
+                onPressed: onRefresh,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  minimumSize: const Size(80, 32), // Tamanho mínimo
+                ),
+                child: const Text(
+                  'Atualizar',
+                  style: TextStyle(fontSize: 12), // Fonte menor
+                ),
+              ),
             ),
           ],
         ),

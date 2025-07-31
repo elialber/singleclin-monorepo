@@ -320,6 +320,9 @@ public class Program
 
             // Custom operation filter for better documentation
             c.OperationFilter<SwaggerDefaultValues>();
+            
+            // Use full type names to avoid schema conflicts
+            c.CustomSchemaIds(type => type.FullName?.Replace('+', '.'));
         });
 
         // Add health checks

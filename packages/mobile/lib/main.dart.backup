@@ -9,15 +9,12 @@ import 'package:mobile/core/theme/theme.dart';
 import 'package:mobile/data/services/app_lifecycle_observer.dart';
 import 'package:mobile/data/services/cache_service.dart';
 import 'package:mobile/data/services/token_refresh_service.dart';
-import 'package:mobile/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
 
   // Initialize cache service first
   final cacheService = CacheService.instance;

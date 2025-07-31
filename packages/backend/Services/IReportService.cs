@@ -1,4 +1,5 @@
 using SingleClin.API.DTOs.Report;
+using SingleClin.API.DTOs.Common;
 
 namespace SingleClin.API.Services
 {
