@@ -74,10 +74,7 @@ export default function Transactions() {
   // Debounce search to reduce API calls
   const debouncedFilters = useDebounce(filters, 500)
 
-  useEffect(() => {
-    loadTransactions()
-  }, [debouncedFilters, page, rowsPerPage, loadTransactions])
-
+  // Define loadTransactions before using it
   const loadTransactions = useCallback(async () => {
     try {
       setLoading(true)
@@ -99,6 +96,10 @@ export default function Transactions() {
       setLoading(false)
     }
   }, [debouncedFilters, page, rowsPerPage, showError])
+
+  useEffect(() => {
+    loadTransactions()
+  }, [debouncedFilters, page, rowsPerPage, loadTransactions])
 
   const handleFilterChange = (field: keyof TransactionFilters, value: string | Date | null) => {
     setTempFilters(prev => ({

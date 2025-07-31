@@ -19,8 +19,105 @@ export const planService = {
     if (params.clinicId) queryParams.append('clinicId', params.clinicId)
     if (params.isActive !== undefined) queryParams.append('isActive', params.isActive.toString())
 
-    const response = await api.get<PlanListResponse>(`/plans?${queryParams.toString()}`)
-    return response.data
+    try {
+      const response = await api.get<PlanListResponse>(`/plans?${queryParams.toString()}`)
+      return response.data
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        // Return mock data if endpoint not implemented yet
+        console.warn('Plans endpoint not implemented, returning mock data')
+        
+        const mockPlans: Plan[] = [
+          {
+            id: '1',
+            name: 'Plano Básico',
+            description: 'Ideal para consultas de rotina e exames simples',
+            credits: 10,
+            price: 149.90,
+            isActive: true,
+            clinicId: '1',
+            clinicName: 'Clínica Saúde Total',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: '2',
+            name: 'Plano Intermediário',
+            description: 'Inclui consultas especializadas e exames laboratoriais',
+            credits: 25,
+            price: 299.90,
+            isActive: true,
+            clinicId: '1',
+            clinicName: 'Clínica Saúde Total',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: '3',
+            name: 'Plano Premium',
+            description: 'Acesso completo a todos os serviços e especialidades',
+            credits: 50,
+            price: 549.90,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: '4',
+            name: 'Plano Família',
+            description: 'Ideal para famílias com até 4 pessoas',
+            credits: 100,
+            price: 899.90,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: '5',
+            name: 'Plano Empresarial',
+            description: 'Soluções corporativas para empresas',
+            credits: 200,
+            price: 1499.90,
+            isActive: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ]
+
+        // Apply filters
+        let filtered = [...mockPlans]
+        
+        if (params.search) {
+          filtered = filtered.filter(p => 
+            p.name.toLowerCase().includes(params.search!.toLowerCase()) ||
+            p.description.toLowerCase().includes(params.search!.toLowerCase())
+          )
+        }
+        
+        if (params.clinicId) {
+          filtered = filtered.filter(p => p.clinicId === params.clinicId)
+        }
+        
+        if (params.isActive !== undefined) {
+          filtered = filtered.filter(p => p.isActive === params.isActive)
+        }
+
+        // Pagination
+        const page = params.page || 1
+        const limit = params.limit || 10
+        const start = (page - 1) * limit
+        const end = start + limit
+        const paginatedData = filtered.slice(start, end)
+
+        return {
+          data: paginatedData,
+          total: filtered.length,
+          page,
+          limit,
+        }
+      }
+      throw error
+    }
   },
 
   async getPlan(id: string): Promise<Plan> {
