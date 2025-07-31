@@ -42,7 +42,7 @@ public class FirebaseAuthService : IFirebaseAuthService
                 return false;
             }
 
-            var serviceAccountPath = _configuration["Firebase:ServiceAccountPath"];
+            var serviceAccountPath = _configuration["Firebase:ServiceAccountKeyPath"];
             GoogleCredential credential;
 
             if (!string.IsNullOrEmpty(serviceAccountPath) && File.Exists(serviceAccountPath))
@@ -218,7 +218,8 @@ public class FirebaseAuthService : IFirebaseAuthService
         }
         catch (FirebaseAuthException ex)
         {
-            _logger.LogWarning(ex, "Failed to create Firebase user: {Email}", email);
+            _logger.LogWarning(ex, "Failed to create Firebase user: {Email}. Error Code: {ErrorCode}, Message: {Message}", 
+                email, ex.ErrorCode, ex.Message);
             return null;
         }
         catch (Exception ex)
