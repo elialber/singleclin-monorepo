@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { authService } from '@/services/auth.service'
 import { User } from '@/types/user'
 import { AuthContext } from './AuthContextDefinition'
-import { onAuthStateChange } from '@/services/firebaseAuth'
-import { getGoogleRedirectResult } from '@/services/firebaseAuthRedirect'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -12,73 +10,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 
   useEffect(() => {
-    let isSubscribed = true
-    
-    // Check for redirect result first
-    const checkRedirectResult = async () => {
-      try {
-        // Only check for redirect result if we don't have tokens
-        const hasTokens = authService.getAccessToken() && authService.getRefreshToken()
-        if (hasTokens) {
-          return
-        }
-        
-        setIsLoading(true)
-        const redirectResult = await getGoogleRedirectResult()
-        
-        if (redirectResult && isSubscribed) {
-          console.log('Processing Google redirect login...')
-          // Handle redirect login - the auth state change will trigger automatically
-          // No need to manually call loginWithGoogle here
-        }
-      } catch (error) {
-        console.error('Redirect result error:', error)
-      }
-    }
-
-    // Subscribe to Firebase auth state changes
-    const unsubscribe = onAuthStateChange(async (firebaseUser) => {
-      if (!isSubscribed) return
-      
-      if (firebaseUser) {
-        // If we have a Firebase user but no stored tokens, it might be from a redirect
-        const accessToken = authService.getAccessToken()
-        if (!accessToken) {
-          // This is likely a Google redirect result, handle it
-          try {
-            const token = await firebaseUser.getIdToken()
-            const response = await authService.loginWithGoogle()
-            
-            authService.setTokens(response.accessToken, response.refreshToken)
-            localStorage.setItem('@SingleClin:user', JSON.stringify(response.user))
-            setUser(response.user)
-            
-            // Only navigate if we're on the login page
-            if (window.location.pathname === '/login') {
-              navigate('/dashboard')
-            }
-          } catch (error) {
-            console.error('Error syncing Firebase user with backend:', error)
-            await loadStoredUser()
-          }
-        } else {
-          // We already have tokens, just load the stored user
-          await loadStoredUser()
-        }
-      } else {
-        // No Firebase user, try to load from stored tokens
-        await loadStoredUser()
-      }
-    })
-
-    // Check redirect result and initial load
-    checkRedirectResult()
-
-    return () => {
-      isSubscribed = false
-      unsubscribe()
-    }
-  }, [navigate])
+    // Simply load any existing user session on mount
+    loadStoredUser()
+  }, [])
 
   const loadStoredUser = async () => {
     try {
