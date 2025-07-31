@@ -14,33 +14,7 @@ public static class AuthenticationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Initialize Firebase Admin SDK (optional - if not configured, only internal JWT will work)
-        var firebaseProjectId = configuration["Firebase:ProjectId"];
-        var serviceAccountPath = configuration["Firebase:ServiceAccountPath"];
-
-        if (!string.IsNullOrEmpty(firebaseProjectId))
-        {
-            try
-            {
-                // Initialize Firebase only if not already initialized
-                if (FirebaseApp.DefaultInstance == null)
-                {
-                    FirebaseApp.Create(new AppOptions
-                    {
-                        Credential = string.IsNullOrEmpty(serviceAccountPath) || !File.Exists(serviceAccountPath)
-                            ? GoogleCredential.GetApplicationDefault()
-                            : GoogleCredential.FromFile(serviceAccountPath),
-                        ProjectId = firebaseProjectId
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log warning but don't fail the application startup
-                var logger = services.BuildServiceProvider().GetService<ILogger<Program>>();
-                logger?.LogWarning(ex, "Failed to initialize Firebase Admin SDK. Only internal JWT authentication will be available.");
-            }
-        }
+        // Firebase initialization moved to FirebaseAuthService to centralize the logic
 
         // Configure JWT Bearer authentication
         var key = Encoding.ASCII.GetBytes(configuration["JWT:SecretKey"] ?? 

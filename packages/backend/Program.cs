@@ -18,6 +18,8 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Hangfire.PostgreSql;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 namespace SingleClin.API;
 
@@ -106,6 +108,8 @@ public class Program
         builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IFirebaseAuthService, FirebaseAuthService>();
+        
+        // Firebase initialization will be done after app build
 
         // Add Plan services
         builder.Services.AddScoped<IPlanRepository, PlanRepository>();
@@ -339,6 +343,116 @@ public class Program
                 tags: new[] { "database", "ready" });
 
         var app = builder.Build();
+
+        // Initialize Firebase after app build
+        {
+            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+            var configuration = app.Configuration;
+            
+            logger.LogInformation("=== Initializing Firebase ===");
+            logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
+            
+            try
+            {
+                // Debug configuration sources
+                logger.LogInformation("Configuration Sources:");
+                var configRoot = configuration as IConfigurationRoot;
+                if (configRoot != null)
+                {
+                    foreach (var provider in configRoot.Providers)
+                    {
+                        logger.LogInformation("  Provider: {Provider}", provider.GetType().Name);
+                    }
+                }
+                
+                // Test configuration loading
+                logger.LogInformation("Testing configuration:");
+                logger.LogInformation("  ConnectionString: {HasValue}", !string.IsNullOrEmpty(configuration.GetConnectionString("DefaultConnection")));
+                logger.LogInformation("  JWT:SecretKey: {HasValue}", !string.IsNullOrEmpty(configuration["JWT:SecretKey"]));
+                
+                // Debug Firebase configuration
+                var firebaseSection = configuration.GetSection("Firebase");
+                logger.LogInformation("Firebase Section exists: {Exists}", firebaseSection.Exists());
+                logger.LogInformation("Firebase Section path: {Path}", firebaseSection.Path);
+                logger.LogInformation("Firebase Section children:");
+                foreach (var child in firebaseSection.GetChildren())
+                {
+                    logger.LogInformation("  {Key}: '{Value}' (Path: {Path})", child.Key, child.Value, child.Path);
+                    
+                    // For nested sections, log their children too
+                    if (child.GetChildren().Any())
+                    {
+                        foreach (var subchild in child.GetChildren())
+                        {
+                            logger.LogInformation("    {Key}: '{Value}'", subchild.Key, subchild.Value);
+                        }
+                    }
+                }
+                
+                // Try different ways to access ProjectId
+                var projectId1 = configuration["Firebase:ProjectId"];
+                var projectId2 = configuration.GetValue<string>("Firebase:ProjectId");
+                var projectId3 = firebaseSection["ProjectId"];
+                var projectId4 = firebaseSection.GetValue<string>("ProjectId");
+                
+                logger.LogInformation("ProjectId access methods:");
+                logger.LogInformation("  Method 1 (indexer): '{Value}'", projectId1 ?? "NULL");
+                logger.LogInformation("  Method 2 (GetValue): '{Value}'", projectId2 ?? "NULL");
+                logger.LogInformation("  Method 3 (section indexer): '{Value}'", projectId3 ?? "NULL");
+                logger.LogInformation("  Method 4 (section GetValue): '{Value}'", projectId4 ?? "NULL");
+                
+                var projectId = projectId1 ?? projectId2 ?? projectId3 ?? projectId4;
+                var serviceAccountPath = configuration["Firebase:ServiceAccountKeyPath"];
+                
+                logger.LogInformation("Firebase Configuration:");
+                logger.LogInformation("  ProjectId: '{ProjectId}'", projectId ?? "NULL");
+                logger.LogInformation("  ServiceAccountKeyPath: '{Path}'", serviceAccountPath ?? "NULL");
+                logger.LogInformation("  Current Directory: {Dir}", Directory.GetCurrentDirectory());
+                
+                if (!string.IsNullOrEmpty(projectId))
+                {
+                    if (FirebaseApp.DefaultInstance == null)
+                    {
+                        if (!string.IsNullOrEmpty(serviceAccountPath) && File.Exists(serviceAccountPath))
+                        {
+                            logger.LogInformation("Service account file exists: {Exists}", File.Exists(serviceAccountPath));
+                            logger.LogInformation("Initializing Firebase Admin SDK...");
+                            
+                            var credential = GoogleCredential.FromFile(serviceAccountPath);
+                            FirebaseApp.Create(new AppOptions
+                            {
+                                Credential = credential,
+                                ProjectId = projectId
+                            });
+                            
+                            logger.LogInformation("✅ Firebase Admin SDK initialized successfully!");
+                            logger.LogInformation("Firebase Project: {ProjectId}", FirebaseApp.DefaultInstance.Options.ProjectId);
+                        }
+                        else
+                        {
+                            logger.LogError("Firebase service account file not found!");
+                            logger.LogError("  Expected path: {Path}", serviceAccountPath);
+                            logger.LogError("  File exists: {Exists}", File.Exists(serviceAccountPath));
+                        }
+                    }
+                    else
+                    {
+                        logger.LogInformation("Firebase already initialized for project: {ProjectId}", 
+                            FirebaseApp.DefaultInstance.Options.ProjectId);
+                    }
+                }
+                else
+                {
+                    logger.LogError("Firebase ProjectId is NULL or empty!");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to initialize Firebase");
+            }
+            
+            logger.LogInformation("=== Firebase Initialization Complete ===");
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

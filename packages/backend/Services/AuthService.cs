@@ -96,9 +96,14 @@ public class AuthService : IAuthService
                 return (false, null, errors);
             }
 
-            // Create user in Firebase if Firebase is configured
+            // Create user in Firebase
+            _logger.LogInformation("=== FIREBASE USER CREATION START ===");
+            _logger.LogInformation("Firebase IsConfigured: {IsConfigured}", _firebaseAuthService.IsConfigured);
+            _logger.LogInformation("Email: {Email}, FullName: {FullName}", registerDto.Email, registerDto.FullName);
+            
             if (_firebaseAuthService.IsConfigured)
             {
+                _logger.LogInformation("Firebase is configured. Attempting to create user...");
                 try
                 {
                     var firebaseUser = await _firebaseAuthService.CreateUserAsync(
@@ -113,23 +118,24 @@ public class AuthService : IAuthService
                         // Update user with Firebase UID
                         user.FirebaseUid = firebaseUser.Uid;
                         await _userManager.UpdateAsync(user);
-                        _logger.LogInformation("Created user in Firebase: {Email}, UID: {FirebaseUid}", registerDto.Email, firebaseUser.Uid);
+                        _logger.LogInformation("✅ SUCCESS: Created user in Firebase - Email: {Email}, UID: {FirebaseUid}", 
+                            registerDto.Email, firebaseUser.Uid);
                     }
                     else
                     {
-                        _logger.LogWarning("Failed to create user in Firebase: {Email}. User created locally only.", registerDto.Email);
+                        _logger.LogError("❌ FAILED: CreateUserAsync returned null for email: {Email}", registerDto.Email);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error creating user in Firebase: {Email}. User created locally only.", registerDto.Email);
-                    // Continue with local user creation - Firebase is optional
+                    _logger.LogError(ex, "❌ EXCEPTION: Error creating user in Firebase for email: {Email}", registerDto.Email);
                 }
             }
             else
             {
-                _logger.LogInformation("Firebase not configured. User created locally only: {Email}", registerDto.Email);
+                _logger.LogError("❌ Firebase NOT configured! Cannot create user in Firebase for: {Email}", registerDto.Email);
             }
+            _logger.LogInformation("=== FIREBASE USER CREATION END ===");
 
             // Add role claim
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", user.Role.ToString()));
