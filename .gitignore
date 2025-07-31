@@ -39,6 +39,8 @@ serviceAccountKey.json
 # .NET specific
 bin/
 obj/
+Debug/
+Release/
 *.user
 *.userprefs
 .vs/
