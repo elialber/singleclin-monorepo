@@ -36,24 +36,28 @@ class PlanCard extends StatelessWidget {
 
   /// Build loading state card
   Widget _buildLoadingCard(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      elevation: 4,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 160), // Consistente com o outro card
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 12),
-              Text(
-                'Carregando plano...',
-                style: TextStyle(fontSize: 12, color: Colors.grey), // Fonte menor para iOS
-              ),
-            ],
+    return SizedBox(
+      width: double.infinity, // Força largura total
+      child: Card(
+        margin: EdgeInsets.zero, // Removida margem para usar largura total
+        elevation: 4,
+        child: Container(
+          width: double.infinity, // Garante largura total
+          constraints: const BoxConstraints(minHeight: 220), // Consistente com o outro card
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text(
+                  'Carregando plano...',
+                  style: TextStyle(fontSize: 14, color: Colors.grey), // Fonte maior para consistência
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -62,53 +66,58 @@ class PlanCard extends StatelessWidget {
 
   /// Build no plan available card
   Widget _buildNoPlanCard(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      elevation: 4,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 160), // Altura mínima ainda menor
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Padding mais compacto
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribuição uniforme
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.credit_card_off, size: 36, color: Colors.grey[400]), // Ícone ainda menor
+    return SizedBox(
+      width: double.infinity, // Força largura total
+      child: Card(
+        margin: EdgeInsets.zero, // Removida margem para usar largura total
+        elevation: 4,
+        child: Container(
+          width: double.infinity, // Garante largura total
+          constraints: const BoxConstraints(minHeight: 220), // Altura mínima maior para melhor visualização
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24), // Padding mais espaçoso
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Centralização melhor
+            mainAxisSize: MainAxisSize.min,
+            children: [
+            Icon(Icons.credit_card_off, size: 48, color: Colors.grey[400]), // Ícone maior
+            const SizedBox(height: 16), // Espaçamento maior
             Text(
               'Nenhum plano ativo',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith( // titleSmall para iOS
+              style: Theme.of(context).textTheme.titleMedium?.copyWith( // titleMedium para melhor legibilidade
                 color: Colors.grey[600],
                 fontWeight: FontWeight.w600,
               ),
             ),
-            Flexible( // Permite flexibilidade no texto
-              child: Text(
-                'Você não possui um plano ativo\nno momento',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[500],
-                  fontSize: 12, // Fonte ainda menor
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 8),
+            Text(
+              'Você não possui um plano ativo\nno momento',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[500],
+                fontSize: 14, // Fonte maior para melhor leitura
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            SizedBox( // Botão compacto
-              height: 32, // Altura ainda menor
+            const SizedBox(height: 20), // Espaçamento maior antes do botão
+            SizedBox(
+              height: 40, // Altura maior para o botão
               child: ElevatedButton(
                 onPressed: onRefresh,
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                  minimumSize: const Size(80, 32), // Tamanho mínimo
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  minimumSize: const Size(120, 40), // Tamanho mínimo maior
                 ),
                 child: const Text(
                   'Atualizar',
-                  style: TextStyle(fontSize: 12), // Fonte menor
+                  style: TextStyle(fontSize: 14), // Fonte maior
                 ),
               ),
             ),
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -119,7 +128,7 @@ class PlanCard extends StatelessWidget {
     final usagePercentage = plan.usagePercentage;
 
     return Card(
-      margin: const EdgeInsets.all(16),
+      margin: EdgeInsets.zero, // Removida margem para usar largura total
       elevation: 4,
       child: InkWell(
         onTap: onTap,
