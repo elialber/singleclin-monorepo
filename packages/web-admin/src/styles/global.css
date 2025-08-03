@@ -16,23 +16,23 @@ body {
   flex-direction: column;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - SingleClin branded */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #E6E6E6; /* SingleClin Light Grey */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #005156; /* SingleClin Primary */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #006B71; /* SingleClin Primary Light */
 }
 
 /* Utility classes */

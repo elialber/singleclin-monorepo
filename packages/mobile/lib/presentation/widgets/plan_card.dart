@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/domain/entities/user_plan_entity.dart';
 
 /// Main plan visualization card component
@@ -140,7 +141,12 @@ class PlanCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [statusColor.withValues(alpha: 0.1), Colors.white],
+              colors: AppColors.singleclinSecondaryGradient.map((color) => 
+                color.withValues(alpha: 0.9)).toList(),
+            ),
+            border: Border.all(
+              color: AppColors.singleclinPrimary.withValues(alpha: 0.2), 
+              width: 1,
             ),
           ),
           child: Column(
@@ -379,18 +385,18 @@ class PlanCard extends StatelessWidget {
     );
   }
 
-  /// Get status color based on plan status
+  /// Get status color based on plan status - using SingleClin brand colors
   Color _getStatusColor(String statusColor) {
     switch (statusColor.toLowerCase()) {
       case 'green':
-        return Colors.green;
+        return AppColors.success;
       case 'yellow':
       case 'amber':
-        return Colors.amber[700]!;
+        return AppColors.warning;
       case 'red':
-        return Colors.red;
+        return AppColors.error;
       default:
-        return Colors.blue;
+        return AppColors.singleclinPrimary; // Using brand primary color as default
     }
   }
 }

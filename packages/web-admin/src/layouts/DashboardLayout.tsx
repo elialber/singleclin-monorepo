@@ -38,6 +38,7 @@ import {
 } from '@mui/icons-material'
 import { useAuth } from "@/hooks/useAuth"
 import LogoutDialog from '@/components/LogoutDialog'
+import { SingleClinLogo } from '@/components/SingleClinLogo'
 
 const drawerWidth = 280
 
@@ -233,10 +234,12 @@ export default function DashboardLayout() {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <LocalHospitalIcon
-            sx={{ color: theme.palette.primary.main, mr: 1, fontSize: 32 }}
+          <SingleClinLogo 
+            width={32} 
+            height={32} 
+            variant="dark"
           />
-          <Typography variant="h6" noWrap component="div" fontWeight={600}>
+          <Typography variant="h6" noWrap component="div" fontWeight={600} sx={{ ml: 1 }}>
             SingleClin Admin
           </Typography>
         </Box>

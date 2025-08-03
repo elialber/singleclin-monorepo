@@ -1,21 +1,34 @@
 import { createTheme } from '@mui/material/styles'
 import { ptBR } from '@mui/material/locale'
 
+// SingleClin Brand Color Palette
+const singleclinColors = {
+  primary: '#005156', // Azul-Esverdeado (Pantone 7476 C)
+  primaryLight: '#006B71', // Lighter version for hover states
+  primaryDark: '#003A3D', // Darker version for pressed states
+  black: '#000000', // Preto
+  white: '#FFFFFF', // Branco
+  lightGrey: '#E6E6E6', // Cinza Claro
+  // Additional complementary colors for better UX
+  darkGrey: '#333333',
+  mediumGrey: '#666666',
+}
+
 export const theme = createTheme(
   {
     palette: {
       mode: 'light',
       primary: {
-        main: '#1976d2',
-        light: '#42a5f5',
-        dark: '#1565c0',
-        contrastText: '#fff',
+        main: singleclinColors.primary, // #005156
+        light: singleclinColors.primaryLight, // #006B71
+        dark: singleclinColors.primaryDark, // #003A3D
+        contrastText: singleclinColors.white,
       },
       secondary: {
-        main: '#dc004e',
-        light: '#e33371',
-        dark: '#9a0036',
-        contrastText: '#fff',
+        main: singleclinColors.lightGrey, // #E6E6E6
+        light: '#F0F0F0',
+        dark: '#CCCCCC',
+        contrastText: singleclinColors.black,
       },
       error: {
         main: '#d32f2f',
@@ -24,15 +37,20 @@ export const theme = createTheme(
         main: '#ed6c02',
       },
       info: {
-        main: '#0288d1',
+        main: singleclinColors.primary, // Using brand color for info
       },
       success: {
         main: '#2e7d32',
       },
       background: {
-        default: '#f5f5f5',
-        paper: '#ffffff',
+        default: singleclinColors.white, // #FFFFFF
+        paper: singleclinColors.white, // #FFFFFF
       },
+      text: {
+        primary: singleclinColors.black, // #000000
+        secondary: singleclinColors.mediumGrey, // #666666
+      },
+      divider: singleclinColors.lightGrey, // #E6E6E6
     },
     typography: {
       fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
@@ -72,13 +90,34 @@ export const theme = createTheme(
         styleOverrides: {
           root: {
             borderRadius: 8,
+            textTransform: 'none',
+          },
+          containedPrimary: {
+            background: `linear-gradient(135deg, ${singleclinColors.primary} 0%, ${singleclinColors.primaryDark} 100%)`,
+            '&:hover': {
+              background: `linear-gradient(135deg, ${singleclinColors.primaryLight} 0%, ${singleclinColors.primary} 100%)`,
+              boxShadow: `0 4px 12px rgba(0, 81, 86, 0.3)`,
+            },
+          },
+          outlinedPrimary: {
+            borderColor: singleclinColors.primary,
+            color: singleclinColors.primary,
+            '&:hover': {
+              borderColor: singleclinColors.primaryLight,
+              backgroundColor: `${singleclinColors.primary}08`,
+            },
           },
         },
       },
       MuiCard: {
         styleOverrides: {
           root: {
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            border: `1px solid ${singleclinColors.lightGrey}`,
+            borderRadius: 12,
+            '&:hover': {
+              boxShadow: `0 4px 16px rgba(0, 81, 86, 0.12)`,
+            },
           },
         },
       },
@@ -86,7 +125,55 @@ export const theme = createTheme(
         styleOverrides: {
           paper: {
             borderRight: 'none',
-            boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
+            boxShadow: '2px 0 8px rgba(0,0,0,0.08)',
+            background: `linear-gradient(180deg, ${singleclinColors.white} 0%, ${singleclinColors.lightGrey}20 100%)`,
+          },
+        },
+      },
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+            background: `linear-gradient(135deg, ${singleclinColors.primary} 0%, ${singleclinColors.black} 100%)`,
+            boxShadow: '0 2px 8px rgba(0, 81, 86, 0.2)',
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: 'none',
+          },
+          elevation1: {
+            boxShadow: '0 1px 4px rgba(0, 81, 86, 0.08)',
+          },
+          elevation2: {
+            boxShadow: '0 2px 8px rgba(0, 81, 86, 0.12)',
+          },
+          elevation4: {
+            boxShadow: '0 4px 16px rgba(0, 81, 86, 0.16)',
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+          },
+          colorPrimary: {
+            background: `linear-gradient(135deg, ${singleclinColors.primary}20 0%, ${singleclinColors.primary}10 100%)`,
+            color: singleclinColors.primary,
+            border: `1px solid ${singleclinColors.primary}40`,
+          },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: {
+            borderRadius: 4,
+            backgroundColor: singleclinColors.lightGrey,
+          },
+          bar: {
+            background: `linear-gradient(90deg, ${singleclinColors.primary} 0%, ${singleclinColors.primaryLight} 100%)`,
           },
         },
       },
