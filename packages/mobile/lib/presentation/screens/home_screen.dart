@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mobile/core/routes/app_routes.dart';
+import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/data/services/plan_service.dart';
 import 'package:mobile/domain/entities/transaction_entity.dart';
 import 'package:mobile/domain/entities/user_plan_entity.dart';
@@ -76,8 +77,8 @@ class _HomeScreenState extends State<HomeScreen>
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
-      backgroundColor: Theme.of(context).primaryColor,
-      foregroundColor: Colors.white,
+      backgroundColor: AppColors.singleclinPrimary,
+      foregroundColor: AppColors.singleclinWhite,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -236,14 +237,16 @@ class _HomeScreenState extends State<HomeScreen>
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Theme.of(context).primaryColor.withValues(alpha: 0.1),
-            Theme.of(context).primaryColor.withValues(alpha: 0.05),
-          ],
+          colors: AppColors.singleclinSecondaryGradient.map((color) => 
+            color.withValues(alpha: 0.8)).toList(),
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.singleclinPrimary.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,11 +295,8 @@ class _HomeScreenState extends State<HomeScreen>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: hasActivePlan
-              ? [
-                  Theme.of(context).primaryColor,
-                  Theme.of(context).primaryColor.withValues(alpha: 0.8),
-                ]
-              : [Colors.grey, Colors.grey.withValues(alpha: 0.8)],
+              ? AppColors.singleclinPrimaryGradient
+              : [AppColors.grey500, AppColors.grey400],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -304,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen>
         boxShadow: [
           BoxShadow(
             color: hasActivePlan
-                ? Theme.of(context).primaryColor.withValues(alpha: 0.3)
+                ? AppColors.singleclinPrimary.withValues(alpha: 0.3)
                 : Colors.grey.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),

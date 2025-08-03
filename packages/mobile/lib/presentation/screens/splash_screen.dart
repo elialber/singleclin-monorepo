@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile/core/routes/app_routes.dart';
 import 'package:mobile/data/services/auth_service.dart';
 import 'package:mobile/data/services/token_refresh_service.dart';
+import 'package:mobile/presentation/widgets/singleclin_logo.dart';
 
 /// Splash screen shown on app launch
 class SplashScreen extends StatefulWidget {
@@ -68,19 +69,9 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo placeholder
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.medical_services_outlined,
-                size: 60,
-                color: Colors.white,
-              ),
+            // Logo
+            const SingleClinLogo(
+              size: 120,
             ),
             const SizedBox(height: 24),
             Text(

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:mobile/core/utils/form_validators.dart';
 import 'package:mobile/presentation/controllers/auth_controller.dart';
+import 'package:mobile/presentation/widgets/singleclin_logo.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -23,19 +24,9 @@ class LoginScreen extends StatelessWidget {
               // Logo and welcome text
               Column(
                 children: [
-                  // App logo placeholder
-                  Container(
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.medical_services,
-                      color: Colors.white,
-                      size: 40,
-                    ),
+                  // App logo
+                  const SingleClinLogo(
+                    size: 80,
                   ),
                   const SizedBox(height: 24),
                   Text(
