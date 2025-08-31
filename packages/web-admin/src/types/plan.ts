@@ -4,7 +4,11 @@ export interface Plan {
   description: string
   credits: number
   price: number
+  originalPrice?: number
+  validityDays: number
   isActive: boolean
+  displayOrder: number
+  isFeatured: boolean
   clinicId?: string
   clinicName?: string
   createdAt: string
@@ -13,10 +17,14 @@ export interface Plan {
 
 export interface CreatePlanRequest {
   name: string
-  description: string
+  description?: string
   credits: number
   price: number
-  clinicId?: string
+  originalPrice?: number
+  validityDays?: number
+  isActive?: boolean
+  displayOrder?: number
+  isFeatured?: boolean
 }
 
 export interface UpdatePlanRequest extends Partial<CreatePlanRequest> {
