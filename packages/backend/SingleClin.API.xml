@@ -2164,7 +2164,7 @@
         </member>
         <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.DisplayOrder">
             <summary>
-            Display order for sorting
+            Display order for sorting (optional - will be auto-calculated if not provided)
             </summary>
         </member>
         <member name="P:SingleClin.API.DTOs.Plan.PlanRequestDto.IsFeatured">
@@ -4018,6 +4018,12 @@
             <summary>
             Service implementation for Plan business logic
             </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.PlanService.GetNextDisplayOrderAsync">
+            <summary>
+            Get the next available display order for a new plan
+            </summary>
+            <returns>Next display order value</returns>
         </member>
         <member name="M:SingleClin.API.Services.PlanService.GetUserPlanByIdAsync(System.Guid)">
             <summary>
