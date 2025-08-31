@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import {
   Box,
   Typography,
@@ -18,6 +18,14 @@ import {
   CircularProgress,
   Alert,
   Tooltip,
+  Stack,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  TableSortLabel,
+  Collapse,
+  Divider,
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -27,343 +35,566 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   Refresh as RefreshIcon,
+  FilterList as FilterIcon,
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material'
-import { Plan, CreatePlanRequest, UpdatePlanRequest } from '@/types/plan'
-import { planService } from '@/services/plan.service'
-import { useNotification } from "@/hooks/useNotification"
-import PlanDialog from '@/components/PlanDialog'
+import { Plan } from '@/types/plan'
+import { usePlans, useDeletePlan, useTogglePlanStatus, useInvalidatePlans } from '@/hooks/usePlans'
+import { PlanQueryParams } from '@/services/plan.service'
+import PlanFormDialog from '@/components/PlanFormDialog'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import { useDebounce } from '@/hooks/useDebounce'
+import { formatCurrency, formatDate } from '@/utils/format'
 
 export default function Plans() {
-  const [plans, setPlans] = useState<Plan[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  // State for filters and pagination
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [total, setTotal] = useState(0)
   const [search, setSearch] = useState('')
-  const [searchDebounce, setSearchDebounce] = useState('')
+  const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined)
+  
+  // Advanced filters
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  const [minPrice, setMinPrice] = useState<number | undefined>(undefined)
+  const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined)
+  const [minCredits, setMinCredits] = useState<number | undefined>(undefined)
+  const [maxCredits, setMaxCredits] = useState<number | undefined>(undefined)
+  
+  // Sorting
+  const [sortBy, setSortBy] = useState<PlanQueryParams['sortBy']>('createdat')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  
+  // Debounce search to avoid excessive API calls
+  const debouncedSearch = useDebounce(search, 500)
+  const debouncedMinPrice = useDebounce(minPrice, 500)
+  const debouncedMaxPrice = useDebounce(maxPrice, 500)
+  const debouncedMinCredits = useDebounce(minCredits, 500)
+  const debouncedMaxCredits = useDebounce(maxCredits, 500)
   
   // Dialog states
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
-  const [planDialogLoading, setPlanDialogLoading] = useState(false)
   
-  // Delete confirmation dialog
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [planToDelete, setPlanToDelete] = useState<Plan | null>(null)
-  const [deleteLoading, setDeleteLoading] = useState(false)
+  // Confirm dialog states
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+  const [confirmDialogTitle, setConfirmDialogTitle] = useState('')
+  const [confirmDialogMessage, setConfirmDialogMessage] = useState('')
+  const [confirmDialogAction, setConfirmDialogAction] = useState<(() => void) | null>(null)
+  
+  // Create query params
+  const queryParams = useMemo<PlanQueryParams>(() => ({
+    pageNumber: page + 1,
+    pageSize: rowsPerPage,
+    searchTerm: debouncedSearch || undefined,
+    isActive: activeFilter,
+    minPrice: debouncedMinPrice,
+    maxPrice: debouncedMaxPrice,
+    minCredits: debouncedMinCredits,
+    maxCredits: debouncedMaxCredits,
+    isFeatured: undefined,
+    sortBy,
+    sortDirection
+  }), [page, rowsPerPage, debouncedSearch, activeFilter, debouncedMinPrice, debouncedMaxPrice, debouncedMinCredits, debouncedMaxCredits, sortBy, sortDirection])
+  
+  // TanStack Query hooks
+  const { data: plansResponse, isLoading, error, refetch } = usePlans(queryParams)
+  const deletePlan = useDeletePlan()
+  const toggleStatus = useTogglePlanStatus()
+  const invalidatePlans = useInvalidatePlans()
 
-  const { showSuccess, showError } = useNotification()
+  // Extract data from response
+  const plans = plansResponse?.data ?? []
+  const total = plansResponse?.total ?? 0
 
-  // Define loadPlans before using it
-  const loadPlans = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await planService.getPlans({
-        page: page + 1, // API expects 1-based pagination
-        limit: rowsPerPage,
-        search: searchDebounce || undefined,
-      })
-      setPlans(response.data)
-      setTotal(response.total)
-    } catch (err: unknown) {
-      console.error('Error loading plans:', err)
-      setError('Erro ao carregar planos')
-      showError('Erro ao carregar planos')
-    } finally {
-      setLoading(false)
-    }
-  }, [page, rowsPerPage, searchDebounce, showError])
-
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchDebounce(search)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [search])
-
-  // Load plans when page, search, or rowsPerPage changes
-  useEffect(() => {
-    loadPlans()
-  }, [page, rowsPerPage, searchDebounce, loadPlans])
-
-  const handleChangePage = (_: unknown, newPage: number) => {
+  // Event handlers
+  const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage)
-  }
+  }, [])
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10))
     setPage(0)
-  }
+  }, [])
 
-  // Dialog handlers
-  const handleOpenCreateDialog = () => {
+  const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value)
+    setPage(0) // Reset to first page when searching
+  }, [])
+
+  const handleActiveFilterChange = useCallback((value: string) => {
+    setActiveFilter(value === 'all' ? undefined : value === 'active')
+    setPage(0)
+  }, [])
+
+
+  const handleMinPriceChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setMinPrice(value ? Number(value) : undefined)
+    setPage(0)
+  }, [])
+
+  const handleMaxPriceChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setMaxPrice(value ? Number(value) : undefined)
+    setPage(0)
+  }, [])
+
+  const handleMinCreditsChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setMinCredits(value ? Number(value) : undefined)
+    setPage(0)
+  }, [])
+
+  const handleMaxCreditsChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setMaxCredits(value ? Number(value) : undefined)
+    setPage(0)
+  }, [])
+
+  const handleSort = useCallback((field: PlanQueryParams['sortBy']) => {
+    if (sortBy === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(field)
+      setSortDirection('asc')
+    }
+    setPage(0)
+  }, [sortBy])
+
+  const handleClearFilters = useCallback(() => {
+    setSearch('')
+    setActiveFilter(undefined)
+    setMinPrice(undefined)
+    setMaxPrice(undefined)
+    setMinCredits(undefined)
+    setMaxCredits(undefined)
+    setSortBy('createdat')
+    setSortDirection('desc')
+    setPage(0)
+  }, [])
+
+  const handleRefresh = useCallback(() => {
+    refetch()
+  }, [refetch])
+
+  const handleCreatePlan = useCallback(() => {
     setSelectedPlan(null)
     setPlanDialogOpen(true)
-  }
+  }, [])
 
-  const handleOpenEditDialog = (plan: Plan) => {
+  const handleEditPlan = useCallback((plan: Plan) => {
     setSelectedPlan(plan)
     setPlanDialogOpen(true)
-  }
+  }, [])
 
-  const handleCloseDialog = () => {
+  const handleDeletePlan = useCallback((plan: Plan) => {
+    setConfirmDialogTitle('Confirmar exclusão')
+    setConfirmDialogMessage(`Tem certeza que deseja excluir o plano "${plan.name}"? Esta ação não pode ser desfeita.`)
+    setConfirmDialogAction(() => () => deletePlan.mutate(plan.id))
+    setConfirmDialogOpen(true)
+  }, [deletePlan])
+
+  const handleToggleStatus = useCallback((plan: Plan) => {
+    const action = plan.isActive ? 'desativar' : 'ativar'
+    setConfirmDialogTitle(`Confirmar ${action}`)
+    setConfirmDialogMessage(`Tem certeza que deseja ${action} o plano "${plan.name}"?`)
+    setConfirmDialogAction(() => () => toggleStatus.mutate(plan.id))
+    setConfirmDialogOpen(true)
+  }, [toggleStatus])
+
+  const handleCloseDialogs = useCallback(() => {
     setPlanDialogOpen(false)
+    setConfirmDialogOpen(false)
     setSelectedPlan(null)
-  }
+    setConfirmDialogAction(null)
+  }, [])
 
-  const handleSubmitPlan = async (data: CreatePlanRequest) => {
-    try {
-      setPlanDialogLoading(true)
-      if (selectedPlan) {
-        // Update
-        await planService.updatePlan(selectedPlan.id, data as UpdatePlanRequest)
-        showSuccess('Plano atualizado com sucesso!')
-      } else {
-        // Create
-        await planService.createPlan(data)
-        showSuccess('Plano criado com sucesso!')
-      }
-      loadPlans()
-    } catch (err: unknown) {
-      console.error('Error saving plan:', err)
-      const message = err.response?.data?.message || 'Erro ao salvar plano'
-      showError(message)
-      throw err // Re-throw to prevent dialog from closing
-    } finally {
-      setPlanDialogLoading(false)
-    }
-  }
-
-  const handleOpenDeleteDialog = (plan: Plan) => {
-    setPlanToDelete(plan)
-    setDeleteDialogOpen(true)
-  }
-
-  const handleCloseDeleteDialog = () => {
-    setDeleteDialogOpen(false)
-    setPlanToDelete(null)
-  }
-
-  const handleDeletePlan = async () => {
-    if (!planToDelete) return
-
-    try {
-      setDeleteLoading(true)
-      await planService.deletePlan(planToDelete.id)
-      showSuccess('Plano excluído com sucesso!')
-      handleCloseDeleteDialog()
-      loadPlans()
-    } catch (err: unknown) {
-      console.error('Error deleting plan:', err)
-      const message = err.response?.data?.message || 'Erro ao excluir plano'
-      showError(message)
-    } finally {
-      setDeleteLoading(false)
-    }
-  }
-
-  const handleToggleStatus = async (plan: Plan) => {
-    try {
-      await planService.togglePlanStatus(plan.id)
-      showSuccess(`Plano ${plan.isActive ? 'desativado' : 'ativado'} com sucesso!`)
-      loadPlans()
-    } catch (err: unknown) {
-      console.error('Error toggling plan status:', err)
-      const message = err.response?.data?.message || 'Erro ao alterar status do plano'
-      showError(message)
-    }
+  // Loading state
+  if (isLoading && plans.length === 0) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress size={40} />
+      </Box>
+    )
   }
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+      {/* Header */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
           <Typography variant="h4" fontWeight={600} gutterBottom>
             Planos
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Gerencie os planos de tratamento disponíveis
+            Gerencie os planos de crédito disponíveis para os clientes
           </Typography>
         </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={handleOpenCreateDialog}
+          onClick={handleCreatePlan}
+          size="large"
+          disabled={error?.message?.includes('403') || error?.message?.includes('Forbidden')}
         >
           Novo Plano
         </Button>
       </Box>
 
-      {/* Search and filters */}
-      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-        <TextField
-          placeholder="Buscar planos..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ flexGrow: 1, maxWidth: 400 }}
-        />
-        <Button
-          variant="outlined"
-          startIcon={<RefreshIcon />}
-          onClick={loadPlans}
-          disabled={loading}
-        >
-          Atualizar
-        </Button>
-      </Box>
+      {/* Filters */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" mb={2}>
+          <TextField
+            placeholder="Buscar planos..."
+            value={search}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ minWidth: 300, flex: 1 }}
+          />
+          
+          <FormControl sx={{ minWidth: 150 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={activeFilter === undefined ? 'all' : activeFilter ? 'active' : 'inactive'}
+              onChange={(e) => handleActiveFilterChange(e.target.value)}
+              label="Status"
+              size="small"
+            >
+              <MenuItem value="all">Todos</MenuItem>
+              <MenuItem value="active">Ativos</MenuItem>
+              <MenuItem value="inactive">Inativos</MenuItem>
+            </Select>
+          </FormControl>
 
+          <Button
+            variant="outlined"
+            startIcon={<FilterIcon />}
+            endIcon={showAdvancedFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+          >
+            Filtros
+          </Button>
+
+          <Tooltip title="Limpar filtros">
+            <Button
+              variant="outlined"
+              onClick={handleClearFilters}
+              disabled={!search && activeFilter === undefined && !minPrice && !maxPrice && !minCredits && !maxCredits}
+            >
+              Limpar
+            </Button>
+          </Tooltip>
+
+          <Tooltip title="Atualizar lista">
+            <IconButton onClick={handleRefresh} disabled={isLoading}>
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+
+        <Collapse in={showAdvancedFilters}>
+          <Divider sx={{ mb: 2 }} />
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary" minWidth="60px">
+                Preço:
+              </Typography>
+              <TextField
+                placeholder="Min"
+                type="number"
+                value={minPrice || ''}
+                onChange={handleMinPriceChange}
+                size="small"
+                sx={{ width: 100 }}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                }}
+              />
+              <Typography variant="body2" color="text.secondary">
+                até
+              </Typography>
+              <TextField
+                placeholder="Max"
+                type="number"
+                value={maxPrice || ''}
+                onChange={handleMaxPriceChange}
+                size="small"
+                sx={{ width: 100 }}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                }}
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary" minWidth="60px">
+                Créditos:
+              </Typography>
+              <TextField
+                placeholder="Min"
+                type="number"
+                value={minCredits || ''}
+                onChange={handleMinCreditsChange}
+                size="small"
+                sx={{ width: 80 }}
+              />
+              <Typography variant="body2" color="text.secondary">
+                até
+              </Typography>
+              <TextField
+                placeholder="Max"
+                type="number"
+                value={maxCredits || ''}
+                onChange={handleMaxCreditsChange}
+                size="small"
+                sx={{ width: 80 }}
+              />
+            </Box>
+
+          </Stack>
+        </Collapse>
+      </Paper>
+
+      {/* Error Alert */}
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+        <Alert 
+          severity={error.message?.includes('403') || error.message?.includes('Forbidden') ? 'warning' : 'error'} 
+          sx={{ mb: 2 }}
+        >
+          {error.message?.includes('403') || error.message?.includes('Forbidden') ? (
+            <>
+              <strong>Acesso negado:</strong> Você não tem permissão para gerenciar planos. 
+              Entre em contato com um administrador para obter acesso.
+            </>
+          ) : (
+            <>
+              Erro ao carregar planos: {error.message}
+              <Button size="small" onClick={handleRefresh} sx={{ ml: 1 }}>
+                Tentar novamente
+              </Button>
+            </>
+          )}
         </Alert>
       )}
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Descrição</TableCell>
-              <TableCell align="center">Créditos</TableCell>
-              <TableCell align="right">Preço</TableCell>
-              <TableCell align="center">Clínica</TableCell>
-              <TableCell align="center">Status</TableCell>
-              <TableCell align="center">Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
+      {/* Table */}
+      <Paper>
+        <TableContainer>
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                  <CircularProgress />
+                <TableCell>
+                  <TableSortLabel
+                    active={sortBy === 'name'}
+                    direction={sortBy === 'name' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('name')}
+                  >
+                    Nome
+                  </TableSortLabel>
                 </TableCell>
-              </TableRow>
-            ) : plans.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {search ? 'Nenhum plano encontrado' : 'Nenhum plano cadastrado'}
-                  </Typography>
+                <TableCell>Descrição</TableCell>
+                <TableCell align="center">
+                  <TableSortLabel
+                    active={sortBy === 'credits'}
+                    direction={sortBy === 'credits' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('credits')}
+                  >
+                    Créditos
+                  </TableSortLabel>
                 </TableCell>
+                <TableCell align="center">
+                  <TableSortLabel
+                    active={sortBy === 'price'}
+                    direction={sortBy === 'price' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('price')}
+                  >
+                    Preço
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="center">Valor/Crédito</TableCell>
+                <TableCell align="center">
+                  <TableSortLabel
+                    active={sortBy === 'isactive'}
+                    direction={sortBy === 'isactive' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('isactive')}
+                  >
+                    Status
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="center">
+                  <TableSortLabel
+                    active={sortBy === 'createdat'}
+                    direction={sortBy === 'createdat' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('createdat')}
+                  >
+                    Criado em
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="center" width="120">Ações</TableCell>
               </TableRow>
-            ) : (
-              plans.map((plan) => (
-                <TableRow key={plan.id} hover>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={600}>
-                      {plan.name}
+            </TableHead>
+            <TableBody>
+              {isLoading && plans.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                    <CircularProgress size={32} />
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      Carregando planos...
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ 
-                        maxWidth: 200, 
-                        overflow: 'hidden', 
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {plan.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">{plan.credits}</TableCell>
-                  <TableCell align="right">
-                    R$ {plan.price.toFixed(2).replace('.', ',')}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography variant="body2" color="text.secondary">
-                      {plan.clinicName || 'Geral'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Chip
-                      label={plan.isActive ? 'Ativo' : 'Inativo'}
-                      color={plan.isActive ? 'success' : 'default'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="Editar">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleOpenEditDialog(plan)}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={plan.isActive ? 'Desativar' : 'Ativar'}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleToggleStatus(plan)}
-                        color={plan.isActive ? 'warning' : 'success'}
-                      >
-                        {plan.isActive ? (
-                          <VisibilityOffIcon fontSize="small" />
-                        ) : (
-                          <VisibilityIcon fontSize="small" />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Excluir">
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleOpenDeleteDialog(plan)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : plans.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {debouncedSearch 
+                        ? `Nenhum plano encontrado para "${debouncedSearch}"`
+                        : 'Nenhum plano cadastrado'
+                      }
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                plans.map((plan) => {
+                  const pricePerCredit = plan.credits > 0 ? plan.price / plan.credits : 0
+                  
+                  return (
+                    <TableRow key={plan.id} hover>
+                      <TableCell>
+                        <Typography variant="subtitle2" fontWeight={500}>
+                          {plan.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            maxWidth: 250,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                          title={plan.description}
+                        >
+                          {plan.description}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={plan.credits}
+                          size="small"
+                          variant="outlined"
+                          color="primary"
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2" fontWeight={500}>
+                          {formatCurrency(plan.price)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          {formatCurrency(pricePerCredit)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={plan.isActive ? 'Ativo' : 'Inativo'}
+                          size="small"
+                          color={plan.isActive ? 'success' : 'default'}
+                          variant={plan.isActive ? 'filled' : 'outlined'}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDate(plan.createdAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Stack direction="row" spacing={0.5} justifyContent="center">
+                          <Tooltip title="Editar">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEditPlan(plan)}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          
+                          <Tooltip title={plan.isActive ? 'Desativar' : 'Ativar'}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleToggleStatus(plan)}
+                              disabled={toggleStatus.isPending}
+                            >
+                              {plan.isActive ? (
+                                <VisibilityOffIcon fontSize="small" />
+                              ) : (
+                                <VisibilityIcon fontSize="small" />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                          
+                          <Tooltip title="Excluir">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleDeletePlan(plan)}
+                              disabled={deletePlan.isPending}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Pagination */}
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={total}
-          rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
           labelRowsPerPage="Itens por página:"
-          labelDisplayedRows={({ from, to, count }) =>
+          labelDisplayedRows={({ from, to, count }) => 
             `${from}-${to} de ${count !== -1 ? count : `mais de ${to}`}`
           }
         />
-      </TableContainer>
+      </Paper>
 
-      {/* Plan Dialog */}
-      <PlanDialog
+      {/* Dialogs */}
+      <PlanFormDialog
         open={planDialogOpen}
-        onClose={handleCloseDialog}
-        onSubmit={handleSubmitPlan}
+        onClose={handleCloseDialogs}
         plan={selectedPlan}
-        loading={planDialogLoading}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
-        open={deleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        onConfirm={handleDeletePlan}
-        title="Excluir Plano"
-        message={`Tem certeza de que deseja excluir o plano "${planToDelete?.name}"? Esta ação não pode ser desfeita.`}
-        confirmText="Excluir"
-        loading={deleteLoading}
+        open={confirmDialogOpen}
+        onClose={handleCloseDialogs}
+        onConfirm={() => {
+          confirmDialogAction?.()
+          setConfirmDialogOpen(false)
+        }}
+        title={confirmDialogTitle}
+        message={confirmDialogMessage}
+        loading={deletePlan.isPending || toggleStatus.isPending}
       />
     </Box>
   )

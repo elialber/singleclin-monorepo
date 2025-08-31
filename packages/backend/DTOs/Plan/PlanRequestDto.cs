@@ -54,10 +54,10 @@ public class PlanRequestDto
     public bool IsActive { get; set; } = true;
 
     /// <summary>
-    /// Display order for sorting
+    /// Display order for sorting (optional - will be auto-calculated if not provided)
     /// </summary>
     [Range(0, int.MaxValue, ErrorMessage = "Display order must be greater than or equal to 0")]
-    public int DisplayOrder { get; set; } = 0;
+    public int? DisplayOrder { get; set; }
 
     /// <summary>
     /// Whether this is a featured plan

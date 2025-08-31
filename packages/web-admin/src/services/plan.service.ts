@@ -2,145 +2,127 @@ import { api } from './api'
 import { Plan, CreatePlanRequest, UpdatePlanRequest, PlanListResponse } from '@/types/plan'
 
 export interface PlanQueryParams {
-  page?: number
-  limit?: number
-  search?: string
-  clinicId?: string
+  pageNumber?: number
+  pageSize?: number
+  searchTerm?: string
   isActive?: boolean
+  minPrice?: number
+  maxPrice?: number
+  minCredits?: number
+  maxCredits?: number
+  isFeatured?: boolean
+  sortBy?: 'name' | 'price' | 'credits' | 'validitydays' | 'createdat' | 'updatedat' | 'isfeatured' | 'isactive' | 'displayorder'
+  sortDirection?: 'asc' | 'desc'
 }
 
 export const planService = {
+  async getActivePlans(): Promise<Plan[]> {
+    const response = await api.get<Plan[]>('/plan/active')
+    return response.data
+  },
+
   async getPlans(params: PlanQueryParams = {}): Promise<PlanListResponse> {
-    const queryParams = new URLSearchParams()
+    // For now, use the public endpoint and simulate pagination
+    const activePlans = await this.getActivePlans()
     
-    if (params.page) queryParams.append('page', params.page.toString())
-    if (params.limit) queryParams.append('limit', params.limit.toString())
-    if (params.search) queryParams.append('search', params.search)
-    if (params.clinicId) queryParams.append('clinicId', params.clinicId)
-    if (params.isActive !== undefined) queryParams.append('isActive', params.isActive.toString())
+    // Apply client-side filtering and sorting
+    let filteredPlans = activePlans
 
-    try {
-      const response = await api.get<PlanListResponse>(`/plans?${queryParams.toString()}`)
-      return response.data
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        // Return mock data if endpoint not implemented yet
-        console.warn('Plans endpoint not implemented, returning mock data')
-        
-        const mockPlans: Plan[] = [
-          {
-            id: '1',
-            name: 'Plano Básico',
-            description: 'Ideal para consultas de rotina e exames simples',
-            credits: 10,
-            price: 149.90,
-            isActive: true,
-            clinicId: '1',
-            clinicName: 'Clínica Saúde Total',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: '2',
-            name: 'Plano Intermediário',
-            description: 'Inclui consultas especializadas e exames laboratoriais',
-            credits: 25,
-            price: 299.90,
-            isActive: true,
-            clinicId: '1',
-            clinicName: 'Clínica Saúde Total',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: '3',
-            name: 'Plano Premium',
-            description: 'Acesso completo a todos os serviços e especialidades',
-            credits: 50,
-            price: 549.90,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: '4',
-            name: 'Plano Família',
-            description: 'Ideal para famílias com até 4 pessoas',
-            credits: 100,
-            price: 899.90,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: '5',
-            name: 'Plano Empresarial',
-            description: 'Soluções corporativas para empresas',
-            credits: 200,
-            price: 1499.90,
-            isActive: false,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ]
+    if (params.searchTerm) {
+      const searchLower = params.searchTerm.toLowerCase()
+      filteredPlans = filteredPlans.filter(plan => 
+        plan.name.toLowerCase().includes(searchLower) ||
+        plan.description?.toLowerCase().includes(searchLower)
+      )
+    }
 
-        // Apply filters
-        let filtered = [...mockPlans]
-        
-        if (params.search) {
-          filtered = filtered.filter(p => 
-            p.name.toLowerCase().includes(params.search!.toLowerCase()) ||
-            p.description.toLowerCase().includes(params.search!.toLowerCase())
-          )
-        }
-        
-        if (params.clinicId) {
-          filtered = filtered.filter(p => p.clinicId === params.clinicId)
-        }
-        
-        if (params.isActive !== undefined) {
-          filtered = filtered.filter(p => p.isActive === params.isActive)
-        }
+    if (params.minPrice !== undefined) {
+      filteredPlans = filteredPlans.filter(plan => plan.price >= params.minPrice!)
+    }
 
-        // Pagination
-        const page = params.page || 1
-        const limit = params.limit || 10
-        const start = (page - 1) * limit
-        const end = start + limit
-        const paginatedData = filtered.slice(start, end)
+    if (params.maxPrice !== undefined) {
+      filteredPlans = filteredPlans.filter(plan => plan.price <= params.maxPrice!)
+    }
 
-        return {
-          data: paginatedData,
-          total: filtered.length,
-          page,
-          limit,
+    if (params.minCredits !== undefined) {
+      filteredPlans = filteredPlans.filter(plan => plan.credits >= params.minCredits!)
+    }
+
+    if (params.maxCredits !== undefined) {
+      filteredPlans = filteredPlans.filter(plan => plan.credits <= params.maxCredits!)
+    }
+
+    if (params.isFeatured !== undefined) {
+      filteredPlans = filteredPlans.filter(plan => plan.isFeatured === params.isFeatured)
+    }
+
+    // Apply sorting
+    if (params.sortBy) {
+      filteredPlans.sort((a, b) => {
+        const direction = params.sortDirection === 'desc' ? -1 : 1
+        
+        switch (params.sortBy) {
+          case 'name':
+            return direction * a.name.localeCompare(b.name)
+          case 'price':
+            return direction * (a.price - b.price)
+          case 'credits':
+            return direction * (a.credits - b.credits)
+          case 'validitydays':
+            return direction * (a.validityDays - b.validityDays)
+          case 'createdat':
+            return direction * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+          case 'updatedat':
+            return direction * (new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime())
+          case 'isfeatured':
+            return direction * (Number(a.isFeatured) - Number(b.isFeatured))
+          case 'isactive':
+            return direction * (Number(a.isActive) - Number(b.isActive))
+          case 'displayorder':
+            return direction * (a.displayOrder - b.displayOrder)
+          default:
+            return 0
         }
-      }
-      throw error
+      })
+    }
+
+    // Apply pagination
+    const pageSize = params.pageSize || 10
+    const pageNumber = params.pageNumber || 1
+    const startIndex = (pageNumber - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    const paginatedPlans = filteredPlans.slice(startIndex, endIndex)
+
+    return {
+      data: paginatedPlans,
+      totalCount: filteredPlans.length,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      totalPages: Math.ceil(filteredPlans.length / pageSize)
     }
   },
 
   async getPlan(id: string): Promise<Plan> {
-    const response = await api.get<{ data: Plan }>(`/plans/${id}`)
-    return response.data.data
+    const response = await api.get<Plan>(`/plan/${id}`)
+    return response.data
   },
 
   async createPlan(data: CreatePlanRequest): Promise<Plan> {
-    const response = await api.post<{ data: Plan }>('/plans', data)
-    return response.data.data
+    const response = await api.post<Plan>('/plan', data)
+    return response.data
   },
 
   async updatePlan(id: string, data: UpdatePlanRequest): Promise<Plan> {
-    const response = await api.put<{ data: Plan }>(`/plans/${id}`, data)
-    return response.data.data
+    const response = await api.put<Plan>(`/plan/${id}`, data)
+    return response.data
   },
 
   async deletePlan(id: string): Promise<void> {
-    await api.delete(`/plans/${id}`)
+    await api.delete(`/plan/${id}`)
   },
 
   async togglePlanStatus(id: string): Promise<Plan> {
-    const response = await api.patch<{ data: Plan }>(`/plans/${id}/toggle-status`)
-    return response.data.data
+    const response = await api.patch<Plan>(`/plan/${id}/toggle-status`)
+    return response.data
   },
 }

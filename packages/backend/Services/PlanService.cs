@@ -65,6 +65,9 @@ public class PlanService : IPlanService
             throw new PlanValidationException(validationErrors);
         }
 
+        // Auto-calculate DisplayOrder if not provided
+        var displayOrder = planRequest.DisplayOrder ?? await GetNextDisplayOrderAsync();
+
         var plan = new Plan
         {
             Name = planRequest.Name,
@@ -74,13 +77,14 @@ public class PlanService : IPlanService
             OriginalPrice = planRequest.OriginalPrice,
             ValidityDays = planRequest.ValidityDays,
             IsActive = planRequest.IsActive,
-            DisplayOrder = planRequest.DisplayOrder,
+            DisplayOrder = displayOrder,
             IsFeatured = planRequest.IsFeatured
         };
 
         var createdPlan = await _planRepository.CreateAsync(plan);
         
-        _logger.LogInformation("Plan created successfully: {PlanName} (ID: {PlanId})", createdPlan.Name, createdPlan.Id);
+        _logger.LogInformation("Plan created successfully: {PlanName} (ID: {PlanId}), DisplayOrder: {DisplayOrder}", 
+            createdPlan.Name, createdPlan.Id, createdPlan.DisplayOrder);
         
         return MapToResponseDto(createdPlan);
     }
@@ -111,7 +115,7 @@ public class PlanService : IPlanService
             OriginalPrice = planRequest.OriginalPrice,
             ValidityDays = planRequest.ValidityDays,
             IsActive = planRequest.IsActive,
-            DisplayOrder = planRequest.DisplayOrder,
+            DisplayOrder = planRequest.DisplayOrder ?? existingPlan.DisplayOrder,
             IsFeatured = planRequest.IsFeatured
         };
 
@@ -173,7 +177,7 @@ public class PlanService : IPlanService
             errors.Add("Validity days must be greater than 0");
         }
 
-        if (planRequest.DisplayOrder < 0)
+        if (planRequest.DisplayOrder.HasValue && planRequest.DisplayOrder < 0)
         {
             errors.Add("Display order must be greater than or equal to 0");
         }
@@ -195,6 +199,18 @@ public class PlanService : IPlanService
         }
 
         return errors;
+    }
+
+    /// <summary>
+    /// Get the next available display order for a new plan
+    /// </summary>
+    /// <returns>Next display order value</returns>
+    private async Task<int> GetNextDisplayOrderAsync()
+    {
+        var maxDisplayOrder = await _context.Plans
+            .MaxAsync(p => (int?)p.DisplayOrder) ?? -1;
+        
+        return maxDisplayOrder + 1;
     }
 
     private static PlanResponseDto MapToResponseDto(Plan plan)

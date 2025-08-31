@@ -15,8 +15,8 @@ public class PlanRequestValidator : AbstractValidator<PlanRequestDto>
             .WithMessage("Plan name is required")
             .Length(1, 100)
             .WithMessage("Plan name must be between 1 and 100 characters")
-            .Matches(@"^[a-zA-Z0-9\s\-_\.]+$")
-            .WithMessage("Plan name can only contain letters, numbers, spaces, hyphens, underscores, and dots");
+            .Matches(@"^[\w\s\-_\.À-ÿ]+$")
+            .WithMessage("Plan name can only contain letters (including accents), numbers, spaces, hyphens, underscores, and dots");
 
         RuleFor(x => x.Description)
             .MaximumLength(500)
@@ -55,7 +55,8 @@ public class PlanRequestValidator : AbstractValidator<PlanRequestDto>
             .GreaterThanOrEqualTo(0)
             .WithMessage("Display order must be greater than or equal to 0")
             .LessThanOrEqualTo(999)
-            .WithMessage("Display order cannot exceed 999");
+            .WithMessage("Display order cannot exceed 999")
+            .When(x => x.DisplayOrder.HasValue);
 
         // Business rule: Original price must be greater than current price (if set)
         RuleFor(x => x.OriginalPrice)
@@ -75,11 +76,6 @@ public class PlanRequestValidator : AbstractValidator<PlanRequestDto>
             .WithMessage("Inactive plans cannot be featured")
             .When(x => !x.IsActive);
 
-        // Business rule: High-value plans need more credits
-        RuleFor(x => x.Credits)
-            .GreaterThanOrEqualTo(100)
-            .WithMessage("Plans with price above R$ 100 should have at least 100 credits")
-            .When(x => x.Price > 100);
 
         // Business rule: Long validity should have more credits
         RuleFor(x => x.Credits)
