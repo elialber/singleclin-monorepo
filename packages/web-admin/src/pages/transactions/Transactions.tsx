@@ -11,19 +11,24 @@ import {
   IconButton,
   Tooltip,
   Chip,
+  Tabs,
+  Tab,
 } from '@mui/material'
 import {
   Download as DownloadIcon,
   Refresh as RefreshIcon,
   TableView as TableViewIcon,
   ViewModule as ViewModuleIcon,
+  List as ListIcon,
+  Dashboard as DashboardIcon,
 } from '@mui/icons-material'
-import { useTransactions, useExportTransactions, useInvalidateTransactions } from '@/hooks/useTransactions'
+import { useTransactions, useExportTransactions, useInvalidateTransactions, useTransactionMetrics } from '@/hooks/useTransactions'
 import { TransactionFilters, Transaction } from '@/types/transaction'
 import { useNotification } from '@/hooks/useNotification'
 import { useDebounce } from '@/hooks/useDebounce'
 import TransactionTable from './components/TransactionTable'
 import TransactionCard from './components/TransactionCard'
+import TransactionDashboard from './components/TransactionDashboard'
 
 export default function Transactions() {
   const { showSuccess, showError } = useNotification()
@@ -31,6 +36,7 @@ export default function Transactions() {
   
   // View and pagination state
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
+  const [currentTab, setCurrentTab] = useState<'transactions' | 'dashboard'>('transactions')
   const [page, setPage] = useState(1)
   const [limit] = useState(20)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -65,6 +71,7 @@ export default function Transactions() {
   }), [filters, debouncedSearch, page, limit])
   
   const { data, isLoading, error } = useTransactions(queryParams)
+  const { data: metricsData, isLoading: metricsLoading } = useTransactionMetrics()
   const exportMutation = useExportTransactions()
 
   // Filter change handlers
@@ -562,14 +569,48 @@ export default function Transactions() {
             </Box>
           </Stack>
 
-          {/* Quick Summary Statistics */}
-          {renderQuickStats()}
+          {/* Navigation Tabs */}
+          <Paper sx={{ mb: 3 }}>
+            <Tabs
+              value={currentTab}
+              onChange={(_, newValue) => setCurrentTab(newValue)}
+              sx={{ px: 2 }}
+            >
+              <Tab 
+                label="Transações" 
+                value="transactions"
+                icon={<ListIcon />}
+              />
+              <Tab 
+                label="Dashboard" 
+                value="dashboard"
+                icon={<DashboardIcon />}
+              />
+            </Tabs>
+          </Paper>
 
-          {/* Advanced Filters */}
-          {renderFilters()}
+          {/* Tab Content */}
+          {currentTab === 'dashboard' ? (
+            <TransactionDashboard
+              metrics={metricsData}
+              loading={metricsLoading}
+              onRefresh={() => {
+                invalidateAll()
+                showSuccess('Dados do dashboard atualizados!')
+              }}
+            />
+          ) : (
+            <>
+              {/* Quick Summary Statistics */}
+              {renderQuickStats()}
 
-          {/* Main Content */}
-          {renderContent()}
+              {/* Advanced Filters */}
+              {renderFilters()}
+
+              {/* Main Content */}
+              {renderContent()}
+            </>
+          )}
         </Box>
       </Fade>
     </Container>

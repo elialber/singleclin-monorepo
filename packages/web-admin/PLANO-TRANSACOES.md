@@ -202,23 +202,50 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 - Handlers de ação preparados (TODOs para modals)
 - Skeleton loading para ambos os modos
 
-### ⏳ 12. Implementar dashboard de métricas de transações
-**Status:** 🔄 **PENDENTE**  
+### ✅ 12. Implementar dashboard de métricas de transações
+**Status:** ✅ **CONCLUÍDO**  
 **Descrição:** Painel de estatísticas e gráficos  
-**Métricas:**
-- Total de transações do período
-- Valor total transacionado
-- Transações por status
-- Top clínicas e planos
-- Gráficos de tendências
+**Resultado:** Dashboard completo de métricas implementado:
 
-### ⏳ 13. Adicionar rota para transações no sistema de navegação
-**Status:** 🔄 **PENDENTE**  
+**TransactionDashboard Component:**
+- Layout responsivo com Grid Material-UI (8 cards principais)
+- Métricas principais: receita total, transações totais, pacientes/clínicas ativos
+- Métricas calculadas: valor médio, créditos médios por transação
+- Indicadores de crescimento mensal com ícones de trending
+- Sistema de cores por categoria (success, primary, secondary, warning)
+
+**Gráficos e Visualizações:**
+- Gráfico de distribuição por status com LinearProgress colorido
+- Timeline de tendências de 6 meses com barras proporcionais
+- Top performers: plano mais usado e clínica top
+- Cards com avatars e ícones contextuais
+
+**Funcionalidades:**
+- Loading states com skeleton para todos os componentes
+- Mock data integrado para desenvolvimento/demonstração
+- Botão refresh integrado com invalidação de cache
+- Cálculo automático de crescimento percentual mensal
+- Formatação de moeda em pt-BR
+- Chip indicador de dados simulados vs reais
+
+**Integração na Página:**
+- Sistema de abas (Transações | Dashboard)
+- Ícones nas abas (List | Dashboard)
+- Hook useTransactionMetrics integrado
+- Botão refresh com feedback de sucesso
+- Navegação fluida entre visualizações
+
+### ✅ 13. Adicionar rota para transações no sistema de navegação
+**Status:** ✅ **CONCLUÍDO**  
 **Descrição:** Integrar no menu e rotas  
-**Alterações:**
-- Adicionar no menu lateral
-- Configurar rota `/transactions`
-- Ícone e permissões adequadas
+**Resultado:** Integração completa no sistema de navegação:
+- **Rota configurada**: `/transactions` funcionando no sistema de rotas
+- **Menu lateral**: Item "Transações" adicionado ao DashboardLayout
+- **Ícone**: CreditCard icon (mais apropriado para transações de crédito)
+- **Posicionamento**: Entre "Usuários" e "Relatórios" na ordem lógica
+- **Import corrigido**: Rota apontando para `/pages/transactions/Transactions`
+- **Cleanup**: Removido arquivo antigo `/pages/Transactions.tsx`
+- **Navegação**: Funcional através do menu lateral e URLs diretas
 
 ---
 
@@ -418,18 +445,20 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 
 ## 📊 **Resumo de Progresso**
 
-- **✅ Concluídas:** 11/33 (33.3%)
+- **✅ Concluídas:** 13/33 (39.4%)
 - **🔄 Em andamento:** 0/33 (0.0%)
-- **⏳ Pendentes:** 22/33 (66.7%)
+- **⏳ Pendentes:** 20/33 (60.6%)
 
 ---
 
 ## 🚀 **Próximos Passos**
 
-1. **Próxima tarefa:** Configurar injeção de dependência (Tarefa 6)
-2. **Seguir ordem sequencial** das fases para manter dependências
-3. **Atualizar este documento** após cada tarefa concluída
-4. **Testar incrementalmente** após cada fase
+1. **Próxima tarefa:** Implementar cancelamento de transações (Tarefa 14)
+2. **Fase atual:** FASE 3 - Funcionalidades Avançadas
+3. **Frontend:** COMPLETO ✅ (100% - Todas as 7 tarefas concluídas)
+4. **Backend:** COMPLETO ✅ (100% - Todas as 6 tarefas concluídas)
+5. **Seguir ordem sequencial** das fases para manter dependências
+6. **Atualizar este documento** após cada tarefa concluída
 
 ---
 

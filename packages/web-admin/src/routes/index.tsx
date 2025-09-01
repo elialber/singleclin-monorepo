@@ -15,7 +15,7 @@ import Plans from '@/pages/plans/Plans'
 import Clinics from '@/pages/clinics/Clinics'
 import Patients from '@/pages/patients/Patients'
 import Users from '@/pages/users/Users'
-import Transactions from '@/pages/Transactions'
+import Transactions from '@/pages/transactions/Transactions'
 import Reports from '@/pages/reports/Reports'
 import Settings from '@/pages/settings/Settings'
 

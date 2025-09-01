@@ -35,6 +35,7 @@ import {
   ExpandMore,
   MedicalServices as MedicalServicesIcon,
   ManageAccounts as ManageAccountsIcon,
+  CreditCard as CreditCardIcon,
 } from '@mui/icons-material'
 import { useAuth } from "@/hooks/useAuth"
 import LogoutDialog from '@/components/LogoutDialog'
@@ -77,7 +78,7 @@ const menuItems: MenuItem[] = [
   },
   {
     text: 'Transações',
-    icon: <ReceiptIcon />,
+    icon: <CreditCardIcon />,
     path: '/transactions',
   },
   {
