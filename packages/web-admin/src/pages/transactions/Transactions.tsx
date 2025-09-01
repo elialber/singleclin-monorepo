@@ -36,6 +36,7 @@ import TransactionReportsModal from './components/TransactionReportsModal'
 import TransactionErrorBoundary from '@/components/TransactionErrorBoundary'
 import ErrorAlert from '@/components/ErrorAlert'
 import { handleTransactionError } from '@/utils/transactionErrorHandler'
+import { TransactionCardSkeleton, FiltersSkeletonLoader } from '@/components/SkeletonLoader'
 
 function TransactionsComponent() {
   const { showSuccess, showError } = useNotification()
@@ -552,14 +553,7 @@ function TransactionsComponent() {
               // Loading skeleton for cards
               Array.from(new Array(limit)).map((_, index) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                  <Box 
-                    sx={{ 
-                      height: 400, 
-                      bgcolor: 'grey.100', 
-                      borderRadius: 2,
-                      animation: 'pulse 1.5s ease-in-out infinite'
-                    }} 
-                  />
+                  <TransactionCardSkeleton />
                 </Grid>
               ))
             ) : (

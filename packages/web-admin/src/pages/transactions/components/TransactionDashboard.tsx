@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useCallback, memo } from 'react'
 import {
   Box,
   Card,
@@ -13,6 +13,9 @@ import {
   Paper,
   IconButton,
   Tooltip,
+  useTheme,
+  useMediaQuery,
+  Container,
 } from '@mui/material'
 import {
   TrendingUp as TrendingUpIcon,
@@ -27,6 +30,7 @@ import {
 import { DashboardMetrics } from '@/types/transaction'
 import { format, parseISO, subMonths } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { DashboardMetricsSkeleton } from '@/components/SkeletonLoader'
 
 interface TransactionDashboardProps {
   metrics?: DashboardMetrics
@@ -34,11 +38,14 @@ interface TransactionDashboardProps {
   onRefresh?: () => void
 }
 
-export default function TransactionDashboard({
+const TransactionDashboard = memo(function TransactionDashboard({
   metrics,
   loading = false,
   onRefresh,
 }: TransactionDashboardProps) {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'))
   // Mock data for development when metrics are not available
   const mockMetrics: DashboardMetrics = useMemo(() => ({
     totalTransactions: 1247,
@@ -97,7 +104,7 @@ export default function TransactionDashboard({
     }
   }, [displayMetrics.monthlyTrends])
 
-  const MetricCard = ({ 
+  const MetricCard = useMemo(() => memo(({ 
     title, 
     value, 
     subtitle, 
@@ -114,34 +121,82 @@ export default function TransactionDashboard({
     trend?: number
     loading?: boolean
   }) => (
-    <Card elevation={2} sx={{ height: '100%' }}>
-      <CardContent>
-        <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+    <Card 
+      elevation={2} 
+      sx={{ 
+        height: '100%',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: theme.shadows[4]
+        }
+      }}
+    >
+      <CardContent sx={{ p: isMobile ? 2 : 3 }}>
+        <Stack 
+          direction={isMobile ? "column" : "row"} 
+          alignItems={isMobile ? "center" : "flex-start"} 
+          justifyContent="space-between"
+          spacing={isMobile ? 1 : 0}
+          textAlign={isMobile ? "center" : "left"}
+        >
           <Box>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
+            <Typography 
+              variant={isMobile ? "caption" : "body2"} 
+              color="text.secondary" 
+              gutterBottom
+              sx={{ fontSize: isMobile ? '0.75rem' : undefined }}
+            >
               {title}
             </Typography>
             {cardLoading ? (
               <Box sx={{ width: 120, height: 32, bgcolor: 'grey.200', borderRadius: 1 }} />
             ) : (
-              <Typography variant="h4" fontWeight={700} color={`${color}.main`} gutterBottom>
+              <Typography 
+                variant={isMobile ? "h5" : "h4"} 
+                fontWeight={700} 
+                color={`${color}.main`} 
+                gutterBottom
+                sx={{ 
+                  fontSize: isMobile ? '1.5rem' : undefined,
+                  wordBreak: 'break-word'
+                }}
+              >
                 {value}
               </Typography>
             )}
             {subtitle && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant={isMobile ? "caption" : "body2"} 
+                color="text.secondary"
+                sx={{ fontSize: isMobile ? '0.7rem' : undefined }}
+              >
                 {subtitle}
               </Typography>
             )}
           </Box>
           
-          <Avatar sx={{ bgcolor: `${color}.light`, color: `${color}.main` }}>
+          <Avatar sx={{ 
+            bgcolor: `${color}.light`, 
+            color: `${color}.main`,
+            width: isMobile ? 32 : 40,
+            height: isMobile ? 32 : 40,
+            '& .MuiSvgIcon-root': {
+              fontSize: isMobile ? '1rem' : '1.25rem'
+            }
+          }}>
             {icon}
           </Avatar>
         </Stack>
         
         {trend !== undefined && (
-          <Stack direction="row" alignItems="center" spacing={0.5} mt={2}>
+          <Stack 
+            direction="row" 
+            alignItems="center" 
+            justifyContent={isMobile ? "center" : "flex-start"}
+            spacing={0.5} 
+            mt={2}
+          >
             {trend >= 0 ? (
               <TrendingUpIcon fontSize="small" color="success" />
             ) : (
@@ -151,6 +206,7 @@ export default function TransactionDashboard({
               variant="caption" 
               color={trend >= 0 ? 'success.main' : 'error.main'}
               fontWeight={500}
+              sx={{ fontSize: isMobile ? '0.65rem' : undefined }}
             >
               {Math.abs(trend).toFixed(1)}% vs mês anterior
             </Typography>
@@ -158,11 +214,11 @@ export default function TransactionDashboard({
         )}
       </CardContent>
     </Card>
-  )
+  )), []), [])
 
-  const StatusChart = () => (
+  const StatusChart = useCallback(() => (
     <Card elevation={2}>
-      <CardContent>
+      <CardContent sx={{ p: isMobile ? 2 : 3 }}>
         <Typography variant="h6" gutterBottom>
           Distribuição por Status
         </Typography>
@@ -202,12 +258,18 @@ export default function TransactionDashboard({
         </Stack>
       </CardContent>
     </Card>
-  )
+  ), [displayMetrics.statusDistribution])
 
-  const TrendsChart = () => (
+  const TrendsChart = useCallback(() => (
     <Card elevation={2}>
-      <CardContent>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+      <CardContent sx={{ p: isMobile ? 2 : 3 }}>
+        <Stack 
+          direction={isMobile ? "column" : "row"} 
+          justifyContent="space-between" 
+          alignItems={isMobile ? "flex-start" : "center"} 
+          spacing={isMobile ? 1 : 0}
+          mb={2}
+        >
           <Typography variant="h6">
             Tendências (6 meses)
           </Typography>
@@ -267,11 +329,11 @@ export default function TransactionDashboard({
         )}
       </CardContent>
     </Card>
-  )
+  ), [displayMetrics.monthlyTrends, loading, onRefresh])
 
-  const TopPerformers = () => (
+  const TopPerformers = useCallback(() => (
     <Card elevation={2}>
-      <CardContent>
+      <CardContent sx={{ p: isMobile ? 2 : 3 }}>
         <Typography variant="h6" gutterBottom>
           Top Performers
         </Typography>
@@ -282,7 +344,12 @@ export default function TransactionDashboard({
             <Typography variant="subtitle2" color="primary" gutterBottom>
               Plano Mais Usado
             </Typography>
-            <Paper sx={{ p: 2, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
+            <Paper sx={{ 
+              p: isMobile ? 1.5 : 2, 
+              bgcolor: 'primary.light', 
+              color: 'primary.contrastText',
+              borderRadius: 2
+            }}>
               <Typography variant="body1" fontWeight={600}>
                 {displayMetrics.mostUsedPlan?.name}
               </Typography>
@@ -302,7 +369,12 @@ export default function TransactionDashboard({
             <Typography variant="subtitle2" color="secondary" gutterBottom>
               Clínica Top
             </Typography>
-            <Paper sx={{ p: 2, bgcolor: 'secondary.light', color: 'secondary.contrastText' }}>
+            <Paper sx={{ 
+              p: isMobile ? 1.5 : 2, 
+              bgcolor: 'secondary.light', 
+              color: 'secondary.contrastText',
+              borderRadius: 2
+            }}>
               <Typography variant="body1" fontWeight={600}>
                 {displayMetrics.topClinic?.name}
               </Typography>
@@ -317,7 +389,7 @@ export default function TransactionDashboard({
         </Stack>
       </CardContent>
     </Card>
-  )
+  ), [displayMetrics.mostUsedPlan, displayMetrics.topClinic])
 
   if (loading) {
     return (
@@ -325,35 +397,29 @@ export default function TransactionDashboard({
         <Typography variant="h5" gutterBottom>
           Dashboard de Métricas
         </Typography>
-        
-        <Grid container spacing={3}>
-          {/* Loading skeletons */}
-          {Array.from({ length: 8 }).map((_, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Box sx={{ height: 140, bgcolor: 'grey.100', borderRadius: 2 }} />
-            </Grid>
-          ))}
-          
-          <Grid item xs={12} md={8}>
-            <Box sx={{ height: 300, bgcolor: 'grey.100', borderRadius: 2 }} />
-          </Grid>
-          
-          <Grid item xs={12} md={4}>
-            <Box sx={{ height: 300, bgcolor: 'grey.100', borderRadius: 2 }} />
-          </Grid>
-        </Grid>
+        <DashboardMetricsSkeleton />
       </Box>
     )
   }
 
   return (
-    <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight={600}>
+    <Container maxWidth={false} disableGutters={isMobile} sx={{ p: isMobile ? 1 : 0 }}>
+      <Stack 
+        direction={isMobile ? "column" : "row"} 
+        justifyContent="space-between" 
+        alignItems={isMobile ? "flex-start" : "center"} 
+        spacing={isMobile ? 2 : 0}
+        mb={3}
+      >
+        <Typography 
+          variant={isMobile ? "h6" : "h5"} 
+          fontWeight={600}
+          sx={{ fontSize: isMobile ? '1.25rem' : undefined }}
+        >
           Dashboard de Métricas
         </Typography>
         
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} flexWrap="wrap">
           <Chip 
             icon={<AssessmentIcon />}
             label={`${displayMetrics.totalTransactions} transações`}
@@ -370,8 +436,8 @@ export default function TransactionDashboard({
         </Stack>
       </Stack>
 
-      <Grid container spacing={3}>
-        {/* Main Metrics */}
+      <Grid container spacing={isMobile ? 2 : 3}>
+        {/* Main Metrics - Mobile: 1 per row, Tablet: 2 per row, Desktop: 4 per row */}
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Receita Total"
@@ -418,7 +484,7 @@ export default function TransactionDashboard({
           />
         </Grid>
 
-        {/* Averages */}
+        {/* Additional Metrics - Mobile: 1 per row, Tablet: 2 per row, Desktop: 4 per row */}
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Valor Médio"
@@ -464,11 +530,12 @@ export default function TransactionDashboard({
           />
         </Grid>
 
-        {/* Charts Row */}
+        {/* Charts Row - Mobile: Full width, Desktop: 8/12 */}
         <Grid item xs={12} md={8}>
           <TrendsChart />
         </Grid>
 
+        {/* Status Chart - Mobile: Full width, Desktop: 4/12 */}
         <Grid item xs={12} md={4}>
           <StatusChart />
         </Grid>
@@ -478,6 +545,8 @@ export default function TransactionDashboard({
           <TopPerformers />
         </Grid>
       </Grid>
-    </Box>
+    </Container>
   )
-}
+})
+
+export default TransactionDashboard

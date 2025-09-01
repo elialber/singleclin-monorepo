@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation'
 import {
   Dialog,
   DialogTitle,
@@ -38,6 +39,7 @@ import {
 import { LoadingButton } from '@mui/lab'
 import { TransactionFilters } from '@/types/transaction'
 import { useExportTransactions } from '@/hooks/useTransactions'
+import { useNotification } from '@/hooks/useNotification'
 
 interface TransactionReportsModalProps {
   open: boolean
@@ -84,6 +86,7 @@ export default function TransactionReportsModal({
   currentFilters = {},
 }: TransactionReportsModalProps) {
   const exportMutation = useExportTransactions()
+  const { showSuccess, showError, showInfo } = useNotification()
 
   const [reportOptions, setReportOptions] = useState<ReportOptions>({
     format: 'xlsx',
@@ -95,6 +98,43 @@ export default function TransactionReportsModal({
     includeSummary: true,
     includeCharts: false,
   })
+
+  // Form validation for custom date fields
+  const dateForm = useFormValidation(
+    {
+      customStartDate: reportOptions.customStartDate,
+      customEndDate: reportOptions.customEndDate,
+    },
+    {
+      customStartDate: {
+        custom: (value: string) => {
+          if (reportOptions.dateRange === 'custom' && !value) {
+            return 'Data de início é obrigatória para período personalizado'
+          }
+          if (value && reportOptions.customEndDate && new Date(value) >= new Date(reportOptions.customEndDate)) {
+            return 'Data de início deve ser anterior à data final'
+          }
+          return null
+        }
+      },
+      customEndDate: {
+        custom: (value: string) => {
+          if (reportOptions.dateRange === 'custom' && !value) {
+            return 'Data final é obrigatória para período personalizado'
+          }
+          if (value && reportOptions.customStartDate && new Date(value) <= new Date(reportOptions.customStartDate)) {
+            return 'Data final deve ser posterior à data inicial'
+          }
+          return null
+        }
+      }
+    },
+    {
+      validateOnChange: true,
+      validateOnBlur: true,
+      debounceMs: 300
+    }
+  )
 
   const handleClose = () => {
     onClose()
@@ -155,14 +195,48 @@ export default function TransactionReportsModal({
     try {
       const filters = buildFiltersForReport()
       
+      // Show info notification about generation starting
+      showInfo(
+        'Gerando relatório...',
+        `Processando relatório em formato ${reportOptions.format.toUpperCase()} com ${reportOptions.includeFields.length} campos.`,
+        {
+          duration: 3000
+        }
+      )
+      
       await exportMutation.mutateAsync({
         params: filters,
         format: reportOptions.format,
       })
       
+      showSuccess(
+        'Relatório gerado com sucesso!',
+        `O arquivo foi baixado em formato ${reportOptions.format.toUpperCase()}. Verifique sua pasta de downloads.`,
+        {
+          title: 'Download Completo',
+          duration: 8000,
+          action: {
+            label: 'Gerar Novo',
+            onClick: () => {
+              // Keep modal open for another report
+            }
+          }
+        }
+      )
+      
       handleClose()
     } catch (error) {
-      // Error is handled by the hook
+      showError(
+        'Erro ao gerar relatório',
+        error instanceof Error ? error.message : 'Não foi possível gerar o relatório. Tente novamente.',
+        {
+          duration: 8000,
+          action: {
+            label: 'Tentar Novamente',
+            onClick: () => handleGenerateReport()
+          }
+        }
+      )
     }
   }
 
@@ -365,10 +439,16 @@ export default function TransactionReportsModal({
                         label="Data Início"
                         type="date"
                         value={reportOptions.customStartDate || ''}
-                        onChange={(e) => setReportOptions(prev => ({ 
-                          ...prev, 
-                          customStartDate: e.target.value 
-                        }))}
+                        onChange={(e) => {
+                          setReportOptions(prev => ({ 
+                            ...prev, 
+                            customStartDate: e.target.value 
+                          }))
+                          dateForm.setValue('customStartDate', e.target.value)
+                        }}
+                        onBlur={() => dateForm.setFieldTouched('customStartDate')}
+                        error={dateForm.touched.customStartDate && !!dateForm.errors.customStartDate}
+                        helperText={dateForm.touched.customStartDate ? dateForm.errors.customStartDate : 'Selecione a data de início do período'}
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                       />
@@ -376,10 +456,16 @@ export default function TransactionReportsModal({
                         label="Data Fim"
                         type="date"
                         value={reportOptions.customEndDate || ''}
-                        onChange={(e) => setReportOptions(prev => ({ 
-                          ...prev, 
-                          customEndDate: e.target.value 
-                        }))}
+                        onChange={(e) => {
+                          setReportOptions(prev => ({ 
+                            ...prev, 
+                            customEndDate: e.target.value 
+                          }))
+                          dateForm.setValue('customEndDate', e.target.value)
+                        }}
+                        onBlur={() => dateForm.setFieldTouched('customEndDate')}
+                        error={dateForm.touched.customEndDate && !!dateForm.errors.customEndDate}
+                        helperText={dateForm.touched.customEndDate ? dateForm.errors.customEndDate : 'Selecione a data final do período'}
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                       />
@@ -536,7 +622,10 @@ export default function TransactionReportsModal({
           loading={exportMutation.isPending}
           variant="contained"
           startIcon={<DownloadIcon />}
-          disabled={reportOptions.includeFields.length === 0}
+          disabled={
+            reportOptions.includeFields.length === 0 ||
+            (reportOptions.dateRange === 'custom' && !dateForm.isValid)
+          }
           loadingPosition="start"
         >
           {exportMutation.isPending ? 'Gerando Relatório...' : 'Gerar Relatório'}

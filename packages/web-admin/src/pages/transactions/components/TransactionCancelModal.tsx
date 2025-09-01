@@ -31,6 +31,8 @@ import { Transaction, TransactionCancel } from '@/types/transaction'
 import { useCancelTransaction } from '@/hooks/useTransactions'
 import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation'
+import { useNotification } from '@/hooks/useNotification'
 
 interface TransactionCancelModalProps {
   open: boolean
@@ -43,64 +45,80 @@ export default function TransactionCancelModal({
   transaction,
   onClose,
 }: TransactionCancelModalProps) {
-  const [formData, setFormData] = useState<TransactionCancel>({
-    cancellationReason: '',
-    notes: '',
-    refundCredits: true,
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-
   const cancelMutation = useCancelTransaction()
+  const { showSuccess, showError } = useNotification()
 
-  const handleClose = () => {
-    setFormData({
+  // Real-time form validation
+  const form = useFormValidation<TransactionCancel>(
+    {
       cancellationReason: '',
       notes: '',
       refundCredits: true,
-    })
-    setErrors({})
+    },
+    {
+      cancellationReason: ValidationRules.transactionReason,
+      notes: { maxLength: 1000 },
+      refundCredits: {} // No validation needed for boolean
+    },
+    {
+      validateOnChange: true,
+      validateOnBlur: true,
+      debounceMs: 500
+    }
+  )
+
+  const handleClose = () => {
+    form.reset()
     onClose()
   }
 
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.cancellationReason.trim()) {
-      newErrors.cancellationReason = 'Motivo do cancelamento é obrigatório'
-    } else if (formData.cancellationReason.trim().length < 3) {
-      newErrors.cancellationReason = 'Motivo deve ter pelo menos 3 caracteres'
-    } else if (formData.cancellationReason.trim().length > 500) {
-      newErrors.cancellationReason = 'Motivo não pode exceder 500 caracteres'
-    }
-
-    // Check for generic reasons
-    const genericReasons = ['erro', 'error', 'cancel', 'cancelar', 'test', 'teste', 'wrong', 'errado']
-    if (genericReasons.some(generic => 
-      formData.cancellationReason.toLowerCase().includes(generic) && 
-      formData.cancellationReason.trim().length < 10
-    )) {
-      newErrors.cancellationReason = 'Por favor, forneça um motivo mais específico'
-    }
-
-    if (formData.notes && formData.notes.length > 1000) {
-      newErrors.notes = 'Observações não podem exceder 1000 caracteres'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
   const handleSubmit = async () => {
-    if (!transaction || !validateForm()) return
+    if (!transaction) return
 
-    try {
-      await cancelMutation.mutateAsync({
-        id: transaction.id,
-        data: formData,
-      })
-      handleClose()
-    } catch (error) {
-      // Error handling is done by the hook
+    const success = await form.submit(async (values) => {
+      try {
+        await cancelMutation.mutateAsync({
+          id: transaction.id,
+          data: values,
+        })
+        
+        showSuccess(
+          'Transação cancelada com sucesso',
+          `A transação ${transaction.code} foi cancelada.${values.refundCredits ? ' Os créditos foram devolvidos ao paciente.' : ''}`,
+          {
+            duration: 6000,
+            action: {
+              label: 'Ver Detalhes',
+              onClick: () => {
+                // Could navigate to transaction details or trigger a modal
+                console.log('Navigate to transaction details')
+              }
+            }
+          }
+        )
+        
+        handleClose()
+      } catch (error) {
+        showError(
+          'Erro ao cancelar transação',
+          error instanceof Error ? error.message : 'Ocorreu um erro inesperado ao cancelar a transação.',
+          {
+            duration: 8000,
+            action: {
+              label: 'Tentar Novamente',
+              onClick: () => handleSubmit()
+            }
+          }
+        )
+      }
+    })
+
+    if (!success) {
+      showError(
+        'Formulário inválido',
+        'Por favor, corrija os erros no formulário antes de continuar.',
+        { duration: 5000 }
+      )
     }
   }
 
@@ -295,7 +313,7 @@ export default function TransactionCancelModal({
             </Typography>
             <Typography variant="body2">
               Ao cancelar esta transação, ela será marcada como cancelada e 
-              {formData.refundCredits ? ' os créditos serão devolvidos ao plano do paciente.' : ' os créditos NÃO serão devolvidos.'}
+              {form.values.refundCredits ? ' os créditos serão devolvidos ao plano do paciente.' : ' os créditos NÃO serão devolvidos.'}
             </Typography>
           </Alert>
         )}
@@ -307,10 +325,8 @@ export default function TransactionCancelModal({
               label="Motivo do Cancelamento *"
               multiline
               rows={3}
-              value={formData.cancellationReason}
-              onChange={(e) => setFormData(prev => ({ ...prev, cancellationReason: e.target.value }))}
-              error={!!errors.cancellationReason}
-              helperText={errors.cancellationReason || 'Descreva o motivo do cancelamento (3-500 caracteres)'}
+              {...form.getFieldProps('cancellationReason')}
+              helperText={form.getFieldStatus('cancellationReason').error || 'Descreva o motivo do cancelamento (3-500 caracteres)'}
               fullWidth
               placeholder="Ex: Paciente não compareceu ao atendimento agendado"
             />
@@ -320,10 +336,8 @@ export default function TransactionCancelModal({
               label="Observações Adicionais"
               multiline
               rows={2}
-              value={formData.notes}
-              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              error={!!errors.notes}
-              helperText={errors.notes || 'Informações adicionais sobre o cancelamento (opcional)'}
+              {...form.getFieldProps('notes')}
+              helperText={form.getFieldStatus('notes').error || 'Informações adicionais sobre o cancelamento (opcional)'}
               fullWidth
               placeholder="Ex: Reagendamento solicitado para próxima semana"
             />
@@ -335,8 +349,8 @@ export default function TransactionCancelModal({
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={formData.refundCredits}
-                    onChange={(e) => setFormData(prev => ({ ...prev, refundCredits: e.target.checked }))}
+                    checked={form.values.refundCredits}
+                    onChange={(e) => form.setValue('refundCredits', e.target.checked)}
                     color="primary"
                   />
                 }
@@ -352,7 +366,7 @@ export default function TransactionCancelModal({
                 }
               />
 
-              {!formData.refundCredits && (
+              {!form.values.refundCredits && (
                 <Alert severity="info" sx={{ mt: 2 }}>
                   <Typography variant="body2">
                     Os créditos não serão devolvidos. Esta opção deve ser usada apenas em casos específicos
@@ -377,7 +391,7 @@ export default function TransactionCancelModal({
             variant="contained"
             color="error"
             startIcon={<CancelIcon />}
-            disabled={!formData.cancellationReason.trim()}
+            disabled={!form.isValid || !form.values.cancellationReason.trim()}
           >
             {cancelMutation.isPending ? 'Cancelando...' : 'Cancelar Transação'}
           </LoadingButton>

@@ -16,6 +16,15 @@ const singleclinColors = {
 
 export const theme = createTheme(
   {
+    breakpoints: {
+      values: {
+        xs: 0,      // Mobile portrait
+        sm: 600,    // Mobile landscape / Small tablet
+        md: 900,    // Tablet
+        lg: 1200,   // Desktop
+        xl: 1536,   // Large desktop
+      },
+    },
     palette: {
       mode: 'light',
       primary: {
@@ -86,29 +95,6 @@ export const theme = createTheme(
       borderRadius: 8,
     },
     components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: 8,
-            textTransform: 'none',
-          },
-          containedPrimary: {
-            background: `linear-gradient(135deg, ${singleclinColors.primary} 0%, ${singleclinColors.primaryDark} 100%)`,
-            '&:hover': {
-              background: `linear-gradient(135deg, ${singleclinColors.primaryLight} 0%, ${singleclinColors.primary} 100%)`,
-              boxShadow: `0 4px 12px rgba(0, 81, 86, 0.3)`,
-            },
-          },
-          outlinedPrimary: {
-            borderColor: singleclinColors.primary,
-            color: singleclinColors.primary,
-            '&:hover': {
-              borderColor: singleclinColors.primaryLight,
-              backgroundColor: `${singleclinColors.primary}08`,
-            },
-          },
-        },
-      },
       MuiCard: {
         styleOverrides: {
           root: {
@@ -174,6 +160,77 @@ export const theme = createTheme(
           },
           bar: {
             background: `linear-gradient(90deg, ${singleclinColors.primary} 0%, ${singleclinColors.primaryLight} 100%)`,
+          },
+        },
+      },
+      // Mobile-first responsive components
+      MuiContainer: {
+        styleOverrides: {
+          root: {
+            paddingLeft: '16px',
+            paddingRight: '16px',
+            '@media (min-width: 600px)': {
+              paddingLeft: '24px',
+              paddingRight: '24px',
+            },
+          },
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            // Ensure touch targets are at least 44px for mobile
+            '@media (max-width: 599px)': {
+              minHeight: '44px',
+              minWidth: '44px',
+            },
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            textTransform: 'none',
+            // Ensure touch targets are at least 44px for mobile
+            '@media (max-width: 599px)': {
+              minHeight: '44px',
+              fontSize: '0.875rem',
+            },
+          },
+          containedPrimary: {
+            background: `linear-gradient(135deg, ${singleclinColors.primary} 0%, ${singleclinColors.primaryDark} 100%)`,
+            '&:hover': {
+              background: `linear-gradient(135deg, ${singleclinColors.primaryLight} 0%, ${singleclinColors.primary} 100%)`,
+              boxShadow: `0 4px 12px rgba(0, 81, 86, 0.3)`,
+            },
+          },
+          outlinedPrimary: {
+            borderColor: singleclinColors.primary,
+            color: singleclinColors.primary,
+            '&:hover': {
+              borderColor: singleclinColors.primaryLight,
+              backgroundColor: `${singleclinColors.primary}08`,
+            },
+          },
+        },
+      },
+      MuiTableContainer: {
+        styleOverrides: {
+          root: {
+            '@media (max-width: 899px)': {
+              // Add horizontal scrolling for tables on mobile/tablet
+              overflowX: 'auto',
+            },
+          },
+        },
+      },
+      MuiTable: {
+        styleOverrides: {
+          root: {
+            '@media (max-width: 899px)': {
+              minWidth: '700px', // Ensure table doesn't collapse too much
+            },
           },
         },
       },
