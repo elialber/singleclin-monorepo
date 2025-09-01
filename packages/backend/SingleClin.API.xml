@@ -3051,6 +3051,496 @@
             Usage by plan
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.DashboardMetricsDto">
+            <summary>
+            DTO for transaction dashboard metrics
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.TotalTransactions">
+            <summary>
+            Total number of transactions in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.TotalRevenue">
+            <summary>
+            Total revenue from all transactions
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.TransactionsThisMonth">
+            <summary>
+            Number of transactions this month
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.RevenueThisMonth">
+            <summary>
+            Revenue this month
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.ActivePatients">
+            <summary>
+            Number of active patients (with transactions)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.ActiveClinics">
+            <summary>
+            Number of active clinics (with transactions)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.ActivePlans">
+            <summary>
+            Number of active plans (with transactions)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.AverageTransactionAmount">
+            <summary>
+            Average transaction amount
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.AverageCreditsPerTransaction">
+            <summary>
+            Average credits used per transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.MostUsedPlan">
+            <summary>
+            Most used plan information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.TopClinic">
+            <summary>
+            Top performing clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.StatusDistribution">
+            <summary>
+            Transaction status distribution
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.DashboardMetricsDto.MonthlyTrends">
+            <summary>
+            Monthly trends (last 12 months)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.MostUsedPlanDto">
+            <summary>
+            Most used plan information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.MostUsedPlanDto.Id">
+            <summary>
+            Plan ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.MostUsedPlanDto.Name">
+            <summary>
+            Plan name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.MostUsedPlanDto.TransactionCount">
+            <summary>
+            Number of transactions
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.MostUsedPlanDto.TotalRevenue">
+            <summary>
+            Total revenue from this plan
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.TopClinicDto">
+            <summary>
+            Top performing clinic information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TopClinicDto.Id">
+            <summary>
+            Clinic ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TopClinicDto.Name">
+            <summary>
+            Clinic name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TopClinicDto.TransactionCount">
+            <summary>
+            Number of transactions
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TopClinicDto.TotalRevenue">
+            <summary>
+            Total revenue from this clinic
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.StatusDistributionDto">
+            <summary>
+            Transaction status distribution
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.StatusDistributionDto.Status">
+            <summary>
+            Transaction status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.StatusDistributionDto.Count">
+            <summary>
+            Number of transactions with this status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.StatusDistributionDto.Percentage">
+            <summary>
+            Percentage of total transactions
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.MonthlyTrendDto">
+            <summary>
+            Monthly trend data
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.MonthlyTrendDto.Month">
+            <summary>
+            Month and year (YYYY-MM)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.MonthlyTrendDto.TransactionCount">
+            <summary>
+            Number of transactions in the month
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.MonthlyTrendDto.Revenue">
+            <summary>
+            Total revenue in the month
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.MonthlyTrendDto.CreditsUsed">
+            <summary>
+            Total credits used in the month
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.TransactionCancelDto">
+            <summary>
+            DTO for cancelling a transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionCancelDto.CancellationReason">
+            <summary>
+            Reason for cancelling the transaction (required)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionCancelDto.Notes">
+            <summary>
+            Additional notes about the cancellation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionCancelDto.RefundCredits">
+            <summary>
+            Whether to refund credits to the patient's plan (default: true)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.TransactionFilterDto">
+            <summary>
+            DTO for filtering transactions
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.Search">
+            <summary>
+            Search term for patient name, transaction code, or clinic name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.PatientId">
+            <summary>
+            Filter by patient ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.ClinicId">
+            <summary>
+            Filter by clinic ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.PlanId">
+            <summary>
+            Filter by plan ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.Status">
+            <summary>
+            Filter by transaction status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.StartDate">
+            <summary>
+            Filter by start date (inclusive)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.EndDate">
+            <summary>
+            Filter by end date (inclusive)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.ValidationStartDate">
+            <summary>
+            Filter by validation start date
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.ValidationEndDate">
+            <summary>
+            Filter by validation end date
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.MinAmount">
+            <summary>
+            Filter by minimum amount
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.MaxAmount">
+            <summary>
+            Filter by maximum amount
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.MinCredits">
+            <summary>
+            Filter by minimum credits used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.MaxCredits">
+            <summary>
+            Filter by maximum credits used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.ServiceType">
+            <summary>
+            Filter by service type
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.IncludeCancelled">
+            <summary>
+            Include cancelled transactions (default: false)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.Page">
+            <summary>
+            Page number for pagination (1-based)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.Limit">
+            <summary>
+            Number of items per page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.SortBy">
+            <summary>
+            Field to sort by
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionFilterDto.SortOrder">
+            <summary>
+            Sort order (asc or desc)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.TransactionListResponseDto">
+            <summary>
+            Response DTO for paginated transaction list
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionListResponseDto.Data">
+            <summary>
+            List of transactions
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionListResponseDto.Total">
+            <summary>
+            Total number of transactions (all pages)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionListResponseDto.Page">
+            <summary>
+            Current page number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionListResponseDto.Limit">
+            <summary>
+            Number of items per page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionListResponseDto.TotalPages">
+            <summary>
+            Total number of pages
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionListResponseDto.HasNextPage">
+            <summary>
+            Whether there is a next page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionListResponseDto.HasPreviousPage">
+            <summary>
+            Whether there is a previous page
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.TransactionResponseDto">
+            <summary>
+            Response DTO for transaction information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.Id">
+            <summary>
+            Transaction ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.Code">
+            <summary>
+            Unique transaction code
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.PatientId">
+            <summary>
+            Patient ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.PatientName">
+            <summary>
+            Patient full name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.PatientEmail">
+            <summary>
+            Patient email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.ClinicId">
+            <summary>
+            Clinic ID where transaction occurred
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.ClinicName">
+            <summary>
+            Clinic name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.PlanId">
+            <summary>
+            Plan ID used for transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.PlanName">
+            <summary>
+            Plan name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.UserPlanId">
+            <summary>
+            User plan ID used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.Status">
+            <summary>
+            Transaction status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.CreditsUsed">
+            <summary>
+            Number of credits used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.ServiceDescription">
+            <summary>
+            Service or procedure description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.ServiceType">
+            <summary>
+            Service type
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.Amount">
+            <summary>
+            Amount charged for this transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.CreatedAt">
+            <summary>
+            Date when transaction was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.ValidationDate">
+            <summary>
+            Date when transaction was validated
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.ValidatedBy">
+            <summary>
+            User who validated the transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.ValidationNotes">
+            <summary>
+            Validation notes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.CancellationDate">
+            <summary>
+            Date when transaction was cancelled
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.CancellationReason">
+            <summary>
+            Cancellation reason
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.Latitude">
+            <summary>
+            Latitude where transaction occurred
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.Longitude">
+            <summary>
+            Longitude where transaction occurred
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.IpAddress">
+            <summary>
+            IP address from where transaction was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.UserAgent">
+            <summary>
+            User agent of device that created transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.QRToken">
+            <summary>
+            QR token used for transaction
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionResponseDto.UpdatedAt">
+            <summary>
+            Last updated date
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Transaction.TransactionUpdateDto">
+            <summary>
+            DTO for updating transaction information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionUpdateDto.ServiceDescription">
+            <summary>
+            Service or procedure description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionUpdateDto.ServiceType">
+            <summary>
+            Service type
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionUpdateDto.ValidationNotes">
+            <summary>
+            Validation notes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Transaction.TransactionUpdateDto.Amount">
+            <summary>
+            Amount charged for this transaction
+            </summary>
+        </member>
         <member name="T:SingleClin.API.DTOs.User.CreateUserDto">
             <summary>
             DTO for creating a new user

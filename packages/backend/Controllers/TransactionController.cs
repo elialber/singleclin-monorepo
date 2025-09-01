@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SingleClin.API.DTOs;
 using SingleClin.API.DTOs.QRCode;
+using SingleClin.API.DTOs.Transaction;
 using SingleClin.API.Services;
 using System.Security.Claims;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,13 +18,16 @@ namespace SingleClin.API.Controllers;
 public class TransactionController : BaseController
 {
     private readonly IQRCodeValidationService _qrValidationService;
+    private readonly ITransactionService _transactionService;
     private readonly ILogger<TransactionController> _logger;
 
     public TransactionController(
         IQRCodeValidationService qrValidationService,
+        ITransactionService transactionService,
         ILogger<TransactionController> logger)
     {
         _qrValidationService = qrValidationService;
+        _transactionService = transactionService;
         _logger = logger;
     }
 
@@ -194,6 +198,222 @@ public class TransactionController : BaseController
         }
     }
 
+    // ADMIN ENDPOINTS - For web admin portal
+
+    /// <summary>
+    /// Get paginated list of all transactions (admin only)
+    /// </summary>
+    /// <param name="filter">Filter parameters</param>
+    /// <returns>Paginated list of transactions</returns>
+    [HttpGet]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Get Transactions",
+        Description = "Get paginated list of all transactions with advanced filtering (admin only)"
+    )]
+    [SwaggerResponse(200, "Transactions retrieved successfully", typeof(ResponseWrapper<TransactionListResponseDto>))]
+    [SwaggerResponse(403, "Insufficient permissions")]
+    public async Task<ActionResult<ResponseWrapper<TransactionListResponseDto>>> GetTransactions([FromQuery] TransactionFilterDto filter)
+    {
+        try
+        {
+            _logger.LogInformation("Retrieving transactions with filters: {@Filter}", filter);
+            
+            var result = await _transactionService.GetTransactionsAsync(filter);
+            return Ok(ResponseWrapper<TransactionListResponseDto>.CreateSuccess(result));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve transactions");
+            return StatusCode(500, ResponseWrapper<TransactionListResponseDto>.CreateFailure("Internal server error"));
+        }
+    }
+
+    /// <summary>
+    /// Get transaction by ID (admin only)
+    /// </summary>
+    /// <param name="id">Transaction ID</param>
+    /// <returns>Transaction details</returns>
+    [HttpGet("{id:guid}")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Get Transaction",
+        Description = "Get transaction details by ID (admin only)"
+    )]
+    [SwaggerResponse(200, "Transaction retrieved successfully", typeof(ResponseWrapper<TransactionResponseDto>))]
+    [SwaggerResponse(404, "Transaction not found")]
+    [SwaggerResponse(403, "Insufficient permissions")]
+    public async Task<ActionResult<ResponseWrapper<TransactionResponseDto>>> GetTransaction(Guid id)
+    {
+        try
+        {
+            _logger.LogInformation("Retrieving transaction with ID: {TransactionId}", id);
+            
+            var result = await _transactionService.GetTransactionByIdAsync(id);
+            if (result == null)
+            {
+                return NotFound(ResponseWrapper<TransactionResponseDto>.CreateFailure("Transaction not found"));
+            }
+            
+            return Ok(ResponseWrapper<TransactionResponseDto>.CreateSuccess(result));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve transaction {TransactionId}", id);
+            return StatusCode(500, ResponseWrapper<TransactionResponseDto>.CreateFailure("Internal server error"));
+        }
+    }
+
+    /// <summary>
+    /// Update transaction details (admin only)
+    /// </summary>
+    /// <param name="id">Transaction ID</param>
+    /// <param name="request">Update request</param>
+    /// <returns>Updated transaction</returns>
+    [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Update Transaction",
+        Description = "Update transaction details (admin only)"
+    )]
+    [SwaggerResponse(200, "Transaction updated successfully", typeof(ResponseWrapper<TransactionResponseDto>))]
+    [SwaggerResponse(404, "Transaction not found")]
+    [SwaggerResponse(400, "Invalid request")]
+    [SwaggerResponse(403, "Insufficient permissions")]
+    public async Task<ActionResult<ResponseWrapper<TransactionResponseDto>>> UpdateTransaction(Guid id, [FromBody] TransactionUpdateDto request)
+    {
+        try
+        {
+            _logger.LogInformation("Updating transaction {TransactionId} with data: {@Request}", id, request);
+            
+            var result = await _transactionService.UpdateTransactionAsync(id, request);
+            if (result == null)
+            {
+                return NotFound(ResponseWrapper<TransactionResponseDto>.CreateFailure("Transaction not found"));
+            }
+            
+            return Ok(ResponseWrapper<TransactionResponseDto>.CreateSuccess(result, "Transaction updated successfully"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update transaction {TransactionId}", id);
+            return StatusCode(500, ResponseWrapper<TransactionResponseDto>.CreateFailure("Internal server error"));
+        }
+    }
+
+    /// <summary>
+    /// Cancel transaction and refund credits (admin only)
+    /// </summary>
+    /// <param name="id">Transaction ID</param>
+    /// <param name="request">Cancellation request</param>
+    /// <returns>Cancelled transaction</returns>
+    [HttpPut("{id:guid}/cancel")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Cancel Transaction",
+        Description = "Cancel transaction and optionally refund credits to patient (admin only)"
+    )]
+    [SwaggerResponse(200, "Transaction cancelled successfully", typeof(ResponseWrapper<TransactionResponseDto>))]
+    [SwaggerResponse(404, "Transaction not found")]
+    [SwaggerResponse(400, "Transaction cannot be cancelled")]
+    [SwaggerResponse(403, "Insufficient permissions")]
+    public async Task<ActionResult<ResponseWrapper<TransactionResponseDto>>> CancelTransaction(Guid id, [FromBody] TransactionCancelDto request)
+    {
+        try
+        {
+            var adminUserId = GetAuthenticatedUserId();
+            _logger.LogInformation("Admin {AdminId} cancelling transaction {TransactionId} with reason: {Reason}", 
+                adminUserId, id, request.CancellationReason);
+            
+            var result = await _transactionService.CancelTransactionAsync(id, request, adminUserId.ToString());
+            if (result == null)
+            {
+                return NotFound(ResponseWrapper<TransactionResponseDto>.CreateFailure("Transaction not found"));
+            }
+            
+            return Ok(ResponseWrapper<TransactionResponseDto>.CreateSuccess(result, "Transaction cancelled successfully"));
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Cannot cancel transaction {TransactionId}", id);
+            return BadRequest(ResponseWrapper<TransactionResponseDto>.CreateFailure(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to cancel transaction {TransactionId}", id);
+            return StatusCode(500, ResponseWrapper<TransactionResponseDto>.CreateFailure("Internal server error"));
+        }
+    }
+
+    /// <summary>
+    /// Get dashboard metrics for transactions (admin only)
+    /// </summary>
+    /// <param name="startDate">Start date for metrics calculation (optional)</param>
+    /// <param name="endDate">End date for metrics calculation (optional)</param>
+    /// <returns>Dashboard metrics</returns>
+    [HttpGet("dashboard-metrics")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Get Dashboard Metrics",
+        Description = "Get transaction metrics for dashboard (admin only)"
+    )]
+    [SwaggerResponse(200, "Metrics retrieved successfully", typeof(ResponseWrapper<DashboardMetricsDto>))]
+    [SwaggerResponse(403, "Insufficient permissions")]
+    public async Task<ActionResult<ResponseWrapper<DashboardMetricsDto>>> GetDashboardMetrics(
+        [FromQuery] DateTime? startDate = null, 
+        [FromQuery] DateTime? endDate = null)
+    {
+        try
+        {
+            _logger.LogInformation("Retrieving dashboard metrics from {StartDate} to {EndDate}", startDate, endDate);
+            
+            var result = await _transactionService.GetDashboardMetricsAsync(startDate, endDate);
+            return Ok(ResponseWrapper<DashboardMetricsDto>.CreateSuccess(result));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve dashboard metrics");
+            return StatusCode(500, ResponseWrapper<DashboardMetricsDto>.CreateFailure("Internal server error"));
+        }
+    }
+
+    /// <summary>
+    /// Export transactions to various formats (admin only)
+    /// </summary>
+    /// <param name="filter">Filter parameters</param>
+    /// <param name="format">Export format (excel, csv, pdf)</param>
+    /// <returns>File download</returns>
+    [HttpGet("export")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Export Transactions",
+        Description = "Export transactions to Excel, CSV or PDF format (admin only)"
+    )]
+    [SwaggerResponse(200, "File generated successfully")]
+    [SwaggerResponse(400, "Invalid export format")]
+    [SwaggerResponse(403, "Insufficient permissions")]
+    public async Task<IActionResult> ExportTransactions([FromQuery] TransactionFilterDto filter, [FromQuery] string format = "excel")
+    {
+        try
+        {
+            _logger.LogInformation("Exporting transactions in {Format} format with filters: {@Filter}", format, filter);
+            
+            var (fileBytes, fileName, contentType) = await _transactionService.ExportTransactionsAsync(filter, format);
+            
+            return File(fileBytes, contentType, fileName);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid export format: {Format}", format);
+            return BadRequest(ResponseWrapper<object>.CreateFailure(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to export transactions");
+            return StatusCode(500, ResponseWrapper<object>.CreateFailure("Internal server error"));
+        }
+    }
+
     /// <summary>
     /// Get authenticated clinic ID from JWT claims
     /// </summary>
@@ -207,5 +427,20 @@ public class TransactionController : BaseController
         }
 
         return Guid.TryParse(clinicIdClaim, out var clinicId) ? clinicId : Guid.Empty;
+    }
+
+    /// <summary>
+    /// Get authenticated user ID from JWT claims
+    /// </summary>
+    /// <returns>User ID if found, empty GUID otherwise</returns>
+    private Guid GetAuthenticatedUserId()
+    {
+        var userIdClaim = User.FindFirst("sub")?.Value ?? User.FindFirst("userId")?.Value;
+        if (string.IsNullOrEmpty(userIdClaim))
+        {
+            return Guid.Empty;
+        }
+
+        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
     }
 }
