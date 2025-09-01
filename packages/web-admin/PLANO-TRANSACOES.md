@@ -251,14 +251,29 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 
 ## 🎛️ **FASE 3: Funcionalidades Avançadas**
 
-### ⏳ 14. Implementar funcionalidade de cancelamento de transações
-**Status:** 🔄 **PENDENTE**  
+### ✅ 14. Implementar funcionalidade de cancelamento de transações
+**Status:** ✅ **CONCLUÍDO**  
 **Descrição:** Cancelar transações com devolução de créditos  
-**Funcionalidades:**
-- Modal de confirmação
-- Campo para motivo do cancelamento
-- Devolução automática de créditos
-- Log de auditoria
+**Resultado:** Implementação completa com componentes modais avançados:
+
+**TransactionCancelModal:**
+- Modal de confirmação com detalhes da transação
+- Validação de motivo do cancelamento (3-500 caracteres)
+- Rejeição de motivos genéricos  
+- Checkbox para devolução de créditos com alertas explicativos
+- Estados de loading e integração com API
+
+**TransactionDetailsModal:**
+- Visualização completa dos detalhes da transação
+- Timeline com histórico de status e validações
+- Informações técnicas (geolocalização, device data)
+- Funcionalidade copy-to-clipboard para códigos e coordenadas
+- Botões de ação contextuais (editar/cancelar)
+
+**Integração:**
+- Modais integrados na página principal de Transações
+- Gerenciamento de estado local para abertura/fechamento
+- Handlers atualizados para usar modais ao invés de placeholders
 
 ### ⏳ 15. Criar relatórios e exportação de dados
 **Status:** 🔄 **PENDENTE**  

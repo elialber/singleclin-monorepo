@@ -21,6 +21,7 @@ import {
   ViewModule as ViewModuleIcon,
   List as ListIcon,
   Dashboard as DashboardIcon,
+  Assessment as AssessmentIcon,
 } from '@mui/icons-material'
 import { useTransactions, useExportTransactions, useInvalidateTransactions, useTransactionMetrics } from '@/hooks/useTransactions'
 import { TransactionFilters, Transaction } from '@/types/transaction'
@@ -31,6 +32,7 @@ import TransactionCard from './components/TransactionCard'
 import TransactionDashboard from './components/TransactionDashboard'
 import TransactionDetailsModal from './components/TransactionDetailsModal'
 import TransactionCancelModal from './components/TransactionCancelModal'
+import TransactionReportsModal from './components/TransactionReportsModal'
 
 export default function Transactions() {
   const { showSuccess, showError } = useNotification()
@@ -46,6 +48,7 @@ export default function Transactions() {
   // Modal state
   const [detailsModalOpen, setDetailsModalOpen] = useState(false)
   const [cancelModalOpen, setCancelModalOpen] = useState(false)
+  const [reportsModalOpen, setReportsModalOpen] = useState(false)
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
   
   // Filters state - all advanced filters from backend
@@ -137,6 +140,14 @@ export default function Transactions() {
   const handleCloseCancelModal = () => {
     setCancelModalOpen(false)
     setSelectedTransaction(null)
+  }
+
+  const handleOpenReportsModal = () => {
+    setReportsModalOpen(true)
+  }
+
+  const handleCloseReportsModal = () => {
+    setReportsModalOpen(false)
   }
 
   const handleBulkAction = (action: string, ids: string[]) => {
@@ -246,12 +257,21 @@ export default function Transactions() {
             </IconButton>
           </Tooltip>
           
-          <Tooltip title="Exportar Excel">
+          <Tooltip title="Exportar Rápido (Excel)">
             <IconButton 
               onClick={() => handleExport('xlsx')} 
               disabled={exportMutation.isPending}
             >
               <DownloadIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Relatórios Avançados">
+            <IconButton 
+              onClick={handleOpenReportsModal}
+              color="secondary"
+            >
+              <AssessmentIcon />
             </IconButton>
           </Tooltip>
           
@@ -646,6 +666,13 @@ export default function Transactions() {
         open={cancelModalOpen}
         transaction={selectedTransaction}
         onClose={handleCloseCancelModal}
+      />
+
+      {/* Transaction Reports Modal */}
+      <TransactionReportsModal
+        open={reportsModalOpen}
+        onClose={handleCloseReportsModal}
+        currentFilters={filters}
       />
     </Container>
   )
