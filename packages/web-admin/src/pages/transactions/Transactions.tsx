@@ -29,6 +29,8 @@ import { useDebounce } from '@/hooks/useDebounce'
 import TransactionTable from './components/TransactionTable'
 import TransactionCard from './components/TransactionCard'
 import TransactionDashboard from './components/TransactionDashboard'
+import TransactionDetailsModal from './components/TransactionDetailsModal'
+import TransactionCancelModal from './components/TransactionCancelModal'
 
 export default function Transactions() {
   const { showSuccess, showError } = useNotification()
@@ -40,6 +42,11 @@ export default function Transactions() {
   const [page, setPage] = useState(1)
   const [limit] = useState(20)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  
+  // Modal state
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false)
+  const [cancelModalOpen, setCancelModalOpen] = useState(false)
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
   
   // Filters state - all advanced filters from backend
   const [filters, setFilters] = useState<TransactionFilters>({
@@ -107,18 +114,29 @@ export default function Transactions() {
 
   // Transaction action handlers
   const handleViewTransaction = (transaction: Transaction) => {
-    showSuccess(`Visualizando detalhes da transação ${transaction.code}`)
-    // TODO: Implement transaction details modal/page
+    setSelectedTransaction(transaction)
+    setDetailsModalOpen(true)
   }
 
   const handleEditTransaction = (transaction: Transaction) => {
-    showSuccess(`Editando transação ${transaction.code}`)
-    // TODO: Implement transaction edit modal/form
+    setSelectedTransaction(transaction)
+    setDetailsModalOpen(true)
   }
 
   const handleCancelTransaction = (transaction: Transaction) => {
-    showSuccess(`Iniciando cancelamento da transação ${transaction.code}`)
-    // TODO: Implement transaction cancellation modal
+    setSelectedTransaction(transaction)
+    setCancelModalOpen(true)
+  }
+
+  // Modal handlers
+  const handleCloseDetailsModal = () => {
+    setDetailsModalOpen(false)
+    setSelectedTransaction(null)
+  }
+
+  const handleCloseCancelModal = () => {
+    setCancelModalOpen(false)
+    setSelectedTransaction(null)
   }
 
   const handleBulkAction = (action: string, ids: string[]) => {
@@ -613,6 +631,22 @@ export default function Transactions() {
           )}
         </Box>
       </Fade>
+
+      {/* Transaction Details Modal */}
+      <TransactionDetailsModal
+        open={detailsModalOpen}
+        transaction={selectedTransaction}
+        onClose={handleCloseDetailsModal}
+        onEdit={handleEditTransaction}
+        onCancel={handleCancelTransaction}
+      />
+
+      {/* Transaction Cancel Modal */}
+      <TransactionCancelModal
+        open={cancelModalOpen}
+        transaction={selectedTransaction}
+        onClose={handleCloseCancelModal}
+      />
     </Container>
   )
 }
