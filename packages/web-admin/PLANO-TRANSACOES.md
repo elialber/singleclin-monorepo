@@ -78,45 +78,77 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 - Rejeição de motivos genéricos/muito simples
 - Warning para não refund de créditos
 
-### ⏳ 6. Configurar injeção de dependência para transações
-**Status:** 🔄 **PENDENTE**  
+### ✅ 6. Configurar injeção de dependência para transações
+**Status:** ✅ **CONCLUÍDO**  
 **Descrição:** Registrar services no Program.cs  
-**Configurações:**
-- ITransactionService -> TransactionService
-- ITransactionRepository -> TransactionRepository
-- Validators do FluentValidation
+**Resultado:** Configuração de DI implementada:
+- `ITransactionService -> TransactionService` (Scoped)
+- `ITransactionRepository -> TransactionRepository` (Scoped)
+- Validators FluentValidation (auto-descobertos via assembly scanning)
+- Integração com pipeline existente de services
+- Projeto compila e executa sem erros
+- Services registrados nas linhas 122-124 do Program.cs
+
+**Observação:** Todos os services seguem o padrão Scoped para manter consistência com EF Core DbContext
 
 ---
 
 ## 💻 **FASE 2: Frontend (React & TypeScript)**
 
-### ⏳ 7. Criar tipos TypeScript para transações no frontend
-**Status:** 🔄 **PENDENTE**  
+### ✅ 7. Criar tipos TypeScript para transações no frontend
+**Status:** ✅ **CONCLUÍDO**  
 **Descrição:** Interfaces TypeScript alinhadas com backend  
-**Arquivos:**
-- Atualizar `src/types/transaction.ts`
-- Adicionar interfaces para filtros e requests
-- Tipos para dashboard e métricas
+**Resultado:** Tipos TypeScript implementados completos:
+**Interfaces principais:**
+- `Transaction` - Interface completa alinhada com TransactionResponseDto (23 propriedades)
+- `TransactionFilters` - Filtros avançados com 16 opções de filtro
+- `TransactionListResponse` - Response paginada com metadados
+- `TransactionUpdate` - Interface para atualizações
+- `TransactionCancel` - Interface para cancelamento
+- `DashboardMetrics` - Métricas completas do dashboard
+- `MostUsedPlan`, `TopClinic`, `StatusDistribution`, `MonthlyTrend` - Sub-interfaces
+- `ApiResponse<T>` - Wrapper genérico para responses da API
+- `TransactionStatus`, `SortOrder`, `SortField` - Types específicos
 
-### ⏳ 8. Implementar transaction.service.ts no frontend
-**Status:** 🔄 **PENDENTE**  
+### ✅ 8. Implementar transaction.service.ts no frontend
+**Status:** ✅ **CONCLUÍDO**  
 **Descrição:** Camada de integração com API  
-**Funcionalidades:**
-- Métodos CRUD completos
-- Filtros e paginação
-- Tratamento de erros
-- Mock data para desenvolvimento
+**Resultado:** Service de transações implementado completamente:
+**Métodos implementados:**
+- `getTransactions()` - Lista paginada com 16 filtros avançados
+- `getTransaction()` - Busca transação específica por ID
+- `updateTransaction()` - Atualiza campos editáveis (4 campos)
+- `cancelTransaction()` - Cancela transação com refund opcional
+- `getDashboardMetrics()` - Métricas completas para dashboard
+- `exportTransactions()` - Exporta em Excel/CSV/PDF com filtros
+- `generateMockData()` - Mock data para desenvolvimento
+- Tratamento de erros consistente em todos os métodos
+- Integração com backend via ApiResponse<T> wrapper
 
-### ⏳ 9. Criar useTransactions hook com TanStack Query
-**Status:** 🔄 **PENDENTE**  
+### ✅ 9. Criar useTransactions hook com TanStack Query
+**Status:** ✅ **CONCLUÍDO**  
 **Descrição:** Hooks React para estado global  
-**Hooks:**
-- `useTransactions()` - Listagem paginada
-- `useTransaction()` - Transação específica
-- `useCreateTransaction()` - Criar
-- `useUpdateTransaction()` - Atualizar
-- `useCancelTransaction()` - Cancelar
-- `useTransactionMetrics()` - Dashboard
+**Resultado:** Hooks de transações implementados completamente:
+**Hooks principais:**
+- `useTransactions()` - Lista paginada com filtros avançados (16 filtros)
+- `useTransaction()` - Transação específica por ID
+- `useUpdateTransaction()` - Atualizar campos editáveis com update otimista
+- `useCancelTransaction()` - Cancelar com refund e update otimista
+- `useTransactionMetrics()` - Métricas do dashboard com auto-refresh
+- `useExportTransactions()` - Exportar com download automático
+
+**Hooks utilitários:**
+- `usePrefetchTransaction()` - Pré-carregamento para hover effects
+- `useInvalidateTransactions()` - Invalidação granular de cache
+- `useRemoveTransactionCache()` - Remoção de cache específico
+- `useTransactionCacheStatus()` - Status do cache para otimizações
+
+**Funcionalidades avançadas:**
+- Update otimista com rollback automático em erro
+- Query keys estruturadas seguindo best practices
+- Invalidação inteligente de cache (listas + métricas)
+- Auto-refresh configurável (2-5min) para dados atualizados
+- Keep previous data durante paginação
 
 ### ⏳ 10. Implementar página Transactions.tsx com filtros avançados
 **Status:** 🔄 **PENDENTE**  
@@ -353,9 +385,9 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 
 ## 📊 **Resumo de Progresso**
 
-- **✅ Concluídas:** 5/33 (15.2%)
+- **✅ Concluídas:** 6/33 (18.2%)
 - **🔄 Em andamento:** 0/33 (0.0%)
-- **⏳ Pendentes:** 28/33 (84.8%)
+- **⏳ Pendentes:** 27/33 (81.8%)
 
 ---
 
