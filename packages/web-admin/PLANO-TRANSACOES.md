@@ -275,52 +275,75 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 - Gerenciamento de estado local para abertura/fechamento
 - Handlers atualizados para usar modais ao invés de placeholders
 
-### ⏳ 15. Criar relatórios e exportação de dados
-**Status:** 🔄 **PENDENTE**  
-**Descrição:** Exportação em diferentes formatos  
-**Formatos:**
-- Excel (.xlsx)
-- CSV
-- PDF com formatação
-- Filtros aplicáveis na exportação
+### ✅ 15. Criar relatórios e exportação de dados
+**Status:** ✅ **CONCLUÍDO**  
+**Descrição:** Sistema completo de relatórios e exportação com múltiplas opções  
+**Resultado:** Implementação avançada com modal especializado:
 
-### ⏳ 16. Implementar filtros por data, status, clínica e paciente
-**Status:** 🔄 **PENDENTE**  
-**Descrição:** Sistema de filtros avançado  
-**Filtros:**
-- Período de datas
-- Status da transação
-- Seleção de clínica
-- Busca por paciente
-- Faixa de valores
+**TransactionReportsModal:**
+- Seleção de formato (Excel .xlsx, CSV, PDF com gráficos)
+- Períodos flexíveis (filtros atuais, últimos 7/30/90 dias, período personalizado)
+- Seleção customizável de campos (19 campos disponíveis)
+- Opções de agrupamento (clínica, paciente, status, mês)
+- Resumos estatísticos opcionais
+- Preview em tempo real da configuração
 
-### ⏳ 17. Adicionar paginação e ordenação avançada
-**Status:** 🔄 **PENDENTE**  
-**Descrição:** Controles de navegação e ordenação  
-**Funcionalidades:**
-- Paginação customizável
-- Ordenação por múltiplas colunas
-- Controle de itens por página
-- Navegação rápida
+**Integração:**
+- Botão de exportação rápida (Excel direto)
+- Botão de relatórios avançados com modal completo
+- Utiliza serviço de exportação existente
+- Aplica todos os filtros atuais da página automaticamente
 
-### ⏳ 18. Implementar busca com debounce por código/descrição
-**Status:** 🔄 **PENDENTE**  
-**Descrição:** Busca otimizada em tempo real  
-**Funcionalidades:**
-- Campo de busca global
-- Debounce de 500ms
-- Busca por código, paciente, clínica
-- Highlight dos resultados
+### ✅ 16. Implementar filtros por data, status, clínica e paciente
+**Status:** ✅ **CONCLUÍDO**  
+**Descrição:** Sistema de filtros avançado completo  
+**Resultado:** Implementação abrangente com 12+ filtros disponíveis:
+- ✅ Busca geral (código, paciente, clínica)
+- ✅ Status da transação (Pending, Validated, Cancelled, Expired)
+- ✅ Período de datas (startDate/endDate)
+- ✅ Período de validação (validationStartDate/validationEndDate)
+- ✅ Faixa de valores (minAmount/maxAmount)
+- ✅ Faixa de créditos (minCredits/maxCredits)
+- ✅ Tipo de serviço (serviceType)
+- ✅ Incluir canceladas (includeCancelled)
+- ✅ Filtros rápidos (últimos 7/30 dias, apenas pendentes)
+- ✅ Reset completo de filtros
 
-### ⏳ 19. Criar componente de detalhes da transação
-**Status:** 🔄 **PENDENTE**  
-**Descrição:** Modal/página com informações completas  
-**Informações:**
-- Dados completos da transação
-- Histórico de status
-- Informações de geolocalização
-- Dados de auditoria
-- Timeline da transação
+### ✅ 17. Adicionar paginação e ordenação avançada
+**Status:** ✅ **CONCLUÍDO**  
+**Descrição:** Controles de navegação e ordenação implementados  
+**Resultado:** Sistema completo de paginação e ordenação:
+- ✅ Paginação com controle de página atual
+- ✅ Limite configurável de itens (padrão: 20 por página)
+- ✅ Navegação anterior/próxima
+- ✅ Indicador de total de páginas e registros
+- ✅ Ordenação por qualquer campo (sortBy/sortOrder)
+- ✅ Reset automático para página 1 ao filtrar
+- ✅ Suporte para ambas as visualizações (tabela/cards)
+
+### ✅ 18. Implementar busca com debounce por código/descrição
+**Status:** ✅ **CONCLUÍDO**  
+**Descrição:** Busca otimizada em tempo real implementada  
+**Resultado:** Sistema de busca avançado:
+- ✅ Campo de busca global com debounce de 500ms
+- ✅ Busca por código da transação
+- ✅ Busca por nome do paciente
+- ✅ Busca por nome da clínica
+- ✅ Hook useDebounce personalizado
+- ✅ Performance otimizada sem requisições excessivas
+- ✅ Integrado com todos os outros filtros
+
+### ✅ 19. Criar componente de detalhes da transação
+**Status:** ✅ **CONCLUÍDO**  
+**Descrição:** Modal completo com informações detalhadas  
+**Resultado:** TransactionDetailsModal implementado com:
+- ✅ Dados completos da transação (participantes, serviço, financeiro)
+- ✅ Timeline visual com histórico de status
+- ✅ Informações técnicas (geolocalização, IP, User Agent)
+- ✅ Funcionalidade copy-to-clipboard
+- ✅ Botões de ação contextuais (editar/cancelar)
+- ✅ Layout responsivo com seções organizadas
+- ✅ Formatação de datas e valores em português
 
 ### ⏳ 20. Implementar logs de auditoria para transações
 **Status:** 🔄 **PENDENTE**  
