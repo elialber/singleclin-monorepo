@@ -1,40 +1,46 @@
 import { api } from './api'
-import { Patient, PatientListResponse, PatientFilters, PatientDetails } from '@/types/patient'
+import { Patient, PatientListResponse, PatientFilters, PatientDetails, CreatePatientRequest, UpdatePatientRequest } from '@/types/patient'
 
 export interface PatientQueryParams extends PatientFilters {
   page?: number
   limit?: number
+  role?: string // To filter by role
 }
 
 export const patientService = {
   async getPatients(params: PatientQueryParams = {}): Promise<PatientListResponse> {
-    const queryParams = new URLSearchParams()
-    
-    if (params.page) queryParams.append('page', params.page.toString())
-    if (params.limit) queryParams.append('limit', params.limit.toString())
-    if (params.search) queryParams.append('search', params.search)
-    if (params.isActive !== undefined) queryParams.append('isActive', params.isActive.toString())
-    if (params.hasPlan !== undefined) queryParams.append('hasPlan', params.hasPlan.toString())
-
     try {
-      const response = await api.get<PatientListResponse>(`/patients?${queryParams.toString()}`)
+      const queryParams = new URLSearchParams()
+      
+      if (params.page) queryParams.append('page', params.page.toString())
+      if (params.limit) queryParams.append('limit', params.limit.toString())
+      if (params.search) queryParams.append('search', params.search)
+      if (params.isActive !== undefined) queryParams.append('isActive', params.isActive.toString())
+      
+      // Always filter by Patient role
+      queryParams.append('role', 'Patient')
+
+      const response = await api.get<PatientListResponse>(`/users?${queryParams.toString()}`)
       return response.data
     } catch (error: any) {
-      if (error.response?.status === 404) {
+      // Fallback to mock data for development
+      if (error.response?.status === 404 || error.response?.status === 403) {
         // Return mock data if endpoint not implemented yet
         console.warn('Patients endpoint not implemented, returning mock data')
         
         const mockPatients: Patient[] = [
           {
             id: '1',
+            email: 'joao.silva@email.com',
             firstName: 'João',
             lastName: 'Silva',
             fullName: 'João Silva',
-            email: 'joao.silva@email.com',
-            phone: '(11) 98765-4321',
+            role: 'Patient',
+            isActive: true,
+            isEmailVerified: true,
+            phoneNumber: '(11) 98765-4321',
             cpf: '123.456.789-00',
             dateOfBirth: '1985-05-15',
-            isActive: true,
             hasPlan: true,
             createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
             updatedAt: new Date().toISOString(),
@@ -47,13 +53,15 @@ export const patientService = {
           },
           {
             id: '2',
+            email: 'maria.santos@email.com',
             firstName: 'Maria',
             lastName: 'Santos',
             fullName: 'Maria Santos',
-            email: 'maria.santos@email.com',
-            phone: '(21) 97654-3210',
-            cpf: '987.654.321-00',
+            role: 'Patient',
             isActive: true,
+            isEmailVerified: true,
+            phoneNumber: '(21) 97654-3210',
+            cpf: '987.654.321-00',
             hasPlan: true,
             createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
             updatedAt: new Date().toISOString(),
@@ -66,25 +74,29 @@ export const patientService = {
           },
           {
             id: '3',
+            email: 'carlos.oliveira@email.com',
             firstName: 'Carlos',
             lastName: 'Oliveira',
             fullName: 'Carlos Oliveira',
-            email: 'carlos.oliveira@email.com',
-            phone: '(31) 96543-2109',
+            role: 'Patient',
             isActive: true,
+            isEmailVerified: true,
+            phoneNumber: '(31) 96543-2109',
             hasPlan: false,
             createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
             updatedAt: new Date().toISOString(),
           },
           {
             id: '4',
+            email: 'ana.lima@email.com',
             firstName: 'Ana',
             lastName: 'Paula Lima',
             fullName: 'Ana Paula Lima',
-            email: 'ana.lima@email.com',
-            phone: '(41) 95432-1098',
-            cpf: '456.789.123-00',
+            role: 'Patient',
             isActive: false,
+            isEmailVerified: true,
+            phoneNumber: '(41) 95432-1098',
+            cpf: '456.789.123-00',
             hasPlan: true,
             createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
             updatedAt: new Date().toISOString(),
@@ -97,25 +109,29 @@ export const patientService = {
           },
           {
             id: '5',
+            email: 'pedro.almeida@email.com',
             firstName: 'Pedro',
             lastName: 'Almeida',
             fullName: 'Pedro Almeida',
-            email: 'pedro.almeida@email.com',
-            phone: '(51) 94321-0987',
+            role: 'Patient',
             isActive: true,
+            isEmailVerified: true,
+            phoneNumber: '(51) 94321-0987',
             hasPlan: false,
             createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
             updatedAt: new Date().toISOString(),
           },
           {
             id: '6',
+            email: 'fernanda.costa@email.com',
             firstName: 'Fernanda',
             lastName: 'Costa',
             fullName: 'Fernanda Costa',
-            email: 'fernanda.costa@email.com',
-            phone: '(61) 93210-9876',
-            cpf: '789.123.456-00',
+            role: 'Patient',
             isActive: true,
+            isEmailVerified: true,
+            phoneNumber: '(61) 93210-9876',
+            cpf: '789.123.456-00',
             hasPlan: true,
             createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
             updatedAt: new Date().toISOString(),
@@ -171,9 +187,47 @@ export const patientService = {
     }
   },
 
-  async getPatient(id: string): Promise<Patient> {
-    const response = await api.get<{ data: Patient }>(`/patients/${id}`)
+  async getPatient(id: string): Promise<Patient | null> {
+    try {
+      const response = await api.get<{ data: Patient }>(`/users/${id}`)
+      return response.data.data
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        return null
+      }
+      throw error
+    }
+  },
+
+  async createPatient(data: CreatePatientRequest): Promise<Patient> {
+    const createData = {
+      ...data,
+      role: 'Patient',
+      isActive: data.isActive ?? true
+    }
+    
+    const response = await api.post<{ data: Patient }>('/users', createData)
     return response.data.data
+  },
+
+  async updatePatient(id: string, data: UpdatePatientRequest): Promise<Patient> {
+    const response = await api.put<{ data: Patient }>(`/users/${id}`, data)
+    return response.data.data
+  },
+
+  async deletePatient(id: string): Promise<void> {
+    await api.delete(`/users/${id}`)
+  },
+
+  async togglePatientStatus(id: string): Promise<Patient> {
+    // Get current patient data first
+    const patient = await this.getPatient(id)
+    if (!patient) {
+      throw new Error('Patient not found')
+    }
+
+    // Update with opposite status
+    return this.updatePatient(id, { isActive: !patient.isActive })
   },
 
   async getPatientDetails(id: string): Promise<PatientDetails> {

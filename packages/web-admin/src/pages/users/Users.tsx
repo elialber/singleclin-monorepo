@@ -382,7 +382,7 @@ export default function Users() {
               confirmDialog.onConfirm()
               setConfirmDialog({ ...confirmDialog, open: false })
             }}
-            onCancel={() => setConfirmDialog({ ...confirmDialog, open: false })}
+            onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
           />
         </Box>
       </Fade>

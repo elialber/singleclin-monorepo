@@ -281,6 +281,100 @@
             Gets the user's clinic ID as a Guid
             </summary>
         </member>
+        <member name="T:SingleClin.API.Controllers.ClinicController">
+            <summary>
+            Controller for managing clinics
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GetAll(SingleClin.API.DTOs.Clinic.ClinicFilterDto)">
+            <summary>
+            Get all clinics with pagination and filtering (Admin Only)
+            </summary>
+            <param name="filter">Filter criteria including pagination, search, type, status, and sorting</param>
+            <returns>Paginated list of clinics</returns>
+            <response code="200">Returns the paginated list of clinics</response>
+            <response code="400">Invalid filter parameters</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <example>
+            GET /api/clinic?pageNumber=1&amp;pageSize=10&amp;isActive=true&amp;searchTerm=clinic&amp;type=Partner&amp;city=São Paulo&amp;sortBy=name&amp;sortDirection=asc
+            </example>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GetActive">
+            <summary>
+            Get active clinics (Public endpoint)
+            </summary>
+            <returns>List of active clinics</returns>
+            <response code="200">Returns list of active clinics</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GetById(System.Guid)">
+            <summary>
+            Get clinic by ID (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Clinic details</returns>
+            <response code="200">Returns the clinic</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.Create(SingleClin.API.DTOs.Clinic.ClinicRequestDto)">
+            <summary>
+            Create a new clinic (Admin Only)
+            </summary>
+            <param name="clinicRequest">Clinic data</param>
+            <returns>Created clinic</returns>
+            <response code="201">Clinic created successfully</response>
+            <response code="400">Invalid clinic data</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="409">Clinic name or CNPJ already exists</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.Update(System.Guid,SingleClin.API.DTOs.Clinic.ClinicRequestDto)">
+            <summary>
+            Update an existing clinic (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="clinicRequest">Updated clinic data</param>
+            <returns>Updated clinic</returns>
+            <response code="200">Clinic updated successfully</response>
+            <response code="400">Invalid clinic data</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic not found</response>
+            <response code="409">Clinic name or CNPJ already exists</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.Delete(System.Guid)">
+            <summary>
+            Delete a clinic (soft delete) (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Success status</returns>
+            <response code="204">Clinic deleted successfully</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.ToggleStatus(System.Guid)">
+            <summary>
+            Toggle clinic active status (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Updated clinic with new status</returns>
+            <response code="200">Clinic status toggled successfully</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GetStatistics">
+            <summary>
+            Get clinic statistics (Admin Only)
+            </summary>
+            <returns>Clinic statistics</returns>
+            <response code="200">Returns clinic statistics</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+        </member>
         <member name="T:SingleClin.API.Controllers.HealthController">
             <summary>
             Health check endpoints documentation
@@ -1715,6 +1809,181 @@
         <member name="P:SingleClin.API.DTOs.Auth.SocialLoginDto.FullName">
             <summary>
             User's full name (optional, used if not provided by social provider)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.ClinicFilterDto">
+            <summary>
+            Data transfer object for filtering clinics
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.PageNumber">
+            <summary>
+            Page number (1-based)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.PageSize">
+            <summary>
+            Number of items per page
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.IsActive">
+            <summary>
+            Filter by active status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.Type">
+            <summary>
+            Filter by clinic type
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.SearchTerm">
+            <summary>
+            Search term for name or address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.City">
+            <summary>
+            Filter by city (part of address)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.State">
+            <summary>
+            Filter by state (part of address)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.SortBy">
+            <summary>
+            Sort field
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicFilterDto.SortDirection">
+            <summary>
+            Sort direction (asc or desc)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.ClinicRequestDto">
+            <summary>
+            Data transfer object for creating or updating a clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.Name">
+            <summary>
+            Clinic name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.Type">
+            <summary>
+            Type of clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.Address">
+            <summary>
+            Clinic address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.PhoneNumber">
+            <summary>
+            Clinic phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.Email">
+            <summary>
+            Clinic email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.Cnpj">
+            <summary>
+            Clinic CNPJ (Brazilian company registration)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.IsActive">
+            <summary>
+            Whether the clinic is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.Latitude">
+            <summary>
+            Latitude coordinate
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.Longitude">
+            <summary>
+            Longitude coordinate
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.ClinicResponseDto">
+            <summary>
+            Data transfer object for clinic response
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Id">
+            <summary>
+            Clinic unique identifier
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Name">
+            <summary>
+            Clinic name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Type">
+            <summary>
+            Type of clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Address">
+            <summary>
+            Clinic address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.PhoneNumber">
+            <summary>
+            Clinic phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Email">
+            <summary>
+            Clinic email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Cnpj">
+            <summary>
+            Clinic CNPJ (Brazilian company registration)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.IsActive">
+            <summary>
+            Whether the clinic is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Latitude">
+            <summary>
+            Latitude coordinate
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Longitude">
+            <summary>
+            Longitude coordinate
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.CreatedAt">
+            <summary>
+            When the clinic was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.UpdatedAt">
+            <summary>
+            When the clinic was last updated
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.TransactionCount">
+            <summary>
+            Number of transactions processed by this clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.TypeDisplayName">
+            <summary>
+            Type display name for UI
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.Common.ExportFormat">
@@ -3262,6 +3531,101 @@
         <member name="M:SingleClin.API.Migrations.ApplicationDb.AddFirebaseUidToUser.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:SingleClin.API.Repositories.ClinicRepository">
+            <summary>
+            Repository implementation for Clinic entity operations
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Repositories.IClinicRepository">
+            <summary>
+            Repository contract for Clinic entity operations
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.GetAllAsync(System.Int32,System.Int32,System.Nullable{System.Boolean},System.Nullable{SingleClin.API.Data.Models.Enums.ClinicType},System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Get all clinics with pagination and filtering
+            </summary>
+            <param name="pageNumber">Page number (1-based)</param>
+            <param name="pageSize">Number of items per page</param>
+            <param name="isActive">Filter by active status (null for all)</param>
+            <param name="type">Filter by clinic type (null for all)</param>
+            <param name="searchTerm">Search term for name or address</param>
+            <param name="city">Filter by city</param>
+            <param name="state">Filter by state</param>
+            <param name="sortBy">Field to sort by</param>
+            <param name="sortDirection">Sort direction (asc or desc)</param>
+            <returns>Paginated list of clinics</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.GetByIdAsync(System.Guid)">
+            <summary>
+            Get clinic by ID
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Clinic if found, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.GetByNameAsync(System.String)">
+            <summary>
+            Get clinic by name
+            </summary>
+            <param name="name">Clinic name</param>
+            <returns>Clinic if found, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.GetByCnpjAsync(System.String)">
+            <summary>
+            Get clinic by CNPJ
+            </summary>
+            <param name="cnpj">Clinic CNPJ</param>
+            <returns>Clinic if found, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.GetActiveAsync">
+            <summary>
+            Get all active clinics ordered by name
+            </summary>
+            <returns>List of active clinics</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.CreateAsync(SingleClin.API.Data.Models.Clinic)">
+            <summary>
+            Create a new clinic
+            </summary>
+            <param name="clinic">Clinic to create</param>
+            <returns>Created clinic</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.UpdateAsync(SingleClin.API.Data.Models.Clinic)">
+            <summary>
+            Update an existing clinic
+            </summary>
+            <param name="clinic">Clinic to update</param>
+            <returns>Updated clinic</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.DeleteAsync(System.Guid)">
+            <summary>
+            Delete a clinic (soft delete)
+            </summary>
+            <param name="id">Clinic ID to delete</param>
+            <returns>True if deleted, false if not found</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.NameExistsAsync(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check if clinic name exists (for validation)
+            </summary>
+            <param name="name">Clinic name to check</param>
+            <param name="excludeId">Clinic ID to exclude from check (for updates)</param>
+            <returns>True if name exists, false otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.CnpjExistsAsync(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check if CNPJ exists (for validation)
+            </summary>
+            <param name="cnpj">CNPJ to check</param>
+            <param name="excludeId">Clinic ID to exclude from check (for updates)</param>
+            <returns>True if CNPJ exists, false otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.IClinicRepository.GetCountsByStatusAndTypeAsync">
+            <summary>
+            Get clinics count by status and type
+            </summary>
+            <returns>Dictionary with counts</returns>
+        </member>
         <member name="T:SingleClin.API.Repositories.IPlanRepository">
             <summary>
             Repository contract for Plan entity operations
@@ -3361,6 +3725,11 @@
         <member name="T:SingleClin.API.Services.ClaimsTransformationService">
             <summary>
             Service for transforming and adding claims dynamically during authentication
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.ClinicService">
+            <summary>
+            Service implementation for Clinic business logic
             </summary>
         </member>
         <member name="T:SingleClin.API.Services.EmailTemplateService">
@@ -3485,6 +3854,77 @@
             <param name="firebaseLoginDto">Firebase login data</param>
             <param name="ipAddress">Client IP address</param>
             <returns>Authentication response with tokens</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IClinicService">
+            <summary>
+            Service contract for Clinic business logic
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.GetAllAsync(SingleClin.API.DTOs.Clinic.ClinicFilterDto)">
+            <summary>
+            Get all clinics with pagination and filtering
+            </summary>
+            <param name="filter">Filter criteria</param>
+            <returns>Paginated list of clinics</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.GetByIdAsync(System.Guid)">
+            <summary>
+            Get clinic by ID
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Clinic if found, null otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.GetActiveAsync">
+            <summary>
+            Get all active clinics
+            </summary>
+            <returns>List of active clinics</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.CreateAsync(SingleClin.API.DTOs.Clinic.ClinicRequestDto)">
+            <summary>
+            Create a new clinic
+            </summary>
+            <param name="clinicRequest">Clinic data</param>
+            <returns>Created clinic</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic name or CNPJ already exists</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.UpdateAsync(System.Guid,SingleClin.API.DTOs.Clinic.ClinicRequestDto)">
+            <summary>
+            Update an existing clinic
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="clinicRequest">Updated clinic data</param>
+            <returns>Updated clinic</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic not found or name/CNPJ already exists</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.DeleteAsync(System.Guid)">
+            <summary>
+            Delete a clinic (soft delete)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>True if deleted, false if not found</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.ToggleStatusAsync(System.Guid)">
+            <summary>
+            Toggle clinic active status
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Updated clinic with new status</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic not found</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.GetStatisticsAsync">
+            <summary>
+            Get statistics about clinics
+            </summary>
+            <returns>Dictionary with clinic statistics</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.ValidateAsync(SingleClin.API.DTOs.Clinic.ClinicRequestDto,System.Nullable{System.Guid})">
+            <summary>
+            Validate clinic data
+            </summary>
+            <param name="clinicRequest">Clinic data to validate</param>
+            <param name="excludeId">Clinic ID to exclude from uniqueness checks (for updates)</param>
+            <returns>List of validation errors</returns>
         </member>
         <member name="T:SingleClin.API.Services.IEmailTemplateService">
             <summary>
@@ -4333,6 +4773,18 @@
             <summary>
             Service for managing users
             </summary>
+        </member>
+        <member name="T:SingleClin.API.Validators.ClinicRequestValidator">
+            <summary>
+            Validator for ClinicRequestDto using FluentValidation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Validators.ClinicRequestValidator.BeValidCnpjFormat(System.String)">
+            <summary>
+            Validates Brazilian CNPJ format
+            </summary>
+            <param name="cnpj">CNPJ to validate</param>
+            <returns>True if format is valid, false otherwise</returns>
         </member>
         <member name="T:SingleClin.API.Validators.PlanRequestValidator">
             <summary>

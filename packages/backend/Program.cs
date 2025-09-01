@@ -115,6 +115,10 @@ public class Program
         builder.Services.AddScoped<IPlanRepository, PlanRepository>();
         builder.Services.AddScoped<IPlanService, PlanService>();
 
+        // Add Clinic services
+        builder.Services.AddScoped<IClinicRepository, ClinicRepository>();
+        builder.Services.AddScoped<IClinicService, ClinicService>();
+
         // Add Redis caching
         builder.Services.AddStackExchangeRedisCache(options =>
         {

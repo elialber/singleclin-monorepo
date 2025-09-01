@@ -13,6 +13,7 @@ import { userService, CreateUserDto, UpdateUserDto } from '@/services/user.servi
 import { useNotification } from '@/hooks/useNotification'
 import UserForm from './UserForm'
 import { clinicService } from '@/services/clinic.service'
+import { extractErrorMessage } from '@/utils/errorHandler'
 
 interface UserDialogProps {
   open: boolean
@@ -75,8 +76,9 @@ export default function UserDialog({ open, user, onClose }: UserDialogProps) {
 
       onClose(true)
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Erro ao salvar usuário'
-      showNotification(message, 'error')
+      const errorMessage = extractErrorMessage(error, 'Erro ao salvar usuário')
+      console.log('Error details:', error.response?.data, 'Formatted message:', errorMessage)
+      showNotification(errorMessage, 'error')
     } finally {
       setLoading(false)
     }

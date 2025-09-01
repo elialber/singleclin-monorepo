@@ -460,10 +460,6 @@ export default function Login() {
                     }}
                     {...register('password', {
                       required: 'Senha é obrigatória',
-                      minLength: {
-                        value: 6,
-                        message: 'Senha deve ter no mínimo 6 caracteres',
-                      },
                     })}
                   />
                   
@@ -1000,10 +996,6 @@ export default function Login() {
                   }}
                   {...register('password', {
                     required: 'Senha é obrigatória',
-                    minLength: {
-                      value: 6,
-                      message: 'Senha deve ter no mínimo 6 caracteres',
-                    },
                   })}
                 />
                 

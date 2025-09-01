@@ -1,0 +1,86 @@
+using SingleClin.API.Data.Models.Enums;
+
+namespace SingleClin.API.DTOs.Clinic;
+
+/// <summary>
+/// Data transfer object for clinic response
+/// </summary>
+public class ClinicResponseDto
+{
+    /// <summary>
+    /// Clinic unique identifier
+    /// </summary>
+    public Guid Id { get; set; }
+
+    /// <summary>
+    /// Clinic name
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Type of clinic
+    /// </summary>
+    public ClinicType Type { get; set; }
+
+    /// <summary>
+    /// Clinic address
+    /// </summary>
+    public string Address { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Clinic phone number
+    /// </summary>
+    public string? PhoneNumber { get; set; }
+
+    /// <summary>
+    /// Clinic email
+    /// </summary>
+    public string? Email { get; set; }
+
+    /// <summary>
+    /// Clinic CNPJ (Brazilian company registration)
+    /// </summary>
+    public string? Cnpj { get; set; }
+
+    /// <summary>
+    /// Whether the clinic is active
+    /// </summary>
+    public bool IsActive { get; set; }
+
+    /// <summary>
+    /// Latitude coordinate
+    /// </summary>
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Longitude coordinate
+    /// </summary>
+    public double? Longitude { get; set; }
+
+    /// <summary>
+    /// When the clinic was created
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
+
+    /// <summary>
+    /// When the clinic was last updated
+    /// </summary>
+    public DateTime UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Number of transactions processed by this clinic
+    /// </summary>
+    public int TransactionCount { get; set; }
+
+    /// <summary>
+    /// Type display name for UI
+    /// </summary>
+    public string TypeDisplayName => Type switch
+    {
+        ClinicType.Regular => "Regular",
+        ClinicType.Origin => "Origin",
+        ClinicType.Partner => "Partner", 
+        ClinicType.Administrative => "Administrative",
+        _ => "Unknown"
+    };
+}

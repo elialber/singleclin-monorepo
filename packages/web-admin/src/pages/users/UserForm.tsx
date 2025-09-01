@@ -411,10 +411,18 @@ export default function UserForm({ user, onSubmit, clinics = [] }: UserFormProps
                   control={control}
                   rules={{
                     required: !user ? 'Senha é obrigatória' : false,
-                    minLength: {
-                      value: 6,
-                      message: 'Senha deve ter no mínimo 6 caracteres',
-                    },
+                    validate: (value) => {
+                      if (!value && !user) return 'Senha é obrigatória'
+                      if (!value && user) return true // Skip validation for existing user updates
+                      
+                      if (value.length < 8) return 'Senha deve ter pelo menos 8 caracteres'
+                      if (!/[a-z]/.test(value)) return 'Senha deve conter pelo menos uma letra minúscula'
+                      if (!/[A-Z]/.test(value)) return 'Senha deve conter pelo menos uma letra maiúscula'  
+                      if (!/\d/.test(value)) return 'Senha deve conter pelo menos um número'
+                      if (!/[\W_]/.test(value)) return 'Senha deve conter pelo menos um caractere especial'
+                      
+                      return true
+                    }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -423,7 +431,7 @@ export default function UserForm({ user, onSubmit, clinics = [] }: UserFormProps
                       type={showPassword ? 'text' : 'password'}
                       fullWidth
                       error={!!errors.password}
-                      helperText={errors.password?.message || 'Mínimo 6 caracteres'}
+                      helperText={errors.password?.message || 'Mínimo 8 caracteres com maiúscula, minúscula, número e símbolo. Ex: MinhaSenh@123'}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">

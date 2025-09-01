@@ -1,19 +1,23 @@
 export interface Patient {
   id: string
+  email: string
   firstName: string
   lastName: string
   fullName: string
-  email: string
-  phoneNumber?: string
-  phone?: string // Alias for phoneNumber
-  cpf?: string
-  dateOfBirth?: string
+  role: string
   isActive: boolean
-  hasPlan?: boolean
+  isEmailVerified: boolean
+  phoneNumber?: string
+  clinicId?: string
   createdAt: string
   updatedAt: string
   
-  // Current plan info
+  // Computed/additional fields for patient view
+  cpf?: string
+  dateOfBirth?: string
+  hasPlan?: boolean
+  
+  // Current plan info (from related data)
   currentPlan?: {
     id: string
     name: string
@@ -33,6 +37,20 @@ export interface PatientListResponse {
   total: number
   page: number
   limit: number
+}
+
+export interface CreatePatientRequest {
+  email: string
+  firstName: string
+  lastName: string
+  phoneNumber?: string
+  clinicId?: string
+  password: string
+  isActive?: boolean
+}
+
+export interface UpdatePatientRequest extends Partial<Omit<CreatePatientRequest, 'password'>> {
+  isActive?: boolean
 }
 
 export interface PatientDetails extends Patient {
