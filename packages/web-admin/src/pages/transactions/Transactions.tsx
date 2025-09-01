@@ -33,8 +33,11 @@ import TransactionDashboard from './components/TransactionDashboard'
 import TransactionDetailsModal from './components/TransactionDetailsModal'
 import TransactionCancelModal from './components/TransactionCancelModal'
 import TransactionReportsModal from './components/TransactionReportsModal'
+import TransactionErrorBoundary from '@/components/TransactionErrorBoundary'
+import ErrorAlert from '@/components/ErrorAlert'
+import { handleTransactionError } from '@/utils/transactionErrorHandler'
 
-export default function Transactions() {
+function TransactionsComponent() {
   const { showSuccess, showError } = useNotification()
   const { invalidateAll } = useInvalidateTransactions()
   
@@ -493,12 +496,21 @@ export default function Transactions() {
 
   const renderContent = () => {
     if (error) {
+      const transactionError = handleTransactionError(error, 'Carregamento de transações')
+      
       return (
-        <Paper sx={{ p: 3 }}>
-          <Typography color="error">
-            Erro ao carregar transações: {error.message}
-          </Typography>
-        </Paper>
+        <Box sx={{ mb: 3 }}>
+          <ErrorAlert
+            error={transactionError}
+            onRetry={() => {
+              if (transactionError.isRetryable) {
+                window.location.reload()
+              }
+            }}
+            showDetails={true}
+            showSuggestions={true}
+          />
+        </Box>
       )
     }
 
@@ -675,5 +687,14 @@ export default function Transactions() {
         currentFilters={filters}
       />
     </Container>
+  )
+}
+
+// Export with error boundary
+export default function Transactions() {
+  return (
+    <TransactionErrorBoundary>
+      <TransactionsComponent />
+    </TransactionErrorBoundary>
   )
 }

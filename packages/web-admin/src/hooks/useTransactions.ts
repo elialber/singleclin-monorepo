@@ -7,6 +7,7 @@ import {
   DashboardMetrics 
 } from '@/types/transaction'
 import { useNotification } from '@/hooks/useNotification'
+import { getTransactionErrorMessage } from '@/utils/transactionErrorHandler'
 
 // Query keys following TanStack Query best practices
 export const transactionKeys = {
@@ -111,9 +112,7 @@ export function useUpdateTransaction() {
         return
       }
       
-      const message = error.response?.data?.detail || 
-                     error.response?.data?.message || 
-                     'Erro ao atualizar transação'
+      const message = getTransactionErrorMessage(error, 'Atualização de transação')
       showError(message)
     },
   })
@@ -172,9 +171,7 @@ export function useCancelTransaction() {
         return
       }
       
-      const message = error.response?.data?.detail || 
-                     error.response?.data?.message || 
-                     'Erro ao cancelar transação'
+      const message = getTransactionErrorMessage(error, 'Cancelamento de transação')
       showError(message)
     },
   })
@@ -217,9 +214,7 @@ export function useExportTransactions() {
       showSuccess(`Relatório exportado em ${formatName} com sucesso!`)
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 
-                     error.response?.data?.message || 
-                     'Erro ao exportar transações'
+      const message = getTransactionErrorMessage(error, 'Exportação de transações')
       showError(message)
     },
   })
