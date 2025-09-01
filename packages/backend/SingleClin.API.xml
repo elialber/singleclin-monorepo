@@ -802,11 +802,63 @@
             <param name="pageSize">Page size (default: 20, max: 100)</param>
             <returns>Paginated list of transactions</returns>
         </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.GetTransactions(SingleClin.API.DTOs.Transaction.TransactionFilterDto)">
+            <summary>
+            Get paginated list of all transactions (admin only)
+            </summary>
+            <param name="filter">Filter parameters</param>
+            <returns>Paginated list of transactions</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.GetTransaction(System.Guid)">
+            <summary>
+            Get transaction by ID (admin only)
+            </summary>
+            <param name="id">Transaction ID</param>
+            <returns>Transaction details</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.UpdateTransaction(System.Guid,SingleClin.API.DTOs.Transaction.TransactionUpdateDto)">
+            <summary>
+            Update transaction details (admin only)
+            </summary>
+            <param name="id">Transaction ID</param>
+            <param name="request">Update request</param>
+            <returns>Updated transaction</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.CancelTransaction(System.Guid,SingleClin.API.DTOs.Transaction.TransactionCancelDto)">
+            <summary>
+            Cancel transaction and refund credits (admin only)
+            </summary>
+            <param name="id">Transaction ID</param>
+            <param name="request">Cancellation request</param>
+            <returns>Cancelled transaction</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.GetDashboardMetrics(System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Get dashboard metrics for transactions (admin only)
+            </summary>
+            <param name="startDate">Start date for metrics calculation (optional)</param>
+            <param name="endDate">End date for metrics calculation (optional)</param>
+            <returns>Dashboard metrics</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.ExportTransactions(SingleClin.API.DTOs.Transaction.TransactionFilterDto,System.String)">
+            <summary>
+            Export transactions to various formats (admin only)
+            </summary>
+            <param name="filter">Filter parameters</param>
+            <param name="format">Export format (excel, csv, pdf)</param>
+            <returns>File download</returns>
+        </member>
         <member name="M:SingleClin.API.Controllers.TransactionController.GetAuthenticatedClinicId">
             <summary>
             Get authenticated clinic ID from JWT claims
             </summary>
             <returns>Clinic ID if found, empty GUID otherwise</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.TransactionController.GetAuthenticatedUserId">
+            <summary>
+            Get authenticated user ID from JWT claims
+            </summary>
+            <returns>User ID if found, empty GUID otherwise</returns>
         </member>
         <member name="M:SingleClin.API.Controllers.UserController.GetUsers(SingleClin.API.DTOs.User.UserFilterDto)">
             <summary>
@@ -4193,6 +4245,87 @@
             </summary>
             <returns>Dictionary with status counts</returns>
         </member>
+        <member name="T:SingleClin.API.Repositories.ITransactionRepository">
+            <summary>
+            Interface for transaction data access operations
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.GetTransactionsAsync(SingleClin.API.DTOs.Transaction.TransactionFilterDto)">
+            <summary>
+            Get paginated list of transactions with filtering
+            </summary>
+            <param name="filter">Filter parameters</param>
+            <returns>Paginated transaction list</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.GetTransactionByIdAsync(System.Guid)">
+            <summary>
+            Get transaction by ID with related data
+            </summary>
+            <param name="id">Transaction ID</param>
+            <returns>Transaction with related entities</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.CreateTransactionAsync(SingleClin.API.Data.Models.Transaction)">
+            <summary>
+            Create a new transaction
+            </summary>
+            <param name="transaction">Transaction entity to create</param>
+            <returns>Created transaction</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.UpdateTransactionAsync(SingleClin.API.Data.Models.Transaction)">
+            <summary>
+            Update an existing transaction
+            </summary>
+            <param name="transaction">Transaction entity to update</param>
+            <returns>Updated transaction</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.GetClinicTransactionsAsync(System.Guid,System.Int32,System.Int32)">
+            <summary>
+            Get transactions for a specific clinic
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <param name="page">Page number</param>
+            <param name="pageSize">Page size</param>
+            <returns>Paginated clinic transactions</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.GetPatientTransactionsAsync(System.Guid,System.Int32,System.Int32)">
+            <summary>
+            Get transactions for a specific patient
+            </summary>
+            <param name="patientId">Patient (User) ID</param>
+            <param name="page">Page number</param>
+            <param name="pageSize">Page size</param>
+            <returns>Paginated patient transactions</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.GetDashboardMetricsAsync(System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Get dashboard metrics
+            </summary>
+            <param name="startDate">Start date filter (optional)</param>
+            <param name="endDate">End date filter (optional)</param>
+            <returns>Dashboard metrics</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.GetTransactionsForExportAsync(SingleClin.API.DTOs.Transaction.TransactionFilterDto)">
+            <summary>
+            Get transactions for export
+            </summary>
+            <param name="filter">Filter parameters</param>
+            <returns>All matching transactions for export</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.CanCancelTransactionAsync(System.Guid)">
+            <summary>
+            Check if transaction can be cancelled
+            </summary>
+            <param name="transactionId">Transaction ID</param>
+            <returns>True if can be cancelled</returns>
+        </member>
+        <member name="M:SingleClin.API.Repositories.ITransactionRepository.GetTransactionStatisticsAsync(System.DateTime,System.DateTime)">
+            <summary>
+            Get transaction statistics for a date range
+            </summary>
+            <param name="startDate">Start date</param>
+            <param name="endDate">End date</param>
+            <returns>Statistics object</returns>
+        </member>
         <member name="T:SingleClin.API.Repositories.PlanRepository">
             <summary>
             Repository implementation for Plan entity operations
@@ -4206,6 +4339,11 @@
             <param name="sortBy">Field to sort by</param>
             <param name="sortDirection">Sort direction (asc or desc)</param>
             <returns>Sorted query</returns>
+        </member>
+        <member name="T:SingleClin.API.Repositories.TransactionRepository">
+            <summary>
+            Repository for transaction data access operations
+            </summary>
         </member>
         <member name="T:SingleClin.API.Services.AuthService">
             <summary>
@@ -4894,6 +5032,91 @@
             Report type information
             </summary>
         </member>
+        <member name="T:SingleClin.API.Services.ITransactionService">
+            <summary>
+            Interface for transaction business logic operations
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.GetTransactionsAsync(SingleClin.API.DTOs.Transaction.TransactionFilterDto)">
+            <summary>
+            Get paginated list of transactions with filtering
+            </summary>
+            <param name="filter">Filter parameters</param>
+            <returns>Paginated transaction list</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.GetTransactionByIdAsync(System.Guid)">
+            <summary>
+            Get transaction by ID
+            </summary>
+            <param name="id">Transaction ID</param>
+            <returns>Transaction response DTO</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.UpdateTransactionAsync(System.Guid,SingleClin.API.DTOs.Transaction.TransactionUpdateDto)">
+            <summary>
+            Update transaction details
+            </summary>
+            <param name="id">Transaction ID</param>
+            <param name="updateDto">Update data</param>
+            <returns>Updated transaction</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.CancelTransactionAsync(System.Guid,SingleClin.API.DTOs.Transaction.TransactionCancelDto,System.String)">
+            <summary>
+            Cancel transaction and optionally refund credits
+            </summary>
+            <param name="id">Transaction ID</param>
+            <param name="cancelDto">Cancellation data</param>
+            <param name="cancelledBy">User ID who cancelled</param>
+            <returns>Cancelled transaction</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.GetDashboardMetricsAsync(System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Get dashboard metrics
+            </summary>
+            <param name="startDate">Start date filter (optional)</param>
+            <param name="endDate">End date filter (optional)</param>
+            <returns>Dashboard metrics</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.ExportTransactionsAsync(SingleClin.API.DTOs.Transaction.TransactionFilterDto,System.String)">
+            <summary>
+            Export transactions to various formats
+            </summary>
+            <param name="filter">Filter parameters</param>
+            <param name="format">Export format (excel, csv, pdf)</param>
+            <returns>File bytes, filename and content type</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.GetClinicTransactionsAsync(System.Guid,System.Int32,System.Int32)">
+            <summary>
+            Get transactions for a specific clinic
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <param name="page">Page number</param>
+            <param name="pageSize">Page size</param>
+            <returns>Paginated clinic transactions</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.GetPatientTransactionsAsync(System.Guid,System.Int32,System.Int32)">
+            <summary>
+            Get transactions for a specific patient
+            </summary>
+            <param name="patientId">Patient (User) ID</param>
+            <param name="page">Page number</param>
+            <param name="pageSize">Page size</param>
+            <returns>Paginated patient transactions</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.CanCancelTransactionAsync(System.Guid)">
+            <summary>
+            Validate if transaction can be cancelled
+            </summary>
+            <param name="id">Transaction ID</param>
+            <returns>True if can be cancelled</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.GetTransactionStatisticsAsync(System.DateTime,System.DateTime)">
+            <summary>
+            Get transaction statistics for a date range
+            </summary>
+            <param name="startDate">Start date</param>
+            <param name="endDate">End date</param>
+            <returns>Statistics object</returns>
+        </member>
         <member name="T:SingleClin.API.Services.IUserService">
             <summary>
             Interface for user management service
@@ -5259,6 +5482,11 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>Notification response</returns>
         </member>
+        <member name="T:SingleClin.API.Services.TransactionService">
+            <summary>
+            Service for transaction business logic operations
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.UserService">
             <summary>
             Service for managing users
@@ -5294,6 +5522,41 @@
             </summary>
             <param name="value">Nullable decimal value to validate</param>
             <returns>True if valid, false otherwise</returns>
+        </member>
+        <member name="T:SingleClin.API.Validators.TransactionCancelValidator">
+            <summary>
+            Validator for TransactionCancelDto using FluentValidation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Validators.TransactionCancelValidator.BeValidCancellationReason(System.String)">
+            <summary>
+            Validates that cancellation reason is meaningful
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Validators.TransactionFilterValidator">
+            <summary>
+            Validator for TransactionFilterDto using FluentValidation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Validators.TransactionFilterValidator.BeValidSortField(System.String)">
+            <summary>
+            Validates if the sort field is allowed
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Validators.TransactionFilterValidator.BeValidSortOrder(System.String)">
+            <summary>
+            Validates if the sort order is valid
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Validators.TransactionUpdateValidator">
+            <summary>
+            Validator for TransactionUpdateDto using FluentValidation
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Validators.TransactionUpdateValidator.BeValidDecimalPrecision(System.Nullable{System.Decimal})">
+            <summary>
+            Validates that decimal has maximum 2 decimal places
+            </summary>
         </member>
     </members>
 </doc>

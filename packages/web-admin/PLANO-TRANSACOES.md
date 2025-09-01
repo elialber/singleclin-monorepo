@@ -24,15 +24,25 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 - `GET /api/transactions/export` - Exportação em Excel/CSV/PDF
 **Observação:** Mantidos endpoints existentes para QR Code validation das clínicas
 
-### ⏳ 3. Implementar TransactionService e Repository no backend
-**Status:** 🔄 **PENDENTE**  
+### ✅ 3. Implementar TransactionService e Repository no backend
+**Status:** ✅ **CONCLUÍDO**  
 **Descrição:** Camada de business logic e acesso a dados  
-**Funcionalidades:**
-- CRUD completo com validações de negócio
-- Filtros avançados (data, status, clínica, paciente)
-- Cálculos de métricas e estatísticas
-- Validação de créditos disponíveis
-- Atualização automática de UserPlan
+**Resultado:** Implementados TransactionRepository e TransactionService completos:
+**Repository (ITransactionRepository + TransactionRepository):**
+- CRUD completo com Entity Framework Core
+- Filtros avançados (10+ campos de filtro)
+- Queries otimizadas com Include para relacionamentos
+- Paginação e ordenação por qualquer campo
+- Métricas e estatísticas calculadas
+- Suporte a exportação de dados
+
+**Service (ITransactionService + TransactionService):**
+- Lógica de negócio para todas as operações
+- Validações completas de dados e regras de negócio
+- Cancelamento com refund de créditos
+- Integração com ExportService para Excel/CSV/PDF
+- Logging estruturado e tratamento de erros
+- Mapeamento entre entities e DTOs
 
 ### ✅ 4. Criar DTOs para requests e responses de transações
 **Status:** ✅ **CONCLUÍDO**  
@@ -45,14 +55,28 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 - `TransactionCancelDto` - Cancelamento com motivo e refund
 - `DashboardMetricsDto` - Métricas completas com trends e distribuição
 
-### ⏳ 5. Implementar validações FluentValidation para transações
-**Status:** 🔄 **PENDENTE**  
-**Descrição:** Validações robustas de dados  
-**Validações:**
-- Créditos suficientes no UserPlan
-- Datas válidas e consistentes
-- Clínica e paciente existentes
-- Valores monetários válidos
+### ✅ 5. Implementar validações FluentValidation para transações
+**Status:** ✅ **CONCLUÍDO**  
+**Descrição:** Validações robustas de dados com FluentValidation  
+**Resultado:** Criados 3 validadores completos:
+**TransactionFilterValidator:**
+- Validação de filtros de busca (search, datas, valores, créditos)
+- Validação de paginação (page, limit max 100)
+- Validação de ordenação (campos válidos, direção)
+- Validação de ranges de datas e valores
+- Warnings para ranges muito grandes (>365 dias)
+
+**TransactionUpdateValidator:**
+- Validação de campos editáveis
+- Validação de precision decimal (2 casas)
+- Validação de tamanhos máximos de strings
+- Regra de pelo menos um campo obrigatório
+
+**TransactionCancelValidator:**
+- Motivo de cancelamento obrigatório (3-500 chars)
+- Validação de caracteres permitidos
+- Rejeição de motivos genéricos/muito simples
+- Warning para não refund de créditos
 
 ### ⏳ 6. Configurar injeção de dependência para transações
 **Status:** 🔄 **PENDENTE**  
@@ -329,15 +353,15 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 
 ## 📊 **Resumo de Progresso**
 
-- **✅ Concluídas:** 3/33 (9.1%)
+- **✅ Concluídas:** 5/33 (15.2%)
 - **🔄 Em andamento:** 0/33 (0.0%)
-- **⏳ Pendentes:** 30/33 (90.9%)
+- **⏳ Pendentes:** 28/33 (84.8%)
 
 ---
 
 ## 🚀 **Próximos Passos**
 
-1. **Próxima tarefa:** Implementar TransactionService e Repository (Tarefa 3)
+1. **Próxima tarefa:** Configurar injeção de dependência (Tarefa 6)
 2. **Seguir ordem sequencial** das fases para manter dependências
 3. **Atualizar este documento** após cada tarefa concluída
 4. **Testar incrementalmente** após cada fase
