@@ -366,7 +366,7 @@ export default function PatientDetails() {
                 <Grid item xs={12} md={6} lg={4} key={userPlan.id}>
                   <Card sx={{ height: '100%' }}>
                     <CardContent>
-                      <Box display="flex" justifyContent="between" alignItems="start" mb={2}>
+                      <Box display="flex" justifyContent="space-between" alignItems="start" mb={2}>
                         <Typography variant="h6" fontWeight={600}>
                           {userPlan.plan.name}
                         </Typography>
@@ -376,6 +376,7 @@ export default function PatientDetails() {
                           size="small"
                           color="success"
                           variant="filled"
+                          sx={{ ml: 'auto' }}
                         />
                       </Box>
 
@@ -387,9 +388,9 @@ export default function PatientDetails() {
                       <Box mb={2}>
                         <Box display="flex" justifyContent="between" alignItems="center" mb={1}>
                           <Typography variant="body2" fontWeight={500}>
-                            Créditos utilizados
+                            Créditos utilizados:
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
                             {userPlan.creditsUsed} / {userPlan.credits}
                           </Typography>
                         </Box>
@@ -405,7 +406,7 @@ export default function PatientDetails() {
                           <Typography variant="body2" color="text.secondary">
                             Créditos restantes:
                           </Typography>
-                          <Typography variant="body2" fontWeight={600} color="primary">
+                          <Typography variant="body2" fontWeight={600} color="primary" sx={{ ml: 1 }}>
                             {userPlan.creditsRemaining}
                           </Typography>
                         </Box>
@@ -414,7 +415,7 @@ export default function PatientDetails() {
                           <Typography variant="body2" color="text.secondary">
                             Valor pago:
                           </Typography>
-                          <Typography variant="body2" fontWeight={600}>
+                          <Typography variant="body2" fontWeight={600} sx={{ ml: 1 }}>
                             {formatCurrency(userPlan.amountPaid)}
                           </Typography>
                         </Box>
@@ -423,7 +424,7 @@ export default function PatientDetails() {
                           <Typography variant="body2" color="text.secondary">
                             Expira em:
                           </Typography>
-                          <Typography variant="body2" fontWeight={600}>
+                          <Typography variant="body2" fontWeight={600} sx={{ ml: 1 }}>
                             {formatDate(userPlan.expirationDate)}
                           </Typography>
                         </Box>
@@ -433,7 +434,7 @@ export default function PatientDetails() {
                             <Typography variant="body2" color="text.secondary">
                               Pagamento:
                             </Typography>
-                            <Typography variant="body2">
+                            <Typography variant="body2" sx={{ ml: 1 }}>
                               {userPlan.paymentMethod}
                             </Typography>
                           </Box>
