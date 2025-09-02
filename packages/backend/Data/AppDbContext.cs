@@ -16,14 +16,9 @@ public class AppDbContext : DbContext
     }
 
     /// <summary>
-    /// Users in the system
+    /// Users in the system (separate from ApplicationUser Identity)
     /// </summary>
     public DbSet<User> Users => Set<User>();
-    
-    /// <summary>
-    /// Clinics registered in the system
-    /// </summary>
-    public DbSet<Clinic> Clinics => Set<Clinic>();
     
     /// <summary>
     /// Available plans for purchase
@@ -75,8 +70,9 @@ public class AppDbContext : DbContext
             }
         }
 
-        // Apply configurations from separate files
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        // Apply specific configurations only for AppDbContext entities
+        // NOTE: We explicitly avoid ApplicationUser configurations to prevent conflicts
+        // with ApplicationDbContext which handles Identity entities
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

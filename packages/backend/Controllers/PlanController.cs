@@ -13,7 +13,7 @@ namespace SingleClin.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Policy = "RequireAdminRole")]
+[Authorize(Policy = "RequireAdministratorRole")]
 [SwaggerTag("Plan management endpoints for administrators")]
 public class PlanController : ControllerBase
 {

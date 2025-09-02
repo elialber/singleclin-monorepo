@@ -80,24 +80,9 @@ public class DatabaseSeeder
     
     private async Task SeedClinicsAsync()
     {
-        if (await _context.Clinics.AnyAsync())
-            return;
-            
-        var adminClinic = new Clinic
-        {
-            Id = Guid.NewGuid(),
-            Name = "SingleClin Administrativo",
-            Type = ClinicType.Administrative,
-            Address = "Rua Virtual, 123 - Centro, São Paulo - SP",
-            PhoneNumber = "(11) 9999-9999",
-            Email = "admin@singleclin.com.br",
-            Cnpj = "00.000.000/0001-00",
-            IsActive = true,
-            Latitude = -23.550520,
-            Longitude = -46.633308
-        };
-        
-        await _context.Clinics.AddAsync(adminClinic);
+        // Clinics are now managed by ApplicationDbContext, not AppDbContext
+        // This seeding is handled in the ApplicationDbContext setup
+        await Task.CompletedTask;
     }
     
     private async Task SeedUsersAsync()

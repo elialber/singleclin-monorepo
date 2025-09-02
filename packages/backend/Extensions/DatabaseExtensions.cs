@@ -45,14 +45,22 @@ public static class DatabaseExtensions
             await RoleSeeder.SeedDefaultAdminAsync(scope.ServiceProvider);
             logger.LogInformation("Roles and admin seeding completed");
             
-            // Seed legacy data if exists
-            logger.LogInformation("Seeding legacy database...");
-            var legacyContext = scope.ServiceProvider.GetService<AppDbContext>();
-            if (legacyContext != null)
+            // Create missing AppDbContext tables to resolve schema conflicts
+            logger.LogInformation("Creating missing AppDbContext tables...");
+            try
             {
-                var seeder = new DatabaseSeeder(legacyContext);
-                await seeder.SeedAsync();
+                var appContext = scope.ServiceProvider.GetService<AppDbContext>();
+                if (appContext != null)
+                {
+                    await EnsureTablesExist.CreateMissingTablesAsync(appContext);
+                    logger.LogInformation("AppDbContext tables created successfully");
+                }
             }
+            catch (Exception tableEx)
+            {
+                logger.LogWarning(tableEx, "Could not create AppDbContext tables - will use mock data");
+            }
+            
             logger.LogInformation("Database seeding completed");
         }
         catch (Exception ex)

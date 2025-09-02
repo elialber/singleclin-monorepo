@@ -8,9 +8,19 @@ namespace SingleClin.API.Data.Models;
 public class User : BaseEntity
 {
     /// <summary>
+    /// Reference to ApplicationUser ID from Identity system
+    /// </summary>
+    public Guid ApplicationUserId { get; set; }
+    
+    /// <summary>
     /// User's email address (unique)
     /// </summary>
     public string Email { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// User's full name
+    /// </summary>
+    public string FullName { get; set; } = string.Empty;
     
     /// <summary>
     /// User's role in the system

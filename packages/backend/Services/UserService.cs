@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data;
 using SingleClin.API.Data.Models;
 using SingleClin.API.DTOs.Common;
+using SingleClin.API.DTOs.Plan;
 using SingleClin.API.DTOs.User;
 using System.Linq.Expressions;
 
@@ -15,17 +16,20 @@ public class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ApplicationDbContext _context;
+    private readonly AppDbContext _appDbContext;
     private readonly ILogger<UserService> _logger;
     private readonly IEmailTemplateService _emailService;
 
     public UserService(
         UserManager<ApplicationUser> userManager,
         ApplicationDbContext context,
+        AppDbContext appDbContext,
         ILogger<UserService> logger,
         IEmailTemplateService emailService)
     {
         _userManager = userManager;
         _context = context;
+        _appDbContext = appDbContext;
         _logger = logger;
         _emailService = emailService;
     }
@@ -118,7 +122,53 @@ public class UserService : IUserService
             .Include(u => u.Clinic)
             .FirstOrDefaultAsync(u => u.Id == id);
 
-        return user != null ? MapToDto(user) : null;
+        if (user == null)
+        {
+            return null;
+        }
+
+        // Ensure user also exists in AppDbContext (users table)
+        var appUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == id);
+        if (appUser == null)
+        {
+            _logger.LogInformation("Creating User in AppDbContext for ApplicationUser {UserId}", id);
+            
+            appUser = new User
+            {
+                Id = Guid.NewGuid(),
+                ApplicationUserId = id,
+                Email = user.Email!,
+                FullName = user.FullName,
+                FirstName = ExtractFirstName(user.FullName),
+                LastName = ExtractLastName(user.FullName),
+                Role = (Data.Models.Enums.UserRole)(int)user.Role,
+                IsActive = user.IsActive,
+                PhoneNumber = user.PhoneNumber,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            
+            _appDbContext.Users.Add(appUser);
+            await _appDbContext.SaveChangesAsync();
+            
+            _logger.LogInformation("User created in AppDbContext with ID {AppUserId}", appUser.Id);
+        }
+
+        return MapToDto(user);
+    }
+
+    private string? ExtractFirstName(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return null;
+        var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length > 0 ? parts[0] : null;
+    }
+
+    private string? ExtractLastName(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return null;
+        var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length > 1 ? string.Join(" ", parts.Skip(1)) : null;
     }
 
     public async Task<(bool Success, UserResponseDto? User, IEnumerable<string> Errors)> CreateUserAsync(CreateUserDto dto)
@@ -317,5 +367,318 @@ public class UserService : IUserService
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt ?? user.CreatedAt
         };
+    }
+
+    public async Task<(bool Success, UserPlanResponseDto? UserPlan, IEnumerable<string> Errors)> PurchasePlanAsync(Guid userId, PurchasePlanDto purchaseDto)
+    {
+        try
+        {
+            // Check if user exists in ApplicationUser context
+            var applicationUser = await _userManager.FindByIdAsync(userId.ToString());
+            if (applicationUser == null)
+            {
+                return (false, null, new[] { "User not found" });
+            }
+
+            // Check if plan exists
+            var plan = await _appDbContext.Plans.FindAsync(purchaseDto.PlanId);
+            if (plan == null)
+            {
+                return (false, null, new[] { "Plan not found" });
+            }
+
+            if (!plan.IsActive)
+            {
+                return (false, null, new[] { "Plan is not active" });
+            }
+
+            // Find or create corresponding User in AppDbContext
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+            if (user == null)
+            {
+                _logger.LogInformation("Creating new User in AppDbContext for ApplicationUser {UserId}", userId);
+                
+                user = new User
+                {
+                    Id = Guid.NewGuid(), // Explicitly set ID
+                    ApplicationUserId = userId,
+                    Email = applicationUser.Email!,
+                    FullName = applicationUser.FullName,
+                    Role = (Data.Models.Enums.UserRole)(int)applicationUser.Role,
+                    IsActive = applicationUser.IsActive,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                
+                _appDbContext.Users.Add(user);
+                await _appDbContext.SaveChangesAsync();
+                
+                _logger.LogInformation("User created in AppDbContext with ID {UserId}", user.Id);
+            }
+            else
+            {
+                _logger.LogInformation("Found existing User in AppDbContext with ID {UserId} for ApplicationUser {ApplicationUserId}", user.Id, userId);
+            }
+
+            // Create UserPlan
+            _logger.LogInformation("Creating UserPlan for User {UserId} and Plan {PlanId}", user.Id, plan.Id);
+            
+            var userPlan = new UserPlan
+            {
+                Id = Guid.NewGuid(), // Explicitly set ID
+                UserId = user.Id,
+                PlanId = plan.Id,
+                Credits = plan.Credits,
+                CreditsRemaining = plan.Credits,
+                AmountPaid = plan.Price,
+                ExpirationDate = DateTime.UtcNow.AddDays(plan.ValidityDays),
+                IsActive = true,
+                PaymentMethod = purchaseDto.PaymentMethod,
+                PaymentTransactionId = purchaseDto.PaymentTransactionId,
+                Notes = purchaseDto.Notes,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _appDbContext.UserPlans.Add(userPlan);
+            
+            try
+            {
+                await _appDbContext.SaveChangesAsync();
+                _logger.LogInformation("UserPlan created successfully with ID {UserPlanId}", userPlan.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to create UserPlan for User {UserId} and Plan {PlanId}", user.Id, plan.Id);
+                throw;
+            }
+
+            // Load the plan for response
+            await _appDbContext.Entry(userPlan)
+                .Reference(up => up.Plan)
+                .LoadAsync();
+
+            var response = new UserPlanResponseDto
+            {
+                Id = userPlan.Id,
+                UserId = userId,
+                PlanId = userPlan.PlanId,
+                Plan = new PlanResponseDto
+                {
+                    Id = plan.Id,
+                    Name = plan.Name,
+                    Description = plan.Description,
+                    Credits = plan.Credits,
+                    Price = plan.Price,
+                    OriginalPrice = plan.OriginalPrice,
+                    ValidityDays = plan.ValidityDays,
+                    IsActive = plan.IsActive,
+                    DisplayOrder = plan.DisplayOrder,
+                    IsFeatured = plan.IsFeatured,
+                    CreatedAt = plan.CreatedAt,
+                    UpdatedAt = plan.UpdatedAt
+                },
+                Credits = userPlan.Credits,
+                CreditsRemaining = userPlan.CreditsRemaining,
+                AmountPaid = userPlan.AmountPaid,
+                ExpirationDate = userPlan.ExpirationDate,
+                IsActive = userPlan.IsActive,
+                PaymentMethod = userPlan.PaymentMethod,
+                PaymentTransactionId = userPlan.PaymentTransactionId,
+                Notes = userPlan.Notes,
+                CreatedAt = userPlan.CreatedAt,
+                UpdatedAt = userPlan.UpdatedAt
+            };
+
+            _logger.LogInformation("User {UserId} successfully purchased plan {PlanId}", userId, purchaseDto.PlanId);
+
+            return (true, response, Array.Empty<string>());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error purchasing plan {PlanId} for user {UserId}", purchaseDto.PlanId, userId);
+            return (false, null, new[] { "An error occurred while purchasing the plan" });
+        }
+    }
+
+    public async Task<IEnumerable<UserPlanResponseDto>> GetUserPlansAsync(Guid userId)
+    {
+        try
+        {
+            // Find user in AppDbContext
+            var user = await _appDbContext.Users
+                .FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+
+            if (user == null)
+            {
+                return Array.Empty<UserPlanResponseDto>();
+            }
+
+            var userPlans = await _appDbContext.UserPlans
+                .Where(up => up.UserId == user.Id && up.IsActive)
+                .Include(up => up.Plan)
+                .OrderBy(up => up.ExpirationDate)
+                .ToListAsync();
+
+            return userPlans.Select(up => new UserPlanResponseDto
+            {
+                Id = up.Id,
+                UserId = userId,
+                PlanId = up.PlanId,
+                Plan = new PlanResponseDto
+                {
+                    Id = up.Plan.Id,
+                    Name = up.Plan.Name,
+                    Description = up.Plan.Description,
+                    Credits = up.Plan.Credits,
+                    Price = up.Plan.Price,
+                    OriginalPrice = up.Plan.OriginalPrice,
+                    ValidityDays = up.Plan.ValidityDays,
+                    IsActive = up.Plan.IsActive,
+                    DisplayOrder = up.Plan.DisplayOrder,
+                    IsFeatured = up.Plan.IsFeatured,
+                    CreatedAt = up.Plan.CreatedAt,
+                    UpdatedAt = up.Plan.UpdatedAt
+                },
+                Credits = up.Credits,
+                CreditsRemaining = up.CreditsRemaining,
+                AmountPaid = up.AmountPaid,
+                ExpirationDate = up.ExpirationDate,
+                IsActive = up.IsActive,
+                PaymentMethod = up.PaymentMethod,
+                PaymentTransactionId = up.PaymentTransactionId,
+                Notes = up.Notes,
+                CreatedAt = up.CreatedAt,
+                UpdatedAt = up.UpdatedAt
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting plans for user {UserId}", userId);
+            return Array.Empty<UserPlanResponseDto>();
+        }
+    }
+
+    public async Task<UserPlanResponseDto?> GetUserPlanAsync(Guid userId, Guid userPlanId)
+    {
+        try
+        {
+            // Find user in AppDbContext
+            var user = await _appDbContext.Users
+                .FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var userPlan = await _appDbContext.UserPlans
+                .Where(up => up.Id == userPlanId && up.UserId == user.Id && up.IsActive)
+                .Include(up => up.Plan)
+                .FirstOrDefaultAsync();
+
+            if (userPlan == null)
+            {
+                return null;
+            }
+
+            return new UserPlanResponseDto
+            {
+                Id = userPlan.Id,
+                UserId = userId,
+                PlanId = userPlan.PlanId,
+                Plan = new PlanResponseDto
+                {
+                    Id = userPlan.Plan.Id,
+                    Name = userPlan.Plan.Name,
+                    Description = userPlan.Plan.Description,
+                    Credits = userPlan.Plan.Credits,
+                    Price = userPlan.Plan.Price,
+                    OriginalPrice = userPlan.Plan.OriginalPrice,
+                    ValidityDays = userPlan.Plan.ValidityDays,
+                    IsActive = userPlan.Plan.IsActive,
+                    DisplayOrder = userPlan.Plan.DisplayOrder,
+                    IsFeatured = userPlan.Plan.IsFeatured,
+                    CreatedAt = userPlan.Plan.CreatedAt,
+                    UpdatedAt = userPlan.Plan.UpdatedAt
+                },
+                Credits = userPlan.Credits,
+                CreditsRemaining = userPlan.CreditsRemaining,
+                AmountPaid = userPlan.AmountPaid,
+                ExpirationDate = userPlan.ExpirationDate,
+                IsActive = userPlan.IsActive,
+                PaymentMethod = userPlan.PaymentMethod,
+                PaymentTransactionId = userPlan.PaymentTransactionId,
+                Notes = userPlan.Notes,
+                CreatedAt = userPlan.CreatedAt,
+                UpdatedAt = userPlan.UpdatedAt
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting user plan {UserPlanId} for user {UserId}", userPlanId, userId);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Cancel/Remove a user's plan
+    /// </summary>
+    public async Task<(bool Success, IEnumerable<string> Errors)> CancelUserPlanAsync(Guid userId, Guid userPlanId, string? reason = null)
+    {
+        try
+        {
+            _logger.LogInformation("Attempting to cancel user plan {UserPlanId} for user {UserId}", userPlanId, userId);
+
+            // Find the user plan
+            var userPlan = await _appDbContext.UserPlans
+                .Include(up => up.Plan)
+                .FirstOrDefaultAsync(up => up.Id == userPlanId && up.UserId == userId);
+
+            if (userPlan == null)
+            {
+                // Try to find by UserPlan ID alone (in case userId is ApplicationUser ID)
+                var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+                if (user != null)
+                {
+                    userPlan = await _appDbContext.UserPlans
+                        .Include(up => up.Plan)
+                        .FirstOrDefaultAsync(up => up.Id == userPlanId && up.UserId == user.Id);
+                }
+
+                if (userPlan == null)
+                {
+                    return (false, new[] { "User plan not found" });
+                }
+            }
+
+            // Check if plan is already inactive
+            if (!userPlan.IsActive)
+            {
+                return (false, new[] { "User plan is already cancelled" });
+            }
+
+            // Deactivate the plan instead of deleting it (for audit purposes)
+            userPlan.IsActive = false;
+            userPlan.UpdatedAt = DateTime.UtcNow;
+            
+            // Add cancellation reason if provided
+            if (!string.IsNullOrWhiteSpace(reason))
+            {
+                userPlan.Notes = string.IsNullOrWhiteSpace(userPlan.Notes) 
+                    ? $"Cancelled: {reason}" 
+                    : $"{userPlan.Notes}\nCancelled: {reason}";
+            }
+
+            await _appDbContext.SaveChangesAsync();
+            
+            _logger.LogInformation("User plan {UserPlanId} cancelled successfully", userPlanId);
+            return (true, Array.Empty<string>());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling user plan {UserPlanId} for user {UserId}", userPlanId, userId);
+            return (false, new[] { "An error occurred while cancelling the user plan" });
+        }
     }
 }

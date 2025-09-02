@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SingleClin.API.DTOs;
 using SingleClin.API.DTOs.Common;
+using SingleClin.API.DTOs.Plan;
 using SingleClin.API.DTOs.User;
 using SingleClin.API.Services;
 
@@ -308,4 +309,175 @@ public class UserController : BaseController
             return StatusCode(500, new { message = "An error occurred while updating user status" });
         }
     }
+
+    /// <summary>
+    /// Purchase a plan for a user
+    /// </summary>
+    [HttpPost("{id}/purchase-plan")]
+    [Authorize(Roles = "Administrator,Patient")]
+    public async Task<ActionResult<ResponseWrapper<UserPlanResponseDto>>> PurchasePlan(
+        Guid id,
+        [FromBody] PurchasePlanDto purchaseDto)
+    {
+        try
+        {
+            var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
+            var isAdmin = User.IsInRole("Administrator");
+            
+            // Users can only purchase plans for themselves, admins can purchase for anyone
+            if (!isAdmin && currentUserId != id)
+            {
+                return Forbid();
+            }
+
+            var result = await _userService.PurchasePlanAsync(id, purchaseDto);
+            
+            if (!result.Success)
+            {
+                return BadRequest(new ResponseWrapper<UserPlanResponseDto>
+                {
+                    Success = false,
+                    Message = "Failed to purchase plan",
+                    Errors = result.Errors.ToList()
+                });
+            }
+
+            return Ok(new ResponseWrapper<UserPlanResponseDto>
+            {
+                Data = result.UserPlan,
+                Success = true,
+                Message = "Plan purchased successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error purchasing plan for user {UserId}", id);
+            return StatusCode(500, new { message = "An error occurred while purchasing the plan" });
+        }
+    }
+
+    /// <summary>
+    /// Get user's active plans
+    /// </summary>
+    [HttpGet("{id}/plans")]
+    [Authorize(Roles = "Administrator,Patient")]
+    public async Task<ActionResult<ResponseWrapper<IEnumerable<UserPlanResponseDto>>>> GetUserPlans(Guid id)
+    {
+        try
+        {
+            var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
+            var isAdmin = User.IsInRole("Administrator");
+            
+            // Users can only view their own plans, admins can view anyone's
+            if (!isAdmin && currentUserId != id)
+            {
+                return Forbid();
+            }
+
+            var userPlans = await _userService.GetUserPlansAsync(id);
+            
+            return Ok(new ResponseWrapper<IEnumerable<UserPlanResponseDto>>
+            {
+                Data = userPlans,
+                Success = true,
+                Message = $"Found {userPlans.Count()} active plans"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting plans for user {UserId}", id);
+            return StatusCode(500, new { message = "An error occurred while retrieving user plans" });
+        }
+    }
+
+    /// <summary>
+    /// Get specific user plan by ID
+    /// </summary>
+    [HttpGet("{id}/plans/{planId}")]
+    [Authorize(Roles = "Administrator,Patient")]
+    public async Task<ActionResult<ResponseWrapper<UserPlanResponseDto>>> GetUserPlan(Guid id, Guid planId)
+    {
+        try
+        {
+            var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
+            var isAdmin = User.IsInRole("Administrator");
+            
+            // Users can only view their own plans, admins can view anyone's
+            if (!isAdmin && currentUserId != id)
+            {
+                return Forbid();
+            }
+
+            var userPlan = await _userService.GetUserPlanAsync(id, planId);
+            
+            if (userPlan == null)
+            {
+                return NotFound(new ResponseWrapper<UserPlanResponseDto>
+                {
+                    Success = false,
+                    Message = "User plan not found"
+                });
+            }
+
+            return Ok(new ResponseWrapper<UserPlanResponseDto>
+            {
+                Data = userPlan,
+                Success = true
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting plan {PlanId} for user {UserId}", planId, id);
+            return StatusCode(500, new { message = "An error occurred while retrieving the user plan" });
+        }
+    }
+
+    /// <summary>
+    /// Cancel/Remove a user's plan
+    /// </summary>
+    [HttpDelete("{id}/plans/{userPlanId}")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<ActionResult<ResponseWrapper<object>>> CancelUserPlan(Guid id, Guid userPlanId, [FromBody] CancelPlanRequest? request = null)
+    {
+        try
+        {
+            var result = await _userService.CancelUserPlanAsync(id, userPlanId, request?.Reason);
+            
+            if (!result.Success)
+            {
+                if (result.Errors.Any(e => e.Contains("not found")))
+                {
+                    return NotFound(new { message = "User plan not found" });
+                }
+                
+                return BadRequest(new 
+                { 
+                    message = "Failed to cancel user plan", 
+                    errors = result.Errors 
+                });
+            }
+
+            return Ok(new ResponseWrapper<object>
+            {
+                Success = true,
+                Message = "User plan cancelled successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling plan {UserPlanId} for user {UserId}", userPlanId, id);
+            return StatusCode(500, new { message = "An error occurred while cancelling the user plan" });
+        }
+    }
+}
+
+/// <summary>
+/// Request model for cancelling a user plan
+/// </summary>
+public class CancelPlanRequest
+{
+    /// <summary>
+    /// Reason for cancelling the plan
+    /// </summary>
+    public string? Reason { get; set; }
 }

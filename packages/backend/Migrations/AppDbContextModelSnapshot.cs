@@ -31,13 +31,11 @@ namespace SingleClin.API.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("address");
 
                     b.Property<string>("Cnpj")
-                        .HasMaxLength(18)
-                        .HasColumnType("character varying(18)")
+                        .HasColumnType("text")
                         .HasColumnName("cnpj");
 
                     b.Property<DateTime>("CreatedAt")
@@ -45,8 +43,7 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("email");
 
                     b.Property<bool>("IsActive")
@@ -54,24 +51,20 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<double?>("Latitude")
-                        .HasPrecision(10, 8)
                         .HasColumnType("double precision")
                         .HasColumnName("latitude");
 
                     b.Property<double?>("Longitude")
-                        .HasPrecision(11, 8)
                         .HasColumnType("double precision")
                         .HasColumnName("longitude");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("name");
 
                     b.Property<string>("PhoneNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasColumnType("text")
                         .HasColumnName("phone_number");
 
                     b.Property<int>("Type")
@@ -83,18 +76,9 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
-                        .HasName("pk_clinics");
+                        .HasName("pk_clinic");
 
-                    b.HasIndex("Cnpj")
-                        .IsUnique()
-                        .HasFilter("cnpj IS NOT NULL");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("Latitude", "Longitude")
-                        .HasFilter("latitude IS NOT NULL AND longitude IS NOT NULL");
-
-                    b.ToTable("clinics");
+                    b.ToTable("clinic");
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.Plan", b =>
@@ -113,42 +97,32 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("credits");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasColumnType("text")
                         .HasColumnName("description");
 
                     b.Property<int>("DisplayOrder")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(0)
                         .HasColumnName("display_order");
 
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(true)
                         .HasColumnName("is_active");
 
                     b.Property<bool>("IsFeatured")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
                         .HasColumnName("is_featured");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("name");
 
                     b.Property<decimal?>("OriginalPrice")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
+                        .HasColumnType("numeric")
                         .HasColumnName("original_price");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
+                        .HasColumnType("numeric")
                         .HasColumnName("price");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -156,19 +130,11 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("updated_at");
 
                     b.Property<int>("ValidityDays")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(365)
                         .HasColumnName("validity_days");
 
                     b.HasKey("Id")
                         .HasName("pk_plans");
-
-                    b.HasIndex("DisplayOrder");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("IsFeatured");
 
                     b.ToTable("plans");
                 });
@@ -180,13 +146,16 @@ namespace SingleClin.API.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric")
+                        .HasColumnName("amount");
+
                     b.Property<DateTime?>("CancellationDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cancellation_date");
 
                     b.Property<string>("CancellationReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("cancellation_reason");
 
                     b.Property<Guid>("ClinicId")
@@ -195,8 +164,7 @@ namespace SingleClin.API.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("text")
                         .HasColumnName("code");
 
                     b.Property<DateTime>("CreatedAt")
@@ -208,30 +176,36 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("credits_used");
 
                     b.Property<string>("IpAddress")
-                        .HasMaxLength(45)
-                        .HasColumnType("character varying(45)")
+                        .HasColumnType("text")
                         .HasColumnName("ip_address");
 
                     b.Property<double?>("Latitude")
-                        .HasPrecision(10, 8)
                         .HasColumnType("double precision")
                         .HasColumnName("latitude");
 
                     b.Property<double?>("Longitude")
-                        .HasPrecision(11, 8)
                         .HasColumnType("double precision")
                         .HasColumnName("longitude");
 
+                    b.Property<string>("QRNonce")
+                        .HasColumnType("text")
+                        .HasColumnName("qrnonce");
+
+                    b.Property<string>("QRToken")
+                        .HasColumnType("text")
+                        .HasColumnName("qrtoken");
+
                     b.Property<string>("ServiceDescription")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("service_description");
 
+                    b.Property<string>("ServiceType")
+                        .HasColumnType("text")
+                        .HasColumnName("service_type");
+
                     b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(0)
                         .HasColumnName("status");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -239,8 +213,7 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("updated_at");
 
                     b.Property<string>("UserAgent")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("user_agent");
 
                     b.Property<Guid>("UserPlanId")
@@ -248,8 +221,7 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("user_plan_id");
 
                     b.Property<string>("ValidatedBy")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("validated_by");
 
                     b.Property<DateTime?>("ValidationDate")
@@ -257,23 +229,17 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("validation_date");
 
                     b.Property<string>("ValidationNotes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasColumnType("text")
                         .HasColumnName("validation_notes");
 
                     b.HasKey("Id")
                         .HasName("pk_transactions");
 
-                    b.HasIndex("Code")
-                        .IsUnique();
+                    b.HasIndex("ClinicId")
+                        .HasDatabaseName("ix_transactions_clinic_id");
 
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("UserPlanId", "Status");
-
-                    b.HasIndex("ClinicId", "Status", "CreatedAt");
+                    b.HasIndex("UserPlanId")
+                        .HasDatabaseName("ix_transactions_user_plan_id");
 
                     b.ToTable("transactions");
                 });
@@ -285,33 +251,46 @@ namespace SingleClin.API.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid>("ApplicationUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("application_user_id");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
                     b.Property<string>("DisplayName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("display_name");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("email");
 
                     b.Property<string>("FirebaseUid")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("text")
                         .HasColumnName("firebase_uid");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text")
+                        .HasColumnName("first_name");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("full_name");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
 
+                    b.Property<string>("LastName")
+                        .HasColumnType("text")
+                        .HasColumnName("last_name");
+
                     b.Property<string>("PhoneNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasColumnType("text")
                         .HasColumnName("phone_number");
 
                     b.Property<int>("Role")
@@ -325,13 +304,6 @@ namespace SingleClin.API.Migrations
                     b.HasKey("Id")
                         .HasName("pk_users");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("FirebaseUid")
-                        .IsUnique()
-                        .HasFilter("firebase_uid IS NOT NULL");
-
                     b.ToTable("users");
                 });
 
@@ -343,8 +315,7 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("id");
 
                     b.Property<decimal>("AmountPaid")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
+                        .HasColumnType("numeric")
                         .HasColumnName("amount_paid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -364,24 +335,19 @@ namespace SingleClin.API.Migrations
                         .HasColumnName("expiration_date");
 
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(true)
                         .HasColumnName("is_active");
 
                     b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasColumnType("text")
                         .HasColumnName("notes");
 
                     b.Property<string>("PaymentMethod")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("text")
                         .HasColumnName("payment_method");
 
                     b.Property<string>("PaymentTransactionId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("payment_transaction_id");
 
                     b.Property<Guid>("PlanId")
@@ -399,16 +365,11 @@ namespace SingleClin.API.Migrations
                     b.HasKey("Id")
                         .HasName("pk_user_plans");
 
-                    b.HasIndex("ExpirationDate");
-
-                    b.HasIndex("PaymentTransactionId")
-                        .IsUnique()
-                        .HasFilter("payment_transaction_id IS NOT NULL");
-
                     b.HasIndex("PlanId")
                         .HasDatabaseName("ix_user_plans_plan_id");
 
-                    b.HasIndex("UserId", "IsActive");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_plans_user_id");
 
                     b.ToTable("user_plans");
                 });
@@ -418,14 +379,14 @@ namespace SingleClin.API.Migrations
                     b.HasOne("SingleClin.API.Data.Models.Clinic", "Clinic")
                         .WithMany("Transactions")
                         .HasForeignKey("ClinicId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_transactions_clinics_clinic_id");
+                        .HasConstraintName("fk_transactions_clinic_clinic_id");
 
                     b.HasOne("SingleClin.API.Data.Models.UserPlan", "UserPlan")
                         .WithMany("Transactions")
                         .HasForeignKey("UserPlanId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_transactions_user_plans_user_plan_id");
 
@@ -439,14 +400,14 @@ namespace SingleClin.API.Migrations
                     b.HasOne("SingleClin.API.Data.Models.Plan", "Plan")
                         .WithMany("UserPlans")
                         .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_plans_plans_plan_id");
 
                     b.HasOne("SingleClin.API.Data.Models.User", "User")
                         .WithMany("UserPlans")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_plans_users_user_id");
 

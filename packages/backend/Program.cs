@@ -56,6 +56,21 @@ public class Program
             }
         });
 
+        // Add AppDbContext with the same configuration
+        builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+                .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+                .EnableDetailedErrors(builder.Environment.IsDevelopment());
+            
+            // Add auditing interceptor in development
+            if (builder.Environment.IsDevelopment())
+            {
+                var auditingInterceptor = serviceProvider.GetRequiredService<SingleClin.API.Data.Interceptors.AuditingInterceptor>();
+                options.AddInterceptors(auditingInterceptor);
+            }
+        });
+
         // Configure ASP.NET Core Identity
         builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
         {
@@ -224,7 +239,7 @@ public class Program
             options.AddPolicy("RequireClinicRole", policy => 
                 policy.RequireClaim("role", "ClinicOrigin", "ClinicPartner"));
             
-            options.AddPolicy("RequireAdminRole", policy => 
+            options.AddPolicy("RequireAdministratorRole", policy => 
                 policy.RequireClaim("role", "Administrator"));
 
             // Clinic owner policy - requires clinic role and clinicId claim

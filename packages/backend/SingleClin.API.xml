@@ -895,6 +895,36 @@
             Toggle user active status
             </summary>
         </member>
+        <member name="M:SingleClin.API.Controllers.UserController.PurchasePlan(System.Guid,SingleClin.API.DTOs.Plan.PurchasePlanDto)">
+            <summary>
+            Purchase a plan for a user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.GetUserPlans(System.Guid)">
+            <summary>
+            Get user's active plans
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.GetUserPlan(System.Guid,System.Guid)">
+            <summary>
+            Get specific user plan by ID
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.CancelUserPlan(System.Guid,System.Guid,SingleClin.API.Controllers.CancelPlanRequest)">
+            <summary>
+            Cancel/Remove a user's plan
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Controllers.CancelPlanRequest">
+            <summary>
+            Request model for cancelling a user plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.CancelPlanRequest.Reason">
+            <summary>
+            Reason for cancelling the plan
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.AppDbContext">
             <summary>
             Main database context for the SingleClin application
@@ -902,12 +932,7 @@
         </member>
         <member name="P:SingleClin.API.Data.AppDbContext.Users">
             <summary>
-            Users in the system
-            </summary>
-        </member>
-        <member name="P:SingleClin.API.Data.AppDbContext.Clinics">
-            <summary>
-            Clinics registered in the system
+            Users in the system (separate from ApplicationUser Identity)
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.AppDbContext.Plans">
@@ -1485,9 +1510,19 @@
             Represents a user in the system
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.Models.User.ApplicationUserId">
+            <summary>
+            Reference to ApplicationUser ID from Identity system
+            </summary>
+        </member>
         <member name="P:SingleClin.API.Data.Models.User.Email">
             <summary>
             User's email address (unique)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.User.FullName">
+            <summary>
+            User's full name
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.Models.User.Role">
@@ -2566,6 +2601,116 @@
         <member name="P:SingleClin.API.DTOs.Plan.PlanResponseDto.PricePerCredit">
             <summary>
             Calculated price per credit
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Plan.PurchasePlanDto">
+            <summary>
+            DTO for purchasing a plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PurchasePlanDto.PlanId">
+            <summary>
+            ID of the plan to purchase
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PurchasePlanDto.PaymentMethod">
+            <summary>
+            Payment method used (optional)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PurchasePlanDto.PaymentTransactionId">
+            <summary>
+            Payment transaction ID from payment provider (optional)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.PurchasePlanDto.Notes">
+            <summary>
+            Optional notes about the purchase
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Plan.UserPlanResponseDto">
+            <summary>
+            DTO for user plan response
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.Id">
+            <summary>
+            User plan ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.UserId">
+            <summary>
+            User ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.PlanId">
+            <summary>
+            Plan ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.Plan">
+            <summary>
+            Plan information
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.Credits">
+            <summary>
+            Total credits purchased
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.CreditsRemaining">
+            <summary>
+            Credits remaining
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.CreditsUsed">
+            <summary>
+            Credits used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.AmountPaid">
+            <summary>
+            Amount paid for the plan
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.ExpirationDate">
+            <summary>
+            When the plan expires
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.IsActive">
+            <summary>
+            Whether the plan is active
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.IsExpired">
+            <summary>
+            Whether the plan is expired
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.PaymentMethod">
+            <summary>
+            Payment method used
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.PaymentTransactionId">
+            <summary>
+            Payment transaction ID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.Notes">
+            <summary>
+            Purchase notes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.CreatedAt">
+            <summary>
+            When the plan was purchased
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Plan.UserPlanResponseDto.UpdatedAt">
+            <summary>
+            Last update date
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.QRCode.QRCodeGenerateRequestDto">
@@ -3828,6 +3973,12 @@
             When the user was last updated
             </summary>
         </member>
+        <member name="T:SingleClin.API.EnsureTablesExist">
+            <summary>
+            Helper class to ensure required tables exist in the database
+            This is a temporary solution to resolve schema conflicts between DbContexts
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Exceptions.PlanNotFoundException">
             <summary>
             Exception thrown when a plan is not found
@@ -4012,18 +4163,6 @@
             <summary>
             Adds Firebase authentication middleware to the pipeline
             </summary>
-        </member>
-        <member name="T:SingleClin.API.Migrations.InitialCreate">
-            <inheritdoc />
-        </member>
-        <member name="M:SingleClin.API.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:SingleClin.API.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:SingleClin.API.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
         </member>
         <member name="T:SingleClin.API.Migrations.ApplicationDb.AddIdentityAndRefreshTokens">
             <inheritdoc />
@@ -5167,6 +5306,26 @@
             Check if current user can access specified clinic
             </summary>
         </member>
+        <member name="M:SingleClin.API.Services.IUserService.PurchasePlanAsync(System.Guid,SingleClin.API.DTOs.Plan.PurchasePlanDto)">
+            <summary>
+            Purchase a plan for a user
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.GetUserPlansAsync(System.Guid)">
+            <summary>
+            Get user's active plans
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.GetUserPlanAsync(System.Guid,System.Guid)">
+            <summary>
+            Get user's active plan by ID
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.CancelUserPlanAsync(System.Guid,System.Guid,System.String)">
+            <summary>
+            Cancel/Remove a user's plan
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.PlanService">
             <summary>
             Service implementation for Plan business logic
@@ -5490,6 +5649,11 @@
         <member name="T:SingleClin.API.Services.UserService">
             <summary>
             Service for managing users
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.UserService.CancelUserPlanAsync(System.Guid,System.Guid,System.String)">
+            <summary>
+            Cancel/Remove a user's plan
             </summary>
         </member>
         <member name="T:SingleClin.API.Validators.ClinicRequestValidator">
