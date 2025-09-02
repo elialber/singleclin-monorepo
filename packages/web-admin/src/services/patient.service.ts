@@ -230,6 +230,44 @@ export const patientService = {
     return this.updatePatient(id, { isActive: !patient.isActive })
   },
 
+  async purchasePlan(userId: string, planId: string, paymentMethod?: string): Promise<any> {
+    const response = await api.post(`/users/${userId}/purchase-plan`, {
+      planId,
+      paymentMethod: paymentMethod || 'ADMIN_PURCHASE',
+      amountPaid: 0 // Admin purchases are free
+    })
+    return response.data
+  },
+
+  async cancelUserPlan(userId: string, userPlanId: string, reason?: string): Promise<any> {
+    const response = await api.delete(`/users/${userId}/plans/${userPlanId}`, {
+      data: { reason }
+    })
+    return response.data
+  },
+
+  async getUserPlans(userId: string): Promise<any[]> {
+    try {
+      const response = await api.get(`/users/${userId}/plans`)
+      // Handle different response formats from the API
+      if (response.data?.data && Array.isArray(response.data.data)) {
+        return response.data.data
+      } else if (Array.isArray(response.data)) {
+        return response.data
+      } else {
+        console.warn('Unexpected getUserPlans response format:', response.data)
+        return []
+      }
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        // User has no plans yet, return empty array
+        return []
+      }
+      console.error('Error fetching user plans:', error)
+      return []
+    }
+  },
+
   async getPatientDetails(id: string): Promise<PatientDetails> {
     try {
       const response = await api.get<{ data: PatientDetails }>(`/patients/${id}/details`)

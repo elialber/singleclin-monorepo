@@ -12,6 +12,10 @@ import {
   Card,
   CardContent,
   Grid,
+  IconButton,
+  Tooltip,
+} from '@mui/material'
+import {
   Timeline,
   TimelineItem,
   TimelineContent,
@@ -19,9 +23,7 @@ import {
   TimelineSeparator,
   TimelineConnector,
   TimelineOppositeContent,
-  IconButton,
-  Tooltip,
-} from '@mui/material'
+} from '@mui/lab'
 import {
   Visibility as VisibilityIcon,
   Person as PersonIcon,

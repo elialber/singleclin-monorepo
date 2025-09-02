@@ -14,6 +14,7 @@ import Dashboard from '@/pages/Dashboard'
 import Plans from '@/pages/plans/Plans'
 import Clinics from '@/pages/clinics/Clinics'
 import Patients from '@/pages/patients/Patients'
+import PatientDetails from '@/pages/patients/PatientDetails'
 import Users from '@/pages/users/Users'
 import Transactions from '@/pages/transactions/Transactions'
 import Reports from '@/pages/reports/Reports'
@@ -41,6 +42,7 @@ export default function Router() {
         <Route path="/plans" element={<Plans />} />
         <Route path="/clinics" element={<Clinics />} />
         <Route path="/patients" element={<Patients />} />
+        <Route path="/patients/:id" element={<PatientDetails />} />
         <Route path="/users" element={<Users />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/reports" element={<Reports />} />

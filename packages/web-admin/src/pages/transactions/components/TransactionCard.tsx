@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo, useMemo, useCallback } from 'react'
 import {
   Card,
   CardContent,
@@ -35,63 +35,103 @@ interface TransactionCardProps {
   onCancel?: (transaction: Transaction) => void
 }
 
-export default function TransactionCard({
+const TransactionCard = memo<TransactionCardProps>(({
   transaction,
   onView,
   onEdit,
   onCancel,
-}: TransactionCardProps) {
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMenuClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
-  }
+  }, [])
 
-  const handleMenuClose = () => {
+  const handleMenuClose = useCallback(() => {
     setAnchorEl(null)
-  }
+  }, [])
 
-  const handleAction = (action: () => void) => {
+  const handleAction = useCallback((action: () => void) => {
     action()
     handleMenuClose()
-  }
+  }, [handleMenuClose])
 
-  const getStatusColor = (status: Transaction['status']) => {
-    switch (status) {
-      case 'Validated':
-        return 'success'
-      case 'Pending':
-        return 'warning'
-      case 'Cancelled':
-        return 'error'
-      case 'Expired':
-        return 'default'
-      default:
-        return 'default'
+  // Memoize expensive computations
+  const statusInfo = useMemo(() => {
+    const getStatusColor = (status: Transaction['status']) => {
+      switch (status) {
+        case 'Validated':
+          return 'success'
+        case 'Pending':
+          return 'warning'
+        case 'Cancelled':
+          return 'error'
+        case 'Expired':
+          return 'default'
+        default:
+          return 'default'
+      }
     }
-  }
 
-  const getStatusLabel = (status: Transaction['status']) => {
-    const labels = {
-      Validated: 'Validada',
-      Pending: 'Pendente',
-      Cancelled: 'Cancelada',
-      Expired: 'Expirada',
+    const getStatusLabel = (status: Transaction['status']) => {
+      const labels = {
+        Validated: 'Validada',
+        Pending: 'Pendente',
+        Cancelled: 'Cancelada',
+        Expired: 'Expirada',
+      }
+      return labels[status] || status
     }
-    return labels[status] || status
-  }
 
-  const formatDate = (dateString: string) => {
-    try {
-      return format(parseISO(dateString), 'dd/MM/yyyy HH:mm', { locale: ptBR })
-    } catch {
-      return dateString
+    return {
+      color: getStatusColor(transaction.status),
+      label: getStatusLabel(transaction.status)
     }
-  }
+  }, [transaction.status])
 
-  const canEdit = transaction.status === 'Pending' || transaction.status === 'Validated'
-  const canCancel = transaction.status === 'Pending' || transaction.status === 'Validated'
+  // Memoize date formatting
+  const formattedDates = useMemo(() => {
+    const formatDate = (dateString: string) => {
+      try {
+        return format(parseISO(dateString), 'dd/MM/yyyy HH:mm', { locale: ptBR })
+      } catch {
+        return dateString
+      }
+    }
+
+    return {
+      createdAt: formatDate(transaction.createdAt),
+      validationDate: transaction.validationDate ? formatDate(transaction.validationDate) : null,
+      cancellationDate: transaction.cancellationDate ? formatDate(transaction.cancellationDate) : null,
+    }
+  }, [transaction.createdAt, transaction.validationDate, transaction.cancellationDate])
+
+  // Memoize permissions
+  const permissions = useMemo(() => ({
+    canEdit: transaction.status === 'Pending' || transaction.status === 'Validated',
+    canCancel: transaction.status === 'Pending' || transaction.status === 'Validated'
+  }), [transaction.status])
+
+  // Memoize patient initial
+  const patientInitial = useMemo(() => 
+    transaction.patientName.charAt(0).toUpperCase(), 
+    [transaction.patientName]
+  )
+
+  // Memoize location coordinates display
+  const locationDisplay = useMemo(() => 
+    transaction.latitude && transaction.longitude 
+      ? `${transaction.latitude.toFixed(6)}, ${transaction.longitude.toFixed(6)}`
+      : null,
+    [transaction.latitude, transaction.longitude]
+  )
+
+  // Memoize credits display text
+  const creditsDisplay = useMemo(() => 
+    `${transaction.creditsUsed} crédito${transaction.creditsUsed !== 1 ? 's' : ''}`,
+    [transaction.creditsUsed]
+  )
 
   return (
     <Card 
@@ -115,8 +155,8 @@ export default function TransactionCard({
               {transaction.code}
             </Typography>
             <Chip
-              label={getStatusLabel(transaction.status)}
-              color={getStatusColor(transaction.status)}
+              label={statusInfo.label}
+              color={statusInfo.color}
               size="small"
               sx={{ fontWeight: 500 }}
             />
@@ -135,7 +175,7 @@ export default function TransactionCard({
         <Box mb={2}>
           <Stack direction="row" alignItems="center" spacing={1} mb={1}>
             <Avatar sx={{ width: 24, height: 24, bgcolor: 'primary.main', fontSize: '0.75rem' }}>
-              {transaction.patientName.charAt(0).toUpperCase()}
+              {patientInitial}
             </Avatar>
             <Typography variant="body2" fontWeight={500} color="text.primary">
               {transaction.patientName}
@@ -181,7 +221,7 @@ export default function TransactionCard({
             <Stack direction="row" alignItems="center" spacing={0.5} justifyContent="flex-end">
               <CreditCardIcon fontSize="small" color="secondary" />
               <Typography variant="body2" color="secondary.main" fontWeight={500}>
-                {transaction.creditsUsed} crédito{transaction.creditsUsed !== 1 ? 's' : ''}
+                {creditsDisplay}
               </Typography>
             </Stack>
           </Box>
@@ -192,29 +232,29 @@ export default function TransactionCard({
           <Stack direction="row" alignItems="center" spacing={0.5} mb={0.5}>
             <ScheduleIcon fontSize="small" color="action" />
             <Typography variant="caption" color="text.secondary">
-              Criada: {formatDate(transaction.createdAt)}
+              Criada: {formattedDates.createdAt}
             </Typography>
           </Stack>
           
-          {transaction.validationDate && (
+          {formattedDates.validationDate && (
             <Typography variant="caption" color="text.secondary" display="block">
-              Validada: {formatDate(transaction.validationDate)}
+              Validada: {formattedDates.validationDate}
             </Typography>
           )}
           
-          {transaction.cancellationDate && (
+          {formattedDates.cancellationDate && (
             <Typography variant="caption" color="error.main" display="block">
-              Cancelada: {formatDate(transaction.cancellationDate)}
+              Cancelada: {formattedDates.cancellationDate}
             </Typography>
           )}
         </Box>
 
         {/* Location (if available) */}
-        {transaction.latitude && transaction.longitude && (
+        {locationDisplay && (
           <Stack direction="row" alignItems="center" spacing={0.5} mt={1}>
             <LocationIcon fontSize="small" color="action" />
             <Typography variant="caption" color="text.secondary">
-              {transaction.latitude.toFixed(6)}, {transaction.longitude.toFixed(6)}
+              {locationDisplay}
             </Typography>
           </Stack>
         )}
@@ -253,14 +293,14 @@ export default function TransactionCard({
           </MenuItem>
         )}
         
-        {onEdit && canEdit && (
+        {onEdit && permissions.canEdit && (
           <MenuItem onClick={() => handleAction(() => onEdit(transaction))}>
             <EditIcon fontSize="small" sx={{ mr: 1 }} />
             Editar
           </MenuItem>
         )}
         
-        {onCancel && canCancel && (
+        {onCancel && permissions.canCancel && (
           <MenuItem onClick={() => handleAction(() => onCancel(transaction))}>
             <CancelIcon fontSize="small" sx={{ mr: 1, color: 'error.main' }} />
             <Typography color="error.main">Cancelar</Typography>
@@ -269,4 +309,8 @@ export default function TransactionCard({
       </Menu>
     </Card>
   )
-}
+})
+
+TransactionCard.displayName = 'TransactionCard'
+
+export default TransactionCard

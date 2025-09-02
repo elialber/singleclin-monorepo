@@ -47,19 +47,22 @@ import {
   ViewModule as ViewModuleIcon,
   Person as PersonIcon,
   LocalHospital as ClinicIcon,
+  Launch as LaunchIcon,
 } from '@mui/icons-material'
 import { Patient } from '@/types/patient'
 import { 
   usePatients, 
- 
   useTogglePatientStatus, 
 } from '@/hooks/usePatients'
 import { PatientQueryParams } from '@/services/patient.service'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { useDebounce } from '@/hooks/useDebounce'
 import { formatDate, formatPhone } from '@/utils/format'
+import { useNavigate } from 'react-router-dom'
 
 export default function Patients() {
+  const navigate = useNavigate()
+  
   // State for filters and pagination
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -183,6 +186,10 @@ export default function Patients() {
     setConfirmDialogOpen(false)
     setConfirmDialogAction(null)
   }, [])
+
+  const handlePatientClick = useCallback((patientId: string) => {
+    navigate(`/patients/${patientId}`)
+  }, [navigate])
 
   // Loading state
   if (isLoading && patients.length === 0) {
@@ -348,7 +355,20 @@ export default function Patients() {
             <Grid container spacing={3}>
               {patients.map((patient) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={patient.id}>
-                  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <Card 
+                    sx={{ 
+                      height: '100%', 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        boxShadow: 4,
+                        transform: 'translateY(-2px)'
+                      },
+                      transition: 'all 0.2s'
+                    }}
+                    onClick={() => handlePatientClick(patient.id)}
+                  >
                     <CardContent sx={{ flex: 1 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                         <Typography variant="h6" fontWeight={600} noWrap sx={{ flex: 1, mr: 1 }}>
@@ -517,7 +537,12 @@ export default function Patients() {
                 </TableRow>
               ) : (
                 patients.map((patient) => (
-                  <TableRow key={patient.id} hover>
+                  <TableRow 
+                    key={patient.id} 
+                    hover 
+                    onClick={() => handlePatientClick(patient.id)}
+                    sx={{ cursor: 'pointer' }}
+                  >
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <PersonIcon fontSize="small" color="action" />

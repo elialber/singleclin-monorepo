@@ -44,7 +44,7 @@ export const transactionService = {
     if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder)
 
     try {
-      const response = await api.get<ApiResponse<TransactionListResponse>>(`/transactions?${queryParams.toString()}`)
+      const response = await api.get<ApiResponse<TransactionListResponse>>(`/transaction?${queryParams.toString()}`)
       return response.data.data
     } catch (error: any) {
       console.error('Error fetching transactions:', error)
@@ -57,7 +57,7 @@ export const transactionService = {
    */
   async getTransaction(id: string): Promise<Transaction> {
     try {
-      const response = await api.get<ApiResponse<Transaction>>(`/transactions/${id}`)
+      const response = await api.get<ApiResponse<Transaction>>(`/transaction/${id}`)
       return response.data.data
     } catch (error: any) {
       console.error('Error fetching transaction:', error)
@@ -70,7 +70,7 @@ export const transactionService = {
    */
   async updateTransaction(id: string, data: TransactionUpdate): Promise<Transaction> {
     try {
-      const response = await api.put<ApiResponse<Transaction>>(`/transactions/${id}`, data)
+      const response = await api.put<ApiResponse<Transaction>>(`/transaction/${id}`, data)
       return response.data.data
     } catch (error: any) {
       console.error('Error updating transaction:', error)
@@ -83,7 +83,7 @@ export const transactionService = {
    */
   async cancelTransaction(id: string, data: TransactionCancel): Promise<Transaction> {
     try {
-      const response = await api.put<ApiResponse<Transaction>>(`/transactions/${id}/cancel`, data)
+      const response = await api.put<ApiResponse<Transaction>>(`/transaction/${id}/cancel`, data)
       return response.data.data
     } catch (error: any) {
       console.error('Error cancelling transaction:', error)
@@ -96,7 +96,7 @@ export const transactionService = {
    */
   async getDashboardMetrics(): Promise<DashboardMetrics> {
     try {
-      const response = await api.get<ApiResponse<DashboardMetrics>>('/transactions/dashboard-metrics')
+      const response = await api.get<ApiResponse<DashboardMetrics>>('/transaction/dashboard-metrics')
       return response.data.data
     } catch (error: any) {
       console.error('Error fetching dashboard metrics:', error)
@@ -135,7 +135,7 @@ export const transactionService = {
     queryParams.append('format', format)
 
     try {
-      const response = await api.get(`/transactions/export?${queryParams.toString()}`, {
+      const response = await api.get(`/transaction/export?${queryParams.toString()}`, {
         responseType: 'blob',
       })
       return response.data

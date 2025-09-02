@@ -214,11 +214,11 @@ const TransactionDashboard = memo(function TransactionDashboard({
         )}
       </CardContent>
     </Card>
-  )), []), [])
+  )), [])
 
   const StatusChart = useCallback(() => (
     <Card elevation={2}>
-      <CardContent sx={{ p: isMobile ? 2 : 3 }}>
+      <CardContent>
         <Typography variant="h6" gutterBottom>
           Distribuição por Status
         </Typography>
