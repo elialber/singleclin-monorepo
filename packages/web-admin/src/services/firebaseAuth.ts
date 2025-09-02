@@ -12,6 +12,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { IUser } from '@singleclin/shared';
+import { getFirebaseErrorMessage, createAuthError } from '@/utils/authErrors';
 
 // Auth providers
 const googleProvider = new GoogleAuthProvider();
@@ -41,18 +42,8 @@ export const signInWithEmail = async (
       customData: error.customData,
     });
     
-    // Provide better error messages
-    if (error.code === 'auth/invalid-credential') {
-      throw new Error('Email ou senha incorretos. Verifique suas credenciais.');
-    } else if (error.code === 'auth/user-not-found') {
-      throw new Error('Usuário não encontrado. Verifique o email digitado.');
-    } else if (error.code === 'auth/wrong-password') {
-      throw new Error('Senha incorreta. Tente novamente.');
-    } else if (error.code === 'auth/too-many-requests') {
-      throw new Error('Muitas tentativas de login. Tente novamente mais tarde.');
-    }
-    
-    throw error;
+    // Use standardized error messages
+    throw createAuthError(error, 'email_login');
   }
 };
 
@@ -68,15 +59,8 @@ export const signInWithGoogle = async (): Promise<FirebaseAuthResult> => {
     const token = await getIdToken(result.user);
     return { user: result.user, token };
   } catch (error: any) {
-    // Handle specific Firebase auth errors
-    if (error.code === 'auth/popup-blocked') {
-      throw new Error('Por favor, permita popups para fazer login com Google');
-    } else if (error.code === 'auth/cancelled-popup-request') {
-      throw new Error('Login cancelado');
-    } else if (error.code === 'auth/popup-closed-by-user') {
-      throw new Error('Janela de login fechada');
-    }
-    throw error;
+    // Use standardized error messages for Google login
+    throw createAuthError(error, 'google_login');
   }
 };
 

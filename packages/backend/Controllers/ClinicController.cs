@@ -38,7 +38,7 @@ public class ClinicController : ControllerBase
     /// GET /api/clinic?pageNumber=1&amp;pageSize=10&amp;isActive=true&amp;searchTerm=clinic&amp;type=Partner&amp;city=São Paulo&amp;sortBy=name&amp;sortDirection=asc
     /// </example>
     [HttpGet]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Get all clinics with advanced filtering",
         Description = @"Retrieve all clinics with comprehensive filtering, pagination, and sorting options. Admin role required.
@@ -125,7 +125,7 @@ public class ClinicController : ControllerBase
     /// <response code="403">Forbidden - Admin role required</response>
     /// <response code="404">Clinic not found</response>
     [HttpGet("{id:guid}")]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Get clinic by ID",
         Description = "Retrieve a specific clinic by its ID. Admin role required.",
@@ -169,7 +169,7 @@ public class ClinicController : ControllerBase
     /// <response code="403">Forbidden - Admin role required</response>
     /// <response code="409">Clinic name or CNPJ already exists</response>
     [HttpPost]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Create a new clinic",
         Description = "Create a new clinic in the system. Admin role required.",
@@ -224,7 +224,7 @@ public class ClinicController : ControllerBase
     /// <response code="404">Clinic not found</response>
     /// <response code="409">Clinic name or CNPJ already exists</response>
     [HttpPut("{id:guid}")]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Update an existing clinic",
         Description = "Update an existing clinic's information. Admin role required.",
@@ -278,7 +278,7 @@ public class ClinicController : ControllerBase
     /// <response code="403">Forbidden - Admin role required</response>
     /// <response code="404">Clinic not found</response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Delete a clinic (soft delete)",
         Description = "Soft delete a clinic by setting its status to inactive. Admin role required.",
@@ -321,7 +321,7 @@ public class ClinicController : ControllerBase
     /// <response code="403">Forbidden - Admin role required</response>
     /// <response code="404">Clinic not found</response>
     [HttpPatch("{id:guid}/toggle-status")]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Toggle clinic active status",
         Description = "Toggle the active status of a clinic (active becomes inactive and vice versa). Admin role required.",
@@ -362,7 +362,7 @@ public class ClinicController : ControllerBase
     /// <response code="401">Unauthorized</response>
     /// <response code="403">Forbidden - Admin role required</response>
     [HttpGet("statistics")]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Get clinic statistics",
         Description = "Get statistics about clinics including counts by status and type. Admin role required.",

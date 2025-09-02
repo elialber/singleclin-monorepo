@@ -8,7 +8,7 @@ namespace SingleClin.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     public class JobsController : ControllerBase
     {
         private readonly ILogger<JobsController> _logger;

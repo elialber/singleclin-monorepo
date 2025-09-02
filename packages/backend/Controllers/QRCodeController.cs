@@ -209,7 +209,7 @@ public class QRCodeController : BaseController
     /// </summary>
     /// <returns>QR Code generation statistics</returns>
     [HttpGet("metrics")]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Get QR Code Metrics",
         Description = "Get QR Code generation statistics (admin only)"

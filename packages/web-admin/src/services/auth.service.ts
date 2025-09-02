@@ -10,6 +10,7 @@ import {
   onAuthStateChange,
   convertFirebaseUserToIUser,
 } from './firebaseAuth'
+import { getBackendErrorMessage, createAuthError } from '@/utils/authErrors'
 
 export interface LoginRequest {
   email: string
@@ -85,56 +86,8 @@ export const authService = {
         email,
       })
       
-      // Check if it's a backend error
-      if (error.response) {
-        console.error('Backend error:', {
-          status: error.response.status,
-          data: error.response.data,
-          headers: error.response.headers
-        })
-        
-        if (error.response.status === 400 || error.response.status === 401) {
-          throw new Error(error.response.data?.detail || error.response.data?.message || 'Erro na autenticação com o servidor')
-        } else if (error.response.status === 404) {
-          throw new Error('Endpoint de autenticação não encontrado. Verifique se o backend está rodando.')
-        } else if (error.response.status >= 500) {
-          throw new Error('Erro no servidor. Tente novamente mais tarde.')
-        }
-      }
-      
-      // If Firebase login fails, it might be a timing issue after registration
-      // Try with multiple retry attempts
-      if (error.code === 'auth/invalid-credential' || 
-          error.code === 'auth/user-not-found' ||
-          error.code === 'auth/wrong-password') {
-        
-        console.log('Firebase login failed, will retry with increasing delays...')
-        
-        // Try up to 3 times with increasing delays
-        for (let attempt = 1; attempt <= 3; attempt++) {
-          try {
-            const delay = attempt * 2000 // 2s, 4s, 6s
-            console.log(`Retry attempt ${attempt} after ${delay}ms delay...`)
-            await new Promise(resolve => setTimeout(resolve, delay))
-            
-            const firebaseResult = await signInWithEmail(email, password)
-            const response = await api.post<AuthResponse>('/auth/login/firebase', {
-              firebaseToken: firebaseResult.token,
-              deviceInfo: navigator.userAgent,
-              rememberMe: true
-            })
-            return transformAuthResponse(response.data)
-          } catch (retryError: any) {
-            console.error(`Retry attempt ${attempt} failed:`, retryError.code)
-            if (attempt === 3) {
-              // Last attempt failed, throw the original error
-              throw error
-            }
-            // Continue to next attempt
-          }
-        }
-      }
-      throw error
+      // Use standardized error handling
+      throw createAuthError(error, 'backend_login')
     }
   },
 

@@ -83,7 +83,15 @@ public class JwtAuthenticationMiddleware
             }, out SecurityToken validatedToken);
 
             var jwtToken = (JwtSecurityToken)validatedToken;
-            var userId = jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            
+            if (userIdClaim == null)
+            {
+                _logger.LogWarning("JWT token does not contain NameIdentifier claim");
+                return;
+            }
+
+            var userId = userIdClaim.Value;
 
             // Attach user to context on successful jwt validation
             context.User = new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims, "Jwt"));

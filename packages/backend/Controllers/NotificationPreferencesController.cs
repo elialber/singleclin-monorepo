@@ -60,7 +60,7 @@ namespace SingleClin.API.Controllers
         /// <param name="userId">User ID</param>
         /// <returns>User's notification preferences</returns>
         [HttpGet("{userId}")]
-        [Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<ActionResult<ResponseWrapper<NotificationPreferencesResponseDto>>> GetUserPreferences(Guid userId)
         {
             try
@@ -137,7 +137,7 @@ namespace SingleClin.API.Controllers
         /// <param name="preferences">Updated notification preferences</param>
         /// <returns>Updated notification preferences</returns>
         [HttpPut("{userId}")]
-        [Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<ActionResult<ResponseWrapper<NotificationPreferencesResponseDto>>> UpdateUserPreferences(
             Guid userId, [FromBody] NotificationPreferencesDto preferences)
         {
@@ -236,7 +236,7 @@ namespace SingleClin.API.Controllers
         /// <param name="deviceTokenDto">Device token and platform information</param>
         /// <returns>Success confirmation</returns>
         [HttpPost("{userId}/device-token")]
-        [Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<ActionResult<ResponseWrapper<bool>>> UpdateUserDeviceToken(
             Guid userId, [FromBody] UpdateDeviceTokenDto deviceTokenDto)
         {
