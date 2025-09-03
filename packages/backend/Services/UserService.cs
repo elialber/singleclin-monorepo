@@ -19,19 +19,22 @@ public class UserService : IUserService
     private readonly AppDbContext _appDbContext;
     private readonly ILogger<UserService> _logger;
     private readonly IEmailTemplateService _emailService;
+    private readonly IFirebaseAuthService _firebaseAuthService;
 
     public UserService(
         UserManager<ApplicationUser> userManager,
         ApplicationDbContext context,
         AppDbContext appDbContext,
         ILogger<UserService> logger,
-        IEmailTemplateService emailService)
+        IEmailTemplateService emailService,
+        IFirebaseAuthService firebaseAuthService)
     {
         _userManager = userManager;
         _context = context;
         _appDbContext = appDbContext;
         _logger = logger;
         _emailService = emailService;
+        _firebaseAuthService = firebaseAuthService;
     }
 
     public async Task<UserListResponseDto> GetUsersAsync(UserFilterDto filter)
@@ -191,6 +194,47 @@ public class UserService : IUserService
         {
             return (false, null, result.Errors.Select(e => e.Description));
         }
+
+        // Create user in Firebase
+        _logger.LogInformation("=== FIREBASE USER CREATION START ===");
+        _logger.LogInformation("Firebase IsConfigured: {IsConfigured}", _firebaseAuthService.IsConfigured);
+        _logger.LogInformation("Email: {Email}, FullName: {FullName}", dto.Email, user.FullName);
+        
+        if (_firebaseAuthService.IsConfigured)
+        {
+            _logger.LogInformation("Firebase is configured. Attempting to create user...");
+            try
+            {
+                var firebaseUser = await _firebaseAuthService.CreateUserAsync(
+                    dto.Email,
+                    dto.Password,
+                    user.FullName,
+                    false // Email not verified yet
+                );
+
+                if (firebaseUser != null)
+                {
+                    // Update user with Firebase UID
+                    user.FirebaseUid = firebaseUser.Uid;
+                    await _userManager.UpdateAsync(user);
+                    _logger.LogInformation("✅ SUCCESS: Created user in Firebase - Email: {Email}, UID: {FirebaseUid}", 
+                        dto.Email, firebaseUser.Uid);
+                }
+                else
+                {
+                    _logger.LogError("❌ FAILED: CreateUserAsync returned null for email: {Email}", dto.Email);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ EXCEPTION: Error creating user in Firebase for email: {Email}", dto.Email);
+            }
+        }
+        else
+        {
+            _logger.LogError("❌ Firebase NOT configured! Cannot create user in Firebase for: {Email}", dto.Email);
+        }
+        _logger.LogInformation("=== FIREBASE USER CREATION END ===");
 
         // Send email verification
         try
