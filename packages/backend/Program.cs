@@ -106,6 +106,7 @@ public class Program
                 {
                     builder.WithOrigins(
                             "http://localhost:3000", // React web admin
+                            "http://localhost:3001", // React web admin (alternative port)
                             "http://localhost:4200", // Alternative frontend
                             "http://localhost:5173", // Vite dev server
                             "capacitor://localhost", // Capacitor mobile

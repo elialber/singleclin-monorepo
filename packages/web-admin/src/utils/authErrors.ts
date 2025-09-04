@@ -4,7 +4,6 @@ export const getFirebaseErrorMessage = (errorCode: string): string => {
   const errorMessages: Record<string, string> = {
     // Authentication errors
     'auth/invalid-credential': 'Email ou senha incorretos. Verifique suas credenciais e tente novamente.',
-    'auth/user-not-found': 'Usuário não encontrado. Verifique se o email está correto.',
     'auth/wrong-password': 'Senha incorreta. Tente novamente.',
     'auth/invalid-email': 'Email inválido. Digite um email válido.',
     'auth/user-disabled': 'Esta conta foi desabilitada. Entre em contato com o suporte.',
