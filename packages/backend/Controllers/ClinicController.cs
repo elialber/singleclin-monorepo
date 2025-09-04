@@ -17,11 +17,16 @@ namespace SingleClin.API.Controllers;
 public class ClinicController : ControllerBase
 {
     private readonly IClinicService _clinicService;
+    private readonly IImageUploadService _imageUploadService;
     private readonly ILogger<ClinicController> _logger;
 
-    public ClinicController(IClinicService clinicService, ILogger<ClinicController> logger)
+    public ClinicController(
+        IClinicService clinicService, 
+        IImageUploadService imageUploadService,
+        ILogger<ClinicController> logger)
     {
         _clinicService = clinicService;
+        _imageUploadService = imageUploadService;
         _logger = logger;
     }
 
@@ -90,6 +95,75 @@ public class ClinicController : ControllerBase
     /// </summary>
     /// <returns>List of active clinics</returns>
     /// <response code="200">Returns list of active clinics</response>
+    /// <summary>
+    /// Get all clinics (Development Only - No Auth)
+    /// </summary>
+    /// <param name="filter">Filter criteria</param>
+    /// <returns>Paginated list of clinics</returns>
+    /// <response code="200">Returns the paginated list of clinics</response>
+    [HttpGet("dev")]
+    [AllowAnonymous]
+    [SwaggerOperation(
+        Summary = "Get all clinics for development (No Auth Required)",
+        Description = "Development endpoint to get all clinics without authentication. Remove in production!",
+        OperationId = "GetClinicsForDev"
+    )]
+    public async Task<ActionResult<PagedResultDto<ClinicResponseDto>>> GetAllForDev([FromQuery] ClinicFilterDto filter)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _clinicService.GetAllAsync(filter);
+            
+            _logger.LogInformation(
+                "[DEV] Retrieved {Count} clinics (page {PageNumber} of {TotalPages})", 
+                result.ItemCount, 
+                result.PageNumber, 
+                result.TotalPages
+            );
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[DEV] Error retrieving clinics with filter: {@Filter}", filter);
+            return StatusCode(500, new { message = "An error occurred while retrieving clinics" });
+        }
+    }
+
+    /// <summary>
+    /// Debug Token Claims (Development Only)
+    /// </summary>
+    /// <returns>Current user's claims</returns>
+    [HttpGet("debug-token")]
+    [Authorize]
+    [SwaggerOperation(
+        Summary = "Debug Token Claims (DEV ONLY)",
+        Description = "Shows all claims in the current JWT token for debugging authorization issues",
+        OperationId = "DebugToken"
+    )]
+    public IActionResult DebugToken()
+    {
+        var claims = HttpContext.User.Claims.Select(c => new { 
+            Type = c.Type, 
+            Value = c.Value 
+        }).ToList();
+
+        return Ok(new {
+            IsAuthenticated = HttpContext.User.Identity.IsAuthenticated,
+            AuthenticationType = HttpContext.User.Identity.AuthenticationType,
+            Claims = claims,
+            Policies = new {
+                HasAdminRole = HttpContext.User.HasClaim("role", "Administrator"),
+                HasAnyRole = HttpContext.User.Claims.Any(c => c.Type == "role")
+            }
+        });
+    }
+
     [HttpGet("active")]
     [AllowAnonymous]
     [SwaggerOperation(
@@ -385,6 +459,119 @@ public class ClinicController : ControllerBase
         {
             _logger.LogError(ex, "Error retrieving clinic statistics");
             return StatusCode(500, new { message = "An error occurred while retrieving clinic statistics" });
+        }
+    }
+
+    /// <summary>
+    /// Upload clinic image (Admin Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="image">Image file to upload</param>
+    /// <returns>Updated clinic with new image</returns>
+    /// <response code="200">Image uploaded successfully</response>
+    /// <response code="400">Invalid image file or clinic data</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden - Admin role required</response>
+    /// <response code="404">Clinic not found</response>
+    /// <response code="413">File too large</response>
+    [HttpPost("{id:guid}/image")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Upload clinic image",
+        Description = @"Upload an image for a specific clinic. Admin role required.
+
+**Supported formats:** JPEG, PNG, WebP
+**Maximum file size:** 5MB
+**Automatic processing:** Images are resized to max 1200x800px and optimized for web",
+        OperationId = "UploadClinicImage"
+    )]
+    [SwaggerResponse(200, "Image uploaded successfully", typeof(ClinicResponseDto))]
+    [SwaggerResponse(400, "Bad Request - Invalid image file")]
+    [SwaggerResponse(401, "Unauthorized")]
+    [SwaggerResponse(403, "Forbidden - Admin role required")]
+    [SwaggerResponse(404, "Clinic not found")]
+    [SwaggerResponse(413, "Payload Too Large - File exceeds size limit")]
+    public async Task<ActionResult<ClinicResponseDto>> UploadImage([Required] Guid id, IFormFile image)
+    {
+        try
+        {
+            // Validate image file
+            if (image == null || image.Length == 0)
+            {
+                _logger.LogWarning("Image upload attempted with null or empty file for clinic: {ClinicId}", id);
+                return BadRequest(new { message = "No image file provided" });
+            }
+
+            // Validate image using service
+            if (!await _imageUploadService.ValidateImageAsync(image))
+            {
+                _logger.LogWarning("Invalid image file uploaded for clinic: {ClinicId}, FileName: {FileName}", id, image.FileName);
+                return BadRequest(new { message = "Invalid image file. Please ensure it's a valid JPEG, PNG, or WebP image under 5MB." });
+            }
+
+            // Upload image via service
+            var clinic = await _clinicService.UpdateImageAsync(id, image);
+            
+            _logger.LogInformation("Successfully uploaded image for clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
+            
+            return Ok(clinic);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            _logger.LogWarning("Clinic not found for image upload: {ClinicId}", id);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Image upload failed for clinic: {ClinicId}", id);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading image for clinic: {ClinicId}", id);
+            return StatusCode(500, new { message = "An error occurred while uploading the image" });
+        }
+    }
+
+    /// <summary>
+    /// Delete clinic image (Admin Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <returns>Updated clinic without image</returns>
+    /// <response code="200">Image deleted successfully</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden - Admin role required</response>
+    /// <response code="404">Clinic not found</response>
+    [HttpDelete("{id:guid}/image")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Delete clinic image",
+        Description = "Remove image from a specific clinic. Admin role required.",
+        OperationId = "DeleteClinicImage"
+    )]
+    [SwaggerResponse(200, "Image deleted successfully", typeof(ClinicResponseDto))]
+    [SwaggerResponse(401, "Unauthorized")]
+    [SwaggerResponse(403, "Forbidden - Admin role required")]
+    [SwaggerResponse(404, "Clinic not found")]
+    public async Task<ActionResult<ClinicResponseDto>> DeleteImage([Required] Guid id)
+    {
+        try
+        {
+            var clinic = await _clinicService.DeleteImageAsync(id);
+            
+            _logger.LogInformation("Successfully deleted image for clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
+            
+            return Ok(clinic);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            _logger.LogWarning("Clinic not found for image deletion: {ClinicId}", id);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting image for clinic: {ClinicId}", id);
+            return StatusCode(500, new { message = "An error occurred while deleting the image" });
         }
     }
 }

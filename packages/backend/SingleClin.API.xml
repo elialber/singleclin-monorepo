@@ -136,6 +136,16 @@
             <response code="200">Tokens revoked successfully</response>
             <response code="401">Not authenticated</response>
         </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.CreateAdmin(SingleClin.API.DTOs.Auth.RegisterDto)">
+            <summary>
+            [DEVELOPMENT ONLY] Create an Administrator account
+            </summary>
+            <param name="adminDto">Administrator account information</param>
+            <returns>Created administrator details</returns>
+            <response code="200">Administrator created successfully</response>
+            <response code="400">Invalid data or email already exists</response>
+            <response code="503">Not available in production</response>
+        </member>
         <member name="M:SingleClin.API.Controllers.AuthTestController.GetPublic">
             <summary>
             Public endpoint - no authentication required
@@ -300,12 +310,24 @@
             GET /api/clinic?pageNumber=1&amp;pageSize=10&amp;isActive=true&amp;searchTerm=clinic&amp;type=Partner&amp;city=São Paulo&amp;sortBy=name&amp;sortDirection=asc
             </example>
         </member>
-        <member name="M:SingleClin.API.Controllers.ClinicController.GetActive">
+        <member name="M:SingleClin.API.Controllers.ClinicController.GetAllForDev(SingleClin.API.DTOs.Clinic.ClinicFilterDto)">
             <summary>
             Get active clinics (Public endpoint)
             </summary>
             <returns>List of active clinics</returns>
             <response code="200">Returns list of active clinics</response>
+            <summary>
+            Get all clinics (Development Only - No Auth)
+            </summary>
+            <param name="filter">Filter criteria</param>
+            <returns>Paginated list of clinics</returns>
+            <response code="200">Returns the paginated list of clinics</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.DebugToken">
+            <summary>
+            Debug Token Claims (Development Only)
+            </summary>
+            <returns>Current user's claims</returns>
         </member>
         <member name="M:SingleClin.API.Controllers.ClinicController.GetById(System.Guid)">
             <summary>
@@ -374,6 +396,31 @@
             <response code="200">Returns clinic statistics</response>
             <response code="401">Unauthorized</response>
             <response code="403">Forbidden - Admin role required</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.UploadImage(System.Guid,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Upload clinic image (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="image">Image file to upload</param>
+            <returns>Updated clinic with new image</returns>
+            <response code="200">Image uploaded successfully</response>
+            <response code="400">Invalid image file or clinic data</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic not found</response>
+            <response code="413">File too large</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.DeleteImage(System.Guid)">
+            <summary>
+            Delete clinic image (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Updated clinic without image</returns>
+            <response code="200">Image deleted successfully</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic not found</response>
         </member>
         <member name="T:SingleClin.API.Controllers.HealthController">
             <summary>
@@ -1185,6 +1232,26 @@
             Longitude coordinate
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.ImageUrl">
+            <summary>
+            URL da imagem/logo da clínica
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.ImageFileName">
+            <summary>
+            Nome do arquivo da imagem no storage
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.ImageSize">
+            <summary>
+            Tamanho da imagem em bytes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.ImageContentType">
+            <summary>
+            Tipo MIME da imagem
+            </summary>
+        </member>
         <member name="P:SingleClin.API.Data.Models.Clinic.Transactions">
             <summary>
             Transactions processed by this clinic
@@ -1948,6 +2015,76 @@
             Sort direction (asc or desc)
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.ClinicImageUploadDto">
+            <summary>
+            Data transfer object for clinic image upload operations
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageUploadDto.Image">
+            <summary>
+            Image file to upload
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageUploadDto.AltText">
+            <summary>
+            Optional alt text for accessibility
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageUploadDto.Description">
+            <summary>
+            Optional description of the image
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto">
+            <summary>
+            Response DTO for image upload operations
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.Success">
+            <summary>
+            Indicates if the upload was successful
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.ImageUrl">
+            <summary>
+            Public URL of the uploaded image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.FileSize">
+            <summary>
+            Size of the uploaded image in bytes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.OriginalFileName">
+            <summary>
+            Original filename of the uploaded image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.ContentType">
+            <summary>
+            Content type of the uploaded image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.ErrorMessage">
+            <summary>
+            Error message if upload failed
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.UploadedAt">
+            <summary>
+            Timestamp when the upload was completed
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.CreateSuccess(System.String,System.Int64,System.String,System.String)">
+            <summary>
+            Create a successful upload response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Clinic.ImageUploadResponseDto.CreateFailure(System.String)">
+            <summary>
+            Create a failed upload response
+            </summary>
+        </member>
         <member name="T:SingleClin.API.DTOs.Clinic.ClinicRequestDto">
             <summary>
             Data transfer object for creating or updating a clinic
@@ -2063,9 +2200,19 @@
             When the clinic was last updated
             </summary>
         </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.ImageUrl">
+            <summary>
+            URL da imagem/logo da clínica
+            </summary>
+        </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.TransactionCount">
             <summary>
             Number of transactions processed by this clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.HasImage">
+            <summary>
+            Indicates if the clinic has an image
             </summary>
         </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.TypeDisplayName">
@@ -4164,6 +4311,18 @@
             Adds Firebase authentication middleware to the pipeline
             </summary>
         </member>
+        <member name="T:SingleClin.API.Migrations.InitialClinicWithImages">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.InitialClinicWithImages.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.InitialClinicWithImages.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.InitialClinicWithImages.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
         <member name="T:SingleClin.API.Migrations.ApplicationDb.AddIdentityAndRefreshTokens">
             <inheritdoc />
         </member>
@@ -4210,6 +4369,18 @@
             <inheritdoc />
         </member>
         <member name="M:SingleClin.API.Migrations.ApplicationDb.AddFirebaseUidToUser.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.SyncModels">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.SyncModels.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.SyncModels.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.SyncModels.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
         <member name="T:SingleClin.API.Repositories.ClinicRepository">
@@ -4499,6 +4670,21 @@
             Service implementation for Clinic business logic
             </summary>
         </member>
+        <member name="M:SingleClin.API.Services.ClinicService.UpdateImageAsync(System.Guid,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Update clinic image
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="imageFile">Image file to upload</param>
+            <returns>Updated clinic with new image</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ClinicService.DeleteImageAsync(System.Guid)">
+            <summary>
+            Delete clinic image
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Updated clinic without image</returns>
+        </member>
         <member name="T:SingleClin.API.Services.EmailTemplateService">
             <summary>
             Service for processing and rendering email templates
@@ -4693,6 +4879,23 @@
             <param name="excludeId">Clinic ID to exclude from uniqueness checks (for updates)</param>
             <returns>List of validation errors</returns>
         </member>
+        <member name="M:SingleClin.API.Services.IClinicService.UpdateImageAsync(System.Guid,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Update clinic image
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="imageFile">Image file to upload</param>
+            <returns>Updated clinic with new image</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic not found or image upload fails</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.DeleteImageAsync(System.Guid)">
+            <summary>
+            Delete clinic image
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Updated clinic without image</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic not found</exception>
+        </member>
         <member name="T:SingleClin.API.Services.IEmailTemplateService">
             <summary>
             Service for processing and rendering email templates
@@ -4820,6 +5023,94 @@
             </summary>
             <param name="email">User email</param>
             <returns>User record if found, null otherwise</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IImageUploadService">
+            <summary>
+            Service interface for handling image uploads to Azure Blob Storage
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IImageUploadService.UploadImageAsync(Microsoft.AspNetCore.Http.IFormFile,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Upload an image file to Azure Blob Storage
+            </summary>
+            <param name="file">The image file to upload</param>
+            <param name="folder">The folder/container to upload to</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Upload result with file details</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IImageUploadService.DeleteImageAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Delete an image file from Azure Blob Storage
+            </summary>
+            <param name="fileName">Name of the file to delete</param>
+            <param name="folder">The folder/container where the file is located</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>True if deletion was successful</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IImageUploadService.GetImageUrlAsync(System.String,System.String)">
+            <summary>
+            Get the public URL for an image
+            </summary>
+            <param name="fileName">Name of the file</param>
+            <param name="folder">The folder/container where the file is located</param>
+            <returns>Public URL of the image</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IImageUploadService.ValidateImageAsync(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Validate an image file before upload
+            </summary>
+            <param name="file">The image file to validate</param>
+            <returns>True if the file is valid for upload</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.ImageUploadResult">
+            <summary>
+            Result of an image upload operation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Services.ImageUploadResult.Success">
+            <summary>
+            Indicates if the upload was successful
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Services.ImageUploadResult.FileName">
+            <summary>
+            Generated file name in storage
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Services.ImageUploadResult.Url">
+            <summary>
+            Public URL of the uploaded image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Services.ImageUploadResult.Size">
+            <summary>
+            Size of the uploaded file in bytes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Services.ImageUploadResult.ContentType">
+            <summary>
+            Content type (MIME type) of the uploaded file
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Services.ImageUploadResult.ErrorMessage">
+            <summary>
+            Error message if upload failed
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ImageUploadResult.CreateSuccess(System.String,System.String,System.Int64,System.String)">
+            <summary>
+            Create a successful upload result
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ImageUploadResult.CreateFailure(System.String)">
+            <summary>
+            Create a failed upload result
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.ImageUploadService">
+            <summary>
+            Service implementation for handling image uploads to Azure Blob Storage
+            </summary>
         </member>
         <member name="T:SingleClin.API.Services.IPlanService">
             <summary>

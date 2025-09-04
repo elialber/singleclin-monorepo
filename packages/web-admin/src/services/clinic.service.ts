@@ -4,7 +4,9 @@ import {
   CreateClinicRequest, 
   UpdateClinicRequest, 
   ClinicListResponse, 
-  ClinicType 
+  ClinicType,
+  ClinicImageUpload,
+  ImageUploadResult
 } from '@/types/clinic'
 
 export interface ClinicQueryParams {
@@ -156,5 +158,66 @@ export const clinicService = {
       id: clinic.id,
       name: clinic.name
     }))
+  },
+
+  async uploadImage(clinicId: string, uploadData: ClinicImageUpload): Promise<ImageUploadResult> {
+    try {
+      const formData = new FormData()
+      formData.append('image', uploadData.image)
+      
+      if (uploadData.altText) {
+        formData.append('altText', uploadData.altText)
+      }
+      
+      if (uploadData.description) {
+        formData.append('description', uploadData.description)
+      }
+
+      const response = await api.post<Clinic>(`/clinic/${clinicId}/image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      return {
+        success: true,
+        clinic: response.data
+      }
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || 
+                          error?.message || 
+                          'Erro ao fazer upload da imagem'
+      
+      return {
+        success: false,
+        error: errorMessage
+      }
+    }
+  },
+
+  async deleteImage(clinicId: string): Promise<ImageUploadResult> {
+    try {
+      const response = await api.delete<Clinic>(`/clinic/${clinicId}/image`)
+      
+      return {
+        success: true,
+        clinic: response.data
+      }
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || 
+                          error?.message || 
+                          'Erro ao remover imagem'
+      
+      return {
+        success: false,
+        error: errorMessage
+      }
+    }
+  },
+
+  async getImageUrl(clinicId: string, fileName: string): Promise<string> {
+    // Para Azure Blob Storage, a URL já é retornada completa do backend
+    // Esta função pode ser usada para gerar URLs de preview ou cache
+    return `https://singleclin.blob.core.windows.net/clinic-images/clinics/${fileName}`
   },
 }

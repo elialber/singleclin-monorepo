@@ -53,6 +53,26 @@ public class Clinic : BaseEntity
     public double? Longitude { get; set; }
     
     /// <summary>
+    /// URL da imagem/logo da clínica
+    /// </summary>
+    public string? ImageUrl { get; set; }
+    
+    /// <summary>
+    /// Nome do arquivo da imagem no storage
+    /// </summary>
+    public string? ImageFileName { get; set; }
+    
+    /// <summary>
+    /// Tamanho da imagem em bytes
+    /// </summary>
+    public long? ImageSize { get; set; }
+    
+    /// <summary>
+    /// Tipo MIME da imagem
+    /// </summary>
+    public string? ImageContentType { get; set; }
+    
+    /// <summary>
     /// Transactions processed by this clinic
     /// </summary>
     public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();

@@ -24,7 +24,7 @@ export interface FormValidation<T = Record<string, any>> {
   isSubmitting: boolean
 }
 
-export interface ValidationSchema<T = Record<string, any>> {
+export type ValidationSchema<T = Record<string, any>> = {
   [K in keyof T]?: ValidationRule
 }
 

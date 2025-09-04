@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -17,6 +17,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Divider,
 } from '@mui/material'
 import {
   LocationOn as LocationIcon,
@@ -28,6 +29,8 @@ import { useForm, Controller } from 'react-hook-form'
 import { AxiosError } from 'axios'
 import { Clinic, CreateClinicRequest, UpdateClinicRequest, ClinicType, getClinicTypeLabel } from '@/types/clinic'
 import { useCreateClinic, useUpdateClinic } from '@/hooks/useClinics'
+import { useImageUpload } from '@/hooks/useImageUpload'
+import ImageUpload from './ImageUpload'
 
 interface ValidationError {
   type: string
@@ -57,6 +60,16 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
   const isEditing = Boolean(clinic)
   const createClinic = useCreateClinic()
   const updateClinic = useUpdateClinic()
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null)
+
+  const { uploadImage, deleteImage, loading: imageLoading, error: imageError, clearError: clearImageError } = useImageUpload({
+    onSuccess: () => {
+      clearImageError()
+    },
+    onError: (error) => {
+      console.error('Image upload error:', error)
+    }
+  })
 
   const {
     control,
@@ -65,7 +78,6 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
     setError,
     clearErrors,
     formState: { errors, isValid },
-    watch,
   } = useForm<ClinicFormData>({
     defaultValues: {
       name: '',
@@ -135,13 +147,32 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
           isActive: true,
         })
       }
+      // Reset image state
+      setPendingImageFile(null)
+      clearImageError()
     }
-  }, [open, clinic, reset])
+  }, [open, clinic, reset, clearImageError])
 
   const handleClose = () => {
-    if (!createClinic.isPending && !updateClinic.isPending) {
+    if (!createClinic.isPending && !updateClinic.isPending && !imageLoading) {
       onClose()
     }
+  }
+
+  const handleImageUpload = (file: File) => {
+    setPendingImageFile(file)
+    clearImageError()
+  }
+
+  const handleImageDelete = async () => {
+    if (isEditing && clinic?.id && clinic.hasImage) {
+      try {
+        await deleteImage(clinic.id)
+      } catch (error) {
+        console.error('Error deleting image:', error)
+      }
+    }
+    setPendingImageFile(null)
   }
 
   const onSubmit = async (data: ClinicFormData) => {
@@ -159,7 +190,15 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
         isActive: data.isActive,
       }
       updateClinic.mutate({ id: clinic.id, data: updateData }, {
-        onSuccess: () => {
+        onSuccess: async () => {
+          // Upload image if there's a pending file
+          if (pendingImageFile) {
+            try {
+              await uploadImage(clinic.id, { image: pendingImageFile })
+            } catch (error) {
+              console.error('Error uploading image after clinic update:', error)
+            }
+          }
           onClose()
         },
         onError: (error: any) => {
@@ -179,7 +218,15 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
         isActive: data.isActive,
       }
       createClinic.mutate(createData, {
-        onSuccess: () => {
+        onSuccess: async (createdClinic) => {
+          // Upload image if there's a pending file
+          if (pendingImageFile && createdClinic.id) {
+            try {
+              await uploadImage(createdClinic.id, { image: pendingImageFile })
+            } catch (error) {
+              console.error('Error uploading image after clinic creation:', error)
+            }
+          }
           onClose()
         },
         onError: (error: any) => {
@@ -191,8 +238,8 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
     }
   }
 
-  const isLoading = createClinic.isPending || updateClinic.isPending
-  const submitError = createClinic.error || updateClinic.error
+  const isLoading = createClinic.isPending || updateClinic.isPending || imageLoading
+  const submitError = createClinic.error || updateClinic.error || imageError
 
   // CNPJ validation regex
   const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$|^\d{14}$/
@@ -448,6 +495,31 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
                     }}
                   />
                 )}
+              />
+            </Grid>
+
+            {/* Image Upload Section */}
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Imagem da Clínica
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Faça upload do logotipo ou imagem representativa da clínica (opcional)
+              </Typography>
+              
+              <ImageUpload
+                currentImageUrl={clinic?.imageUrl}
+                onImageUpload={handleImageUpload}
+                onImageDelete={handleImageDelete}
+                loading={imageLoading}
+                error={imageError || undefined}
+                disabled={isLoading}
+                label="Imagem da Clínica"
+                helperText="Formatos aceitos: JPEG, PNG, WebP • Tamanho máximo: 5MB"
+                variant="standard"
+                size="medium"
+                showPreview={true}
               />
             </Grid>
 

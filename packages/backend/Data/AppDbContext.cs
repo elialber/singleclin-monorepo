@@ -34,6 +34,7 @@ public class AppDbContext : DbContext
     /// Transactions (credit usage)
     /// </summary>
     public DbSet<Transaction> Transactions => Set<Transaction>();
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

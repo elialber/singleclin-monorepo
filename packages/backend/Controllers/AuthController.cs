@@ -17,11 +17,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
+    private readonly IWebHostEnvironment _hostEnvironment;
 
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger, IWebHostEnvironment hostEnvironment)
     {
         _authService = authService;
         _logger = logger;
+        _hostEnvironment = hostEnvironment;
     }
 
     /// <summary>
@@ -441,6 +443,65 @@ public class AuthController : ControllerBase
             {
                 Title = "Token Revocation Error",
                 Detail = "An unexpected error occurred while revoking tokens",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    /// <summary>
+    /// [DEVELOPMENT ONLY] Create an Administrator account
+    /// </summary>
+    /// <param name="adminDto">Administrator account information</param>
+    /// <returns>Created administrator details</returns>
+    /// <response code="200">Administrator created successfully</response>
+    /// <response code="400">Invalid data or email already exists</response>
+    /// <response code="503">Not available in production</response>
+    [HttpPost("create-admin")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IActionResult> CreateAdmin([FromBody] RegisterDto adminDto)
+    {
+        // Only allow in development environment
+        if (!_hostEnvironment.IsDevelopment())
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new ProblemDetails
+            {
+                Title = "Service Unavailable",
+                Detail = "Administrator creation is only available in development environment",
+                Status = StatusCodes.Status503ServiceUnavailable
+            });
+        }
+
+        try
+        {
+            // Force Administrator role
+            adminDto.Role = UserRole.Administrator;
+            
+            var ipAddress = GetIpAddress();
+            var result = await _authService.RegisterAsync(adminDto, ipAddress);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Admin Creation Failed",
+                    Detail = result.Error,
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            _logger.LogInformation("Administrator created successfully: {Email}", adminDto.Email);
+            return Ok(result.Response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating administrator: {Email}", adminDto.Email);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "Admin Creation Error",
+                Detail = "An unexpected error occurred while creating administrator",
                 Status = StatusCodes.Status500InternalServerError
             });
         }

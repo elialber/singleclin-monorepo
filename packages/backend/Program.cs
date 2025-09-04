@@ -20,6 +20,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Azure.Storage.Blobs;
 
 namespace SingleClin.API;
 
@@ -229,6 +230,16 @@ public class Program
 
         // Add User Service
         builder.Services.AddScoped<IUserService, UserService>();
+
+        // Add Azure Blob Storage Client
+        builder.Services.AddSingleton<BlobServiceClient>(provider =>
+        {
+            var connectionString = builder.Configuration.GetSection("AzureStorage")["ConnectionString"];
+            return new BlobServiceClient(connectionString);
+        });
+
+        // Add Image Upload Service with Azure Blob Storage
+        builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 
         // Configure authorization policies
         builder.Services.AddAuthorization(options =>

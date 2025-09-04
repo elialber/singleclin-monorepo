@@ -1,6 +1,7 @@
 using QRCoder;
 using System.Drawing;
 using System.Text.Json;
+using SdColor = System.Drawing.Color;
 
 namespace SingleClin.API.Services;
 
@@ -80,8 +81,8 @@ public class QRCodeGeneratorService : IQRCodeGeneratorService
             // Generate PNG bytes with configuration
             var qrCodeBytes = qrCode.GetGraphic(
                 pixelsPerModule: CalculatePixelsPerModule(size),
-                darkColor: Color.Black,
-                lightColor: Color.White,
+                darkColor: SdColor.Black,
+                lightColor: SdColor.White,
                 drawQuietZones: true
             );
 

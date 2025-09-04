@@ -68,9 +68,19 @@ public class ClinicResponseDto
     public DateTime UpdatedAt { get; set; }
 
     /// <summary>
+    /// URL da imagem/logo da clínica
+    /// </summary>
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
     /// Number of transactions processed by this clinic
     /// </summary>
     public int TransactionCount { get; set; }
+
+    /// <summary>
+    /// Indicates if the clinic has an image
+    /// </summary>
+    public bool HasImage => !string.IsNullOrEmpty(ImageUrl);
 
     /// <summary>
     /// Type display name for UI

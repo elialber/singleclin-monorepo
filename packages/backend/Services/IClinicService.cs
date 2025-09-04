@@ -1,5 +1,6 @@
 using SingleClin.API.DTOs.Clinic;
 using SingleClin.API.DTOs.Common;
+using Microsoft.AspNetCore.Http;
 
 namespace SingleClin.API.Services;
 
@@ -73,4 +74,21 @@ public interface IClinicService
     /// <param name="excludeId">Clinic ID to exclude from uniqueness checks (for updates)</param>
     /// <returns>List of validation errors</returns>
     Task<List<string>> ValidateAsync(ClinicRequestDto clinicRequest, Guid? excludeId = null);
+
+    /// <summary>
+    /// Update clinic image
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="imageFile">Image file to upload</param>
+    /// <returns>Updated clinic with new image</returns>
+    /// <exception cref="InvalidOperationException">Thrown when clinic not found or image upload fails</exception>
+    Task<ClinicResponseDto> UpdateImageAsync(Guid id, IFormFile imageFile);
+
+    /// <summary>
+    /// Delete clinic image
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <returns>Updated clinic without image</returns>
+    /// <exception cref="InvalidOperationException">Thrown when clinic not found</exception>
+    Task<ClinicResponseDto> DeleteImageAsync(Guid id);
 }

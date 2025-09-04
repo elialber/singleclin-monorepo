@@ -5,6 +5,7 @@ using SingleClin.API.Data.Models;
 using SingleClin.API.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace SingleClin.API.Services;
 
@@ -14,11 +15,16 @@ namespace SingleClin.API.Services;
 public class ClinicService : IClinicService
 {
     private readonly IClinicRepository _clinicRepository;
+    private readonly IImageUploadService _imageUploadService;
     private readonly ILogger<ClinicService> _logger;
 
-    public ClinicService(IClinicRepository clinicRepository, ILogger<ClinicService> logger)
+    public ClinicService(
+        IClinicRepository clinicRepository, 
+        IImageUploadService imageUploadService,
+        ILogger<ClinicService> logger)
     {
         _clinicRepository = clinicRepository;
+        _imageUploadService = imageUploadService;
         _logger = logger;
     }
 
@@ -204,6 +210,100 @@ public class ClinicService : IClinicService
         return errors;
     }
 
+    /// <summary>
+    /// Update clinic image
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="imageFile">Image file to upload</param>
+    /// <returns>Updated clinic with new image</returns>
+    public async Task<ClinicResponseDto> UpdateImageAsync(Guid id, IFormFile imageFile)
+    {
+        var clinic = await _clinicRepository.GetByIdAsync(id);
+        if (clinic == null)
+        {
+            throw new InvalidOperationException($"Clinic with ID {id} not found");
+        }
+
+        try
+        {
+            // Remove existing image if present
+            if (!string.IsNullOrEmpty(clinic.ImageFileName))
+            {
+                await _imageUploadService.DeleteImageAsync(clinic.ImageFileName, "clinics");
+            }
+
+            // Upload new image
+            var uploadResult = await _imageUploadService.UploadImageAsync(imageFile, "clinics");
+
+            if (uploadResult.Success)
+            {
+                // Update clinic with new image information
+                clinic.ImageUrl = uploadResult.Url;
+                clinic.ImageFileName = uploadResult.FileName;
+                clinic.ImageSize = uploadResult.Size;
+                clinic.ImageContentType = uploadResult.ContentType;
+                clinic.UpdatedAt = DateTime.UtcNow;
+
+                await _clinicRepository.UpdateAsync(clinic);
+
+                _logger.LogInformation("Successfully updated image for clinic {ClinicId}: {ImageUrl}", 
+                    id, uploadResult.Url);
+            }
+            else
+            {
+                throw new InvalidOperationException($"Image upload failed: {uploadResult.ErrorMessage}");
+            }
+
+            return MapToResponseDto(clinic);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating image for clinic {ClinicId}", id);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Delete clinic image
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <returns>Updated clinic without image</returns>
+    public async Task<ClinicResponseDto> DeleteImageAsync(Guid id)
+    {
+        var clinic = await _clinicRepository.GetByIdAsync(id);
+        if (clinic == null)
+        {
+            throw new InvalidOperationException($"Clinic with ID {id} not found");
+        }
+
+        try
+        {
+            // Delete image from storage if exists
+            if (!string.IsNullOrEmpty(clinic.ImageFileName))
+            {
+                await _imageUploadService.DeleteImageAsync(clinic.ImageFileName, "clinics");
+            }
+
+            // Clear image fields
+            clinic.ImageUrl = null;
+            clinic.ImageFileName = null;
+            clinic.ImageSize = null;
+            clinic.ImageContentType = null;
+            clinic.UpdatedAt = DateTime.UtcNow;
+
+            await _clinicRepository.UpdateAsync(clinic);
+
+            _logger.LogInformation("Successfully deleted image for clinic {ClinicId}", id);
+
+            return MapToResponseDto(clinic);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting image for clinic {ClinicId}", id);
+            throw;
+        }
+    }
+
     private static ClinicResponseDto MapToResponseDto(Clinic clinic)
     {
         return new ClinicResponseDto
@@ -218,6 +318,7 @@ public class ClinicService : IClinicService
             IsActive = clinic.IsActive,
             Latitude = clinic.Latitude,
             Longitude = clinic.Longitude,
+            ImageUrl = clinic.ImageUrl,
             CreatedAt = clinic.CreatedAt,
             UpdatedAt = clinic.UpdatedAt,
             TransactionCount = clinic.Transactions?.Count ?? 0

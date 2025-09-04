@@ -32,6 +32,7 @@ import {
   Grid,
   ToggleButton,
   ToggleButtonGroup,
+  Avatar,
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -433,16 +434,33 @@ export default function Clinics() {
                 <Grid item xs={12} sm={6} md={4} lg={3} key={clinic.id}>
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                        <Typography variant="h6" fontWeight={600} noWrap sx={{ flex: 1, mr: 1 }}>
-                          {clinic.name}
-                        </Typography>
-                        <Chip
-                          label={clinic.isActive ? 'Ativo' : 'Inativo'}
-                          size="small"
-                          color={clinic.isActive ? 'success' : 'default'}
-                          variant={clinic.isActive ? 'filled' : 'outlined'}
-                        />
+                      {/* Clinic Image and Header */}
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                        <Avatar
+                          src={clinic.imageUrl}
+                          alt={clinic.name}
+                          sx={{ 
+                            width: 56, 
+                            height: 56, 
+                            bgcolor: 'primary.100',
+                            fontSize: 20,
+                            fontWeight: 600
+                          }}
+                        >
+                          {clinic.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                        
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography variant="h6" fontWeight={600} noWrap sx={{ mb: 0.5 }}>
+                            {clinic.name}
+                          </Typography>
+                          <Chip
+                            label={clinic.isActive ? 'Ativo' : 'Inativo'}
+                            size="small"
+                            color={clinic.isActive ? 'success' : 'default'}
+                            variant={clinic.isActive ? 'filled' : 'outlined'}
+                          />
+                        </Box>
                       </Box>
 
                       <Chip
@@ -553,6 +571,7 @@ export default function Clinics() {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell width="80">Imagem</TableCell>
                 <TableCell>
                   <TableSortLabel
                     active={sortBy === 'name'}
@@ -605,7 +624,7 @@ export default function Clinics() {
             <TableBody>
               {isLoading && clinics.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
                     <CircularProgress size={32} />
                     <Typography variant="body2" sx={{ mt: 1 }}>
                       Carregando clínicas...
@@ -614,7 +633,7 @@ export default function Clinics() {
                 </TableRow>
               ) : clinics.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
                     <Typography variant="body2" color="text.secondary">
                       {debouncedSearch 
                         ? `Nenhuma clínica encontrada para "${debouncedSearch}"`
@@ -626,6 +645,21 @@ export default function Clinics() {
               ) : (
                 clinics.map((clinic) => (
                   <TableRow key={clinic.id} hover>
+                    <TableCell>
+                      <Avatar
+                        src={clinic.imageUrl}
+                        alt={clinic.name}
+                        sx={{ 
+                          width: 40, 
+                          height: 40, 
+                          bgcolor: 'primary.100',
+                          fontSize: 16,
+                          fontWeight: 600
+                        }}
+                      >
+                        {clinic.name.charAt(0).toUpperCase()}
+                      </Avatar>
+                    </TableCell>
                     <TableCell>
                       <Typography variant="subtitle2" fontWeight={500}>
                         {clinic.name}
