@@ -422,6 +422,88 @@
             <response code="403">Forbidden - Admin role required</response>
             <response code="404">Clinic not found</response>
         </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.UploadImages(System.Guid,SingleClin.API.DTOs.Clinic.MultipleImageUploadDto)">
+            <summary>
+            Upload multiple images to a clinic (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="uploadDto">Multiple images upload data</param>
+            <returns>Upload response with results</returns>
+            <response code="200">Images uploaded successfully</response>
+            <response code="400">Invalid image files or clinic data</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic not found</response>
+            <response code="413">File too large</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GetImages(System.Guid)">
+            <summary>
+            Get all images for a clinic
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>List of clinic images</returns>
+            <response code="200">Images retrieved successfully</response>
+            <response code="404">Clinic not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.UpdateImage(System.Guid,System.Guid,SingleClin.API.DTOs.Clinic.ClinicImageUpdateDto)">
+            <summary>
+            Update image properties (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="imageId">Image ID</param>
+            <param name="updateDto">Updated image data</param>
+            <returns>Updated image</returns>
+            <response code="200">Image updated successfully</response>
+            <response code="400">Invalid request data</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic or image not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.DeleteImageById(System.Guid,System.Guid)">
+            <summary>
+            Delete a specific image from a clinic (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="imageId">Image ID</param>
+            <returns>Success result</returns>
+            <response code="204">Image deleted successfully</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic or image not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.SetFeaturedImage(System.Guid,System.Guid)">
+            <summary>
+            Set featured image for a clinic (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="imageId">Image ID to set as featured</param>
+            <returns>Updated image</returns>
+            <response code="200">Featured image set successfully</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic or image not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.ReorderImages(System.Guid,System.Collections.Generic.Dictionary{System.Guid,System.Int32})">
+            <summary>
+            Reorder clinic images (Admin Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="imageOrders">Dictionary of image ID to display order</param>
+            <returns>List of reordered images</returns>
+            <response code="200">Images reordered successfully</response>
+            <response code="400">Invalid request data</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Forbidden - Admin role required</response>
+            <response code="404">Clinic not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.TestUploadImages(System.Guid,SingleClin.API.DTOs.Clinic.MultipleImageUploadDto)">
+            <summary>
+            TEST ENDPOINT: Upload images without authentication (Development Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <param name="uploadDto">Multiple images upload data</param>
+            <returns>Upload response with results</returns>
+        </member>
         <member name="T:SingleClin.API.Controllers.HealthController">
             <summary>
             Health check endpoints documentation
@@ -997,6 +1079,16 @@
             Transactions (credit usage)
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.Clinics">
+            <summary>
+            Clinics in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.ClinicImages">
+            <summary>
+            Clinic images
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.ApplicationDbContext">
             <summary>
             Main database context for the SingleClin application with Identity support
@@ -1005,6 +1097,11 @@
         <member name="P:SingleClin.API.Data.ApplicationDbContext.Clinics">
             <summary>
             Clinics registered in the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.ClinicImages">
+            <summary>
+            Images associated with clinics
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.ApplicationDbContext.Plans">
@@ -1050,6 +1147,11 @@
         <member name="M:SingleClin.API.Data.Configurations.BaseEntityConfiguration`1.ConfigureEntity(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{`0})">
             <summary>
             Override this method to add entity-specific configurations
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Configurations.ClinicImageConfiguration">
+            <summary>
+            Entity Framework configuration for ClinicImage entity
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Configurations.RefreshTokenConfiguration">
@@ -1234,27 +1336,102 @@
         </member>
         <member name="P:SingleClin.API.Data.Models.Clinic.ImageUrl">
             <summary>
-            URL da imagem/logo da clínica
+            URL da imagem/logo da clínica (DEPRECATED - use Images collection)
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.Models.Clinic.ImageFileName">
             <summary>
-            Nome do arquivo da imagem no storage
+            Nome do arquivo da imagem no storage (DEPRECATED - use Images collection)
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.Models.Clinic.ImageSize">
             <summary>
-            Tamanho da imagem em bytes
+            Tamanho da imagem em bytes (DEPRECATED - use Images collection)
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.Models.Clinic.ImageContentType">
             <summary>
-            Tipo MIME da imagem
+            Tipo MIME da imagem (DEPRECATED - use Images collection)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Images">
+            <summary>
+            Collection of images associated with this clinic
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.Models.Clinic.Transactions">
             <summary>
             Transactions processed by this clinic
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.ClinicImage">
+            <summary>
+            Represents an image associated with a clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.ClinicId">
+            <summary>
+            ID of the clinic this image belongs to
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.Clinic">
+            <summary>
+            Navigation property to the clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.ImageUrl">
+            <summary>
+            URL of the image in Azure Blob Storage
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.FileName">
+            <summary>
+            Original file name of the image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.StorageFileName">
+            <summary>
+            File name used in storage (with unique identifier)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.Size">
+            <summary>
+            Size of the image file in bytes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.ContentType">
+            <summary>
+            MIME type of the image (e.g., image/jpeg)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.AltText">
+            <summary>
+            Alternative text for accessibility
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.Description">
+            <summary>
+            Description of the image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.DisplayOrder">
+            <summary>
+            Display order for sorting images (0 = first)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.IsFeatured">
+            <summary>
+            Whether this is the featured/primary image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.Width">
+            <summary>
+            Width of the image in pixels
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.ClinicImage.Height">
+            <summary>
+            Height of the image in pixels
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Models.Enums.ClinicType">
@@ -2015,6 +2192,86 @@
             Sort direction (asc or desc)
             </summary>
         </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.ClinicImageDto">
+            <summary>
+            Data transfer object for clinic image data
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.Id">
+            <summary>
+            Image unique identifier
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.ClinicId">
+            <summary>
+            ID of the clinic this image belongs to
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.ImageUrl">
+            <summary>
+            URL of the image in Azure Blob Storage
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.FileName">
+            <summary>
+            Original file name of the image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.StorageFileName">
+            <summary>
+            File name used in storage (with unique identifier)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.Size">
+            <summary>
+            Size of the image file in bytes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.ContentType">
+            <summary>
+            MIME type of the image (e.g., image/jpeg)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.AltText">
+            <summary>
+            Alternative text for accessibility
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.Description">
+            <summary>
+            Description of the image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.DisplayOrder">
+            <summary>
+            Display order for sorting images (0 = first)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.IsFeatured">
+            <summary>
+            Whether this is the featured/primary image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.Width">
+            <summary>
+            Width of the image in pixels
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.Height">
+            <summary>
+            Height of the image in pixels
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.CreatedAt">
+            <summary>
+            When the image was created
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageDto.UpdatedAt">
+            <summary>
+            When the image was last updated
+            </summary>
+        </member>
         <member name="T:SingleClin.API.DTOs.Clinic.ClinicImageUploadDto">
             <summary>
             Data transfer object for clinic image upload operations
@@ -2202,7 +2459,12 @@
         </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.ImageUrl">
             <summary>
-            URL da imagem/logo da clínica
+            URL da imagem/logo da clínica (DEPRECATED - use Images collection)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Images">
+            <summary>
+            Collection of images associated with this clinic
             </summary>
         </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.TransactionCount">
@@ -2210,14 +2472,129 @@
             Number of transactions processed by this clinic
             </summary>
         </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.HasImages">
+            <summary>
+            Indicates if the clinic has images
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.FeaturedImage">
+            <summary>
+            Gets the featured image or the first image if no featured image is set
+            </summary>
+        </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.HasImage">
             <summary>
-            Indicates if the clinic has an image
+            Indicates if the clinic has an image (backward compatibility)
             </summary>
         </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.TypeDisplayName">
             <summary>
             Type display name for UI
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.MultipleImageUploadDto">
+            <summary>
+            Data transfer object for uploading multiple clinic images
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadDto.Images">
+            <summary>
+            Image files to upload (maximum 10 files)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadDto.AltTexts">
+            <summary>
+            Optional alt texts for each image (must match image count)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadDto.Descriptions">
+            <summary>
+            Optional descriptions for each image (must match image count)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadDto.DisplayOrders">
+            <summary>
+            Display orders for each image (if not provided, will use array index)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadDto.FeaturedImageIndex">
+            <summary>
+            Index of the featured image (0-based, default is first image)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.ClinicImageUpdateDto">
+            <summary>
+            Data transfer object for updating clinic image properties
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageUpdateDto.AltText">
+            <summary>
+            Alternative text for accessibility
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageUpdateDto.Description">
+            <summary>
+            Description of the image
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageUpdateDto.DisplayOrder">
+            <summary>
+            Display order for sorting images
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicImageUpdateDto.IsFeatured">
+            <summary>
+            Whether this is the featured/primary image
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto">
+            <summary>
+            Response DTO for multiple image upload operations
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.Success">
+            <summary>
+            Indicates if the upload was successful
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.UploadedImages">
+            <summary>
+            List of uploaded images
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.ErrorMessages">
+            <summary>
+            Error messages if any uploads failed
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.SuccessCount">
+            <summary>
+            Count of successfully uploaded images
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.FailureCount">
+            <summary>
+            Count of failed uploads
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.UploadedAt">
+            <summary>
+            Timestamp when the upload was completed
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.CreateSuccess(System.Collections.Generic.List{SingleClin.API.DTOs.Clinic.ClinicImageDto})">
+            <summary>
+            Create a successful upload response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.CreatePartialSuccess(System.Collections.Generic.List{SingleClin.API.DTOs.Clinic.ClinicImageDto},System.Collections.Generic.List{System.String})">
+            <summary>
+            Create a partial success response
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.Clinic.MultipleImageUploadResponseDto.CreateFailure(System.Collections.Generic.List{System.String})">
+            <summary>
+            Create a failed upload response
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.Common.ExportFormat">
@@ -4311,16 +4688,16 @@
             Adds Firebase authentication middleware to the pipeline
             </summary>
         </member>
-        <member name="T:SingleClin.API.Migrations.InitialClinicWithImages">
+        <member name="T:SingleClin.API.Migrations.AddClinicImages">
             <inheritdoc />
         </member>
-        <member name="M:SingleClin.API.Migrations.InitialClinicWithImages.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+        <member name="M:SingleClin.API.Migrations.AddClinicImages.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:SingleClin.API.Migrations.InitialClinicWithImages.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+        <member name="M:SingleClin.API.Migrations.AddClinicImages.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:SingleClin.API.Migrations.InitialClinicWithImages.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+        <member name="M:SingleClin.API.Migrations.AddClinicImages.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
         <member name="T:SingleClin.API.Migrations.ApplicationDb.AddIdentityAndRefreshTokens">
@@ -4381,6 +4758,30 @@
             <inheritdoc />
         </member>
         <member name="M:SingleClin.API.Migrations.ApplicationDb.SyncModels.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.AddApplicationUserIdToUser">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddApplicationUserIdToUser.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddApplicationUserIdToUser.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddApplicationUserIdToUser.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.AddClinicImagesTableFixed">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddClinicImagesTableFixed.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddClinicImagesTableFixed.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddClinicImagesTableFixed.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
         <member name="T:SingleClin.API.Repositories.ClinicRepository">
@@ -4881,7 +5282,7 @@
         </member>
         <member name="M:SingleClin.API.Services.IClinicService.UpdateImageAsync(System.Guid,Microsoft.AspNetCore.Http.IFormFile)">
             <summary>
-            Update clinic image
+            Update clinic image (DEPRECATED - use multiple image methods)
             </summary>
             <param name="id">Clinic ID</param>
             <param name="imageFile">Image file to upload</param>
@@ -4890,10 +5291,62 @@
         </member>
         <member name="M:SingleClin.API.Services.IClinicService.DeleteImageAsync(System.Guid)">
             <summary>
-            Delete clinic image
+            Delete clinic image (DEPRECATED - use multiple image methods)
             </summary>
             <param name="id">Clinic ID</param>
             <returns>Updated clinic without image</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic not found</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.AddImagesAsync(System.Guid,SingleClin.API.DTOs.Clinic.MultipleImageUploadDto)">
+            <summary>
+            Add multiple images to a clinic
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <param name="uploadDto">Multiple images upload data</param>
+            <returns>Upload response with results</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic not found</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.GetImagesAsync(System.Guid)">
+            <summary>
+            Get all images for a clinic
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <returns>List of clinic images</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.UpdateImageAsync(System.Guid,System.Guid,SingleClin.API.DTOs.Clinic.ClinicImageUpdateDto)">
+            <summary>
+            Update image properties (metadata only, not the file)
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <param name="imageId">Image ID</param>
+            <param name="updateDto">Updated image data</param>
+            <returns>Updated image</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic or image not found</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.DeleteImageAsync(System.Guid,System.Guid)">
+            <summary>
+            Delete a specific image from a clinic
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <param name="imageId">Image ID</param>
+            <returns>True if deleted, false if not found</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.SetFeaturedImageAsync(System.Guid,System.Guid)">
+            <summary>
+            Set featured image for a clinic
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <param name="imageId">Image ID to set as featured</param>
+            <returns>Updated image</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when clinic or image not found</exception>
+        </member>
+        <member name="M:SingleClin.API.Services.IClinicService.ReorderImagesAsync(System.Guid,System.Collections.Generic.Dictionary{System.Guid,System.Int32})">
+            <summary>
+            Reorder clinic images
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <param name="imageOrders">Dictionary of image ID to display order</param>
+            <returns>List of updated images</returns>
             <exception cref="T:System.InvalidOperationException">Thrown when clinic not found</exception>
         </member>
         <member name="T:SingleClin.API.Services.IEmailTemplateService">

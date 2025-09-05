@@ -34,6 +34,11 @@ namespace SingleClin.API.Jobs
         {
             try
             {
+                _logger.LogInformation("Balance check job is temporarily disabled due to database schema issues");
+                // TODO: Re-enable after fixing User.ApplicationUserId column mapping issue
+                return;
+
+                /*
                 _logger.LogInformation("Starting balance check job execution at {Timestamp}", DateTime.UtcNow);
 
                 // Get all active user plans with remaining credits
@@ -110,6 +115,7 @@ namespace SingleClin.API.Jobs
 
                 _logger.LogInformation("Balance check job completed. Notifications sent: {Sent}, skipped: {Skipped}", 
                     notificationsSent, notificationsSkipped);
+                */
             }
             catch (Exception ex)
             {
@@ -127,13 +133,12 @@ namespace SingleClin.API.Jobs
             {
                 // Get all active user plans with remaining credits <= 5 (maximum threshold)
                 var lowBalanceUserPlans = await _context.UserPlans
-                    .Include(up => up.User)
-                    .Include(up => up.Plan)
                     .Where(up => up.CreditsRemaining <= 5 && 
                                 up.CreditsRemaining > 0 && 
-                                up.IsActive &&
-                                up.User != null && 
-                                up.Plan != null)
+                                up.IsActive)
+                    .Include(up => up.User)
+                    .Include(up => up.Plan)
+                    .Where(up => up.User != null && up.Plan != null)
                     .ToListAsync();
 
                 return lowBalanceUserPlans;

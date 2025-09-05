@@ -68,9 +68,15 @@ public class ClinicResponseDto
     public DateTime UpdatedAt { get; set; }
 
     /// <summary>
-    /// URL da imagem/logo da clínica
+    /// URL da imagem/logo da clínica (DEPRECATED - use Images collection)
     /// </summary>
+    [Obsolete("Use Images collection instead. Will be removed in future version.")]
     public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// Collection of images associated with this clinic
+    /// </summary>
+    public List<ClinicImageDto> Images { get; set; } = new();
 
     /// <summary>
     /// Number of transactions processed by this clinic
@@ -78,9 +84,20 @@ public class ClinicResponseDto
     public int TransactionCount { get; set; }
 
     /// <summary>
-    /// Indicates if the clinic has an image
+    /// Indicates if the clinic has images
     /// </summary>
-    public bool HasImage => !string.IsNullOrEmpty(ImageUrl);
+    public bool HasImages => Images.Count > 0;
+
+    /// <summary>
+    /// Gets the featured image or the first image if no featured image is set
+    /// </summary>
+    public ClinicImageDto? FeaturedImage => Images.FirstOrDefault(i => i.IsFeatured) ?? Images.FirstOrDefault();
+
+    /// <summary>
+    /// Indicates if the clinic has an image (backward compatibility)
+    /// </summary>
+    [Obsolete("Use HasImages instead. Will be removed in future version.")]
+    public bool HasImage => HasImages || !string.IsNullOrEmpty(ImageUrl);
 
     /// <summary>
     /// Type display name for UI

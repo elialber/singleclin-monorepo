@@ -574,4 +574,365 @@ public class ClinicController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while deleting the image" });
         }
     }
+
+    // Multiple Images Management Endpoints
+
+    /// <summary>
+    /// Upload multiple images to a clinic (Admin Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="uploadDto">Multiple images upload data</param>
+    /// <returns>Upload response with results</returns>
+    /// <response code="200">Images uploaded successfully</response>
+    /// <response code="400">Invalid image files or clinic data</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden - Admin role required</response>
+    /// <response code="404">Clinic not found</response>
+    /// <response code="413">File too large</response>
+    [HttpPost("{id:guid}/images")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Upload multiple clinic images",
+        Description = @"Upload multiple images for a specific clinic. Admin role required.
+**Supported formats:** JPEG, PNG, WebP
+**Maximum file size:** 5MB per file
+**Maximum files:** 10 images
+**Automatic processing:** Images are resized and optimized for web",
+        OperationId = "UploadClinicImages"
+    )]
+    [SwaggerResponse(200, "Images uploaded successfully", typeof(MultipleImageUploadResponseDto))]
+    [SwaggerResponse(400, "Bad Request - Invalid image files")]
+    [SwaggerResponse(401, "Unauthorized")]
+    [SwaggerResponse(403, "Forbidden - Admin role required")]
+    [SwaggerResponse(404, "Clinic not found")]
+    [SwaggerResponse(413, "Payload Too Large - File exceeds size limit")]
+    public async Task<ActionResult<MultipleImageUploadResponseDto>> UploadImages(
+        [Required] Guid id, 
+        [FromForm] MultipleImageUploadDto uploadDto)
+    {
+        try
+        {
+            // Validate that images are provided
+            if (uploadDto.Images == null || uploadDto.Images.Length == 0)
+            {
+                _logger.LogWarning("Multiple images upload attempted with no files for clinic: {ClinicId}", id);
+                return BadRequest(new { message = "No image files provided" });
+            }
+
+            if (uploadDto.Images.Length > 10)
+            {
+                _logger.LogWarning("Too many images uploaded for clinic: {ClinicId}, Count: {Count}", id, uploadDto.Images.Length);
+                return BadRequest(new { message = "Maximum 10 images allowed" });
+            }
+
+            // Validate each image file
+            foreach (var image in uploadDto.Images)
+            {
+                if (!await _imageUploadService.ValidateImageAsync(image))
+                {
+                    _logger.LogWarning("Invalid image file in batch upload for clinic: {ClinicId}, FileName: {FileName}", 
+                        id, image.FileName);
+                    return BadRequest(new { message = $"Invalid image file: {image.FileName}. Please ensure all files are valid JPEG, PNG, or WebP images under 5MB." });
+                }
+            }
+
+            // Upload images via service
+            var result = await _clinicService.AddImagesAsync(id, uploadDto);
+            
+            _logger.LogInformation("Uploaded {SuccessCount} images for clinic: {ClinicId}", result.SuccessCount, id);
+            
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            _logger.LogWarning("Clinic not found for images upload: {ClinicId}", id);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading images for clinic: {ClinicId}", id);
+            return StatusCode(500, new { message = "An error occurred while uploading the images" });
+        }
+    }
+
+    /// <summary>
+    /// Get all images for a clinic
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <returns>List of clinic images</returns>
+    /// <response code="200">Images retrieved successfully</response>
+    /// <response code="404">Clinic not found</response>
+    [HttpGet("{id:guid}/images")]
+    [SwaggerOperation(
+        Summary = "Get clinic images",
+        Description = "Retrieve all images for a specific clinic ordered by display order.",
+        OperationId = "GetClinicImages"
+    )]
+    [SwaggerResponse(200, "Images retrieved successfully", typeof(List<ClinicImageDto>))]
+    [SwaggerResponse(404, "Clinic not found")]
+    public async Task<ActionResult<List<ClinicImageDto>>> GetImages([Required] Guid id)
+    {
+        try
+        {
+            var images = await _clinicService.GetImagesAsync(id);
+            return Ok(images);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving images for clinic: {ClinicId}", id);
+            return StatusCode(500, new { message = "An error occurred while retrieving the images" });
+        }
+    }
+
+    /// <summary>
+    /// Update image properties (Admin Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="imageId">Image ID</param>
+    /// <param name="updateDto">Updated image data</param>
+    /// <returns>Updated image</returns>
+    /// <response code="200">Image updated successfully</response>
+    /// <response code="400">Invalid request data</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden - Admin role required</response>
+    /// <response code="404">Clinic or image not found</response>
+    [HttpPut("{id:guid}/images/{imageId:guid}")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Update clinic image properties",
+        Description = "Update metadata for a specific clinic image (alt text, description, display order, featured status). Admin role required.",
+        OperationId = "UpdateClinicImage"
+    )]
+    [SwaggerResponse(200, "Image updated successfully", typeof(ClinicImageDto))]
+    [SwaggerResponse(400, "Bad Request - Invalid data")]
+    [SwaggerResponse(401, "Unauthorized")]
+    [SwaggerResponse(403, "Forbidden - Admin role required")]
+    [SwaggerResponse(404, "Clinic or image not found")]
+    public async Task<ActionResult<ClinicImageDto>> UpdateImage(
+        [Required] Guid id, 
+        [Required] Guid imageId, 
+        [FromBody] ClinicImageUpdateDto updateDto)
+    {
+        try
+        {
+            var image = await _clinicService.UpdateImageAsync(id, imageId, updateDto);
+            
+            _logger.LogInformation("Successfully updated image {ImageId} for clinic: {ClinicId}", imageId, id);
+            
+            return Ok(image);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            _logger.LogWarning("Clinic or image not found for update: ClinicId={ClinicId}, ImageId={ImageId}", id, imageId);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating image {ImageId} for clinic: {ClinicId}", imageId, id);
+            return StatusCode(500, new { message = "An error occurred while updating the image" });
+        }
+    }
+
+    /// <summary>
+    /// Delete a specific image from a clinic (Admin Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="imageId">Image ID</param>
+    /// <returns>Success result</returns>
+    /// <response code="204">Image deleted successfully</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden - Admin role required</response>
+    /// <response code="404">Clinic or image not found</response>
+    [HttpDelete("{id:guid}/images/{imageId:guid}")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Delete clinic image",
+        Description = "Remove a specific image from a clinic. Admin role required.",
+        OperationId = "DeleteClinicImageById"
+    )]
+    [SwaggerResponse(204, "Image deleted successfully")]
+    [SwaggerResponse(401, "Unauthorized")]
+    [SwaggerResponse(403, "Forbidden - Admin role required")]
+    [SwaggerResponse(404, "Clinic or image not found")]
+    public async Task<ActionResult> DeleteImageById([Required] Guid id, [Required] Guid imageId)
+    {
+        try
+        {
+            var deleted = await _clinicService.DeleteImageAsync(id, imageId);
+            
+            if (!deleted)
+            {
+                _logger.LogWarning("Clinic or image not found for deletion: ClinicId={ClinicId}, ImageId={ImageId}", id, imageId);
+                return NotFound(new { message = "Clinic or image not found" });
+            }
+            
+            _logger.LogInformation("Successfully deleted image {ImageId} from clinic: {ClinicId}", imageId, id);
+            
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting image {ImageId} from clinic: {ClinicId}", imageId, id);
+            return StatusCode(500, new { message = "An error occurred while deleting the image" });
+        }
+    }
+
+    /// <summary>
+    /// Set featured image for a clinic (Admin Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="imageId">Image ID to set as featured</param>
+    /// <returns>Updated image</returns>
+    /// <response code="200">Featured image set successfully</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden - Admin role required</response>
+    /// <response code="404">Clinic or image not found</response>
+    [HttpPost("{id:guid}/images/{imageId:guid}/set-featured")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Set featured clinic image",
+        Description = "Set a specific image as the featured/primary image for a clinic. This will clear the featured status from other images. Admin role required.",
+        OperationId = "SetFeaturedClinicImage"
+    )]
+    [SwaggerResponse(200, "Featured image set successfully", typeof(ClinicImageDto))]
+    [SwaggerResponse(401, "Unauthorized")]
+    [SwaggerResponse(403, "Forbidden - Admin role required")]
+    [SwaggerResponse(404, "Clinic or image not found")]
+    public async Task<ActionResult<ClinicImageDto>> SetFeaturedImage([Required] Guid id, [Required] Guid imageId)
+    {
+        try
+        {
+            var image = await _clinicService.SetFeaturedImageAsync(id, imageId);
+            
+            _logger.LogInformation("Successfully set featured image {ImageId} for clinic: {ClinicId}", imageId, id);
+            
+            return Ok(image);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            _logger.LogWarning("Clinic or image not found for featured image: ClinicId={ClinicId}, ImageId={ImageId}", id, imageId);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error setting featured image {ImageId} for clinic: {ClinicId}", imageId, id);
+            return StatusCode(500, new { message = "An error occurred while setting the featured image" });
+        }
+    }
+
+    /// <summary>
+    /// Reorder clinic images (Admin Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="imageOrders">Dictionary of image ID to display order</param>
+    /// <returns>List of reordered images</returns>
+    /// <response code="200">Images reordered successfully</response>
+    /// <response code="400">Invalid request data</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden - Admin role required</response>
+    /// <response code="404">Clinic not found</response>
+    [HttpPost("{id:guid}/images/reorder")]
+    [Authorize(Policy = "RequireAdministratorRole")]
+    [SwaggerOperation(
+        Summary = "Reorder clinic images",
+        Description = "Change the display order of clinic images. Provide a dictionary mapping image IDs to their new display order. Admin role required.",
+        OperationId = "ReorderClinicImages"
+    )]
+    [SwaggerResponse(200, "Images reordered successfully", typeof(List<ClinicImageDto>))]
+    [SwaggerResponse(400, "Bad Request - Invalid data")]
+    [SwaggerResponse(401, "Unauthorized")]
+    [SwaggerResponse(403, "Forbidden - Admin role required")]
+    [SwaggerResponse(404, "Clinic not found")]
+    public async Task<ActionResult<List<ClinicImageDto>>> ReorderImages(
+        [Required] Guid id, 
+        [FromBody] Dictionary<Guid, int> imageOrders)
+    {
+        try
+        {
+            if (imageOrders == null || imageOrders.Count == 0)
+            {
+                return BadRequest(new { message = "Image order data is required" });
+            }
+
+            var images = await _clinicService.ReorderImagesAsync(id, imageOrders);
+            
+            _logger.LogInformation("Successfully reordered {Count} images for clinic: {ClinicId}", imageOrders.Count, id);
+            
+            return Ok(images);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            _logger.LogWarning("Clinic not found for image reordering: {ClinicId}", id);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error reordering images for clinic: {ClinicId}", id);
+            return StatusCode(500, new { message = "An error occurred while reordering the images" });
+        }
+    }
+
+    /// <summary>
+    /// TEST ENDPOINT: Upload images without authentication (Development Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <param name="uploadDto">Multiple images upload data</param>
+    /// <returns>Upload response with results</returns>
+    [HttpPost("{id:guid}/images/test")]
+    [AllowAnonymous]
+    [SwaggerOperation(
+        Summary = "TEST: Upload clinic images without auth (DEV ONLY)",
+        Description = "Test endpoint to upload images without authentication. REMOVE IN PRODUCTION!",
+        OperationId = "TestUploadClinicImages"
+    )]
+    public async Task<ActionResult<MultipleImageUploadResponseDto>> TestUploadImages(
+        [Required] Guid id, 
+        [FromForm] MultipleImageUploadDto uploadDto)
+    {
+        try
+        {
+            _logger.LogWarning("⚠️  TEST ENDPOINT: Using non-authenticated image upload for clinic {ClinicId}", id);
+            
+            // Validate that images are provided
+            if (uploadDto.Images == null || uploadDto.Images.Length == 0)
+            {
+                _logger.LogWarning("Multiple images upload attempted with no files for clinic: {ClinicId}", id);
+                return BadRequest(new { message = "No image files provided" });
+            }
+
+            if (uploadDto.Images.Length > 10)
+            {
+                _logger.LogWarning("Too many images uploaded for clinic: {ClinicId}, Count: {Count}", id, uploadDto.Images.Length);
+                return BadRequest(new { message = "Maximum 10 images allowed" });
+            }
+
+            // Validate each image file
+            foreach (var image in uploadDto.Images)
+            {
+                if (!await _imageUploadService.ValidateImageAsync(image))
+                {
+                    _logger.LogWarning("Invalid image file in batch upload for clinic: {ClinicId}, FileName: {FileName}", 
+                        id, image.FileName);
+                    return BadRequest(new { message = $"Invalid image file: {image.FileName}. Please ensure all files are valid JPEG, PNG, or WebP images under 5MB." });
+                }
+            }
+
+            // Upload images via service
+            var result = await _clinicService.AddImagesAsync(id, uploadDto);
+            
+            _logger.LogInformation("✅ TEST: Uploaded {SuccessCount} images for clinic: {ClinicId}", result.SuccessCount, id);
+            
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            _logger.LogWarning("Clinic not found for images upload: {ClinicId}", id);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ TEST: Error uploading images for clinic: {ClinicId}", id);
+            return StatusCode(500, new { message = "An error occurred while uploading the images" });
+        }
+    }
 }

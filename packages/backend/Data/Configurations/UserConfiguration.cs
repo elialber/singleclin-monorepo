@@ -39,6 +39,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasConversion<int>();
             
+        builder.Property(u => u.ApplicationUserId)
+            .IsRequired();
+            
         // Relationships
         builder.HasMany(u => u.UserPlans)
             .WithOne(up => up.User)

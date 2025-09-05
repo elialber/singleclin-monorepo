@@ -35,6 +35,16 @@ public class AppDbContext : DbContext
     /// </summary>
     public DbSet<Transaction> Transactions => Set<Transaction>();
     
+    /// <summary>
+    /// Clinics in the system
+    /// </summary>
+    public DbSet<Clinic> Clinics => Set<Clinic>();
+    
+    /// <summary>
+    /// Clinic images
+    /// </summary>
+    public DbSet<ClinicImage> ClinicImages => Set<ClinicImage>();
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,6 +84,9 @@ public class AppDbContext : DbContext
         // Apply specific configurations only for AppDbContext entities
         // NOTE: We explicitly avoid ApplicationUser configurations to prevent conflicts
         // with ApplicationDbContext which handles Identity entities
+        
+        // Apply entity configurations
+        modelBuilder.ApplyConfiguration(new Data.Configurations.ClinicImageConfiguration());
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

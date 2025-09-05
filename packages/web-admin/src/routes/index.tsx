@@ -15,6 +15,7 @@ import Plans from '@/pages/plans/Plans'
 import Clinics from '@/pages/clinics/Clinics'
 import Patients from '@/pages/patients/Patients'
 import PatientDetails from '@/pages/patients/PatientDetails'
+import ClinicStepperPage from '@/pages/clinics/ClinicStepper'
 import Users from '@/pages/users/Users'
 import Transactions from '@/pages/transactions/Transactions'
 import Reports from '@/pages/reports/Reports'
@@ -41,6 +42,8 @@ export default function Router() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/plans" element={<Plans />} />
         <Route path="/clinics" element={<Clinics />} />
+        <Route path="/clinics/new" element={<ClinicStepperPage />} />
+        <Route path="/clinics/:id/edit" element={<ClinicStepperPage />} />
         <Route path="/patients" element={<Patients />} />
         <Route path="/patients/:id" element={<PatientDetails />} />
         <Route path="/users" element={<Users />} />

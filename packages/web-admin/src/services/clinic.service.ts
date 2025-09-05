@@ -6,7 +6,11 @@ import {
   ClinicListResponse, 
   ClinicType,
   ClinicImageUpload,
-  ImageUploadResult
+  ImageUploadResult,
+  MultipleImageUploadRequest,
+  MultipleImageUploadResponse,
+  ClinicImage,
+  ClinicImageUpdateRequest
 } from '@/types/clinic'
 
 export interface ClinicQueryParams {
@@ -219,5 +223,97 @@ export const clinicService = {
     // Para Azure Blob Storage, a URL já é retornada completa do backend
     // Esta função pode ser usada para gerar URLs de preview ou cache
     return `https://singleclin.blob.core.windows.net/clinic-images/clinics/${fileName}`
+  },
+
+  // Multiple Images API Methods
+
+  async uploadMultipleImages(clinicId: string, uploadData: MultipleImageUploadRequest): Promise<MultipleImageUploadResponse> {
+    try {
+      const formData = new FormData()
+      
+      // Add all image files
+      uploadData.images.forEach((image, index) => {
+        formData.append('Images', image)
+      })
+      
+      // Add alt texts if provided
+      if (uploadData.altTexts) {
+        uploadData.altTexts.forEach((altText, index) => {
+          if (altText) {
+            formData.append('AltTexts', altText)
+          }
+        })
+      }
+      
+      // Add descriptions if provided
+      if (uploadData.descriptions) {
+        uploadData.descriptions.forEach((description, index) => {
+          if (description) {
+            formData.append('Descriptions', description)
+          }
+        })
+      }
+      
+      // Add display orders if provided
+      if (uploadData.displayOrders) {
+        uploadData.displayOrders.forEach((order, index) => {
+          formData.append('DisplayOrders', order.toString())
+        })
+      }
+      
+      // Add featured image index
+      if (uploadData.featuredImageIndex !== undefined) {
+        formData.append('FeaturedImageIndex', uploadData.featuredImageIndex.toString())
+      }
+
+      const response = await api.post<MultipleImageUploadResponse>(`/clinic/${clinicId}/images`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      return response.data
+    } catch (error: any) {
+      const errorMessages = error?.response?.data?.errorMessages || 
+                          [error?.response?.data?.message || error?.message || 'Erro ao fazer upload das imagens']
+      
+      return {
+        success: false,
+        uploadedImages: [],
+        errorMessages,
+        successCount: 0,
+        failureCount: uploadData.images.length,
+        uploadedAt: new Date().toISOString()
+      }
+    }
+  },
+
+  async getClinicImages(clinicId: string): Promise<ClinicImage[]> {
+    try {
+      const response = await api.get<ClinicImage[]>(`/clinic/${clinicId}/images`)
+      return response.data
+    } catch (error: any) {
+      console.error('Error fetching clinic images:', error)
+      return []
+    }
+  },
+
+  async updateClinicImage(clinicId: string, imageId: string, updateData: ClinicImageUpdateRequest): Promise<ClinicImage> {
+    const response = await api.put<ClinicImage>(`/clinic/${clinicId}/images/${imageId}`, updateData)
+    return response.data
+  },
+
+  async deleteClinicImage(clinicId: string, imageId: string): Promise<void> {
+    await api.delete(`/clinic/${clinicId}/images/${imageId}`)
+  },
+
+  async setFeaturedImage(clinicId: string, imageId: string): Promise<ClinicImage> {
+    const response = await api.post<ClinicImage>(`/clinic/${clinicId}/images/${imageId}/set-featured`)
+    return response.data
+  },
+
+  async reorderImages(clinicId: string, imageOrders: Record<string, number>): Promise<ClinicImage[]> {
+    const response = await api.post<ClinicImage[]>(`/clinic/${clinicId}/images/reorder`, imageOrders)
+    return response.data
   },
 }

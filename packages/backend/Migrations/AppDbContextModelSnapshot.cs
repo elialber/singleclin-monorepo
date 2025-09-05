@@ -97,6 +97,107 @@ namespace SingleClin.API.Migrations
                     b.ToTable("clinics");
                 });
 
+            modelBuilder.Entity("SingleClin.API.Data.Models.ClinicImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AltText")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("alt_text");
+
+                    b.Property<Guid>("ClinicId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("clinic_id");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("content_type");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("display_order");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("file_name");
+
+                    b.Property<int?>("Height")
+                        .HasColumnType("integer")
+                        .HasColumnName("height");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasColumnName("image_url");
+
+                    b.Property<bool>("IsFeatured")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_featured");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint")
+                        .HasColumnName("size");
+
+                    b.Property<string>("StorageFileName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("storage_file_name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int?>("Width")
+                        .HasColumnType("integer")
+                        .HasColumnName("width");
+
+                    b.HasKey("Id")
+                        .HasName("pk_clinic_images");
+
+                    b.HasIndex("ClinicId")
+                        .HasDatabaseName("IX_ClinicImages_ClinicId");
+
+                    b.HasIndex("StorageFileName")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ClinicImages_StorageFileName");
+
+                    b.HasIndex("ClinicId", "DisplayOrder")
+                        .HasDatabaseName("IX_ClinicImages_ClinicId_DisplayOrder");
+
+                    b.HasIndex("ClinicId", "IsFeatured")
+                        .HasDatabaseName("IX_ClinicImages_ClinicId_IsFeatured")
+                        .HasFilter("is_featured = true");
+
+                    b.ToTable("ClinicImages", (string)null);
+                });
+
             modelBuilder.Entity("SingleClin.API.Data.Models.Plan", b =>
                 {
                     b.Property<Guid>("Id")
@@ -390,6 +491,18 @@ namespace SingleClin.API.Migrations
                     b.ToTable("user_plans");
                 });
 
+            modelBuilder.Entity("SingleClin.API.Data.Models.ClinicImage", b =>
+                {
+                    b.HasOne("SingleClin.API.Data.Models.Clinic", "Clinic")
+                        .WithMany("Images")
+                        .HasForeignKey("ClinicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_clinic_images_clinics_clinic_id");
+
+                    b.Navigation("Clinic");
+                });
+
             modelBuilder.Entity("SingleClin.API.Data.Models.Transaction", b =>
                 {
                     b.HasOne("SingleClin.API.Data.Models.Clinic", "Clinic")
@@ -434,6 +547,8 @@ namespace SingleClin.API.Migrations
 
             modelBuilder.Entity("SingleClin.API.Data.Models.Clinic", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Transactions");
                 });
 

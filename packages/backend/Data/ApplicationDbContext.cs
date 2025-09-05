@@ -21,6 +21,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<Clinic> Clinics => Set<Clinic>();
     
     /// <summary>
+    /// Images associated with clinics
+    /// </summary>
+    public DbSet<ClinicImage> ClinicImages => Set<ClinicImage>();
+    
+    /// <summary>
     /// Available plans for purchase
     /// </summary>
     public DbSet<Plan> Plans => Set<Plan>();

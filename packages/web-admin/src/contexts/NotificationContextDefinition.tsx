@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext, useContext } from 'react'
 import { AlertColor } from '@mui/material'
 
 export interface NotificationOptions {
@@ -33,3 +33,11 @@ interface NotificationContextData {
 export const NotificationContext = createContext<NotificationContextData>(
   {} as NotificationContextData,
 )
+
+export const useNotification = () => {
+  const context = useContext(NotificationContext)
+  if (!context) {
+    throw new Error('useNotification must be used within a NotificationProvider')
+  }
+  return context
+}

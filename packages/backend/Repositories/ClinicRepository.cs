@@ -67,6 +67,7 @@ public class ClinicRepository : IClinicRepository
 
         // Apply pagination
         var clinics = await query
+            .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .AsNoTracking()
@@ -82,6 +83,7 @@ public class ClinicRepository : IClinicRepository
     {
         var clinic = await _context.Clinics
             .Include(c => c.Transactions)
+            .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -114,6 +116,7 @@ public class ClinicRepository : IClinicRepository
     public async Task<IEnumerable<Clinic>> GetActiveAsync()
     {
         var clinics = await _context.Clinics
+            .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
             .Where(c => c.IsActive)
             .OrderBy(c => c.Name)
             .AsNoTracking()

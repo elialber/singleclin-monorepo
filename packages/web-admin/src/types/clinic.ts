@@ -5,6 +5,24 @@ export enum ClinicType {
   Administrative = 3,
 }
 
+export interface ClinicImage {
+  id: string
+  clinicId: string
+  imageUrl: string
+  fileName: string
+  storageFileName: string
+  size: number
+  contentType: string
+  altText?: string
+  description?: string
+  displayOrder: number
+  isFeatured: boolean
+  width?: number
+  height?: number
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Clinic {
   id: string
   name: string
@@ -16,12 +34,15 @@ export interface Clinic {
   isActive: boolean
   latitude?: number
   longitude?: number
-  imageUrl?: string
+  imageUrl?: string // Deprecated - use images instead
+  images: ClinicImage[]
   createdAt: string
   updatedAt: string
   transactionCount: number
   typeDisplayName: string
-  hasImage: boolean
+  hasImage: boolean // Deprecated - use hasImages instead
+  hasImages: boolean
+  featuredImage?: ClinicImage
 }
 
 export interface CreateClinicRequest {
@@ -82,6 +103,32 @@ export interface ClinicImageUpload {
   image: File
   altText?: string
   description?: string
+}
+
+// Multiple images upload interface
+export interface MultipleImageUploadRequest {
+  images: File[]
+  altTexts?: string[]
+  descriptions?: string[]
+  displayOrders?: number[]
+  featuredImageIndex?: number
+}
+
+export interface MultipleImageUploadResponse {
+  success: boolean
+  uploadedImages: ClinicImage[]
+  errorMessages: string[]
+  successCount: number
+  failureCount: number
+  uploadedAt: string
+}
+
+// Image update interface
+export interface ClinicImageUpdateRequest {
+  altText?: string
+  description?: string
+  displayOrder: number
+  isFeatured: boolean
 }
 
 export interface ImageUploadResponse {

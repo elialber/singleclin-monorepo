@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -51,19 +52,46 @@ import {
   ViewList as ViewListIcon,
   ViewModule as ViewModuleIcon,
 } from '@mui/icons-material'
-import { Clinic, ClinicType, getClinicTypeLabel, getClinicTypeColor } from '@/types/clinic'
+import { Clinic, ClinicImage, ClinicType, getClinicTypeLabel, getClinicTypeColor } from '@/types/clinic'
 import { 
   useClinics, 
   useDeleteClinic, 
   useToggleClinicStatus, 
 } from '@/hooks/useClinics'
 import { ClinicQueryParams } from '@/services/clinic.service'
-import ClinicFormDialog from '@/components/ClinicFormDialog'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { useDebounce } from '@/hooks/useDebounce'
 import { formatDate, formatPhone, formatCNPJ } from '@/utils/format'
+import ImageCarousel, { ClinicImage as CarouselImage } from '@/components/clinic/ImageCarousel'
+
+// Helper function to get clinic images for carousel
+function getClinicImages(clinic: Clinic): CarouselImage[] {
+  // Use the new images array from the clinic
+  if (clinic.images && clinic.images.length > 0) {
+    return clinic.images.map(image => ({
+      url: image.imageUrl,
+      altText: image.altText || `Imagem da clínica ${clinic.name}`,
+      title: image.description || `${clinic.name} - Imagem`
+    }))
+  }
+  
+  // Fallback to deprecated imageUrl for backward compatibility
+  if (clinic.imageUrl) {
+    return [
+      {
+        url: clinic.imageUrl,
+        altText: `Imagem principal da clínica ${clinic.name}`,
+        title: `${clinic.name} - Imagem principal`
+      }
+    ]
+  }
+  
+  return []
+}
 
 export default function Clinics() {
+  const navigate = useNavigate()
+  
   // State for filters and pagination
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -103,9 +131,7 @@ export default function Clinics() {
   const debouncedCityFilter = useDebounce(cityFilter, 500)
   const debouncedStateFilter = useDebounce(stateFilter, 500)
   
-  // Dialog states
-  const [clinicDialogOpen, setClinicDialogOpen] = useState(false)
-  const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null)
+  // Dialog states (removed clinic dialog - now using stepper page)
   
   // Confirm dialog states
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
@@ -196,14 +222,12 @@ export default function Clinics() {
   }, [refetch])
 
   const handleCreateClinic = useCallback(() => {
-    setSelectedClinic(null)
-    setClinicDialogOpen(true)
-  }, [])
+    navigate('/clinics/new')
+  }, [navigate])
 
   const handleEditClinic = useCallback((clinic: Clinic) => {
-    setSelectedClinic(clinic)
-    setClinicDialogOpen(true)
-  }, [])
+    navigate(`/clinics/${clinic.id}/edit`)
+  }, [navigate])
 
   const handleDeleteClinic = useCallback((clinic: Clinic) => {
     setConfirmDialogTitle('Confirmar exclusão')
@@ -221,9 +245,7 @@ export default function Clinics() {
   }, [toggleStatus])
 
   const handleCloseDialogs = useCallback(() => {
-    setClinicDialogOpen(false)
     setConfirmDialogOpen(false)
-    setSelectedClinic(null)
     setConfirmDialogAction(null)
   }, [])
 
@@ -434,33 +456,31 @@ export default function Clinics() {
                 <Grid item xs={12} sm={6} md={4} lg={3} key={clinic.id}>
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ flex: 1 }}>
-                      {/* Clinic Image and Header */}
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-                        <Avatar
-                          src={clinic.imageUrl}
-                          alt={clinic.name}
-                          sx={{ 
-                            width: 56, 
-                            height: 56, 
-                            bgcolor: 'primary.100',
-                            fontSize: 20,
-                            fontWeight: 600
-                          }}
-                        >
-                          {clinic.name.charAt(0).toUpperCase()}
-                        </Avatar>
-                        
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography variant="h6" fontWeight={600} noWrap sx={{ mb: 0.5 }}>
-                            {clinic.name}
-                          </Typography>
-                          <Chip
-                            label={clinic.isActive ? 'Ativo' : 'Inativo'}
-                            size="small"
-                            color={clinic.isActive ? 'success' : 'default'}
-                            variant={clinic.isActive ? 'filled' : 'outlined'}
-                          />
-                        </Box>
+                      {/* Clinic Image Carousel */}
+                      <Box sx={{ mb: 2 }}>
+                        <ImageCarousel
+                          images={getClinicImages(clinic)}
+                          clinicName={clinic.name}
+                          height={160}
+                          width="100%"
+                          borderRadius={8}
+                          showControls={true}
+                          allowFullscreen={true}
+                          fallbackMessage="Sem imagem"
+                        />
+                      </Box>
+
+                      {/* Clinic Header */}
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Typography variant="h6" fontWeight={600} noWrap sx={{ flex: 1, mr: 1 }}>
+                          {clinic.name}
+                        </Typography>
+                        <Chip
+                          label={clinic.isActive ? 'Ativo' : 'Inativo'}
+                          size="small"
+                          color={clinic.isActive ? 'success' : 'default'}
+                          variant={clinic.isActive ? 'filled' : 'outlined'}
+                        />
                       </Box>
 
                       <Chip
@@ -571,7 +591,7 @@ export default function Clinics() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell width="80">Imagem</TableCell>
+                <TableCell width="120">Imagens</TableCell>
                 <TableCell>
                   <TableSortLabel
                     active={sortBy === 'name'}
@@ -646,19 +666,16 @@ export default function Clinics() {
                 clinics.map((clinic) => (
                   <TableRow key={clinic.id} hover>
                     <TableCell>
-                      <Avatar
-                        src={clinic.imageUrl}
-                        alt={clinic.name}
-                        sx={{ 
-                          width: 40, 
-                          height: 40, 
-                          bgcolor: 'primary.100',
-                          fontSize: 16,
-                          fontWeight: 600
-                        }}
-                      >
-                        {clinic.name.charAt(0).toUpperCase()}
-                      </Avatar>
+                      <ImageCarousel
+                        images={getClinicImages(clinic)}
+                        clinicName={clinic.name}
+                        height={60}
+                        width={80}
+                        borderRadius={4}
+                        showControls={getClinicImages(clinic).length > 1}
+                        allowFullscreen={true}
+                        fallbackMessage="Sem imagem"
+                      />
                     </TableCell>
                     <TableCell>
                       <Typography variant="subtitle2" fontWeight={500}>
@@ -787,12 +804,6 @@ export default function Clinics() {
       )}
 
       {/* Dialogs */}
-      <ClinicFormDialog
-        open={clinicDialogOpen}
-        onClose={handleCloseDialogs}
-        clinic={selectedClinic}
-      />
-
       <ConfirmDialog
         open={confirmDialogOpen}
         onClose={handleCloseDialogs}

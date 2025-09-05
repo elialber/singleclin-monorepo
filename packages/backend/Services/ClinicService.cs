@@ -17,15 +17,18 @@ public class ClinicService : IClinicService
     private readonly IClinicRepository _clinicRepository;
     private readonly IImageUploadService _imageUploadService;
     private readonly ILogger<ClinicService> _logger;
+    private readonly ApplicationDbContext _context;
 
     public ClinicService(
         IClinicRepository clinicRepository, 
         IImageUploadService imageUploadService,
-        ILogger<ClinicService> logger)
+        ILogger<ClinicService> logger,
+        ApplicationDbContext context)
     {
         _clinicRepository = clinicRepository;
         _imageUploadService = imageUploadService;
         _logger = logger;
+        _context = context;
     }
 
     public async Task<PagedResultDto<ClinicResponseDto>> GetAllAsync(ClinicFilterDto filter)
@@ -304,6 +307,240 @@ public class ClinicService : IClinicService
         }
     }
 
+    // Multiple Image Management Methods
+
+    public async Task<MultipleImageUploadResponseDto> AddImagesAsync(Guid clinicId, MultipleImageUploadDto uploadDto)
+    {
+        var clinic = await _clinicRepository.GetByIdAsync(clinicId);
+        if (clinic == null)
+        {
+            throw new InvalidOperationException($"Clinic with ID {clinicId} not found");
+        }
+
+        var uploadedImages = new List<ClinicImageDto>();
+        var errorMessages = new List<string>();
+
+        try
+        {
+            for (int i = 0; i < uploadDto.Images.Length; i++)
+            {
+                var imageFile = uploadDto.Images[i];
+                
+                try
+                {
+                    var uploadResult = await _imageUploadService.UploadImageAsync(imageFile, "clinics");
+                    
+                    if (uploadResult.Success)
+                    {
+                        var clinicImage = new ClinicImage
+                        {
+                            Id = Guid.NewGuid(),
+                            ClinicId = clinicId,
+                            ImageUrl = uploadResult.Url!,
+                            FileName = imageFile.FileName,
+                            StorageFileName = uploadResult.FileName!,
+                            Size = uploadResult.Size,
+                            ContentType = uploadResult.ContentType!,
+                            AltText = uploadDto.AltTexts?.ElementAtOrDefault(i),
+                            Description = uploadDto.Descriptions?.ElementAtOrDefault(i),
+                            DisplayOrder = uploadDto.DisplayOrders?.ElementAtOrDefault(i) ?? i,
+                            IsFeatured = i == uploadDto.FeaturedImageIndex,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow
+                        };
+
+                        clinic.Images ??= new List<ClinicImage>();
+                        clinic.Images.Add(clinicImage);
+                        uploadedImages.Add(MapToImageDto(clinicImage));
+
+                        _logger.LogInformation("Successfully uploaded image {Index} for clinic {ClinicId}: {ImageUrl}", 
+                            i + 1, clinicId, uploadResult.Url);
+                    }
+                    else
+                    {
+                        errorMessages.Add($"Image {i + 1}: {uploadResult.ErrorMessage}");
+                        _logger.LogWarning("Failed to upload image {Index} for clinic {ClinicId}: {Error}", 
+                            i + 1, clinicId, uploadResult.ErrorMessage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var errorMsg = $"Image {i + 1}: {ex.Message}";
+                    errorMessages.Add(errorMsg);
+                    _logger.LogError(ex, "Error uploading image {Index} for clinic {ClinicId}", i + 1, clinicId);
+                }
+            }
+
+            // Persist the new images directly to the database
+            if (uploadedImages.Any())
+            {
+                _logger.LogInformation("Saving {Count} new images to database for clinic {ClinicId}", uploadedImages.Count, clinicId);
+                
+                // Add the new ClinicImage entities to the context
+                foreach (var newImage in clinic.Images.Where(img => img.CreatedAt > DateTime.UtcNow.AddMinutes(-1)))
+                {
+                    _context.ClinicImages.Add(newImage);
+                    _logger.LogInformation("Added image {ImageId} to context for clinic {ClinicId}", newImage.Id, clinicId);
+                }
+                
+                // Save changes to persist the images
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Successfully saved {Count} images to database for clinic {ClinicId}", uploadedImages.Count, clinicId);
+            }
+
+            return errorMessages.Any() 
+                ? MultipleImageUploadResponseDto.CreatePartialSuccess(uploadedImages, errorMessages)
+                : MultipleImageUploadResponseDto.CreateSuccess(uploadedImages);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding images to clinic {ClinicId}", clinicId);
+            return MultipleImageUploadResponseDto.CreateFailure(new List<string> { ex.Message });
+        }
+    }
+
+    public async Task<List<ClinicImageDto>> GetImagesAsync(Guid clinicId)
+    {
+        // Get clinic with images explicitly loaded
+        var clinic = await _clinicRepository.GetByIdAsync(clinicId);
+        
+        if (clinic?.Images == null)
+        {
+            _logger.LogInformation("No images found for clinic {ClinicId}", clinicId);
+            return new List<ClinicImageDto>();
+        }
+        
+        var images = clinic.Images.OrderBy(i => i.DisplayOrder).ToList();
+        _logger.LogInformation("Found {Count} images for clinic {ClinicId}", images.Count, clinicId);
+        return images.Select(MapToImageDto).ToList();
+    }
+
+    public async Task<ClinicImageDto> UpdateImageAsync(Guid clinicId, Guid imageId, ClinicImageUpdateDto updateDto)
+    {
+        var clinic = await _clinicRepository.GetByIdAsync(clinicId);
+        if (clinic == null)
+        {
+            throw new InvalidOperationException($"Clinic with ID {clinicId} not found");
+        }
+
+        var image = clinic.Images?.FirstOrDefault(i => i.Id == imageId);
+        if (image == null)
+        {
+            throw new InvalidOperationException($"Image with ID {imageId} not found in clinic {clinicId}");
+        }
+
+        // If setting as featured, clear other featured images first
+        if (updateDto.IsFeatured && !image.IsFeatured)
+        {
+            foreach (var otherImage in clinic.Images.Where(i => i.IsFeatured))
+            {
+                otherImage.IsFeatured = false;
+            }
+        }
+
+        image.AltText = updateDto.AltText;
+        image.Description = updateDto.Description;
+        image.DisplayOrder = updateDto.DisplayOrder;
+        image.IsFeatured = updateDto.IsFeatured;
+        image.UpdatedAt = DateTime.UtcNow;
+
+        await _clinicRepository.UpdateAsync(clinic);
+
+        _logger.LogInformation("Successfully updated image {ImageId} for clinic {ClinicId}", imageId, clinicId);
+
+        return MapToImageDto(image);
+    }
+
+    public async Task<bool> DeleteImageAsync(Guid clinicId, Guid imageId)
+    {
+        var clinic = await _clinicRepository.GetByIdAsync(clinicId);
+        if (clinic == null)
+        {
+            return false;
+        }
+
+        var image = clinic.Images?.FirstOrDefault(i => i.Id == imageId);
+        if (image == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            // Delete from storage
+            await _imageUploadService.DeleteImageAsync(image.StorageFileName, "clinics");
+
+            // Remove from clinic
+            clinic.Images.Remove(image);
+            await _clinicRepository.UpdateAsync(clinic);
+
+            _logger.LogInformation("Successfully deleted image {ImageId} from clinic {ClinicId}", imageId, clinicId);
+            
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting image {ImageId} from clinic {ClinicId}", imageId, clinicId);
+            return false;
+        }
+    }
+
+    public async Task<ClinicImageDto> SetFeaturedImageAsync(Guid clinicId, Guid imageId)
+    {
+        var clinic = await _clinicRepository.GetByIdAsync(clinicId);
+        if (clinic == null)
+        {
+            throw new InvalidOperationException($"Clinic with ID {clinicId} not found");
+        }
+
+        var image = clinic.Images?.FirstOrDefault(i => i.Id == imageId);
+        if (image == null)
+        {
+            throw new InvalidOperationException($"Image with ID {imageId} not found in clinic {clinicId}");
+        }
+
+        // Clear all featured flags
+        foreach (var img in clinic.Images)
+        {
+            img.IsFeatured = false;
+        }
+
+        // Set the selected image as featured
+        image.IsFeatured = true;
+        image.UpdatedAt = DateTime.UtcNow;
+
+        await _clinicRepository.UpdateAsync(clinic);
+
+        _logger.LogInformation("Successfully set featured image {ImageId} for clinic {ClinicId}", imageId, clinicId);
+
+        return MapToImageDto(image);
+    }
+
+    public async Task<List<ClinicImageDto>> ReorderImagesAsync(Guid clinicId, Dictionary<Guid, int> imageOrders)
+    {
+        var clinic = await _clinicRepository.GetByIdAsync(clinicId);
+        if (clinic == null)
+        {
+            throw new InvalidOperationException($"Clinic with ID {clinicId} not found");
+        }
+
+        foreach (var imageOrder in imageOrders)
+        {
+            var image = clinic.Images?.FirstOrDefault(i => i.Id == imageOrder.Key);
+            if (image != null)
+            {
+                image.DisplayOrder = imageOrder.Value;
+                image.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+
+        await _clinicRepository.UpdateAsync(clinic);
+
+        _logger.LogInformation("Successfully reordered images for clinic {ClinicId}", clinicId);
+
+        return clinic.Images?.Select(MapToImageDto).OrderBy(i => i.DisplayOrder).ToList() ?? new List<ClinicImageDto>();
+    }
+
     private static ClinicResponseDto MapToResponseDto(Clinic clinic)
     {
         return new ClinicResponseDto
@@ -319,9 +556,32 @@ public class ClinicService : IClinicService
             Latitude = clinic.Latitude,
             Longitude = clinic.Longitude,
             ImageUrl = clinic.ImageUrl,
+            Images = clinic.Images?.Select(MapToImageDto).ToList() ?? new List<ClinicImageDto>(),
             CreatedAt = clinic.CreatedAt,
             UpdatedAt = clinic.UpdatedAt,
             TransactionCount = clinic.Transactions?.Count ?? 0
+        };
+    }
+
+    private static ClinicImageDto MapToImageDto(ClinicImage image)
+    {
+        return new ClinicImageDto
+        {
+            Id = image.Id,
+            ClinicId = image.ClinicId,
+            ImageUrl = image.ImageUrl,
+            FileName = image.FileName,
+            StorageFileName = image.StorageFileName,
+            Size = image.Size,
+            ContentType = image.ContentType,
+            AltText = image.AltText,
+            Description = image.Description,
+            DisplayOrder = image.DisplayOrder,
+            IsFeatured = image.IsFeatured,
+            Width = image.Width,
+            Height = image.Height,
+            CreatedAt = image.CreatedAt,
+            UpdatedAt = image.UpdatedAt
         };
     }
 

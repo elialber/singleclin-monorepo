@@ -53,24 +53,33 @@ public class Clinic : BaseEntity
     public double? Longitude { get; set; }
     
     /// <summary>
-    /// URL da imagem/logo da clínica
+    /// URL da imagem/logo da clínica (DEPRECATED - use Images collection)
     /// </summary>
+    [Obsolete("Use Images collection instead. Will be removed in future version.")]
     public string? ImageUrl { get; set; }
     
     /// <summary>
-    /// Nome do arquivo da imagem no storage
+    /// Nome do arquivo da imagem no storage (DEPRECATED - use Images collection)
     /// </summary>
+    [Obsolete("Use Images collection instead. Will be removed in future version.")]
     public string? ImageFileName { get; set; }
     
     /// <summary>
-    /// Tamanho da imagem em bytes
+    /// Tamanho da imagem em bytes (DEPRECATED - use Images collection)
     /// </summary>
+    [Obsolete("Use Images collection instead. Will be removed in future version.")]
     public long? ImageSize { get; set; }
     
     /// <summary>
-    /// Tipo MIME da imagem
+    /// Tipo MIME da imagem (DEPRECATED - use Images collection)
     /// </summary>
+    [Obsolete("Use Images collection instead. Will be removed in future version.")]
     public string? ImageContentType { get; set; }
+    
+    /// <summary>
+    /// Collection of images associated with this clinic
+    /// </summary>
+    public ICollection<ClinicImage> Images { get; set; } = new List<ClinicImage>();
     
     /// <summary>
     /// Transactions processed by this clinic
