@@ -1,0 +1,10 @@
+{
+  "enabledMcpjsonServers": [
+    "taskmaster-ai",
+    "postgresql",
+    "filesystem",
+    "memory",
+    "github"
+  ],
+  "enableAllProjectMcpServers": true
+}
