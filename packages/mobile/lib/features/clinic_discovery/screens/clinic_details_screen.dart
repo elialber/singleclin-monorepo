@@ -168,12 +168,8 @@ class ClinicDetailsScreen extends StatelessWidget {
         ),
         child: ElevatedButton(
           onPressed: () {
-            // TODO: Implement appointment booking
-            Get.snackbar(
-              'Em desenvolvimento',
-              'Agendamento será implementado em breve',
-              snackPosition: SnackPosition.BOTTOM,
-            );
+            // Navigate to appointment booking screen
+            Get.toNamed('/appointment-booking', arguments: clinicData);
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[700],

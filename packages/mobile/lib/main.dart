@@ -16,6 +16,7 @@ import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/home_screen.dart';
 import 'features/clinic_discovery/screens/clinic_discovery_screen.dart';
 import 'features/clinic_discovery/screens/clinic_details_screen.dart';
+import 'features/appointment_booking/screens/appointment_booking_screen.dart';
 import 'presentation/controllers/auth_controller.dart';
 import 'core/utils/app_bindings.dart';
 
@@ -115,6 +116,7 @@ class SingleClinApp extends StatelessWidget {
         GetPage(name: '/home', page: () => const ClinicDiscoveryScreen()),
         GetPage(name: '/old-home', page: () => const HomeScreen()),
         GetPage(name: '/clinic-details', page: () => ClinicDetailsScreen(clinic: Get.arguments)),
+        GetPage(name: '/appointment-booking', page: () => AppointmentBookingScreen(clinic: Get.arguments)),
         // Add routes for other screens as needed
         // GetPage(name: '/register', page: () => const RegisterScreen()),
         // GetPage(name: '/forgot-password', page: () => const ForgotPasswordScreen()),
