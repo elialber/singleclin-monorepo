@@ -7,7 +7,6 @@ import 'package:singleclin_mobile/features/appointment_booking/widgets/action_bu
 import 'package:singleclin_mobile/features/appointment_booking/widgets/reviews_section.dart';
 import 'package:singleclin_mobile/features/appointment_booking/widgets/subscription_section.dart';
 import 'package:singleclin_mobile/features/appointment_booking/widgets/location_section.dart';
-import 'package:singleclin_mobile/features/appointment_booking/widgets/social_media_section.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class AppointmentBookingScreen extends StatelessWidget {
@@ -138,11 +137,6 @@ class AppointmentBookingScreen extends StatelessWidget {
                         
                         // Location Section
                         LocationSection(clinic: clinic),
-                        
-                        const SizedBox(height: 24),
-                        
-                        // Social Media Section
-                        SocialMediaSection(clinic: clinic),
                         
                         // Bottom spacing for fixed CTA button
                         const SizedBox(height: 80),
