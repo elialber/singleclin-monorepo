@@ -58,7 +58,8 @@ class ApiConstants {
     if (kReleaseMode) {
       return 'https://api.singleclin.com.br'; // Production
     } else {
-      return 'http://localhost:5000'; // Development/Debug
+      // Android emulator uses 10.0.2.2 to access localhost on host machine
+      return 'https://10.0.2.2:5001/api'; // Development/Debug
     }
   }
 
