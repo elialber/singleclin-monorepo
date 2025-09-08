@@ -7,6 +7,7 @@ import 'package:singleclin_mobile/features/appointment_booking/widgets/action_bu
 import 'package:singleclin_mobile/features/appointment_booking/widgets/reviews_section.dart';
 import 'package:singleclin_mobile/features/appointment_booking/widgets/subscription_section.dart';
 import 'package:singleclin_mobile/features/appointment_booking/widgets/location_section.dart';
+import 'package:singleclin_mobile/features/clinic_services/screens/clinic_services_screen.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class AppointmentBookingScreen extends StatelessWidget {
@@ -169,8 +170,19 @@ class AppointmentBookingScreen extends StatelessWidget {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                // Navigate to time slots selection
-                Get.toNamed('/appointment-slots', arguments: clinic);
+                // Navigate to services selection - Direct approach
+                print('DEBUG: Navigating to clinic services with clinic: ${clinic.name}');
+                try {
+                  // Using direct navigation as fallback
+                  Get.to(
+                    () => ClinicServicesScreen(),
+                    arguments: clinic,
+                  );
+                  print('DEBUG: Direct navigation called successfully');
+                } catch (e) {
+                  print('DEBUG: Navigation error: $e');
+                  Get.snackbar('Erro', 'Não foi possível abrir os serviços');
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -181,7 +193,7 @@ class AppointmentBookingScreen extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                'Ver horários',
+                'Ver serviços',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

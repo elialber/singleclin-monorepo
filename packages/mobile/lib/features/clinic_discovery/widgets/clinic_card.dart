@@ -290,7 +290,13 @@ class ClinicCard extends StatelessWidget {
 
   void _navigateToBooking(BuildContext context) {
     // Navigate directly to appointment booking screen (details 2)
-    Get.toNamed('/appointment-booking', arguments: clinic);
+    print('DEBUG: Navigating to appointment booking from clinic card');
+    try {
+      Get.toNamed('/appointment-booking', arguments: clinic);
+    } catch (e) {
+      print('DEBUG: Error navigating to booking: $e');
+      Get.snackbar('Erro', 'Não foi possível abrir o agendamento');
+    }
   }
 
   void _showContactOptions(BuildContext context) {

@@ -47,6 +47,10 @@ import '../features/engagement/screens/feedback_screen.dart';
 import '../features/engagement/screens/trust_center_screen.dart';
 import '../features/engagement/bindings/engagement_binding.dart';
 
+// Clinic services
+import '../features/clinic_services/screens/clinic_services_screen.dart';
+import '../features/appointment_booking/screens/appointment_booking_screen.dart';
+
 import 'app_routes.dart';
 
 class AppPages {
@@ -115,6 +119,14 @@ class AppPages {
       name: AppRoutes.booking,
       page: () => const BookingScreen(),
       binding: DiscoveryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.appointmentBooking,
+      page: () => AppointmentBookingScreen(clinic: Get.arguments),
+    ),
+    GetPage(
+      name: AppRoutes.clinicServices,
+      page: () => ClinicServicesScreen(),
     ),
     
     // Module 3 - Appointment Routes

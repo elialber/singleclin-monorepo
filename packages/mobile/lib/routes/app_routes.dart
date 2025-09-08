@@ -23,6 +23,8 @@ class AppRoutes {
   static const String appointmentDetails = '/appointments/details';
   static const String bookAppointment = '/book-appointment';
   static const String booking = '/booking';
+  static const String appointmentBooking = '/appointment-booking';
+  static const String clinicServices = '/clinic-services';
   static const String selectDateTime = '/select-date-time';
   static const String appointmentSummary = '/appointment-summary';
   static const String appointmentConfirmation = '/appointment-confirmation';
