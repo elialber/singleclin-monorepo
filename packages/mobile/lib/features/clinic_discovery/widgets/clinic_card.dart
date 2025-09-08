@@ -5,13 +5,11 @@ import '../models/clinic.dart';
 class ClinicCard extends StatelessWidget {
   final Clinic clinic;
   final VoidCallback? onTap;
-  final VoidCallback? onBookAppointment;
 
   const ClinicCard({
     Key? key,
     required this.clinic,
     this.onTap,
-    this.onBookAppointment,
   }) : super(key: key);
 
   @override
@@ -237,34 +235,7 @@ class ClinicCard extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context) {
     return Row(
       children: [
-        // Book appointment button
-        Expanded(
-          flex: 2,
-          child: ElevatedButton.icon(
-            onPressed: clinic.isAvailable ? onBookAppointment : null,
-            icon: const Icon(Icons.event, size: 16),
-            label: const Text(
-              'Agendar',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: clinic.isAvailable 
-                  ? Theme.of(context).primaryColor 
-                  : Colors.grey[400],
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        // Contact button
+        // Contact button (now full width)
         Expanded(
           child: OutlinedButton.icon(
             onPressed: () => _showContactOptions(context),

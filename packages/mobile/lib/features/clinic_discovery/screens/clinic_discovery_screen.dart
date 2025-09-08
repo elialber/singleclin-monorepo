@@ -168,7 +168,6 @@ class ClinicDiscoveryScreen extends StatelessWidget {
             return ClinicCard(
               clinic: clinic,
               onTap: () => _navigateToClinicDetails(clinic),
-              onBookAppointment: () => _showAppointmentBooking(context, clinic),
             );
           },
         ),
@@ -249,60 +248,5 @@ class ClinicDiscoveryScreen extends StatelessWidget {
     Get.toNamed('/clinic-details', arguments: clinic);
   }
 
-  void _showAppointmentBooking(BuildContext context, Clinic clinic) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.8,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Agendar em ${clinic.name}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Appointment booking form will be implemented here
-            const Text('Interface de agendamento em desenvolvimento...'),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Implement booking logic
-                  Get.back();
-                  Get.snackbar(
-                    'Sucesso',
-                    'Agendamento realizado com sucesso!',
-                    backgroundColor: Colors.green,
-                    colorText: Colors.white,
-                  );
-                },
-                child: const Text('Confirmar Agendamento'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
 }
