@@ -235,7 +235,7 @@ class ClinicCard extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context) {
     return Row(
       children: [
-        // Contact button (now full width)
+        // Contact button
         Expanded(
           child: OutlinedButton.icon(
             onPressed: () => _showContactOptions(context),
@@ -260,8 +260,37 @@ class ClinicCard extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(width: 8),
+        // Schedule button
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () => _navigateToBooking(context),
+            icon: const Icon(Icons.schedule, size: 16),
+            label: const Text(
+              'Agendar',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
       ],
     );
+  }
+
+  void _navigateToBooking(BuildContext context) {
+    // Navigate directly to appointment booking screen (details 2)
+    Get.toNamed('/appointment-booking', arguments: clinic);
   }
 
   void _showContactOptions(BuildContext context) {
