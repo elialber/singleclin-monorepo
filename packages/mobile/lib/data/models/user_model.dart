@@ -1,4 +1,4 @@
-import 'package:mobile/domain/entities/user_entity.dart';
+import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 
 /// User model in the data layer
 class UserModel extends UserEntity {

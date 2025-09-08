@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:mobile/core/utils/form_validators.dart';
-import 'package:mobile/presentation/controllers/auth_controller.dart';
-import 'package:mobile/presentation/widgets/singleclin_logo.dart';
+import 'package:singleclin_mobile/core/utils/form_validators.dart';
+import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/presentation/widgets/singleclin_logo.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

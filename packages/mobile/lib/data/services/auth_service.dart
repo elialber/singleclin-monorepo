@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:mobile/data/repositories/firebase_auth_repository.dart';
-import 'package:mobile/domain/entities/user_entity.dart';
-import 'package:mobile/domain/repositories/auth_repository.dart';
+import 'package:singleclin_mobile/data/repositories/firebase_auth_repository.dart';
+import 'package:singleclin_mobile/domain/entities/user_entity.dart';
+import 'package:singleclin_mobile/domain/repositories/auth_repository.dart';
 
 /// Service class to wrap AuthRepository for dependency injection
 ///

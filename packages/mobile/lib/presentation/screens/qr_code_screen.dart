@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/core/routes/app_routes.dart';
+import 'package:singleclin_mobile/core/routes/app_routes.dart';
 
 /// QR Code generation and display screen
 class QrCodeScreen extends StatelessWidget {

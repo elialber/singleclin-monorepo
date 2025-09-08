@@ -3,13 +3,16 @@ class AppConstants {
   AppConstants._();
 
   // API Configuration
-  static const String baseUrl = 'https://api.singleclin.com.br';
+  static const String baseUrl = 'http://localhost:5080';
   static const String apiVersion = 'v1';
   static const Duration apiTimeout = Duration(seconds: 30);
+  static const Duration timeoutDuration = Duration(seconds: 30);
 
   // Storage Keys
   static const String authTokenKey = 'auth_token';
+  static const String tokenKey = 'auth_token';
   static const String userDataKey = 'user_data';
+  static const String userKey = 'user_data';
   static const String themeKey = 'theme_preference';
   static const String languageKey = 'language_preference';
 
@@ -62,4 +65,18 @@ class AppConstants {
   static final RegExp cpfRegex = RegExp(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$');
 
   static final RegExp cnpjRegex = RegExp(r'^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$');
+
+  // Error Messages
+  static const String genericError = 'Ocorreu um erro inesperado';
+  static const String networkError = 'Erro de conexão';
+  static const String timeoutError = 'Tempo esgotado';
+  static const String unauthorizedError = 'Não autorizado';
+
+  // Additional Keys
+  static const String creditsKey = 'user_credits';
+  static const String onboardingKey = 'onboarding_completed';
+
+  // Default location (São Paulo)
+  static const double defaultLatitude = -23.5505;
+  static const double defaultLongitude = -46.6333;
 }

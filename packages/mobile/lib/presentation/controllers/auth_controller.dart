@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
+// Removed go_router import - using GetX navigation instead
 
-import 'package:mobile/core/errors/api_exceptions.dart';
-import 'package:mobile/core/errors/auth_exceptions.dart';
-import 'package:mobile/core/routes/routes.dart';
-import 'package:mobile/data/services/auth_service.dart';
-import 'package:mobile/data/services/token_refresh_service.dart';
-import 'package:mobile/data/services/user_api_service.dart';
-import 'package:mobile/domain/entities/user_entity.dart';
+import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
+import 'package:singleclin_mobile/core/errors/auth_exceptions.dart';
+// Routes are handled by GetX - no separate routes file needed
+import 'package:singleclin_mobile/data/services/auth_service.dart';
+import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
+import 'package:singleclin_mobile/data/services/user_api_service.dart';
+import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 
 /// Controller for managing authentication state and UI interactions
 class AuthController extends GetxController {
@@ -55,18 +55,10 @@ class AuthController extends GetxController {
     _authService.authStateChanges.listen((user) async {
       _currentUser.value = user;
       if (user != null) {
-        // Update AppRouter authentication state
-        AppRouter.authenticated = true;
         // Sync user with backend after authentication
         await _syncUserWithBackend(user);
         // Navigate to home screen when authenticated
-        final context = AppRouter.navigatorKey.currentContext;
-        if (context != null) {
-          context.go(AppRoutes.home);
-        }
-      } else {
-        // Update AppRouter authentication state
-        AppRouter.authenticated = false;
+        Get.offAllNamed('/home');
       }
     });
   }
@@ -183,10 +175,7 @@ class AuthController extends GetxController {
         'Email de recuperação enviado! Verifique sua caixa de entrada.',
       );
       forgotEmailController.clear();
-      final context = AppRouter.navigatorKey.currentContext;
-      if (context != null) {
-        context.go(AppRoutes.login);
-      }
+      Get.offAllNamed('/login');
     } on AuthException catch (e) {
       _setError(_getLocalizedErrorMessage(e));
     } catch (e) {
@@ -201,13 +190,8 @@ class AuthController extends GetxController {
     try {
       await _authService.signOut();
       _clearAllForms();
-      // Update AppRouter authentication state
-      AppRouter.authenticated = false;
       // Navigate to login screen
-      final context = AppRouter.navigatorKey.currentContext;
-      if (context != null) {
-        context.go(AppRoutes.login);
-      }
+      Get.offAllNamed('/login');
     } catch (e) {
       _setError('Erro ao fazer logout.');
     }
@@ -216,28 +200,19 @@ class AuthController extends GetxController {
   /// Navigate to register screen
   void goToRegister() {
     _clearError();
-    final context = AppRouter.navigatorKey.currentContext;
-    if (context != null) {
-      context.go(AppRoutes.register);
-    }
+    Get.toNamed('/register');
   }
 
   /// Navigate to login screen
   void goToLogin() {
     _clearError();
-    final context = AppRouter.navigatorKey.currentContext;
-    if (context != null) {
-      context.go(AppRoutes.login);
-    }
+    Get.offAllNamed('/login');
   }
 
   /// Navigate to forgot password screen
   void goToForgotPassword() {
     _clearError();
-    final context = AppRouter.navigatorKey.currentContext;
-    if (context != null) {
-      context.go(AppRoutes.forgotPassword);
-    }
+    Get.toNamed('/forgot-password');
   }
 
   /// Get current user's ID token with automatic refresh

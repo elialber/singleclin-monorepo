@@ -1,3 +1,1 @@
-// Barrel export for routes
-export 'app_router.dart';
-export 'app_routes.dart';
+// Barrel export for routes - currently empty as routes are handled in /routes directory

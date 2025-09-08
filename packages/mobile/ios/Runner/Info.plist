@@ -67,5 +67,41 @@
 	<!-- Camera permission for QR code scanning -->
 	<key>NSCameraUsageDescription</key>
 	<string>Este aplicativo precisa de acesso à câmera para escanear códigos QR dos pacientes.</string>
+	
+	<!-- Location permissions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Este aplicativo precisa de acesso à sua localização para encontrar clínicas próximas a você.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Este aplicativo precisa de acesso à sua localização para encontrar clínicas próximas a você.</string>
+	
+	<!-- Photo Library permissions -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Este aplicativo precisa de acesso à galeria de fotos para que você possa selecionar imagens do seu perfil.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Este aplicativo precisa de permissão para salvar fotos na sua galeria.</string>
+	
+	<!-- Microphone permission (if needed for audio features) -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Este aplicativo pode precisar de acesso ao microfone para recursos de áudio.</string>
+	
+	<!-- Face ID / Touch ID -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>Use Face ID para autenticação rápida e segura no aplicativo.</string>
+	
+	<!-- Motion & Fitness (if needed) -->
+	<key>NSMotionUsageDescription</key>
+	<string>Este aplicativo pode usar dados de movimento para recursos de saúde e fitness.</string>
+	
+	<!-- Contacts (if social features are implemented) -->
+	<key>NSContactsUsageDescription</key>
+	<string>Este aplicativo pode acessar seus contatos para recursos sociais.</string>
+	
+	<!-- Calendar (for appointments) -->
+	<key>NSCalendarsUsageDescription</key>
+	<string>Este aplicativo pode adicionar compromissos ao seu calendário.</string>
+	
+	<!-- Reminders (for appointment reminders) -->
+	<key>NSRemindersUsageDescription</key>
+	<string>Este aplicativo pode criar lembretes para seus agendamentos.</string>
 </dict>
 </plist>

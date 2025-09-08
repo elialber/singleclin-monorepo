@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
-import 'package:mobile/core/routes/app_routes.dart';
-import 'package:mobile/data/services/auth_service.dart';
-import 'package:mobile/data/services/token_refresh_service.dart';
-import 'package:mobile/presentation/widgets/singleclin_logo.dart';
+import 'package:singleclin_mobile/data/services/auth_service.dart';
+import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
+import 'package:singleclin_mobile/presentation/widgets/singleclin_logo.dart';
 
 /// Splash screen shown on app launch
 class SplashScreen extends StatefulWidget {
@@ -30,35 +28,46 @@ class _SplashScreenState extends State<SplashScreen> {
       // Show splash for minimum duration
       await Future.delayed(const Duration(seconds: 1));
 
-      // Check authentication status
-      final isAuthenticated = await _authService.isAuthenticated();
+      // Add timeout to prevent infinite loading
+      final result = await Future.any([
+        _checkAuthenticationWithTimeout(),
+        Future.delayed(const Duration(seconds: 5), () => false), // 5-second timeout
+      ]);
 
-      if (isAuthenticated) {
-        // Verify token is valid and refresh if needed
-        final token = await _tokenRefreshService.getCurrentToken();
-
-        if (token != null) {
-          // User is authenticated with valid token, go to home
-          if (mounted) {
-            context.go(AppRoutes.home);
-          }
-        } else {
-          // Token refresh failed, go to login
-          if (mounted) {
-            context.go(AppRoutes.login);
-          }
+      if (result == true) {
+        // User is authenticated, go to home
+        if (mounted) {
+          Get.offAllNamed('/home');
         }
       } else {
-        // User is not authenticated, go to login
+        // Not authenticated or timeout occurred, go to login
         if (mounted) {
-          context.go(AppRoutes.login);
+          Get.offAllNamed('/login');
         }
       }
     } catch (e) {
+      print('Splash screen error: $e');
       // On any error, default to login screen
       if (mounted) {
-        context.go(AppRoutes.login);
+        Get.offAllNamed('/login');
       }
+    }
+  }
+
+  Future<bool> _checkAuthenticationWithTimeout() async {
+    try {
+      // Simple check - just verify if user is authenticated
+      // Skip token validation on splash to avoid blocking
+      final isAuthenticated = await _authService.isAuthenticated().timeout(
+        const Duration(seconds: 2),
+        onTimeout: () => false,
+      );
+      
+      print('🔍 Authentication check result: $isAuthenticated');
+      return isAuthenticated;
+    } catch (e) {
+      print('Authentication check error: $e');
+      return false;
     }
   }
 

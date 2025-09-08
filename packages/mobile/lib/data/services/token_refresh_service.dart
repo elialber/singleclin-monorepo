@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'package:mobile/data/services/auth_service.dart';
-import 'package:mobile/domain/entities/user_entity.dart';
+import 'package:singleclin_mobile/data/services/auth_service.dart';
+import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 
 /// Service for managing automatic token refresh and session persistence
 ///

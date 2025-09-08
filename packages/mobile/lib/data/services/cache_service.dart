@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:mobile/data/models/transaction_model.dart';
-import 'package:mobile/data/models/user_plan_model.dart';
-import 'package:mobile/domain/entities/transaction_entity.dart';
-import 'package:mobile/domain/entities/user_plan_entity.dart';
+import 'package:singleclin_mobile/data/models/transaction_model.dart';
+import 'package:singleclin_mobile/data/models/user_plan_model.dart';
+import 'package:singleclin_mobile/domain/entities/transaction_entity.dart';
+import 'package:singleclin_mobile/domain/entities/user_plan_entity.dart';
 
 /// Local cache service for storing plan and transaction data
 ///

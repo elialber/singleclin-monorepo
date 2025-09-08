@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import 'package:mobile/domain/entities/plan_entity.dart';
+import 'package:singleclin_mobile/domain/entities/plan_entity.dart';
 
 /// User plan entity representing a user's subscription to a healthcare plan
 @immutable

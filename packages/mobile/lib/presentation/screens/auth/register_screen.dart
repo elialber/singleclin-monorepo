@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:mobile/core/utils/form_validators.dart';
-import 'package:mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/core/utils/form_validators.dart';
+import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});

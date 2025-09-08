@@ -1,4 +1,4 @@
-import 'package:mobile/domain/entities/plan_entity.dart';
+import 'package:singleclin_mobile/domain/entities/plan_entity.dart';
 
 /// Plan model for data layer with JSON serialization
 class PlanModel extends PlanEntity {

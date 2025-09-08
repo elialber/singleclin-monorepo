@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:mobile/domain/entities/user_entity.dart';
+import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 
 /// Repository interface for authentication operations
 ///

@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:mobile/core/constants/api_constants.dart';
-import 'package:mobile/core/errors/api_exceptions.dart';
-import 'package:mobile/data/models/transaction_model.dart';
-import 'package:mobile/data/models/user_plan_model.dart';
-import 'package:mobile/data/services/api_client.dart';
-import 'package:mobile/domain/entities/transaction_entity.dart';
-import 'package:mobile/domain/entities/user_plan_entity.dart';
-import 'package:mobile/domain/repositories/plan_repository.dart';
+import 'package:singleclin_mobile/core/constants/api_constants.dart';
+import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
+import 'package:singleclin_mobile/data/models/transaction_model.dart';
+import 'package:singleclin_mobile/data/models/user_plan_model.dart';
+import 'package:singleclin_mobile/data/services/api_client.dart';
+import 'package:singleclin_mobile/domain/entities/transaction_entity.dart';
+import 'package:singleclin_mobile/domain/entities/user_plan_entity.dart';
+import 'package:singleclin_mobile/domain/repositories/plan_repository.dart';
 
 /// Implementation of PlanRepository using REST API
 class PlanRepositoryImpl implements PlanRepository {

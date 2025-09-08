@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/core/routes/app_routes.dart';
-import 'package:mobile/core/theme/app_colors.dart';
-import 'package:mobile/presentation/controllers/theme_controller.dart';
+import 'package:singleclin_mobile/core/routes/app_routes.dart';
+import 'package:singleclin_mobile/core/theme/app_colors.dart';
+import 'package:singleclin_mobile/presentation/controllers/theme_controller.dart';
 
 /// Theme settings screen
 class ThemeSettingsScreen extends StatelessWidget {

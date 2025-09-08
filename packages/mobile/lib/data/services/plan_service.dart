@@ -1,8 +1,8 @@
-import 'package:mobile/data/repositories/plan_repository_impl.dart';
-import 'package:mobile/data/services/cache_service.dart';
-import 'package:mobile/domain/entities/transaction_entity.dart';
-import 'package:mobile/domain/entities/user_plan_entity.dart';
-import 'package:mobile/domain/repositories/plan_repository.dart';
+import 'package:singleclin_mobile/data/repositories/plan_repository_impl.dart';
+import 'package:singleclin_mobile/data/services/cache_service.dart';
+import 'package:singleclin_mobile/domain/entities/transaction_entity.dart';
+import 'package:singleclin_mobile/domain/entities/user_plan_entity.dart';
+import 'package:singleclin_mobile/domain/repositories/plan_repository.dart';
 
 /// Service class to wrap PlanRepository for dependency injection
 ///
