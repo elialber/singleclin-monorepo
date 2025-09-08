@@ -72,26 +72,26 @@ function mapImageDataToProcessedImage(imageData: ImageData): ProcessedImage {
   return {
     id: imageData.id,
     file: imageData.file,
-    preview: imageData.url || '',
-    dimensions: {
-      width: 800, // Default values since ImageData doesn't have dimensions
+    preview: imageData.preview || imageData.url || '',
+    dimensions: imageData.dimensions || {
+      width: 800, // Default values if dimensions not provided
       height: 600
     },
-    sizeBytes: imageData.file?.size || 0,
-    type: imageData.file?.type || 'image/jpeg',
+    sizeBytes: imageData.sizeBytes || imageData.file?.size || 0,
+    type: imageData.type || imageData.file?.type || 'image/jpeg',
     isFeatured: imageData.isFeatured,
     altText: imageData.altText || '',
     displayOrder: imageData.displayOrder,
     url: imageData.url,
-    isExisting: !!imageData.url && !imageData.file,
-    uploadProgress: {
+    isExisting: imageData.isExisting || (!!imageData.url && !imageData.file),
+    uploadProgress: imageData.uploadProgress ? {
       id: imageData.id,
       file: imageData.file || new File([], 'dummy'),
       progress: imageData.uploadProgress,
       status: imageData.uploadStatus === 'success' ? 'success' :
              imageData.uploadStatus === 'error' ? 'error' :
              imageData.uploadStatus === 'uploading' ? 'pending' : 'pending'
-    }
+    } : undefined
   }
 }
 
@@ -164,7 +164,7 @@ function Step4ImageUpload({ onNext, onPrev, isValid, isDirty }: StepComponentPro
 
   // Atualizar validação global do stepper quando formValid muda
   useEffect(() => {
-    validateStep(2)
+    validateStep(3) // Step 4 = index 3
   }, [formValid]) // Remove validateStep das dependências para evitar loop infinito
 
   // Handlers para seleção

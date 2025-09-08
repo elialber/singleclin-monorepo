@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Box, Container, IconButton, Typography, CircularProgress, Alert } from '@mui/material'
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material'
 import { ClinicStepper } from '@/components/clinic/stepper/core/ClinicStepper'
-import { ClinicFormData, PREDEFINED_SERVICES } from '@/types/stepper'
+import { ClinicFormData, PREDEFINED_SERVICES, ImageData } from '@/types/stepper'
 import { CreateClinicRequest, UpdateClinicRequest, Clinic, ClinicType } from '@/types/clinic'
 import { useNotification } from '@/contexts/NotificationContextDefinition'
 import { clinicService } from '@/services/clinic.service'
@@ -163,24 +163,54 @@ export default function ClinicStepperPage() {
         selectedServices: PREDEFINED_SERVICES.map(service => ({ ...service }))
       },
       images: (() => {
-        const images = clinic.imageUrl ? [{
-          id: 'existing-image',
-          preview: clinic.imageUrl, // Use the URL as preview
-          dimensions: {
-            width: 800, // Default dimensions for existing images
-            height: 600
-          },
-          sizeBytes: 0, // Unknown size for existing images
-          type: 'image/jpeg', // Default type
-          isFeatured: true,
-          altText: `Imagem da clínica ${clinic.name}`,
-          displayOrder: 0,
-          url: clinic.imageUrl,
-          isExisting: true // Mark as existing image
-        }] : []
+        let mappedImages: ImageData[] = []
         
-        console.log('🖼️ Imagens mapeadas para o formulário:', images)
-        return images
+        // Usar o novo array de imagens se disponível
+        if (clinic.images && clinic.images.length > 0) {
+          mappedImages = clinic.images.map((img, index) => ({
+            id: `existing-${img.id}`,
+            file: undefined, // Imagens existentes não têm arquivo
+            url: img.imageUrl,
+            preview: img.imageUrl,
+            altText: img.altText || `Imagem da clínica ${clinic.name}`,
+            displayOrder: img.displayOrder || index,
+            isFeatured: img.isFeatured,
+            isExisting: true,
+            dimensions: {
+              width: img.width || 800,
+              height: img.height || 600
+            },
+            sizeBytes: img.size || 0,
+            type: img.contentType || 'image/jpeg',
+            uploadStatus: 'success' as const,
+            uploadProgress: 100
+          }))
+        } 
+        // Fallback para o campo antigo imageUrl se não tiver imagens no array
+        else if (clinic.imageUrl) {
+          mappedImages = [{
+            id: 'existing-legacy-image',
+            file: undefined, // Imagens existentes não têm arquivo
+            url: clinic.imageUrl,
+            preview: clinic.imageUrl,
+            altText: `Imagem da clínica ${clinic.name}`,
+            displayOrder: 0,
+            isFeatured: true,
+            isExisting: true,
+            dimensions: {
+              width: 800,
+              height: 600
+            },
+            sizeBytes: 0,
+            type: 'image/jpeg',
+            uploadStatus: 'success' as const,
+            uploadProgress: 100
+          }]
+        }
+        
+        console.log('🖼️ Imagens mapeadas para o formulário:', mappedImages)
+        console.log('📊 Total de imagens existentes:', mappedImages.length)
+        return mappedImages
       })(),
       metadata: {
         createdAt: new Date(),
