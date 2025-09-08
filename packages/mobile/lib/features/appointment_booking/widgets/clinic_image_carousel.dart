@@ -26,15 +26,15 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
     super.initState();
     _pageController = PageController();
     
-    // Initialize images list with clinic image and mock additional images
-    _images = [
-      widget.clinic.imageUrl.isNotEmpty 
-        ? widget.clinic.imageUrl 
-        : 'https://via.placeholder.com/400x200?text=Clinic+Image',
-      'https://via.placeholder.com/400x200?text=Interior+View',
-      'https://via.placeholder.com/400x200?text=Equipment',
-      'https://via.placeholder.com/400x200?text=Reception',
-    ];
+    // Use images from backend or fallback to main image
+    if (widget.clinic.images.isNotEmpty) {
+      _images = widget.clinic.images;
+    } else if (widget.clinic.imageUrl.isNotEmpty) {
+      _images = [widget.clinic.imageUrl];
+    } else {
+      // Only show placeholder if no images at all
+      _images = ['https://via.placeholder.com/400x200?text=Sem+Imagem+Disponível'];
+    }
   }
 
   @override

@@ -128,6 +128,7 @@ class ClinicDiscoveryController extends GetxController {
           reviewCount: clinic.reviewCount,
           specializations: clinic.specializations,
           imageUrl: clinic.imageUrl,
+          images: clinic.images,
           isAvailable: clinic.isAvailable,
           nextAvailableSlot: clinic.nextAvailableSlot,
           type: clinic.type,

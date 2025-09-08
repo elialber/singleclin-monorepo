@@ -7,6 +7,7 @@ class Clinic {
   final int reviewCount;
   final List<String> specializations;
   final String imageUrl;
+  final List<String> images; // All images from backend
   final bool isAvailable;
   final DateTime? nextAvailableSlot;
   final ClinicType type;
@@ -25,6 +26,7 @@ class Clinic {
     required this.reviewCount,
     required this.specializations,
     required this.imageUrl,
+    required this.images,
     required this.isAvailable,
     this.nextAvailableSlot,
     required this.type,
@@ -45,6 +47,7 @@ class Clinic {
       reviewCount: json['reviewCount'] ?? 0,
       specializations: List<String>.from(json['specializations'] ?? []),
       imageUrl: json['imageUrl'] ?? '',
+      images: List<String>.from(json['images'] ?? []),
       isAvailable: json['isAvailable'] ?? false,
       nextAvailableSlot: json['nextAvailableSlot'] != null 
           ? DateTime.parse(json['nextAvailableSlot'])
@@ -60,15 +63,27 @@ class Clinic {
 
   /// Factory method to create from backend API response
   factory Clinic.fromBackendDto(Map<String, dynamic> dto) {
-    // Extract the first image URL if available
-    String imageUrl = '';
+    // Extract all image URLs from backend
+    List<String> allImages = [];
+    String mainImageUrl = '';
+    
     if (dto['images'] != null && dto['images'] is List && (dto['images'] as List).isNotEmpty) {
-      var firstImage = (dto['images'] as List).first;
-      if (firstImage is Map<String, dynamic> && firstImage['imageUrl'] != null) {
-        imageUrl = firstImage['imageUrl'];
+      var imagesList = dto['images'] as List;
+      
+      // Extract all image URLs
+      for (var imageItem in imagesList) {
+        if (imageItem is Map<String, dynamic> && imageItem['imageUrl'] != null) {
+          allImages.add(imageItem['imageUrl']);
+        }
+      }
+      
+      // Set main image as the first one
+      if (allImages.isNotEmpty) {
+        mainImageUrl = allImages.first;
       }
     } else if (dto['imageUrl'] != null) {
-      imageUrl = dto['imageUrl'];
+      mainImageUrl = dto['imageUrl'];
+      allImages = [mainImageUrl];
     }
 
     // Parse clinic type from enum int value
@@ -101,7 +116,8 @@ class Clinic {
       rating: 4.5, // Default rating - TODO: implement real ratings
       reviewCount: 0, // Default review count - TODO: implement real reviews
       specializations: [], // TODO: implement specializations from backend
-      imageUrl: imageUrl,
+      imageUrl: mainImageUrl,
+      images: allImages,
       isAvailable: dto['isActive'] ?? false,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 2)), // Default next slot
       type: clinicType,
@@ -123,6 +139,7 @@ class Clinic {
       'reviewCount': reviewCount,
       'specializations': specializations,
       'imageUrl': imageUrl,
+      'images': images,
       'isAvailable': isAvailable,
       'nextAvailableSlot': nextAvailableSlot?.toIso8601String(),
       'type': type.toString(),
