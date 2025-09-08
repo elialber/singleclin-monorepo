@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- SingleClin Brand Colors -->
+    <color name="primary_color">#005156</color>
+    <color name="primary_dark">#003d41</color>
+    <color name="accent_color">#00BCD4</color>
+    <color name="background_color">#FFFFFF</color>
+    
+    <!-- Status Bar Colors -->
+    <color name="status_bar_color">#005156</color>
+    
+    <!-- Splash Screen Colors -->
+    <color name="splash_background">#005156</color>
+    <color name="splash_text">#FFFFFF</color>
+</resources>

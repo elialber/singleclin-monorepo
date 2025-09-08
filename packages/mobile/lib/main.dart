@@ -1,66 +1,151 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-import 'package:mobile/core/bindings/initial_binding.dart';
-import 'package:mobile/core/constants/app_constants.dart';
-import 'package:mobile/core/routes/routes.dart';
-import 'package:mobile/core/theme/theme.dart';
-import 'package:mobile/data/services/app_lifecycle_observer.dart';
-import 'package:mobile/data/services/cache_service.dart';
-import 'package:mobile/data/services/token_refresh_service.dart';
-import 'package:mobile/firebase_options.dart';
+import 'firebase_options.dart';
+import 'core/constants/app_constants.dart';
+import 'core/themes/app_theme.dart';
+import 'core/services/storage_service.dart';
+import 'data/services/api_client.dart';
+import 'data/services/auth_service.dart';
+import 'data/services/token_refresh_service.dart';
+import 'presentation/screens/splash_screen.dart';
+import 'presentation/screens/auth/login_screen.dart';
+import 'presentation/screens/home_screen.dart';
+import 'features/clinic_discovery/screens/clinic_discovery_screen.dart';
+import 'features/clinic_discovery/screens/clinic_details_screen.dart';
+import 'presentation/controllers/auth_controller.dart';
+import 'core/utils/app_bindings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    print('Firebase initialization failed: $e');
+    // Continue without Firebase for now
+  }
+  
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Set system UI overlay style
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
   );
-
-  // Initialize cache service first
-  final cacheService = CacheService.instance;
-  await cacheService.init();
-
-  // Initialize token refresh service and lifecycle observer
-  final tokenRefreshService = TokenRefreshService();
-  final lifecycleObserver = AppLifecycleObserver(tokenRefreshService);
-
+  
+  // Set preferred orientations
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  
   // Initialize services
-  await tokenRefreshService.initialize();
-  lifecycleObserver.initialize();
-
-  // Register services for dependency injection
-  Get
-    ..put<CacheService>(cacheService, permanent: true)
-    ..put<TokenRefreshService>(tokenRefreshService, permanent: true)
-    ..put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
-
-  runApp(const MyApp());
+  await _initServices();
+  
+  runApp(const SingleClinApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+Future<void> _initServices() async {
+  try {
+    print('🚀 Initializing services...');
+    
+    // Initialize storage service first
+    await Get.putAsync(() => StorageService().init()).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        print('⚠️ Storage service initialization timeout');
+        return StorageService(); // Return default instance
+      },
+    );
+    
+    // Initialize API client (singleton instance)
+    Get.put(ApiClient.instance, permanent: true);
+    
+    // Initialize auth service
+    Get.put(AuthService(), permanent: true);
+    
+    // Initialize token refresh service
+    Get.put(TokenRefreshService(), permanent: true);
+    
+    // Initialize auth controller
+    Get.put(AuthController(), permanent: true);
+    
+    print('✅ All services initialized successfully');
+  } catch (e) {
+    print('❌ Error initializing services: $e');
+    // Continue with app launch even if some services fail
+  }
+}
+
+class SingleClinApp extends StatelessWidget {
+  const SingleClinApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Use GetMaterialApp.router for go_router integration
-    return GetMaterialApp.router(
+    return GetMaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
-      initialBinding: InitialBinding(),
+      
+      // Theme configuration
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.light,
+      
+      // Localization
       locale: const Locale('pt', 'BR'),
-      fallbackLocale: const Locale('en', 'US'),
-      // GoRouter configuration
-      routerDelegate: AppRouter.router.routerDelegate,
-      routeInformationParser: AppRouter.router.routeInformationParser,
-      routeInformationProvider: AppRouter.router.routeInformationProvider,
-      // GetX default transition (used with Get.to)
-      defaultTransition: Transition.fadeIn,
-      transitionDuration: AppConstants.normalAnimation,
+      fallbackLocale: const Locale('pt', 'BR'),
+      
+      // Navigation
+      initialRoute: '/splash',
+      getPages: [
+        GetPage(name: '/splash', page: () => const SplashScreen()),
+        GetPage(name: '/login', page: () => const LoginScreen()),
+        GetPage(name: '/home', page: () => const ClinicDiscoveryScreen()),
+        GetPage(name: '/old-home', page: () => const HomeScreen()),
+        GetPage(name: '/clinic-details', page: () => ClinicDetailsScreen(clinic: Get.arguments)),
+        // Add routes for other screens as needed
+        // GetPage(name: '/register', page: () => const RegisterScreen()),
+        // GetPage(name: '/forgot-password', page: () => const ForgotPasswordScreen()),
+      ],
+      
+      // Global configuration
+      defaultTransition: Transition.cupertino,
+      transitionDuration: const Duration(milliseconds: 300),
+      
+      // Error handling
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: const TextScaler.linear(1.0), // Force text scale to 1.0
+          ),
+          child: child!,
+        );
+      },
+      
+      // Smart management
+      smartManagement: SmartManagement.full,
+      
+      // Enable log in debug mode
+      enableLog: false,
     );
+  }
+}
+
+extension StorageServiceInitialization on StorageService {
+  Future<StorageService> init() async {
+    await onInit();
+    return this;
   }
 }
