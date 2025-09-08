@@ -16,6 +16,7 @@ class ServiceListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('DEBUG: ServiceListItem building for: ${service.name} - Price: ${service.price}');
     final canAfford = userCredits >= service.price;
     
     return Container(

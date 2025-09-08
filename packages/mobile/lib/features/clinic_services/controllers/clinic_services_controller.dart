@@ -67,19 +67,29 @@ class ClinicServicesController extends GetxController {
   }
 
   Future<void> loadServices() async {
+    print('DEBUG: loadServices() called');
     try {
       isLoading.value = true;
       error.value = '';
+      print('DEBUG: Loading set to true');
       
+      print('DEBUG: Calling API for clinic ID: ${clinic.id}');
       final loadedServices = await ClinicServicesApi.getClinicServices(clinic.id);
       services.value = loadedServices;
+      print('DEBUG: Services loaded from API: ${loadedServices.length} services');
     } catch (e) {
+      print('DEBUG: API error: $e');
       error.value = e.toString();
       
       // Mock data for development - remove in production
-      services.value = _getMockServices();
+      final mockServices = _getMockServices();
+      services.value = mockServices;
+      print('DEBUG: Using mock data: ${mockServices.length} services');
+      print('DEBUG: Mock services: ${mockServices.map((s) => s.name).join(', ')}');
     } finally {
       isLoading.value = false;
+      print('DEBUG: Loading set to false');
+      print('DEBUG: Final services count: ${services.length}');
     }
   }
 
