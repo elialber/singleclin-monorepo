@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mobile/core/errors/api_exceptions.dart';
+import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
 
 /// HTTP interceptor for automatic JWT token authentication
 ///

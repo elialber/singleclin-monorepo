@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobile/presentation/controllers/base_controller.dart';
+import 'package:singleclin_mobile/presentation/controllers/base_controller.dart';
 
 /// Example home controller demonstrating reactive state with GetX
 class HomeController extends BaseController {

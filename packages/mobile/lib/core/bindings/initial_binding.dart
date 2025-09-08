@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:mobile/presentation/controllers/controllers.dart';
+import '../../features/auth/controllers/auth_controller.dart';
 
 /// Initial binding for dependency injection
 /// This binding is loaded when the app starts
@@ -10,9 +10,7 @@ class InitialBinding extends Bindings {
     // These are initialized lazily (only when needed) to save memory
 
     // Controllers that need to be available immediately
-    Get
-      ..put<ThemeController>(ThemeController())
-      ..put<AuthController>(AuthController());
+    Get.put<AuthController>(AuthController(), permanent: true);
 
     // Example: Local storage service
     // Get.lazyPut<StorageService>(() => StorageService());

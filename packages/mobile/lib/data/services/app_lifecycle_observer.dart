@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:mobile/data/services/token_refresh_service.dart';
+import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
 
 /// Observer for app lifecycle events to manage token refresh service
 ///

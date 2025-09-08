@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/core/theme/app_colors.dart';
-import 'package:mobile/domain/entities/user_plan_entity.dart';
+import 'package:singleclin_mobile/core/theme/app_colors.dart';
+import 'package:singleclin_mobile/domain/entities/user_plan_entity.dart';
 
 /// Main plan visualization card component
 ///

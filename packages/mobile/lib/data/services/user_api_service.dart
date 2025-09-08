@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 
-import 'package:mobile/core/constants/api_constants.dart';
-import 'package:mobile/core/errors/api_exceptions.dart';
-import 'package:mobile/data/models/user_model.dart';
-import 'package:mobile/data/services/api_client.dart';
+import 'package:singleclin_mobile/core/constants/api_constants.dart';
+import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
+import 'package:singleclin_mobile/data/models/user_model.dart';
+import 'package:singleclin_mobile/data/services/api_client.dart';
 
 /// User API service for backend communication
 ///

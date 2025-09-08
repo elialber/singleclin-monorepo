@@ -1,5 +1,5 @@
-import 'package:mobile/domain/entities/transaction_entity.dart';
-import 'package:mobile/domain/entities/user_plan_entity.dart';
+import 'package:singleclin_mobile/domain/entities/transaction_entity.dart';
+import 'package:singleclin_mobile/domain/entities/user_plan_entity.dart';
 
 /// Repository interface for plan-related operations
 abstract class PlanRepository {

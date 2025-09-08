@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
 // import 'package:image_gallery_saver/image_gallery_saver.dart'; // Temporariamente comentado
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screen_brightness/screen_brightness.dart';

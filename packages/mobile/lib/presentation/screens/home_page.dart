@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:mobile/core/routes/app_router.dart';
-import 'package:mobile/core/routes/app_routes.dart';
-import 'package:mobile/presentation/controllers/home_controller.dart';
+import 'package:singleclin_mobile/core/routes/app_router.dart';
+import 'package:singleclin_mobile/core/routes/app_routes.dart';
+import 'package:singleclin_mobile/presentation/controllers/home_controller.dart';
 
 /// Home page using GetX for state management
 class HomePage extends StatelessWidget {

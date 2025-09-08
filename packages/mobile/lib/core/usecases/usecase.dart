@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:mobile/core/errors/failures.dart';
+import 'package:singleclin_mobile/core/errors/failures.dart';
 
 /// Base typedef for all use cases
 typedef UseCase<Type, Params> = Future<Either<Failure, Type>> Function(Params params);

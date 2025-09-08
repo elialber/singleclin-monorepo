@@ -2,15 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
-
-import 'package:mobile/core/routes/app_routes.dart';
-import 'package:mobile/core/theme/app_colors.dart';
-import 'package:mobile/data/services/plan_service.dart';
-import 'package:mobile/domain/entities/transaction_entity.dart';
-import 'package:mobile/domain/entities/user_plan_entity.dart';
-import 'package:mobile/presentation/controllers/auth_controller.dart';
-import 'package:mobile/presentation/widgets/widgets.dart';
+// Removed go_router import - using GetX navigation instead
+import 'package:singleclin_mobile/core/theme/app_colors.dart';
+import 'package:singleclin_mobile/data/services/plan_service.dart';
+import 'package:singleclin_mobile/domain/entities/transaction_entity.dart';
+import 'package:singleclin_mobile/domain/entities/user_plan_entity.dart';
+import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/presentation/widgets/widgets.dart';
 
 /// Home screen with bottom navigation for the SingleClin app
 ///
@@ -313,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       child: ElevatedButton.icon(
         onPressed: hasActivePlan
-            ? () => context.go(AppRoutes.qrGenerate)
+            ? () => Get.toNamed('/qr-code')
             : null,
         icon: Icon(
           Icons.qr_code_2,
@@ -436,7 +434,7 @@ class _HomeScreenState extends State<HomeScreen>
           icon: Icons.info_outline,
           title: 'Sobre',
           subtitle: 'Informações sobre o aplicativo',
-          onTap: () => context.go(AppRoutes.about),
+          onTap: () => Get.toNamed('/about'),
         ),
         const SizedBox(height: 16),
         _buildProfileOption(

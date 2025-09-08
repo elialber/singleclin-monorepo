@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:mobile/core/errors/failures.dart';
+import 'package:singleclin_mobile/core/errors/failures.dart';
 
 /// Base controller that all controllers should extend
 /// Provides common functionality for loading states and error handling
