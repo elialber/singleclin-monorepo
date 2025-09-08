@@ -48,4 +48,39 @@ Release/
 # Build outputs
 dist/
 build/
-*.tsbuildinfo 
+*.tsbuildinfo
+
+# Flutter specific
+**/flutter/ephemeral/
+**/flutter/generated_plugin*
+**/.plugin_symlinks/
+**/GeneratedPluginRegistrant.*
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+*.iconfig
+*.fvm/
+.flutter/
+
+# Flutter iOS/macOS specific
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/flutter_assets/
+**/ios/ServiceDefinitions.json
+**/macos/Flutter/ephemeral/
+**/macos/.symlinks/
+
+# Flutter Windows/Linux specific
+**/windows/flutter/ephemeral/
+**/linux/flutter/ephemeral/
+
+# Fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
+
+# Claude Flow
+.claude-flow/ 
