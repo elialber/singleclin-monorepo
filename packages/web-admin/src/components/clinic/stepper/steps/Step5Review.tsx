@@ -56,11 +56,11 @@ import { BRAZILIAN_STATES } from '../../../../types/stepper'
 import { formatFileSize } from '../../../../utils/imageValidation'
 
 /**
- * Step 4: Revisão Final
+ * Step 5: Revisão Final
  * 
  * Resumo completo de todos os dados com edição inline e validação final
  */
-function Step4Review({ onNext, onPrev, isValid, isDirty }: StepComponentProps) {
+function Step5Review({ onNext, onPrev, isValid, isDirty }: StepComponentProps) {
   const { 
     formData, 
     updateFormData, 
@@ -750,4 +750,4 @@ function Step4Review({ onNext, onPrev, isValid, isDirty }: StepComponentProps) {
   )
 }
 
-export default Step4Review
+export default Step5Review

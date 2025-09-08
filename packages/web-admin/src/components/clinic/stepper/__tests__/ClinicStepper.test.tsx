@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ClinicStepper } from '../core/ClinicStepper'
-import { ClinicFormData, ClinicType } from '../../../../types/stepper'
+import { ClinicFormData } from '../../../../types/stepper'
+import { ClinicType } from '../../../../types/clinic'
 
 // Mock dos hooks
 vi.mock('../hooks/useClinicStepper', () => ({

@@ -8,7 +8,9 @@ import {
   BasicInfoData,
   AddressData,
   LocationData,
-  ImageData
+  ServiceData,
+  ImageData,
+  PREDEFINED_SERVICES
 } from '../../../../types/stepper'
 import { ClinicType } from '../../../../types/clinic'
 
@@ -50,21 +52,24 @@ const initialFormData: ClinicFormData = {
     accuracy: 0,
     source: 'user'
   },
+  services: {
+    selectedServices: PREDEFINED_SERVICES.map(service => ({ ...service }))
+  },
   images: [],
   metadata: {
     createdAt: new Date(),
     updatedAt: new Date(),
     completedSteps: [],
-    timeSpentPerStep: [0, 0, 0, 0],
+    timeSpentPerStep: [0, 0, 0, 0, 0],
     totalTime: 0
   }
 }
 
 const initialState: StepperState = {
   currentStep: 0,
-  totalSteps: 4,
-  isValid: [false, false, false, false],
-  isDirty: [false, false, false, false],
+  totalSteps: 5,
+  isValid: [false, false, true, false, false], // Step 2 (services) começa como válido pois tem serviços pré-selecionados
+  isDirty: [false, false, false, false, false],
   formData: initialFormData,
   errors: {},
   isLoading: false
@@ -244,11 +249,14 @@ export function StepperProvider({
         case 1: // Address
           isValid = validateAddressStep(state.formData.address)
           break
-        case 2: // Images
+        case 2: // Services
+          isValid = validateServices(state.formData.services)
+          break
+        case 3: // Images
           isValid = validateImages(state.formData.images)
           break
-        case 3: // Review
-          isValid = state.isValid.slice(0, 3).every(v => v)
+        case 4: // Review
+          isValid = state.isValid.slice(0, 4).every(v => v)
           break
         default:
           isValid = false
@@ -294,7 +302,8 @@ export function StepperProvider({
         validateStep(0),
         validateStep(1),
         validateStep(2),
-        validateStep(3)
+        validateStep(3),
+        validateStep(4)
       ])
 
       if (allValid.every(v => v)) {
@@ -347,8 +356,10 @@ function getStepIndexForSection(section: keyof ClinicFormData): number {
     case 'address':
     case 'location':
       return 1
-    case 'images':
+    case 'services':
       return 2
+    case 'images':
+      return 3
     case 'metadata':
       return -1
     default:
@@ -375,6 +386,13 @@ function validateAddressStep(data: AddressData): boolean {
     data.city.trim().length >= 2 &&
     data.state.trim().length > 0
   )
+}
+
+function validateServices(data: ServiceData): boolean {
+  // Pelo menos um serviço deve estar selecionado
+  return data.selectedServices && 
+         data.selectedServices.length > 0 &&
+         data.selectedServices.some(service => service.isSelected)
 }
 
 function validateImages(images: ImageData[]): boolean {

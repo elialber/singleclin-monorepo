@@ -18,8 +18,9 @@ import { ClinicFormData } from '../../../../types/stepper'
 // Lazy loading dos steps para melhor performance
 const Step1BasicInfo = React.lazy(() => import('../steps/Step1BasicInfo'))
 const Step2AddressLocation = React.lazy(() => import('../steps/Step2AddressLocation'))
-const Step3ImageUpload = React.lazy(() => import('../steps/Step3ImageUpload'))
-const Step4Review = React.lazy(() => import('../steps/Step4Review'))
+const Step3Services = React.lazy(() => import('../steps/Step3Services'))
+const Step4ImageUpload = React.lazy(() => import('../steps/Step4ImageUpload'))
+const Step5Review = React.lazy(() => import('../steps/Step5Review'))
 
 interface ClinicStepperProps {
   /** Dados iniciais do formulário (para edição) */
@@ -123,13 +124,19 @@ function StepperContent({
       case 2:
         return (
           <Suspense fallback={<StepLoader />}>
-            <Step3ImageUpload {...stepProps} />
+            <Step3Services {...stepProps} />
           </Suspense>
         )
       case 3:
         return (
           <Suspense fallback={<StepLoader />}>
-            <Step4Review {...stepProps} />
+            <Step4ImageUpload {...stepProps} />
+          </Suspense>
+        )
+      case 4:
+        return (
+          <Suspense fallback={<StepLoader />}>
+            <Step5Review {...stepProps} />
           </Suspense>
         )
       default:

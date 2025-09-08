@@ -43,21 +43,30 @@ export function useClinicStepper() {
     },
     {
       index: 2,
-      title: 'Upload de Imagens',
-      description: 'Múltiplas imagens da clínica',
-      icon: '📸',
+      title: 'Serviços da Clínica',
+      description: 'Selecionar serviços oferecidos',
+      icon: '🩺',
       status: getStepStatus(2, state.currentStep, state.isValid[2]),
       isValid: state.isValid[2],
       isDirty: state.isDirty[2]
     },
     {
       index: 3,
-      title: 'Revisão Final',
-      description: 'Confirmar dados antes de enviar',
-      icon: '✅',
+      title: 'Upload de Imagens',
+      description: 'Múltiplas imagens da clínica',
+      icon: '📸',
       status: getStepStatus(3, state.currentStep, state.isValid[3]),
       isValid: state.isValid[3],
       isDirty: state.isDirty[3]
+    },
+    {
+      index: 4,
+      title: 'Revisão Final',
+      description: 'Confirmar dados antes de enviar',
+      icon: '✅',
+      status: getStepStatus(4, state.currentStep, state.isValid[4]),
+      isValid: state.isValid[4],
+      isDirty: state.isDirty[4]
     }
   ], [state.currentStep, state.isValid, state.isDirty])
 

@@ -16,6 +16,7 @@ export interface ClinicFormData {
   basicInfo: BasicInfoData
   address: AddressData
   location: LocationData
+  services: ServiceData
   images: ImageData[]
   metadata: StepperMetadata
 }
@@ -48,17 +49,82 @@ export interface LocationData {
   source: 'user' | 'geocode' | 'gps'
 }
 
-// Step 3: Upload de imagens
+// Step 3: Serviços da clínica
+export interface ServiceData {
+  selectedServices: SelectedService[]
+}
+
+export interface SelectedService {
+  id: string
+  name: string
+  credits: number
+  category: string
+  isSelected: boolean
+}
+
+// Lista predefinida de serviços disponíveis
+export const PREDEFINED_SERVICES: SelectedService[] = [
+  // Terapias Injetáveis
+  { id: 'terapia_im', name: 'Terapia Injetável Intramuscular', credits: 1, category: 'Terapias Injetáveis', isSelected: true },
+  { id: 'terapia_ev', name: 'Terapia Injetável Endovenosa', credits: 3, category: 'Terapias Injetáveis', isSelected: true },
+  
+  // Tirzepatida
+  { id: 'tirzepatida_25', name: 'Tirzepatida SC 2,5mg', credits: 1, category: 'Tirzepatida', isSelected: true },
+  { id: 'tirzepatida_5', name: 'Tirzepatida SC 5mg', credits: 1, category: 'Tirzepatida', isSelected: true },
+  { id: 'tirzepatida_75', name: 'Tirzepatida SC 7,5mg', credits: 1, category: 'Tirzepatida', isSelected: true },
+  { id: 'tirzepatida_10', name: 'Tirzepatida SC 10 mg', credits: 1, category: 'Tirzepatida', isSelected: true },
+  
+  // Procedimentos Básicos
+  { id: 'implante_sc', name: 'Implante subcutâneo', credits: 1, category: 'Procedimentos Básicos', isSelected: true },
+  { id: 'remocao_ponto', name: 'Remoção de Ponto', credits: 1, category: 'Procedimentos Básicos', isSelected: true },
+  { id: 'curativo', name: 'Curativo', credits: 2, category: 'Procedimentos Básicos', isSelected: true },
+  
+  // Estética
+  { id: 'toxina_botulinica', name: 'Toxina Botulínica', credits: 2, category: 'Estética', isSelected: true },
+  { id: 'bioestimulador_facial', name: 'Bioestimulador Facial (5mL)', credits: 3, category: 'Estética', isSelected: true },
+  { id: 'bioestimulador_corporal', name: 'Bioestimulador Corporal (10mL)', credits: 3, category: 'Estética', isSelected: true },
+  { id: 'preenchimento_facial', name: 'Preenchimento com Ac.Hialurônico Facial (5mL)', credits: 3, category: 'Estética', isSelected: true },
+  { id: 'preenchimento_corporal', name: 'Preenchimento com Ac.Hialurônico Corporal (5mL)', credits: 3, category: 'Estética', isSelected: true },
+  { id: 'mmp', name: 'MMP', credits: 3, category: 'Estética', isSelected: true },
+  
+  // Terapias Avançadas
+  { id: 'onda_choque', name: 'Terapia de Onda de Choque (1 Sessão)', credits: 2, category: 'Terapias Avançadas', isSelected: true },
+  { id: 'viscossuplementacao', name: 'Viscossuplementação (1 Sessão)', credits: 3, category: 'Terapias Avançadas', isSelected: true },
+  { id: 'prp', name: 'PRP (1 Sessão)', credits: 3, category: 'Terapias Avançadas', isSelected: true },
+  
+  // Avaliações e Exames
+  { id: 'bioimpedancia', name: 'Bioimpedância', credits: 1, category: 'Avaliações e Exames', isSelected: true },
+  { id: 'calorimetria', name: 'Calorimetria Indireta', credits: 2, category: 'Avaliações e Exames', isSelected: true },
+  { id: 'scaneamento_3d', name: 'Scaneamento 3D', credits: 1, category: 'Avaliações e Exames', isSelected: true },
+  { id: 'biorressonancia', name: 'Biorressonância', credits: 1, category: 'Avaliações e Exames', isSelected: true },
+  { id: 'mineralograma', name: 'Mineralograma', credits: 1, category: 'Avaliações e Exames', isSelected: true },
+  
+  // Tecnologias
+  { id: 'campo_magnetico', name: 'Tecnologia (Campo Magnético)', credits: 3, category: 'Tecnologias', isSelected: true },
+  { id: 'usg_focado', name: 'Tecnologia (USG Micro/Macro focado)', credits: 3, category: 'Tecnologias', isSelected: true },
+  { id: 'laser_co2', name: 'Tecnologia  (Laser CO2)', credits: 3, category: 'Tecnologias', isSelected: true },
+  { id: 'microagulhamento', name: 'Tecnologia (Microagulhamento)', credits: 3, category: 'Tecnologias', isSelected: true },
+]
+
+// Step 4: Upload de imagens
 export interface ImageData {
   id: string
   file?: File
   url?: string
+  preview?: string
   altText?: string
   displayOrder: number
   isFeatured: boolean
   uploadStatus: 'pending' | 'uploading' | 'success' | 'error'
   uploadProgress: number
   error?: string
+  isExisting?: boolean // Para identificar imagens já existentes no backend
+  dimensions?: {
+    width: number
+    height: number
+  }
+  sizeBytes?: number
+  type?: string
 }
 
 // Metadados do stepper

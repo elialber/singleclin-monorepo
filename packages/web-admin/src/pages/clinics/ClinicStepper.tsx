@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Box, Container, IconButton, Typography, CircularProgress, Alert } from '@mui/material'
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material'
 import { ClinicStepper } from '@/components/clinic/stepper/core/ClinicStepper'
-import { ClinicFormData } from '@/types/stepper'
+import { ClinicFormData, PREDEFINED_SERVICES } from '@/types/stepper'
 import { CreateClinicRequest, UpdateClinicRequest, Clinic, ClinicType } from '@/types/clinic'
 import { useNotification } from '@/contexts/NotificationContextDefinition'
 import { clinicService } from '@/services/clinic.service'
@@ -158,6 +158,9 @@ export default function ClinicStepperPage() {
         longitude: clinic.longitude || 0,
         accuracy: 0,
         source: 'user' as const
+      },
+      services: {
+        selectedServices: PREDEFINED_SERVICES.map(service => ({ ...service }))
       },
       images: (() => {
         const images = clinic.imageUrl ? [{

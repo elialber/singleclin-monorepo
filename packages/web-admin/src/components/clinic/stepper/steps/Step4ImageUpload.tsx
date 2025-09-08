@@ -96,11 +96,12 @@ function mapImageDataToProcessedImage(imageData: ImageData): ProcessedImage {
 }
 
 /**
- * Step 3: Upload Múltiplo de Imagens
+ * Step 4: Upload Múltiplo de Imagens
  * 
  * Interface completa para upload, organização e gerenciamento de imagens
+ * Suporta edição de imagens existentes em modo de edição
  */
-function Step3ImageUpload({ onNext, onPrev, isValid, isDirty }: StepComponentProps) {
+function Step4ImageUpload({ onNext, onPrev, isValid, isDirty }: StepComponentProps) {
   const { formData, updateFormData, validateStep } = useClinicStepper()
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set())
   const [previewImage, setPreviewImage] = useState<ProcessedImage | null>(null)
@@ -787,4 +788,4 @@ function Step3ImageUpload({ onNext, onPrev, isValid, isDirty }: StepComponentPro
   )
 }
 
-export default Step3ImageUpload
+export default Step4ImageUpload
