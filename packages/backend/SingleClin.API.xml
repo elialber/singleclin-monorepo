@@ -543,6 +543,22 @@
             Migrate all image URLs to use SAS tokens (Development/Admin only)
             </summary>
         </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GetServices(System.Guid)">
+            <summary>
+            Get services for a specific clinic
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>List of services offered by the clinic</returns>
+            <response code="200">Returns the clinic services</response>
+            <response code="404">Clinic not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.CreateSampleServices(System.Guid)">
+            <summary>
+            Create sample services for a clinic (Development Only)
+            </summary>
+            <param name="id">Clinic ID</param>
+            <returns>Created services</returns>
+        </member>
         <member name="T:SingleClin.API.Controllers.HealthController">
             <summary>
             Health check endpoints documentation

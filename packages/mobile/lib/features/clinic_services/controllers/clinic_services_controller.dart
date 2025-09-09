@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/clinic_service.dart';
 import '../services/clinic_services_api.dart';
 import '../../clinic_discovery/models/clinic.dart';
+import '../../../presentation/controllers/auth_controller.dart';
 
 class ClinicServicesController extends GetxController {
   final RxList<ClinicService> services = <ClinicService>[].obs;
@@ -11,6 +12,7 @@ class ClinicServicesController extends GetxController {
   final RxInt userCredits = 0.obs;
   
   Clinic? _clinic;
+  final AuthController _authController = Get.find<AuthController>();
   
   Clinic get clinic {
     if (_clinic == null) {
@@ -79,13 +81,8 @@ class ClinicServicesController extends GetxController {
       print('DEBUG: Services loaded from API: ${loadedServices.length} services');
     } catch (e) {
       print('DEBUG: API error: $e');
-      error.value = e.toString();
-      
-      // Mock data for development - remove in production
-      final mockServices = _getMockServices();
-      services.value = mockServices;
-      print('DEBUG: Using mock data: ${mockServices.length} services');
-      print('DEBUG: Mock services: ${mockServices.map((s) => s.name).join(', ')}');
+      error.value = 'Erro ao carregar serviços: $e';
+      services.value = [];
     } finally {
       isLoading.value = false;
       print('DEBUG: Loading set to false');
@@ -95,13 +92,17 @@ class ClinicServicesController extends GetxController {
 
   Future<void> loadUserCredits() async {
     try {
-      // Replace with actual user ID from auth service
-      final userId = 'current_user_id';
-      final creditsResponse = await ClinicServicesApi.getUserCredits(userId);
-      userCredits.value = creditsResponse['credits'] ?? 0;
+      final userId = _authController.currentUser?.id;
+      if (userId != null) {
+        final creditsResponse = await ClinicServicesApi.getUserCredits(userId);
+        userCredits.value = creditsResponse['credits'] ?? 0;
+      } else {
+        print('DEBUG: User not authenticated, using mock credits');
+        userCredits.value = 0; // No credits available if not authenticated
+      }
     } catch (e) {
-      // Mock credits for development
-      userCredits.value = 120;
+      print('DEBUG: Error loading credits: $e');
+      userCredits.value = 0;
     }
   }
 
@@ -172,8 +173,8 @@ class ClinicServicesController extends GetxController {
         return;
       }
 
-      // Replace with actual user ID
-      const userId = 'current_user_id';
+      // Get actual user ID
+      final userId = _authController.currentUser?.id ?? 'unknown';
       
       // Book the service
       final bookingSuccess = await ClinicServicesApi.bookService(
@@ -220,68 +221,4 @@ class ClinicServicesController extends GetxController {
     }
   }
 
-  List<ClinicService> _getMockServices() {
-    return [
-      ClinicService(
-        id: '1',
-        name: 'Consulta Geral',
-        description: 'Consulta médica geral com avaliação completa',
-        price: 50.0,
-        duration: 30,
-        category: 'Consulta',
-        isAvailable: true,
-        imageUrl: 'https://via.placeholder.com/300x200?text=Consulta+Geral',
-      ),
-      ClinicService(
-        id: '2',
-        name: 'Exame de Sangue',
-        description: 'Hemograma completo e bioquímicos básicos',
-        price: 25.0,
-        duration: 15,
-        category: 'Exame',
-        isAvailable: true,
-        imageUrl: 'https://via.placeholder.com/300x200?text=Exame+Sangue',
-      ),
-      ClinicService(
-        id: '3',
-        name: 'Ultrassom Abdominal',
-        description: 'Ultrassonografia da região abdominal',
-        price: 80.0,
-        duration: 45,
-        category: 'Exame',
-        isAvailable: true,
-        imageUrl: 'https://via.placeholder.com/300x200?text=Ultrassom',
-      ),
-      ClinicService(
-        id: '4',
-        name: 'Eletrocardiograma',
-        description: 'ECG de repouso para avaliação cardíaca',
-        price: 30.0,
-        duration: 20,
-        category: 'Exame',
-        isAvailable: true,
-        imageUrl: 'https://via.placeholder.com/300x200?text=ECG',
-      ),
-      ClinicService(
-        id: '5',
-        name: 'Consulta Cardiológica',
-        description: 'Consulta especializada em cardiologia',
-        price: 120.0,
-        duration: 60,
-        category: 'Consulta',
-        isAvailable: true,
-        imageUrl: 'https://via.placeholder.com/300x200?text=Cardiologia',
-      ),
-      ClinicService(
-        id: '6',
-        name: 'Raio-X Tórax',
-        description: 'Radiografia do tórax',
-        price: 40.0,
-        duration: 10,
-        category: 'Exame',
-        isAvailable: false,
-        imageUrl: 'https://via.placeholder.com/300x200?text=Raio+X',
-      ),
-    ];
-  }
 }

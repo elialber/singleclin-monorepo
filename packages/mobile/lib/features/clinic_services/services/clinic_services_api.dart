@@ -1,28 +1,27 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 import '../models/clinic_service.dart';
+import '../../../core/services/api_service.dart';
 
 class ClinicServicesApi {
-  static const String baseUrl = 'https://api.singleclin.com'; // Replace with actual API URL
+  static final ApiService _apiService = Get.find<ApiService>();
   
   static Future<List<ClinicService>> getClinicServices(String clinicId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/api/clinics/$clinicId/services'),
-        headers: {
-          'Content-Type': 'application/json',
-          // Add authorization header if needed
-          // 'Authorization': 'Bearer $token',
-        },
-      );
-
+      print('DEBUG: Making API call to get services for clinic: $clinicId');
+      final response = await _apiService.get('/clinics/$clinicId/services');
+      
+      print('DEBUG: API response: $response');
+      
       if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => ClinicService.fromJson(json)).toList();
+        final List<dynamic> data = response.data;
+        final services = data.map((json) => ClinicService.fromJson(json)).toList();
+        print('DEBUG: Converted ${services.length} services from API');
+        return services;
       } else {
         throw Exception('Failed to load clinic services: ${response.statusCode}');
       }
     } catch (e) {
+      print('DEBUG: API error: $e');
       throw Exception('Error fetching clinic services: $e');
     }
   }
@@ -35,21 +34,13 @@ class ClinicServicesApi {
     String? notes,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/appointments'),
-        headers: {
-          'Content-Type': 'application/json',
-          // Add authorization header if needed
-          // 'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'clinicId': clinicId,
-          'serviceId': serviceId,
-          'userId': userId,
-          'appointmentDate': appointmentDate.toIso8601String(),
-          'notes': notes,
-        }),
-      );
+      final response = await _apiService.post('/appointments', data: {
+        'clinicId': clinicId,
+        'serviceId': serviceId,
+        'userId': userId,
+        'appointmentDate': appointmentDate.toIso8601String(),
+        'notes': notes,
+      });
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
@@ -63,17 +54,10 @@ class ClinicServicesApi {
 
   static Future<Map<String, dynamic>> getUserCredits(String userId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/api/users/$userId/credits'),
-        headers: {
-          'Content-Type': 'application/json',
-          // Add authorization header if needed
-          // 'Authorization': 'Bearer $token',
-        },
-      );
+      final response = await _apiService.get('/users/$userId/credits');
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        return response.data;
       } else {
         throw Exception('Failed to load user credits: ${response.statusCode}');
       }
@@ -88,18 +72,10 @@ class ClinicServicesApi {
     required double amount,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/users/$userId/credits/consume'),
-        headers: {
-          'Content-Type': 'application/json',
-          // Add authorization header if needed
-          // 'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'serviceId': serviceId,
-          'amount': amount,
-        }),
-      );
+      final response = await _apiService.post('/users/$userId/credits/consume', data: {
+        'serviceId': serviceId,
+        'amount': amount,
+      });
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;

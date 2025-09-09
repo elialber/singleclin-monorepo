@@ -8,6 +8,7 @@ import 'firebase_options.dart';
 import 'core/constants/app_constants.dart';
 import 'core/themes/app_theme.dart';
 import 'core/services/storage_service.dart';
+import 'core/services/api_service.dart';
 import 'data/services/api_client.dart';
 import 'data/services/auth_service.dart';
 import 'data/services/token_refresh_service.dart';
@@ -73,6 +74,9 @@ Future<void> _initServices() async {
     
     // Initialize API client (singleton instance)
     Get.put(ApiClient.instance, permanent: true);
+    
+    // Initialize API service
+    Get.put(ApiService(), permanent: true);
     
     // Initialize auth service
     Get.put(AuthService(), permanent: true);

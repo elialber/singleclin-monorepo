@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using SingleClin.API.Data.Models;
+using SingleClin.API.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SingleClin.API.Controllers;
 
@@ -27,17 +29,20 @@ public class ClinicController : ControllerBase
     private readonly IImageUploadService _imageUploadService;
     private readonly ILogger<ClinicController> _logger;
     private readonly IConfiguration _configuration;
+    private readonly ApplicationDbContext _context;
 
     public ClinicController(
         IClinicService clinicService, 
         IImageUploadService imageUploadService,
         ILogger<ClinicController> logger,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ApplicationDbContext context)
     {
         _clinicService = clinicService;
         _imageUploadService = imageUploadService;
         _logger = logger;
         _configuration = configuration;
+        _context = context;
     }
 
     /// <summary>
@@ -1274,6 +1279,201 @@ public class ClinicController : ControllerBase
         {
             _logger.LogError(ex, "Error during image URL migration");
             return StatusCode(500, new { message = "Error during migration" });
+        }
+    }
+
+    /// <summary>
+    /// Get services for a specific clinic
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <returns>List of services offered by the clinic</returns>
+    /// <response code="200">Returns the clinic services</response>
+    /// <response code="404">Clinic not found</response>
+    [HttpGet("{id:guid}/services")]
+    [AllowAnonymous]
+    [SwaggerOperation(
+        Summary = "Get clinic services",
+        Description = "Retrieve all services offered by a specific clinic. No authentication required - used for public service display.",
+        OperationId = "GetClinicServices"
+    )]
+    [SwaggerResponse(200, "Success", typeof(List<ClinicServiceDto>))]
+    [SwaggerResponse(404, "Clinic not found")]
+    public async Task<ActionResult<List<ClinicServiceDto>>> GetServices([Required] Guid id)
+    {
+        try
+        {
+            // First check if clinic exists
+            var clinic = await _clinicService.GetByIdAsync(id);
+            if (clinic == null)
+            {
+                _logger.LogWarning("Clinic not found for services request: {ClinicId}", id);
+                return NotFound(new { message = $"Clinic with ID {id} not found" });
+            }
+
+            // Get services from database using ApplicationDbContext
+            var services = await _context.ClinicServices
+                .Where(s => s.ClinicId == id)
+                .OrderBy(s => s.Category)
+                .ThenBy(s => s.Name)
+                .Select(s => new ClinicServiceDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Description = s.Description,
+                    Price = s.Price,
+                    Duration = s.Duration,
+                    Category = s.Category,
+                    IsAvailable = s.IsAvailable,
+                    ImageUrl = s.ImageUrl
+                })
+                .ToListAsync();
+            
+            _logger.LogInformation("Retrieved {Count} services for clinic: {ClinicId}", services.Count, id);
+            
+            return Ok(services);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving services for clinic: {ClinicId}", id);
+            return StatusCode(500, new { message = "An error occurred while retrieving the clinic services" });
+        }
+    }
+
+    /// <summary>
+    /// Create sample services for a clinic (Development Only)
+    /// </summary>
+    /// <param name="id">Clinic ID</param>
+    /// <returns>Created services</returns>
+    [HttpPost("{id:guid}/services/create-samples")]
+    [AllowAnonymous]
+    [SwaggerOperation(
+        Summary = "Create sample services for development (DEV ONLY)",
+        Description = "Creates sample services for a clinic. REMOVE IN PRODUCTION!",
+        OperationId = "CreateSampleClinicServices"
+    )]
+    public async Task<ActionResult<List<ClinicServiceDto>>> CreateSampleServices([Required] Guid id)
+    {
+        try
+        {
+            _logger.LogWarning("⚠️  DEV ENDPOINT: Creating sample services for clinic {ClinicId}", id);
+
+            // First check if clinic exists
+            var clinic = await _clinicService.GetByIdAsync(id);
+            if (clinic == null)
+            {
+                return NotFound(new { message = $"Clinic with ID {id} not found" });
+            }
+
+            // Remove existing services for this clinic
+            var existingServices = await _context.ClinicServices
+                .Where(s => s.ClinicId == id)
+                .ToListAsync();
+
+            if (existingServices.Any())
+            {
+                _context.ClinicServices.RemoveRange(existingServices);
+                await _context.SaveChangesAsync();
+            }
+
+            // Create sample services
+            var sampleServices = new List<Service>
+            {
+                new Service
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Consulta Geral",
+                    Description = "Consulta médica geral com avaliação completa",
+                    Price = 50.0m,
+                    Duration = 30,
+                    Category = "Consulta",
+                    IsAvailable = true,
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Consulta+Geral",
+                    ClinicId = id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Service
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Exame de Sangue",
+                    Description = "Hemograma completo e bioquímicos básicos",
+                    Price = 25.0m,
+                    Duration = 15,
+                    Category = "Exame",
+                    IsAvailable = true,
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Exame+Sangue",
+                    ClinicId = id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Service
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Ultrassom Abdominal",
+                    Description = "Ultrassonografia da região abdominal",
+                    Price = 80.0m,
+                    Duration = 45,
+                    Category = "Exame",
+                    IsAvailable = true,
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Ultrassom",
+                    ClinicId = id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Service
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Eletrocardiograma",
+                    Description = "ECG de repouso para avaliação cardíaca",
+                    Price = 30.0m,
+                    Duration = 20,
+                    Category = "Exame",
+                    IsAvailable = true,
+                    ImageUrl = "https://via.placeholder.com/300x200?text=ECG",
+                    ClinicId = id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Service
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Consulta Cardiológica",
+                    Description = "Consulta especializada em cardiologia",
+                    Price = 120.0m,
+                    Duration = 60,
+                    Category = "Consulta",
+                    IsAvailable = true,
+                    ImageUrl = "https://via.placeholder.com/300x200?text=Cardiologia",
+                    ClinicId = id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                }
+            };
+
+            _context.ClinicServices.AddRange(sampleServices);
+            await _context.SaveChangesAsync();
+
+            // Return the created services as DTOs
+            var serviceDtos = sampleServices.Select(s => new ClinicServiceDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Description = s.Description,
+                Price = s.Price,
+                Duration = s.Duration,
+                Category = s.Category,
+                IsAvailable = s.IsAvailable,
+                ImageUrl = s.ImageUrl
+            }).ToList();
+
+            _logger.LogInformation("✅ DEV: Created {Count} sample services for clinic: {ClinicId}", serviceDtos.Count, id);
+
+            return Ok(serviceDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ DEV: Error creating sample services for clinic: {ClinicId}", id);
+            return StatusCode(500, new { message = "An error occurred while creating sample services" });
         }
     }
 }

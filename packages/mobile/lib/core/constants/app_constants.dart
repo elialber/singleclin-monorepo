@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
+
 /// Application constants
 class AppConstants {
   AppConstants._();
 
   // API Configuration
-  static const String baseUrl = 'http://localhost:5080';
+  static String get baseUrl => _getBaseUrl();
   static const String apiVersion = 'v1';
   static const Duration apiTimeout = Duration(seconds: 30);
   static const Duration timeoutDuration = Duration(seconds: 30);
@@ -79,4 +81,17 @@ class AppConstants {
   // Default location (São Paulo)
   static const double defaultLatitude = -23.5505;
   static const double defaultLongitude = -46.6333;
+
+  /// Get base URL based on environment
+  static String _getBaseUrl() {
+    // You can switch between different environments here
+    // Using kDebugMode to determine environment instead of String.fromEnvironment
+    // to avoid the do_not_use_environment linter warning
+    if (kReleaseMode) {
+      return 'https://api.singleclin.com.br'; // Production
+    } else {
+      // Android emulator uses 10.0.2.2 to access localhost on host machine
+      return 'https://10.0.2.2:5001/api'; // Development/Debug
+    }
+  }
 }
