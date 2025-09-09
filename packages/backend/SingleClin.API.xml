@@ -524,6 +524,25 @@
             <param name="uploadDto">Multiple images upload data</param>
             <returns>Upload response with results</returns>
         </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.TestImageUrl(System.String)">
+            <summary>
+            Test image URL accessibility
+            </summary>
+            <param name="imageUrl">Image URL to test</param>
+            <returns>Status of the image URL</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GetImageUrl(System.String)">
+            <summary>
+            Get fresh SAS URL for an image
+            </summary>
+            <param name="fileName">Storage file name</param>
+            <returns>Fresh SAS URL</returns>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.MigrateImageUrls(SingleClin.API.Services.ImageMigrationService)">
+            <summary>
+            Migrate all image URLs to use SAS tokens (Development/Admin only)
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Controllers.HealthController">
             <summary>
             Health check endpoints documentation
@@ -5748,6 +5767,21 @@
         <member name="M:SingleClin.API.Services.ImageUploadResult.CreateFailure(System.String)">
             <summary>
             Create a failed upload result
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.ImageMigrationService">
+            <summary>
+            Service to migrate existing image URLs to use SAS tokens
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ImageMigrationService.UpdateImageUrlsAsync">
+            <summary>
+            Update all clinic images to use fresh SAS URLs
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ImageMigrationService.UpdateClinicImageUrlsAsync(System.Guid)">
+            <summary>
+            Update URLs for a specific clinic's images
             </summary>
         </member>
         <member name="T:SingleClin.API.Services.ImageUploadService">

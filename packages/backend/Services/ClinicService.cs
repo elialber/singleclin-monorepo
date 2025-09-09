@@ -75,10 +75,40 @@ public class ClinicService : IClinicService
 
         var createdClinic = await _clinicRepository.CreateAsync(clinic);
 
+        // Now that the clinic has been created and has an ID, create the services
+        if (clinicRequest.Services != null && clinicRequest.Services.Any())
+        {
+            foreach (var serviceDto in clinicRequest.Services)
+            {
+                var service = new Service
+                {
+                    Id = serviceDto.Id == Guid.Empty ? Guid.NewGuid() : serviceDto.Id,
+                    Name = serviceDto.Name,
+                    Description = serviceDto.Description,
+                    Price = serviceDto.Price,
+                    Duration = serviceDto.Duration,
+                    Category = serviceDto.Category,
+                    IsAvailable = serviceDto.IsAvailable,
+                    ImageUrl = serviceDto.ImageUrl,
+                    ClinicId = createdClinic.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                _context.ClinicServices.Add(service);
+            }
+
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Created {ServiceCount} services for clinic: {ClinicName} (ID: {ClinicId})",
+                clinicRequest.Services.Count, createdClinic.Name, createdClinic.Id);
+        }
+
         _logger.LogInformation("Clinic created successfully: {ClinicName} (ID: {ClinicId})",
             createdClinic.Name, createdClinic.Id);
 
-        return MapToResponseDto(createdClinic);
+        // Refresh the clinic to include the newly created services
+        var refreshedClinic = await _clinicRepository.GetByIdAsync(createdClinic.Id);
+        return MapToResponseDto(refreshedClinic ?? createdClinic);
     }
 
     public async Task<ClinicResponseDto> UpdateAsync(Guid id, ClinicRequestDto clinicRequest)
@@ -598,18 +628,7 @@ public class ClinicService : IClinicService
             Cnpj = clinicRequest.Cnpj,
             IsActive = clinicRequest.IsActive,
             Latitude = clinicRequest.Latitude,
-            Longitude = clinicRequest.Longitude,
-            Services = clinicRequest.Services.Select(s => new Service
-            {
-                Id = s.Id == Guid.Empty ? Guid.NewGuid() : s.Id,
-                Name = s.Name,
-                Description = s.Description,
-                Price = s.Price,
-                Duration = s.Duration,
-                Category = s.Category,
-                IsAvailable = s.IsAvailable,
-                ImageUrl = s.ImageUrl
-            }).ToList()
+            Longitude = clinicRequest.Longitude
         };
     }
 

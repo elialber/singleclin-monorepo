@@ -222,7 +222,16 @@ export const clinicService = {
   async getImageUrl(clinicId: string, fileName: string): Promise<string> {
     // Para Azure Blob Storage, a URL já é retornada completa do backend
     // Esta função pode ser usada para gerar URLs de preview ou cache
-    return `https://singleclin.blob.core.windows.net/clinic-images/clinics/${fileName}`
+    return `https://singleclin.blob.core.windows.net/clinic-images/${fileName}`
+  },
+
+  async validateImageUrl(imageUrl: string): Promise<boolean> {
+    try {
+      const response = await fetch(imageUrl, { method: 'HEAD' })
+      return response.ok
+    } catch {
+      return false
+    }
   },
 
   // Multiple Images API Methods

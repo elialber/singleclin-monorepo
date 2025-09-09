@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 using Microsoft.AspNetCore.Http;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -78,15 +79,24 @@ public class ImageUploadService : IImageUploadService
             // Check if Azure Blob Storage is available
             if (_blobServiceClient != null)
             {
+                // Ensure container exists (without public access)
+                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+                await containerClient.CreateIfNotExistsAsync();
+                
                 // Upload to Azure Blob Storage
-                var blobClient = _blobServiceClient.GetBlobContainerClient(_containerName).GetBlobClient(uniqueFileName);
+                var blobClient = containerClient.GetBlobClient(uniqueFileName);
                 var uploadOptions = new BlobUploadOptions
                 {
                     HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
                 };
 
                 await blobClient.UploadAsync(processedImageStream, uploadOptions, cancellationToken);
-                var imageUrl = $"{_baseUrl.TrimEnd('/')}/{_containerName}/{uniqueFileName}";
+                
+                // Set blob to hot access tier for better performance
+                await blobClient.SetAccessTierAsync(AccessTier.Hot);
+                
+                // Generate a SAS URL for the image with 1 year expiration
+                var imageUrl = GenerateSasUrl(blobClient);
 
                 _logger.LogInformation("Successfully uploaded image to Azure Blob Storage: {FileName} to {Url}", uniqueFileName, imageUrl);
 
@@ -147,7 +157,20 @@ public class ImageUploadService : IImageUploadService
     public async Task<string> GetImageUrlAsync(string fileName, string folder)
     {
         await Task.CompletedTask; // Placeholder for async pattern
-        return $"{_baseUrl.TrimEnd('/')}/{_containerName}/{fileName}";
+        
+        if (_blobServiceClient != null)
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient(fileName);
+            
+            // Generate a fresh SAS URL
+            return GenerateSasUrl(blobClient);
+        }
+        else
+        {
+            // Local storage fallback
+            return $"{_baseUrl.TrimEnd('/')}/uploads/{fileName}";
+        }
     }
 
     public async Task<bool> ValidateImageAsync(IFormFile file)
@@ -327,5 +350,42 @@ public class ImageUploadService : IImageUploadService
             ".webp" => "image/webp",
             _ => "application/octet-stream"
         };
+    }
+
+    private string GenerateSasUrl(BlobClient blobClient)
+    {
+        try
+        {
+            // Check if the blob client can generate SAS tokens
+            if (blobClient.CanGenerateSasUri)
+            {
+                // Create a SAS builder for read access
+                var sasBuilder = new BlobSasBuilder
+                {
+                    BlobContainerName = blobClient.BlobContainerName,
+                    BlobName = blobClient.Name,
+                    Resource = "b", // "b" for blob
+                    ExpiresOn = DateTimeOffset.UtcNow.AddYears(1) // 1 year expiration
+                };
+
+                // Set read permissions
+                sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+                // Generate the SAS URI
+                return blobClient.GenerateSasUri(sasBuilder).ToString();
+            }
+            else
+            {
+                // Fallback to base URL if SAS cannot be generated
+                _logger.LogWarning("Cannot generate SAS URI for blob: {BlobName}, using base URL", blobClient.Name);
+                return blobClient.Uri.ToString();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating SAS URL for blob: {BlobName}", blobClient.Name);
+            // Fallback to base URL
+            return blobClient.Uri.ToString();
+        }
     }
 }

@@ -68,7 +68,7 @@ public class ClinicRepository : IClinicRepository
         // Apply pagination
         var clinics = await query
             .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
-            // .Include(c => c.Services) // Temporarily disabled until table is created
+            .Include(c => c.Services)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .AsNoTracking()

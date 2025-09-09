@@ -240,6 +240,9 @@ public class Program
 
         // Add Image Upload Service with Azure Blob Storage
         builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
+        
+        // Add image migration service
+        builder.Services.AddScoped<ImageMigrationService>();
 
         // Configure authorization policies
         builder.Services.AddAuthorization(options =>

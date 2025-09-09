@@ -1196,4 +1196,84 @@ public class ClinicController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while uploading the images" });
         }
     }
+
+    /// <summary>
+    /// Test image URL accessibility
+    /// </summary>
+    /// <param name="imageUrl">Image URL to test</param>
+    /// <returns>Status of the image URL</returns>
+    [HttpGet("test-image")]
+    public async Task<ActionResult<object>> TestImageUrl([FromQuery] string imageUrl)
+    {
+        try
+        {
+            using var httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(10);
+            
+            var response = await httpClient.GetAsync(imageUrl);
+            
+            return Ok(new
+            {
+                url = imageUrl,
+                accessible = response.IsSuccessStatusCode,
+                statusCode = (int)response.StatusCode,
+                statusDescription = response.StatusCode.ToString(),
+                contentType = response.Content.Headers.ContentType?.ToString(),
+                contentLength = response.Content.Headers.ContentLength
+            });
+        }
+        catch (Exception ex)
+        {
+            return Ok(new
+            {
+                url = imageUrl,
+                accessible = false,
+                error = ex.Message
+            });
+        }
+    }
+
+    /// <summary>
+    /// Get fresh SAS URL for an image
+    /// </summary>
+    /// <param name="fileName">Storage file name</param>
+    /// <returns>Fresh SAS URL</returns>
+    [HttpGet("image-url/{fileName}")]
+    public async Task<ActionResult<object>> GetImageUrl(string fileName)
+    {
+        try
+        {
+            var url = await _imageUploadService.GetImageUrlAsync(fileName, "clinics");
+            return Ok(new { url, expiresIn = "1 year" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating image URL for: {FileName}", fileName);
+            return StatusCode(500, new { message = "Error generating image URL" });
+        }
+    }
+
+    /// <summary>
+    /// Migrate all image URLs to use SAS tokens (Development/Admin only)
+    /// </summary>
+    [HttpPost("migrate-image-urls")]
+    [Authorize] // Requires authentication
+    public async Task<ActionResult<object>> MigrateImageUrls([FromServices] ImageMigrationService migrationService)
+    {
+        try
+        {
+            var updatedCount = await migrationService.UpdateImageUrlsAsync();
+            return Ok(new 
+            { 
+                message = $"Successfully updated {updatedCount} image URLs",
+                updatedCount,
+                timestamp = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during image URL migration");
+            return StatusCode(500, new { message = "Error during migration" });
+        }
+    }
 }
