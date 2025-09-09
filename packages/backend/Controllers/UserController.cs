@@ -433,6 +433,64 @@ public class UserController : BaseController
     }
 
     /// <summary>
+    /// Get user's total available credits
+    /// </summary>
+    [HttpGet("{id}/credits")]
+    [AllowAnonymous] // Allow anonymous access for mobile app
+    public async Task<ActionResult<object>> GetUserCredits(string id)
+    {
+        try
+        {
+            _logger.LogInformation("Getting credits for user: {UserId}", id);
+            
+            // For Firebase UIDs (like ATp3HykPuYMosiLapAKP6QEsB622), return mock credits for now
+            // In production, this would need to map Firebase UID to internal User ID
+            if (!Guid.TryParse(id, out var userId))
+            {
+                _logger.LogInformation("Non-GUID user ID detected (likely Firebase UID): {UserId}", id);
+                // Return mock credits for Firebase users
+                return Ok(new { credits = 100 });
+            }
+            
+            var userPlans = await _userService.GetUserPlansAsync(userId);
+            var totalCredits = userPlans.Sum(up => up.CreditsRemaining);
+            
+            _logger.LogInformation("Found {TotalCredits} credits for user {UserId}", totalCredits, id);
+            
+            return Ok(new { credits = totalCredits });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting credits for user {UserId}", id);
+            return StatusCode(500, new { message = "An error occurred while retrieving user credits" });
+        }
+    }
+
+    /// <summary>
+    /// Consume credits for a service (mock endpoint for testing)
+    /// </summary>
+    [HttpPost("{id}/credits/consume")]
+    [AllowAnonymous] // Allow anonymous access for mobile app  
+    public async Task<ActionResult<object>> ConsumeCredits(string id, [FromBody] ConsumeCreditsRequest request)
+    {
+        try
+        {
+            _logger.LogInformation("Consuming {Amount} credits for user {UserId} for service {ServiceId}", 
+                request.Amount, id, request.ServiceId);
+            
+            // For now, just return success - this would need proper implementation
+            // with transaction creation and credit deduction
+            
+            return Ok(new { success = true, message = "Credits consumed successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error consuming credits for user {UserId}", id);
+            return StatusCode(500, new { message = "An error occurred while consuming credits" });
+        }
+    }
+
+    /// <summary>
     /// Cancel/Remove a user's plan
     /// </summary>
     [HttpDelete("{id}/plans/{userPlanId}")]
@@ -480,4 +538,20 @@ public class CancelPlanRequest
     /// Reason for cancelling the plan
     /// </summary>
     public string? Reason { get; set; }
+}
+
+/// <summary>
+/// Request model for consuming credits
+/// </summary>
+public class ConsumeCreditsRequest
+{
+    /// <summary>
+    /// ID of the service being booked
+    /// </summary>
+    public string ServiceId { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Amount of credits to consume
+    /// </summary>
+    public double Amount { get; set; }
 }

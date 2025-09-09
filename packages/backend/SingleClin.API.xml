@@ -1094,6 +1094,16 @@
             Get specific user plan by ID
             </summary>
         </member>
+        <member name="M:SingleClin.API.Controllers.UserController.GetUserCredits(System.String)">
+            <summary>
+            Get user's total available credits
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.UserController.ConsumeCredits(System.String,SingleClin.API.Controllers.ConsumeCreditsRequest)">
+            <summary>
+            Consume credits for a service (mock endpoint for testing)
+            </summary>
+        </member>
         <member name="M:SingleClin.API.Controllers.UserController.CancelUserPlan(System.Guid,System.Guid,SingleClin.API.Controllers.CancelPlanRequest)">
             <summary>
             Cancel/Remove a user's plan
@@ -1107,6 +1117,21 @@
         <member name="P:SingleClin.API.Controllers.CancelPlanRequest.Reason">
             <summary>
             Reason for cancelling the plan
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Controllers.ConsumeCreditsRequest">
+            <summary>
+            Request model for consuming credits
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.ConsumeCreditsRequest.ServiceId">
+            <summary>
+            ID of the service being booked
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Controllers.ConsumeCreditsRequest.Amount">
+            <summary>
+            Amount of credits to consume
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.AppDbContext">
