@@ -65,25 +65,7 @@ public static class AuthenticationExtensions
             };
         });
 
-        // Add authorization
-        services.AddAuthorization(options =>
-        {
-            // Add role-based policies based on UserRole enum
-            options.AddPolicy("AdminOnly", policy => policy.RequireRole(UserRole.Administrator.ToString()));
-            options.AddPolicy("ClinicOnly", policy => policy.RequireRole(
-                UserRole.ClinicOrigin.ToString(), 
-                UserRole.ClinicPartner.ToString()));
-            options.AddPolicy("PatientOnly", policy => policy.RequireRole(UserRole.Patient.ToString()));
-            
-            // Add custom policies
-            options.AddPolicy("ClinicOwner", policy =>
-                policy.RequireAssertion(context =>
-                    context.User.HasClaim(c => c.Type == "clinicId") &&
-                    !string.IsNullOrEmpty(context.User.FindFirst("clinicId")?.Value)));
-            
-            // Combined policy for any authenticated user
-            options.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
-        });
+        // Authorization policies are configured in Program.cs to avoid conflicts
 
         return services;
     }

@@ -323,21 +323,41 @@
             <returns>Paginated list of clinics</returns>
             <response code="200">Returns the paginated list of clinics</response>
         </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GenerateRealToken(SingleClin.API.DTOs.Auth.LoginDto,Microsoft.AspNetCore.Identity.UserManager{SingleClin.API.Data.Models.ApplicationUser},SingleClin.API.Services.IJwtService)">
+            <summary>
+            Generate Real User Token (Development Only)
+            </summary>
+        </member>
         <member name="M:SingleClin.API.Controllers.ClinicController.DebugToken">
             <summary>
             Debug Token Claims (Development Only)
             </summary>
             <returns>Current user's claims</returns>
         </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.CreateIdentityUsers(Microsoft.AspNetCore.Identity.UserManager{SingleClin.API.Data.Models.ApplicationUser})">
+            <summary>
+            Create Identity users only (DEV ONLY)
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.SimpleTest">
+            <summary>
+            Simple test endpoint
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ClinicController.GenerateTestToken">
+            <summary>
+            Generate test JWT token (Development Only)
+            </summary>
+            <returns>Test JWT token for debugging</returns>
+        </member>
         <member name="M:SingleClin.API.Controllers.ClinicController.GetById(System.Guid)">
             <summary>
-            Get clinic by ID (Admin Only)
+            Get clinic by ID
             </summary>
             <param name="id">Clinic ID</param>
             <returns>Clinic details</returns>
             <response code="200">Returns the clinic</response>
             <response code="401">Unauthorized</response>
-            <response code="403">Forbidden - Admin role required</response>
             <response code="404">Clinic not found</response>
         </member>
         <member name="M:SingleClin.API.Controllers.ClinicController.Create(SingleClin.API.DTOs.Clinic.ClinicRequestDto)">
@@ -1104,6 +1124,11 @@
             Images associated with clinics
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.ClinicServices">
+            <summary>
+            Services offered by clinics
+            </summary>
+        </member>
         <member name="P:SingleClin.API.Data.ApplicationDbContext.Plans">
             <summary>
             Available plans for purchase
@@ -1357,6 +1382,11 @@
         <member name="P:SingleClin.API.Data.Models.Clinic.Images">
             <summary>
             Collection of images associated with this clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Clinic.Services">
+            <summary>
+            Services offered by this clinic
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.Models.Clinic.Transactions">
@@ -1637,6 +1667,56 @@
         <member name="P:SingleClin.API.Data.Models.RefreshToken.IsActive">
             <summary>
             Check if the token is active
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Service">
+            <summary>
+            Represents a service offered by a clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.Name">
+            <summary>
+            Service name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.Description">
+            <summary>
+            Service description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.Price">
+            <summary>
+            Service price
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.Duration">
+            <summary>
+            Service duration in minutes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.Category">
+            <summary>
+            Service category
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.IsAvailable">
+            <summary>
+            Indicates if the service is available
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.ImageUrl">
+            <summary>
+            Service image URL
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.ClinicId">
+            <summary>
+            Clinic ID that offers this service
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Service.Clinic">
+            <summary>
+            Navigation property to the clinic
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Models.Transaction">
@@ -2392,6 +2472,11 @@
             Longitude coordinate
             </summary>
         </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicRequestDto.Services">
+            <summary>
+            Services offered by this clinic
+            </summary>
+        </member>
         <member name="T:SingleClin.API.DTOs.Clinic.ClinicResponseDto">
             <summary>
             Data transfer object for clinic response
@@ -2467,6 +2552,11 @@
             Collection of images associated with this clinic
             </summary>
         </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.Services">
+            <summary>
+            Services offered by this clinic
+            </summary>
+        </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.TransactionCount">
             <summary>
             Number of transactions processed by this clinic
@@ -2490,6 +2580,51 @@
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.TypeDisplayName">
             <summary>
             Type display name for UI
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Clinic.ClinicServiceDto">
+            <summary>
+            Data transfer object for clinic service
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.Id">
+            <summary>
+            Service unique identifier
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.Name">
+            <summary>
+            Service name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.Description">
+            <summary>
+            Service description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.Price">
+            <summary>
+            Service price
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.Duration">
+            <summary>
+            Service duration in minutes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.Category">
+            <summary>
+            Service category
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.IsAvailable">
+            <summary>
+            Indicates if the service is available
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.ImageUrl">
+            <summary>
+            Service image URL
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.Clinic.MultipleImageUploadDto">
@@ -4568,6 +4703,16 @@
             Configure database migrations and seeding
             </summary>
         </member>
+        <member name="M:SingleClin.API.Extensions.DatabaseExtensions.CreateClinicServicesTableAsync(SingleClin.API.Data.ApplicationDbContext)">
+            <summary>
+            Manually create ClinicServices table to resolve migration issues
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Extensions.DatabaseExtensions.SeedSampleClinicsAsync(SingleClin.API.Data.ApplicationDbContext)">
+            <summary>
+            Seed sample clinic data if none exists
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Filters.SwaggerDefaultValues">
             <summary>
             Swagger operation filter to improve API documentation
@@ -4782,6 +4927,51 @@
             <inheritdoc />
         </member>
         <member name="M:SingleClin.API.Migrations.ApplicationDb.AddClinicImagesTableFixed.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.SyncClinicServicesModel">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.SyncClinicServicesModel.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.SyncClinicServicesModel.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.SyncClinicServicesModel.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.CreateClinicServicesTable">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.CreateClinicServicesTable.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.CreateClinicServicesTable.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.CreateClinicServicesTable.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.ForceCreateClinicServicesTable">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.ForceCreateClinicServicesTable.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.ForceCreateClinicServicesTable.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.ForceCreateClinicServicesTable.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.CreateClinicServicesTableActual">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.CreateClinicServicesTableActual.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.CreateClinicServicesTableActual.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
         <member name="T:SingleClin.API.Repositories.ClinicRepository">

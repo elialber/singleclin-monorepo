@@ -82,6 +82,11 @@ public class Clinic : BaseEntity
     public ICollection<ClinicImage> Images { get; set; } = new List<ClinicImage>();
     
     /// <summary>
+    /// Services offered by this clinic
+    /// </summary>
+    public ICollection<Service> Services { get; set; } = new List<Service>();
+    
+    /// <summary>
     /// Transactions processed by this clinic
     /// </summary>
     public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();

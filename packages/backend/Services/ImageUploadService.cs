@@ -14,7 +14,7 @@ namespace SingleClin.API.Services;
 /// </summary>
 public class ImageUploadService : IImageUploadService
 {
-    private readonly BlobServiceClient _blobServiceClient;
+    private readonly BlobServiceClient? _blobServiceClient;
     private readonly IConfiguration _configuration;
     private readonly ILogger<ImageUploadService> _logger;
 
@@ -39,12 +39,18 @@ public class ImageUploadService : IImageUploadService
         // Load configuration
         var azureConfig = _configuration.GetSection("AzureStorage");
         _containerName = azureConfig["ContainerName"] ?? "clinic-images";
-        _baseUrl = azureConfig["BaseUrl"] ?? "https://singleclin.blob.core.windows.net/";
+        _baseUrl = azureConfig["BaseUrl"] ?? "https://localhost:5001/uploads/";
         _maxFileSize = azureConfig.GetValue<long>("MaxFileSize", 5242880); // 5MB default
         _allowedFileTypes = azureConfig.GetSection("AllowedFileTypes").Get<string[]>() ?? new[] { "jpg", "jpeg", "png", "webp" };
         _imageQuality = azureConfig.GetValue<int>("ImageQuality", 85);
         _maxWidth = azureConfig.GetValue<int>("MaxWidth", 1200);
         _maxHeight = azureConfig.GetValue<int>("MaxHeight", 800);
+
+        // Log if using local storage
+        if (_blobServiceClient == null)
+        {
+            _logger.LogWarning("Azure Blob Storage not configured. Using local file storage for development.");
+        }
     }
 
     public async Task<ImageUploadResult> UploadImageAsync(IFormFile file, string folder, CancellationToken cancellationToken = default)
@@ -67,29 +73,35 @@ public class ImageUploadService : IImageUploadService
             using var originalStream = file.OpenReadStream();
             using var processedImageStream = await ProcessImageAsync(originalStream, fileExtension);
 
-            // Get blob client
-            var blobClient = _blobServiceClient.GetBlobContainerClient(_containerName).GetBlobClient(uniqueFileName);
-
-            // Set content type
             var contentType = GetContentType(fileExtension);
-            var uploadOptions = new BlobUploadOptions
+
+            // Check if Azure Blob Storage is available
+            if (_blobServiceClient != null)
             {
-                HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
-            };
+                // Upload to Azure Blob Storage
+                var blobClient = _blobServiceClient.GetBlobContainerClient(_containerName).GetBlobClient(uniqueFileName);
+                var uploadOptions = new BlobUploadOptions
+                {
+                    HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
+                };
 
-            // Upload to Azure Blob Storage
-            await blobClient.UploadAsync(processedImageStream, uploadOptions, cancellationToken);
+                await blobClient.UploadAsync(processedImageStream, uploadOptions, cancellationToken);
+                var imageUrl = $"{_baseUrl.TrimEnd('/')}/{_containerName}/{uniqueFileName}";
 
-            var imageUrl = $"{_baseUrl.TrimEnd('/')}/{_containerName}/{uniqueFileName}";
+                _logger.LogInformation("Successfully uploaded image to Azure Blob Storage: {FileName} to {Url}", uniqueFileName, imageUrl);
 
-            _logger.LogInformation("Successfully uploaded image: {FileName} to {Url}", uniqueFileName, imageUrl);
-
-            return ImageUploadResult.CreateSuccess(
-                uniqueFileName,
-                imageUrl,
-                processedImageStream.Length,
-                contentType
-            );
+                return ImageUploadResult.CreateSuccess(
+                    uniqueFileName,
+                    imageUrl,
+                    processedImageStream.Length,
+                    contentType
+                );
+            }
+            else
+            {
+                // Use local file storage for development
+                return await SaveToLocalStorageAsync(processedImageStream, uniqueFileName, contentType);
+            }
         }
         catch (Exception ex)
         {
@@ -104,17 +116,26 @@ public class ImageUploadService : IImageUploadService
         {
             _logger.LogInformation("Deleting image: {FileName}", fileName);
 
-            var blobClient = _blobServiceClient.GetBlobContainerClient(_containerName).GetBlobClient(fileName);
-            var response = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
-
-            if (response.Value)
+            // Check if Azure Blob Storage is available
+            if (_blobServiceClient != null)
             {
-                _logger.LogInformation("Successfully deleted image: {FileName}", fileName);
-                return true;
-            }
+                var blobClient = _blobServiceClient.GetBlobContainerClient(_containerName).GetBlobClient(fileName);
+                var response = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
 
-            _logger.LogWarning("Image not found for deletion: {FileName}", fileName);
-            return false;
+                if (response.Value)
+                {
+                    _logger.LogInformation("Successfully deleted image from Azure Blob Storage: {FileName}", fileName);
+                    return true;
+                }
+
+                _logger.LogWarning("Image not found for deletion in Azure Blob Storage: {FileName}", fileName);
+                return false;
+            }
+            else
+            {
+                // Delete from local storage
+                return await DeleteFromLocalStorageAsync(fileName);
+            }
         }
         catch (Exception ex)
         {
@@ -230,6 +251,70 @@ public class ImageUploadService : IImageUploadService
             outputStream.Dispose();
             _logger.LogError(ex, "Error processing image");
             throw;
+        }
+    }
+
+    private async Task<ImageUploadResult> SaveToLocalStorageAsync(MemoryStream imageStream, string fileName, string contentType)
+    {
+        try
+        {
+            // Create uploads directory if it doesn't exist
+            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            Directory.CreateDirectory(uploadsDir);
+
+            // Create the file path
+            var filePath = Path.Combine(uploadsDir, fileName);
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            // Save the file
+            imageStream.Position = 0;
+            using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            await imageStream.CopyToAsync(fileStream);
+
+            // Generate local URL
+            var imageUrl = $"{_baseUrl.TrimEnd('/')}/uploads/{fileName}";
+
+            _logger.LogInformation("Successfully saved image to local storage: {FileName} to {Path}", fileName, filePath);
+
+            return ImageUploadResult.CreateSuccess(
+                fileName,
+                imageUrl,
+                imageStream.Length,
+                contentType
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving image to local storage: {FileName}", fileName);
+            throw;
+        }
+    }
+
+    private async Task<bool> DeleteFromLocalStorageAsync(string fileName)
+    {
+        try
+        {
+            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            var filePath = Path.Combine(uploadsDir, fileName);
+
+            if (File.Exists(filePath))
+            {
+                await Task.Run(() => File.Delete(filePath));
+                _logger.LogInformation("Successfully deleted image from local storage: {FileName} at {Path}", fileName, filePath);
+                return true;
+            }
+
+            _logger.LogWarning("Image not found for deletion in local storage: {FileName} at {Path}", fileName, filePath);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting image from local storage: {FileName}", fileName);
+            return false;
         }
     }
 

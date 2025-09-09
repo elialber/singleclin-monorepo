@@ -68,6 +68,7 @@ public class ClinicRepository : IClinicRepository
         // Apply pagination
         var clinics = await query
             .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+            // .Include(c => c.Services) // Temporarily disabled until table is created
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .AsNoTracking()
@@ -84,6 +85,7 @@ public class ClinicRepository : IClinicRepository
         var clinic = await _context.Clinics
             .Include(c => c.Transactions)
             .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+            .Include(c => c.Services)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -117,6 +119,7 @@ public class ClinicRepository : IClinicRepository
     {
         var clinics = await _context.Clinics
             .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+            .Include(c => c.Services)
             .Where(c => c.IsActive)
             .OrderBy(c => c.Name)
             .AsNoTracking()
@@ -142,7 +145,9 @@ public class ClinicRepository : IClinicRepository
 
     public async Task<Clinic> UpdateAsync(Clinic clinic)
     {
-        var existingClinic = await _context.Clinics.FirstOrDefaultAsync(c => c.Id == clinic.Id);
+        var existingClinic = await _context.Clinics
+            .Include(c => c.Services)
+            .FirstOrDefaultAsync(c => c.Id == clinic.Id);
         if (existingClinic == null)
         {
             throw new InvalidOperationException($"Clinic with ID {clinic.Id} not found for update");
@@ -159,6 +164,23 @@ public class ClinicRepository : IClinicRepository
         existingClinic.Latitude = clinic.Latitude;
         existingClinic.Longitude = clinic.Longitude;
         existingClinic.UpdatedAt = DateTime.UtcNow;
+
+        // Update services
+        if (existingClinic.Services != null)
+        {
+            // Remove existing services
+            _context.ClinicServices.RemoveRange(existingClinic.Services);
+        }
+
+        // Add new services
+        if (clinic.Services != null && clinic.Services.Any())
+        {
+            foreach (var service in clinic.Services)
+            {
+                service.ClinicId = clinic.Id;
+                _context.ClinicServices.Add(service);
+            }
+        }
 
         await _context.SaveChangesAsync();
 

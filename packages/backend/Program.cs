@@ -518,6 +518,9 @@ public class Program
             });
         }
 
+        // Enable static files serving for uploaded images
+        app.UseStaticFiles();
+
         app.UseHttpsRedirection();
 
         // Add global exception handler

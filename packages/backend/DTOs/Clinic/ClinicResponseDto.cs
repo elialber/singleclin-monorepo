@@ -79,6 +79,11 @@ public class ClinicResponseDto
     public List<ClinicImageDto> Images { get; set; } = new();
 
     /// <summary>
+    /// Services offered by this clinic
+    /// </summary>
+    public List<ClinicServiceDto> Services { get; set; } = new();
+
+    /// <summary>
     /// Number of transactions processed by this clinic
     /// </summary>
     public int TransactionCount { get; set; }

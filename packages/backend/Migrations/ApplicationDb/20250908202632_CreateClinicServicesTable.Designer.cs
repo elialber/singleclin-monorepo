@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SingleClin.API.Data;
@@ -11,9 +12,11 @@ using SingleClin.API.Data;
 namespace SingleClin.API.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250908202632_CreateClinicServicesTable")]
+    partial class CreateClinicServicesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,7 +402,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
                     b.HasIndex("Latitude", "Longitude")
                         .HasFilter("latitude IS NOT NULL AND longitude IS NOT NULL");
 
-                    b.ToTable("clinics", (string)null);
+                    b.ToTable("clinics");
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.ClinicImage", b =>
@@ -654,7 +657,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
 
                     b.HasIndex("IsFeatured");
 
-                    b.ToTable("plans", (string)null);
+                    b.ToTable("plans");
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.RefreshToken", b =>
@@ -909,7 +912,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
 
                     b.HasIndex("ClinicId", "Status", "CreatedAt");
 
-                    b.ToTable("transactions", (string)null);
+                    b.ToTable("transactions");
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.User", b =>
@@ -983,7 +986,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
                         .IsUnique()
                         .HasFilter("firebase_uid IS NOT NULL");
 
-                    b.ToTable("user", (string)null);
+                    b.ToTable("user");
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.UserNotificationPreferences", b =>
@@ -1057,7 +1060,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_user_notification_preferences_user_id");
 
-                    b.ToTable("user_notification_preferences", (string)null);
+                    b.ToTable("user_notification_preferences");
                 });
 
             modelBuilder.Entity("SingleClin.API.Data.Models.UserPlan", b =>
@@ -1142,7 +1145,7 @@ namespace SingleClin.API.Migrations.ApplicationDb
 
                     b.HasIndex("UserId", "IsActive");
 
-                    b.ToTable("user_plans", (string)null);
+                    b.ToTable("user_plans");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

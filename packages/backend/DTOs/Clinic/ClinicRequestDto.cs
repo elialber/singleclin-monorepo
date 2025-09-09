@@ -65,4 +65,9 @@ public class ClinicRequestDto
     /// </summary>
     [Range(-180.0, 180.0, ErrorMessage = "Longitude must be between -180 and 180")]
     public double? Longitude { get; set; }
+
+    /// <summary>
+    /// Services offered by this clinic
+    /// </summary>
+    public List<ClinicServiceDto> Services { get; set; } = new();
 }

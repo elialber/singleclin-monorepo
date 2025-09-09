@@ -557,6 +557,7 @@ public class ClinicService : IClinicService
             Longitude = clinic.Longitude,
             ImageUrl = clinic.ImageUrl,
             Images = clinic.Images?.Select(MapToImageDto).ToList() ?? new List<ClinicImageDto>(),
+            Services = clinic.Services?.Select(MapToServiceDto).ToList() ?? new List<ClinicServiceDto>(),
             CreatedAt = clinic.CreatedAt,
             UpdatedAt = clinic.UpdatedAt,
             TransactionCount = clinic.Transactions?.Count ?? 0
@@ -597,7 +598,33 @@ public class ClinicService : IClinicService
             Cnpj = clinicRequest.Cnpj,
             IsActive = clinicRequest.IsActive,
             Latitude = clinicRequest.Latitude,
-            Longitude = clinicRequest.Longitude
+            Longitude = clinicRequest.Longitude,
+            Services = clinicRequest.Services.Select(s => new Service
+            {
+                Id = s.Id == Guid.Empty ? Guid.NewGuid() : s.Id,
+                Name = s.Name,
+                Description = s.Description,
+                Price = s.Price,
+                Duration = s.Duration,
+                Category = s.Category,
+                IsAvailable = s.IsAvailable,
+                ImageUrl = s.ImageUrl
+            }).ToList()
+        };
+    }
+
+    private static ClinicServiceDto MapToServiceDto(Service service)
+    {
+        return new ClinicServiceDto
+        {
+            Id = service.Id,
+            Name = service.Name,
+            Description = service.Description,
+            Price = service.Price,
+            Duration = service.Duration,
+            Category = service.Category,
+            IsAvailable = service.IsAvailable,
+            ImageUrl = service.ImageUrl
         };
     }
 
