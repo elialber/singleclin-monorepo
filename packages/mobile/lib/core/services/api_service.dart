@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:get/get.dart' as getx;
+import 'package:flutter/foundation.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
+import 'dart:io';
 
 class ApiService extends getx.GetxService {
   late Dio _dio;
@@ -24,6 +27,15 @@ class ApiService extends getx.GetxService {
         'Accept': 'application/json',
       },
     ));
+
+    // Configure SSL certificate handling for development
+    if (kDebugMode) {
+      (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+        final HttpClient client = HttpClient();
+        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+        return client;
+      };
+    }
 
     // Interceptor para adicionar token de autenticação
     _dio.interceptors.add(InterceptorsWrapper(

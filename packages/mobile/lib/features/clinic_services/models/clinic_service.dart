@@ -32,6 +32,18 @@ class ClinicService {
     );
   }
 
+  /// Factory method to create services from clinic data
+  static List<ClinicService> fromClinicServices(List<dynamic>? servicesJson) {
+    if (servicesJson == null || servicesJson.isEmpty) {
+      return [];
+    }
+    
+    return servicesJson
+        .whereType<Map<String, dynamic>>()
+        .map((serviceJson) => ClinicService.fromJson(serviceJson))
+        .toList();
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

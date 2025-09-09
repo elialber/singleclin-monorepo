@@ -94,6 +94,16 @@ class Clinic {
       clinicType = ClinicType.fromString(dto['type']);
     }
 
+    // Parse services from backend
+    List<String> clinicServices = [];
+    if (dto['services'] != null && dto['services'] is List) {
+      for (var service in dto['services'] as List) {
+        if (service is Map<String, dynamic> && service['name'] != null) {
+          clinicServices.add(service['name']);
+        }
+      }
+    }
+
     // Create contact info from backend fields
     ContactInfo contact = ContactInfo(
       phone: dto['phoneNumber'] ?? '',
@@ -121,7 +131,7 @@ class Clinic {
       isAvailable: dto['isActive'] ?? false,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 2)), // Default next slot
       type: clinicType,
-      services: ['Consulta', 'Exames'], // Default services - TODO: implement real services
+      services: clinicServices.isNotEmpty ? clinicServices : ['Consulta', 'Exames'], // Use real services from backend
       contact: contact,
       coordinates: coordinates,
       isPartner: clinicType == ClinicType.partner,

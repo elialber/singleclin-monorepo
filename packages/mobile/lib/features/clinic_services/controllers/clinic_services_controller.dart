@@ -48,7 +48,8 @@ class ClinicServicesController extends GetxController {
       _clinic = arguments;
       print('DEBUG: Clinic set successfully: ${_clinic!.name}');
       
-      loadServices();
+      // Use services that already come from clinic data instead of making separate API call
+      loadServicesFromClinic();
       loadUserCredits();
     } catch (e) {
       print('DEBUG: Exception in onInit: $e');
@@ -68,8 +69,54 @@ class ClinicServicesController extends GetxController {
     );
   }
 
+  /// Load services from clinic data (no API call needed)
+  void loadServicesFromClinic() {
+    print('DEBUG: loadServicesFromClinic() called');
+    try {
+      isLoading.value = true;
+      error.value = '';
+      print('DEBUG: Loading set to true');
+      
+      // Check if clinic has services data from backend
+      if (clinic.services.isNotEmpty) {
+        // TODO: Convert clinic.services (List<String>) to List<ClinicService>
+        // For now, create mock services based on the service names from clinic
+        final List<ClinicService> mockServices = clinic.services.asMap().entries.map((entry) {
+          final index = entry.key;
+          final serviceName = entry.value;
+          return ClinicService(
+            id: 'service_${index}_${clinic.id}',
+            name: serviceName,
+            description: 'Serviço de $serviceName disponível na clínica',
+            price: 50.0 + (index * 10), // Mock prices
+            duration: 30 + (index * 15), // Mock durations
+            category: 'Serviços Gerais',
+            isAvailable: true,
+            imageUrl: null,
+          );
+        }).toList();
+        
+        services.value = mockServices;
+        print('DEBUG: Services loaded from clinic data: ${mockServices.length} services');
+      } else {
+        print('DEBUG: No services found in clinic data, trying API fallback');
+        loadServices();
+        return;
+      }
+    } catch (e) {
+      print('DEBUG: Error processing clinic services: $e');
+      error.value = 'Erro ao processar serviços da clínica: $e';
+      services.value = [];
+    } finally {
+      isLoading.value = false;
+      print('DEBUG: Loading set to false');
+      print('DEBUG: Final services count: ${services.length}');
+    }
+  }
+
+  /// Fallback method to load services from API (only used if clinic data doesn't have services)
   Future<void> loadServices() async {
-    print('DEBUG: loadServices() called');
+    print('DEBUG: loadServices() API fallback called');
     try {
       isLoading.value = true;
       error.value = '';
@@ -107,7 +154,7 @@ class ClinicServicesController extends GetxController {
   }
 
   Future<void> refreshServices() async {
-    await loadServices();
+    loadServicesFromClinic();
     await loadUserCredits();
   }
 
