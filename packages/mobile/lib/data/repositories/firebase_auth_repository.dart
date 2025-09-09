@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:singleclin_mobile/core/errors/auth_exceptions.dart';
+import 'package:singleclin_mobile/core/errors/auth_exceptions.dart' as local_auth;
 import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 import 'package:singleclin_mobile/domain/repositories/auth_repository.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -16,7 +16,7 @@ class FirebaseAuthRepository implements AuthRepository {
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
   }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-       _googleSignIn = googleSignIn ?? GoogleSignIn();
+       _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
 
@@ -40,7 +40,7 @@ class FirebaseAuthRepository implements AuthRepository {
           .signInWithEmailAndPassword(email: email, password: password);
 
       if (result.user == null) {
-        throw const EmailPasswordAuthException(
+        throw const local_auth.EmailPasswordAuthException(
           'Sign in failed - no user returned',
           'sign-in-failed',
         );
@@ -48,9 +48,9 @@ class FirebaseAuthRepository implements AuthRepository {
 
       return _mapFirebaseUserToEntity(result.user!);
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      throw EmailPasswordAuthException(
+      throw local_auth.EmailPasswordAuthException(
         'An unexpected error occurred: ${e.toString()}',
         'unexpected-error',
       );
@@ -60,15 +60,16 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<UserEntity> signInWithGoogle() async {
     try {
-      // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-      if (googleUser == null) {
-        throw const GoogleSignInException(
-          'Google sign in was cancelled',
-          'sign-in-cancelled',
+      // Check if authentication is supported
+      if (!await _googleSignIn.supportsAuthenticate()) {
+        throw const local_auth.GoogleSignInException(
+          'Google sign in is not supported on this platform',
+          'not-supported',
         );
       }
+
+      // Trigger the authentication flow
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth =
@@ -76,27 +77,26 @@ class FirebaseAuthRepository implements AuthRepository {
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
       // Sign in to Firebase with the Google credential
-      final UserCredential result = await _firebaseAuth.signInWithCredential(
+      final UserCredential firebaseResult = await _firebaseAuth.signInWithCredential(
         credential,
       );
 
-      if (result.user == null) {
-        throw const GoogleSignInException(
+      if (firebaseResult.user == null) {
+        throw const local_auth.GoogleSignInException(
           'Google sign in failed - no user returned',
           'sign-in-failed',
         );
       }
 
-      return _mapFirebaseUserToEntity(result.user!);
+      return _mapFirebaseUserToEntity(firebaseResult.user!);
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      throw GoogleSignInException(
+      throw local_auth.GoogleSignInException(
         'Google sign in failed: ${e.toString()}',
         'google-sign-in-error',
       );
@@ -130,7 +130,7 @@ class FirebaseAuthRepository implements AuthRepository {
       );
 
       if (result.user == null) {
-        throw const AppleSignInException(
+        throw const local_auth.AppleSignInException(
           'Apple sign in failed - no user returned',
           'sign-in-failed',
         );
@@ -147,14 +147,14 @@ class FirebaseAuthRepository implements AuthRepository {
 
       return _mapFirebaseUserToEntity(result.user!);
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } on SignInWithAppleException catch (e) {
-      throw AppleSignInException(
+      throw local_auth.AppleSignInException(
         'Apple sign in failed: ${e.toString()}',
         'apple-sign-in-error',
       );
     } catch (e) {
-      throw AppleSignInException(
+      throw local_auth.AppleSignInException(
         'Apple sign in failed: ${e.toString()}',
         'apple-sign-in-error',
       );
@@ -172,7 +172,7 @@ class FirebaseAuthRepository implements AuthRepository {
           .createUserWithEmailAndPassword(email: email, password: password);
 
       if (result.user == null) {
-        throw const UserRegistrationException(
+        throw const local_auth.UserRegistrationException(
           'User registration failed - no user returned',
           'registration-failed',
         );
@@ -186,9 +186,9 @@ class FirebaseAuthRepository implements AuthRepository {
 
       return _mapFirebaseUserToEntity(result.user!);
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      throw UserRegistrationException(
+      throw local_auth.UserRegistrationException(
         'User registration failed: ${e.toString()}',
         'registration-error',
       );
@@ -199,16 +199,14 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> signOut() async {
     try {
       // Sign out from Google if signed in
-      if (await _googleSignIn.isSignedIn()) {
-        await _googleSignIn.signOut();
-      }
+      await _googleSignIn.signOut();
 
       // Sign out from Firebase
       await _firebaseAuth.signOut();
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      throw SignOutException(
+      throw local_auth.SignOutException(
         'Sign out failed: ${e.toString()}',
         'sign-out-error',
       );
@@ -225,7 +223,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
       return _mapFirebaseUserToEntity(user);
     } catch (e) {
-      throw GenericAuthException(
+      throw local_auth.GenericAuthException(
         'Failed to get current user: ${e.toString()}',
         'get-current-user-error',
       );
@@ -242,24 +240,24 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       final User? user = _firebaseAuth.currentUser;
       if (user == null) {
-        throw const UserNotAuthenticatedException();
+        throw const local_auth.UserNotAuthenticatedException();
       }
 
       final token = await user.getIdToken(forceRefresh);
       if (token == null) {
-        throw const TokenRetrievalException(
+        throw const local_auth.TokenRetrievalException(
           'Failed to retrieve ID token',
           'token-null',
         );
       }
       return token;
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      if (e is UserNotAuthenticatedException) {
+      if (e is local_auth.UserNotAuthenticatedException) {
         rethrow;
       }
-      throw TokenRetrievalException(
+      throw local_auth.TokenRetrievalException(
         'Failed to get ID token: ${e.toString()}',
         'token-retrieval-error',
       );
@@ -271,9 +269,9 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      throw PasswordResetException(
+      throw local_auth.PasswordResetException(
         'Failed to send password reset email: ${e.toString()}',
         'password-reset-error',
       );
@@ -285,17 +283,17 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       final User? user = _firebaseAuth.currentUser;
       if (user == null) {
-        throw const UserNotAuthenticatedException();
+        throw const local_auth.UserNotAuthenticatedException();
       }
 
       await user.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      if (e is UserNotAuthenticatedException) {
+      if (e is local_auth.UserNotAuthenticatedException) {
         rethrow;
       }
-      throw EmailVerificationException(
+      throw local_auth.EmailVerificationException(
         'Failed to send email verification: ${e.toString()}',
         'email-verification-error',
       );
@@ -307,7 +305,7 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       final User? user = _firebaseAuth.currentUser;
       if (user == null) {
-        throw const UserNotAuthenticatedException();
+        throw const local_auth.UserNotAuthenticatedException();
       }
 
       if (name != null) {
@@ -324,12 +322,12 @@ class FirebaseAuthRepository implements AuthRepository {
 
       return _mapFirebaseUserToEntity(updatedUser!);
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      if (e is UserNotAuthenticatedException) {
+      if (e is local_auth.UserNotAuthenticatedException) {
         rethrow;
       }
-      throw ProfileUpdateException(
+      throw local_auth.ProfileUpdateException(
         'Failed to update profile: ${e.toString()}',
         'profile-update-error',
       );
@@ -341,17 +339,17 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       final User? user = _firebaseAuth.currentUser;
       if (user == null) {
-        throw const UserNotAuthenticatedException();
+        throw const local_auth.UserNotAuthenticatedException();
       }
 
       await user.delete();
     } on FirebaseAuthException catch (e) {
-      throw AuthExceptionMapper.fromFirebaseException(e);
+      throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
-      if (e is UserNotAuthenticatedException) {
+      if (e is local_auth.UserNotAuthenticatedException) {
         rethrow;
       }
-      throw AccountDeletionException(
+      throw local_auth.AccountDeletionException(
         'Failed to delete user account: ${e.toString()}',
         'account-deletion-error',
       );
