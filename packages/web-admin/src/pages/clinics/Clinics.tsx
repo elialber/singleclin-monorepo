@@ -89,6 +89,35 @@ function getClinicImages(clinic: Clinic): CarouselImage[] {
   return []
 }
 
+// Helper function to get only main/featured image for list view
+function getMainClinicImage(clinic: Clinic): CarouselImage[] {
+  // Use the new images array from the clinic
+  if (clinic.images && clinic.images.length > 0) {
+    // Find featured image first, or use the first image
+    const featuredImage = clinic.images.find(image => image.isFeatured) || clinic.images[0]
+    return [
+      {
+        url: featuredImage.imageUrl,
+        altText: featuredImage.altText || `Imagem da clínica ${clinic.name}`,
+        title: featuredImage.description || `${clinic.name} - Imagem principal`
+      }
+    ]
+  }
+  
+  // Fallback to deprecated imageUrl for backward compatibility
+  if (clinic.imageUrl) {
+    return [
+      {
+        url: clinic.imageUrl,
+        altText: `Imagem principal da clínica ${clinic.name}`,
+        title: `${clinic.name} - Imagem principal`
+      }
+    ]
+  }
+  
+  return []
+}
+
 export default function Clinics() {
   const navigate = useNavigate()
   
@@ -666,16 +695,39 @@ export default function Clinics() {
                 clinics.map((clinic) => (
                   <TableRow key={clinic.id} hover>
                     <TableCell>
-                      <ImageCarousel
-                        images={getClinicImages(clinic)}
-                        clinicName={clinic.name}
-                        height={60}
-                        width={80}
-                        borderRadius={4}
-                        showControls={getClinicImages(clinic).length > 1}
-                        allowFullscreen={true}
-                        fallbackMessage="Sem imagem"
-                      />
+                      {(() => {
+                        const mainImage = getMainClinicImage(clinic)[0]
+                        return mainImage ? (
+                          <Avatar
+                            src={mainImage.url}
+                            alt={mainImage.altText}
+                            sx={{ 
+                              width: 60, 
+                              height: 60, 
+                              borderRadius: 2,
+                              cursor: 'pointer'
+                            }}
+                            variant="rounded"
+                            onClick={() => {
+                              // Optional: Add click handler to view full image
+                              window.open(mainImage.url, '_blank')
+                            }}
+                          />
+                        ) : (
+                          <Avatar
+                            sx={{ 
+                              width: 60, 
+                              height: 60, 
+                              borderRadius: 2,
+                              bgcolor: 'grey.300',
+                              color: 'grey.600'
+                            }}
+                            variant="rounded"
+                          >
+                            {clinic.name.charAt(0).toUpperCase()}
+                          </Avatar>
+                        )
+                      })()}
                     </TableCell>
                     <TableCell>
                       <Typography variant="subtitle2" fontWeight={500}>
