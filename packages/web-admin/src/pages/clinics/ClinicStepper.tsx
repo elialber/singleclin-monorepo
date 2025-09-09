@@ -9,6 +9,29 @@ import { clinicService } from '@/services/clinic.service'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
+// Função para gerar um Guid determinístico baseado em uma string
+function generateGuidFromString(input: string): string {
+  // Simples hash baseado na string para gerar um Guid consistente
+  let hash = 0
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Converter para 32bit integer
+  }
+  
+  // Converter para um Guid válido (formato: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx)
+  const hex = Math.abs(hash).toString(16).padEnd(8, '0')
+  const guid = [
+    hex.substring(0, 8),
+    hex.substring(8, 12).padEnd(4, '0'),
+    '4' + hex.substring(12, 15).padEnd(3, '0'), // Versão 4
+    '8' + hex.substring(15, 18).padEnd(3, '0'), // Variant bits
+    hex.substring(18, 30).padEnd(12, '0')
+  ].join('-')
+  
+  return guid
+}
+
 export default function ClinicStepperPage() {
   const navigate = useNavigate()
   const { id: clinicId } = useParams<{ id: string }>()
@@ -160,7 +183,24 @@ export default function ClinicStepperPage() {
         source: 'user' as const
       },
       services: {
-        selectedServices: PREDEFINED_SERVICES.map(service => ({ ...service }))
+        selectedServices: (() => {
+          // Se a clínica tem serviços, mapear do backend para o formato do frontend
+          if (clinic.services && clinic.services.length > 0) {
+            console.log('🔄 Carregando serviços existentes da clínica:', clinic.services)
+            
+            // Criar um mapa dos serviços existentes por ID/nome para facilitar busca
+            const existingServicesMap = new Map(clinic.services.map(s => [s.name, s]))
+            
+            // Mapear os serviços predefinidos e marcar os existentes como selecionados
+            return PREDEFINED_SERVICES.map(predefinedService => ({
+              ...predefinedService,
+              isSelected: existingServicesMap.has(predefinedService.name)
+            }))
+          } else {
+            // Se não tem serviços, usar todos os predefinidos marcados (comportamento padrão)
+            return PREDEFINED_SERVICES.map(service => ({ ...service }))
+          }
+        })()
       },
       images: (() => {
         let mappedImages: ImageData[] = []
@@ -225,7 +265,7 @@ export default function ClinicStepperPage() {
     return formData
   }, [isEditMode, clinic])
 
-  const mapFormDataToRequest = (data: ClinicFormData): CreateClinicRequest & { latitude?: number; longitude?: number } => {
+  const mapFormDataToRequest = (data: ClinicFormData): CreateClinicRequest & { latitude?: number; longitude?: number; services?: any[] } => {
     // Montar endereço completo
     const addressParts = [
       data.address.street,
@@ -253,6 +293,23 @@ export default function ClinicStepperPage() {
     if (data.location && data.location.latitude && data.location.longitude) {
       request.latitude = data.location.latitude
       request.longitude = data.location.longitude
+    }
+
+    // Mapear serviços selecionados para o formato da API
+    if (data.services && data.services.selectedServices) {
+      request.services = data.services.selectedServices
+        .filter(service => service.isSelected)
+        .map(service => ({
+          id: generateGuidFromString(service.id), // Gerar Guid baseado no ID string
+          name: service.name,
+          description: service.name, // Usar o nome como descrição por enquanto
+          price: service.credits * 10, // Converter créditos para preço (assumindo 1 crédito = R$10)
+          duration: 30, // Duração padrão de 30 minutos
+          category: service.category,
+          isAvailable: true
+        }))
+      
+      console.log('🔄 Serviços mapeados:', request.services)
     }
 
     return request

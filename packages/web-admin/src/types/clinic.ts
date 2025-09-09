@@ -36,6 +36,7 @@ export interface Clinic {
   longitude?: number
   imageUrl?: string // Deprecated - use images instead
   images: ClinicImage[]
+  services: ClinicServiceDto[]
   createdAt: string
   updatedAt: string
   transactionCount: number
@@ -53,6 +54,19 @@ export interface CreateClinicRequest {
   email?: string
   cnpj?: string
   isActive?: boolean
+  latitude?: number
+  longitude?: number
+  services?: ClinicServiceDto[]
+}
+
+export interface ClinicServiceDto {
+  id: string
+  name: string
+  description?: string
+  price: number
+  duration: number
+  category: string
+  isAvailable: boolean
 }
 
 export interface UpdateClinicRequest extends Partial<CreateClinicRequest> {

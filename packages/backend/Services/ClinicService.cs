@@ -113,14 +113,7 @@ public class ClinicService : IClinicService
 
     public async Task<ClinicResponseDto> UpdateAsync(Guid id, ClinicRequestDto clinicRequest)
     {
-        // Check if clinic exists
-        var existingClinic = await _clinicRepository.GetByIdAsync(id);
-        if (existingClinic == null)
-        {
-            throw new InvalidOperationException($"Clinic with ID {id} not found");
-        }
-
-        // Validate clinic data
+        // Validate clinic data first
         var validationErrors = await ValidateAsync(clinicRequest, id);
         if (validationErrors.Any())
         {
@@ -128,14 +121,91 @@ public class ClinicService : IClinicService
             throw new InvalidOperationException($"Validation failed: {errorMessage}");
         }
 
-        var clinic = MapToEntity(clinicRequest);
-        clinic.Id = id;
+        // Use a separate context to avoid tracking conflicts
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // Get clinic directly from context to update
+            var existingClinic = await _context.Clinics.FindAsync(id);
+            if (existingClinic == null)
+            {
+                throw new InvalidOperationException($"Clinic with ID {id} not found");
+            }
 
-        var updatedClinic = await _clinicRepository.UpdateAsync(clinic);
+            // Update basic clinic properties
+            existingClinic.Name = clinicRequest.Name;
+            existingClinic.Type = clinicRequest.Type;
+            existingClinic.Address = clinicRequest.Address;
+            existingClinic.PhoneNumber = clinicRequest.PhoneNumber;
+            existingClinic.Email = clinicRequest.Email;
+            existingClinic.Cnpj = clinicRequest.Cnpj;
+            existingClinic.IsActive = clinicRequest.IsActive;
+            existingClinic.Latitude = clinicRequest.Latitude;
+            existingClinic.Longitude = clinicRequest.Longitude;
+            existingClinic.UpdatedAt = DateTime.UtcNow;
 
-        _logger.LogInformation("Clinic updated successfully: {ClinicName} (ID: {ClinicId})", updatedClinic.Name, updatedClinic.Id);
+            // Handle services update if provided
+            if (clinicRequest.Services != null)
+            {
+                _logger.LogInformation("Updating services for clinic: {ClinicName} (ID: {ClinicId}) - {ServiceCount} services provided", 
+                    existingClinic.Name, existingClinic.Id, clinicRequest.Services.Count);
 
-        return MapToResponseDto(updatedClinic);
+                // Remove existing services for this clinic
+                var existingServices = await _context.ClinicServices
+                    .Where(s => s.ClinicId == id)
+                    .ToListAsync();
+                
+                if (existingServices.Any())
+                {
+                    _context.ClinicServices.RemoveRange(existingServices);
+                    _logger.LogInformation("Removed {ExistingServiceCount} existing services for clinic: {ClinicId}", 
+                        existingServices.Count, id);
+                    
+                    // Save changes to ensure deletions are committed before insertions
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Deletion saved to database for clinic: {ClinicId}", id);
+                }
+
+                // Add new services with guaranteed unique IDs
+                foreach (var serviceDto in clinicRequest.Services)
+                {
+                    var service = new Service
+                    {
+                        Id = Guid.NewGuid(), // Always generate new GUID to avoid conflicts
+                        Name = serviceDto.Name,
+                        Description = serviceDto.Description,
+                        Price = serviceDto.Price,
+                        Duration = serviceDto.Duration,
+                        Category = serviceDto.Category,
+                        IsAvailable = serviceDto.IsAvailable,
+                        ImageUrl = serviceDto.ImageUrl,
+                        ClinicId = id,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    _context.ClinicServices.Add(service);
+                }
+
+                _logger.LogInformation("Added {NewServiceCount} new services for clinic: {ClinicName} (ID: {ClinicId})", 
+                    clinicRequest.Services.Count, existingClinic.Name, existingClinic.Id);
+            }
+
+            // Save all changes in transaction
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            _logger.LogInformation("Clinic updated successfully: {ClinicName} (ID: {ClinicId})", existingClinic.Name, existingClinic.Id);
+
+            // Return fresh data from repository
+            var refreshedClinic = await _clinicRepository.GetByIdAsync(id);
+            return MapToResponseDto(refreshedClinic ?? existingClinic);
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<bool> DeleteAsync(Guid id)
