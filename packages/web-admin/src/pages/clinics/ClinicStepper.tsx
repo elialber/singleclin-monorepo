@@ -7,6 +7,7 @@ import { CreateClinicRequest, UpdateClinicRequest, Clinic, ClinicType } from '@/
 import { useNotification } from '@/contexts/NotificationContextDefinition'
 import { clinicService } from '@/services/clinic.service'
 import { useQuery } from '@tanstack/react-query'
+import { useCreateClinic, useUpdateClinic } from '@/hooks/useClinics'
 import { useMemo } from 'react'
 
 // Função para gerar um Guid determinístico baseado em uma string
@@ -38,6 +39,10 @@ export default function ClinicStepperPage() {
   const { showNotification } = useNotification()
   
   const isEditMode = Boolean(clinicId)
+  
+  // Hooks para mutação
+  const createClinicMutation = useCreateClinic()
+  const updateClinicMutation = useUpdateClinic()
   
   // Carregar dados da clínica para edição
   const { data: clinic, isLoading: isLoadingClinic, error: clinicError } = useQuery({
@@ -303,7 +308,7 @@ export default function ClinicStepperPage() {
           id: generateGuidFromString(service.id), // Gerar Guid baseado no ID string
           name: service.name,
           description: service.name, // Usar o nome como descrição por enquanto
-          price: service.credits * 10, // Converter créditos para preço (assumindo 1 crédito = R$10)
+          price: service.credits, // Usar créditos diretamente como SG (SingleClin Gold)
           duration: 30, // Duração padrão de 30 minutos
           category: service.category,
           isAvailable: true
@@ -326,14 +331,14 @@ export default function ClinicStepperPage() {
       let resultClinic: Clinic
       
       if (isEditMode && clinicId) {
-        // Editar clínica existente
+        // Editar clínica existente usando hook (que faz cache invalidation automaticamente)
         console.log('✏️ Atualizando clínica existente:', clinicId)
-        resultClinic = await clinicService.updateClinic(clinicId, requestData as UpdateClinicRequest)
+        resultClinic = await updateClinicMutation.mutateAsync({ id: clinicId, data: requestData as UpdateClinicRequest })
         console.log('✅ Clínica atualizada com sucesso:', resultClinic)
       } else {
-        // Criar nova clínica
+        // Criar nova clínica usando hook (que faz cache invalidation automaticamente)
         console.log('➕ Criando nova clínica')
-        resultClinic = await clinicService.createClinic(requestData)
+        resultClinic = await createClinicMutation.mutateAsync(requestData)
         console.log('✅ Clínica criada com sucesso:', resultClinic)
       }
       
@@ -372,10 +377,8 @@ export default function ClinicStepperPage() {
         }
       }
       
-      const successMessage = isEditMode ? 'Clínica atualizada com sucesso!' : 'Clínica cadastrada com sucesso!'
-      showNotification(successMessage, 'success')
-      
       // Redirecionar para lista de clínicas após sucesso
+      // Não precisa mostrar notificação pois os hooks já fazem isso
       navigate('/clinics')
       
     } catch (error: any) {
