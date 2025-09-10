@@ -10,27 +10,9 @@ import { useQuery } from '@tanstack/react-query'
 import { useCreateClinic, useUpdateClinic } from '@/hooks/useClinics'
 import { useMemo } from 'react'
 
-// Função para gerar um Guid determinístico baseado em uma string
-function generateGuidFromString(input: string): string {
-  // Simples hash baseado na string para gerar um Guid consistente
-  let hash = 0
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // Converter para 32bit integer
-  }
-  
-  // Converter para um Guid válido (formato: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx)
-  const hex = Math.abs(hash).toString(16).padEnd(8, '0')
-  const guid = [
-    hex.substring(0, 8),
-    hex.substring(8, 12).padEnd(4, '0'),
-    '4' + hex.substring(12, 15).padEnd(3, '0'), // Versão 4
-    '8' + hex.substring(15, 18).padEnd(3, '0'), // Variant bits
-    hex.substring(18, 30).padEnd(12, '0')
-  ].join('-')
-  
-  return guid
+// Função para gerar um Guid único (não determinístico para evitar duplicatas)
+function generateUniqueGuid(): string {
+  return crypto.randomUUID()
 }
 
 export default function ClinicStepperPage() {
@@ -305,7 +287,7 @@ export default function ClinicStepperPage() {
       request.services = data.services.selectedServices
         .filter(service => service.isSelected)
         .map(service => ({
-          id: generateGuidFromString(service.id), // Gerar Guid baseado no ID string
+          id: generateUniqueGuid(), // Gerar Guid único para evitar duplicatas
           name: service.name,
           description: service.name, // Usar o nome como descrição por enquanto
           price: service.credits, // Usar créditos diretamente como SG (SingleClin Gold)

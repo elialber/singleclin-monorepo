@@ -82,7 +82,7 @@ public class ClinicService : IClinicService
             {
                 var service = new Service
                 {
-                    Id = serviceDto.Id == Guid.Empty ? Guid.NewGuid() : serviceDto.Id,
+                    Id = Guid.NewGuid(), // Sempre gerar novo GUID para evitar duplicatas
                     Name = serviceDto.Name,
                     Description = serviceDto.Description,
                     Price = NormalizeServicePrice(serviceDto.Price),
