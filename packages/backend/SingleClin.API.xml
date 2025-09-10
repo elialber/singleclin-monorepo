@@ -5336,6 +5336,14 @@
             <param name="id">Clinic ID</param>
             <returns>Updated clinic without image</returns>
         </member>
+        <member name="M:SingleClin.API.Services.ClinicService.NormalizeServicePrice(System.Decimal)">
+            <summary>
+            Normalizes service prices to ensure they are stored correctly in SG format.
+            Prevents multiplication by 10 and ensures proper SG values (1.0, 2.0, 3.0, etc.)
+            </summary>
+            <param name="price">The input price to normalize</param>
+            <returns>The normalized price in SG format</returns>
+        </member>
         <member name="T:SingleClin.API.Services.EmailTemplateService">
             <summary>
             Service for processing and rendering email templates

@@ -1383,7 +1383,7 @@ public class ClinicController : ControllerBase
                     Id = Guid.NewGuid(),
                     Name = "Consulta Geral",
                     Description = "Consulta médica geral com avaliação completa",
-                    Price = 50.0m,
+                    Price = 3.0m, // SG format: 3 SG
                     Duration = 30,
                     Category = "Consulta",
                     IsAvailable = true,
@@ -1397,7 +1397,7 @@ public class ClinicController : ControllerBase
                     Id = Guid.NewGuid(),
                     Name = "Exame de Sangue",
                     Description = "Hemograma completo e bioquímicos básicos",
-                    Price = 25.0m,
+                    Price = 2.0m, // SG format: 2 SG
                     Duration = 15,
                     Category = "Exame",
                     IsAvailable = true,
@@ -1411,7 +1411,7 @@ public class ClinicController : ControllerBase
                     Id = Guid.NewGuid(),
                     Name = "Ultrassom Abdominal",
                     Description = "Ultrassonografia da região abdominal",
-                    Price = 80.0m,
+                    Price = 3.0m, // SG format: 3 SG
                     Duration = 45,
                     Category = "Exame",
                     IsAvailable = true,
@@ -1425,7 +1425,7 @@ public class ClinicController : ControllerBase
                     Id = Guid.NewGuid(),
                     Name = "Eletrocardiograma",
                     Description = "ECG de repouso para avaliação cardíaca",
-                    Price = 30.0m,
+                    Price = 2.0m, // SG format: 2 SG
                     Duration = 20,
                     Category = "Exame",
                     IsAvailable = true,
@@ -1439,7 +1439,7 @@ public class ClinicController : ControllerBase
                     Id = Guid.NewGuid(),
                     Name = "Consulta Cardiológica",
                     Description = "Consulta especializada em cardiologia",
-                    Price = 120.0m,
+                    Price = 3.0m, // SG format: 3 SG
                     Duration = 60,
                     Category = "Consulta",
                     IsAvailable = true,

@@ -85,7 +85,7 @@ public class ClinicService : IClinicService
                     Id = serviceDto.Id == Guid.Empty ? Guid.NewGuid() : serviceDto.Id,
                     Name = serviceDto.Name,
                     Description = serviceDto.Description,
-                    Price = serviceDto.Price,
+                    Price = NormalizeServicePrice(serviceDto.Price),
                     Duration = serviceDto.Duration,
                     Category = serviceDto.Category,
                     IsAvailable = serviceDto.IsAvailable,
@@ -174,7 +174,7 @@ public class ClinicService : IClinicService
                         Id = Guid.NewGuid(), // Always generate new GUID to avoid conflicts
                         Name = serviceDto.Name,
                         Description = serviceDto.Description,
-                        Price = serviceDto.Price,
+                        Price = NormalizeServicePrice(serviceDto.Price),
                         Duration = serviceDto.Duration,
                         Category = serviceDto.Category,
                         IsAvailable = serviceDto.IsAvailable,
@@ -755,5 +755,33 @@ public class ClinicService : IClinicService
             return false;
 
         return System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, @"^\+?[\d\s\-\(\)]+$");
+    }
+
+    /// <summary>
+    /// Normalizes service prices to ensure they are stored correctly in SG format.
+    /// Prevents multiplication by 10 and ensures proper SG values (1.0, 2.0, 3.0, etc.)
+    /// </summary>
+    /// <param name="price">The input price to normalize</param>
+    /// <returns>The normalized price in SG format</returns>
+    private static decimal NormalizeServicePrice(decimal price)
+    {
+        // If price seems to be multiplied by 10 (e.g., 10.0, 20.0, 30.0), divide by 10
+        // SG prices should typically be 1-3 range (1.0 SG, 2.0 SG, 3.0 SG)
+        if (price >= 10.0m && price % 10 == 0)
+        {
+            // Likely multiplied by 10, normalize to SG format
+            return price / 10m;
+        }
+        
+        // For other cases, ensure it's a reasonable SG value
+        // Typical SG values are 1.0, 2.0, 3.0 (occasionally 1.5, 2.5, etc.)
+        if (price > 10.0m)
+        {
+            // If still too high, assume it needs to be divided by 10
+            return Math.Round(price / 10m, 1);
+        }
+        
+        // Price is already in correct SG format
+        return price;
     }
 }
