@@ -58,7 +58,14 @@ class ClinicService {
   }
 
   String get formattedPrice {
-    return 'R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}';
+    // Format price as SG (SingleClin Gold) instead of R$ (Reais)
+    if (price == 1.0) {
+      return '1 SG';
+    } else if (price == price.toInt()) {
+      return '${price.toInt()} SG';
+    } else {
+      return '${price.toStringAsFixed(1)} SG';
+    }
   }
 
   String get formattedDuration {
