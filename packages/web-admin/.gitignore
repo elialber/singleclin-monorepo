@@ -37,3 +37,8 @@ coverage
 # Firebase service account
 firebase-service-account.json
 *.serviceAccountKey.json
+
+# Playwright test results
+test-results/
+playwright-report/
+playwright/.cache/

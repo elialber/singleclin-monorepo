@@ -524,7 +524,8 @@ public class Program
         // Enable static files serving for uploaded images
         app.UseStaticFiles();
 
-        app.UseHttpsRedirection();
+        // Temporarily disable HTTPS redirection for development
+        // app.UseHttpsRedirection();
 
         // Add global exception handler
         app.UseGlobalExceptionHandler();

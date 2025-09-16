@@ -58,8 +58,10 @@ class ApiConstants {
     if (kReleaseMode) {
       return 'https://api.singleclin.com.br'; // Production
     } else {
+      // Development/Debug - Updated to match backend HTTP configuration
       // Android emulator uses 10.0.2.2 to access localhost on host machine
-      return 'https://10.0.2.2:5001/api'; // Development/Debug
+      // iOS simulator can use localhost directly
+      return 'http://10.0.2.2:5015/api'; // Development/Debug - HTTP on port 5015
     }
   }
 

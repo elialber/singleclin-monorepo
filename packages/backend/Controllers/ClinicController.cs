@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using SingleClin.API.Data.Models;
 using SingleClin.API.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SingleClin.API.Controllers;
 
@@ -30,19 +31,22 @@ public class ClinicController : ControllerBase
     private readonly ILogger<ClinicController> _logger;
     private readonly IConfiguration _configuration;
     private readonly ApplicationDbContext _context;
+    private readonly IMemoryCache _memoryCache;
 
     public ClinicController(
         IClinicService clinicService,
         IImageUploadService imageUploadService,
         ILogger<ClinicController> logger,
         IConfiguration configuration,
-        ApplicationDbContext context)
+        ApplicationDbContext context,
+        IMemoryCache memoryCache)
     {
         _clinicService = clinicService;
         _imageUploadService = imageUploadService;
         _logger = logger;
         _configuration = configuration;
         _context = context;
+        _memoryCache = memoryCache;
     }
 
     /// <summary>
@@ -453,9 +457,29 @@ public class ClinicController : ControllerBase
     {
         try
         {
+            const string cacheKey = "active_clinics";
+
+            // Try to get from cache first
+            if (_memoryCache.TryGetValue(cacheKey, out IEnumerable<ClinicResponseDto>? cachedClinics))
+            {
+                _logger.LogInformation("Retrieved {Count} active clinics from cache", cachedClinics!.Count());
+                return Ok(cachedClinics);
+            }
+
+            // If not in cache, get from service
             var clinics = await _clinicService.GetActiveAsync();
 
-            _logger.LogInformation("Retrieved {Count} active clinics", clinics.Count());
+            // Cache for 5 minutes
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
+                SlidingExpiration = TimeSpan.FromMinutes(2),
+                Priority = CacheItemPriority.High
+            };
+
+            _memoryCache.Set(cacheKey, clinics, cacheOptions);
+
+            _logger.LogInformation("Retrieved {Count} active clinics from database and cached", clinics.Count());
 
             return Ok(clinics);
         }

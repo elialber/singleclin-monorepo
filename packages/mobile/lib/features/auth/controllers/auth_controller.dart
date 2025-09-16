@@ -1,12 +1,15 @@
 import 'package:get/get.dart';
-import '../../../core/services/auth_service.dart';
+import 'package:singleclin_mobile/data/services/auth_service.dart';
+import 'package:singleclin_mobile/data/services/user_api_service.dart';
+import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../models/user_model.dart';
 import '../../../routes/app_routes.dart';
 
 class AuthController extends GetxController {
-  final AuthService _authService = Get.find<AuthService>();
+  final AuthService _authService = AuthService();
+  final UserApiService _userApiService = UserApiService();
   final StorageService _storageService = Get.find<StorageService>();
 
   // Observable properties
@@ -31,20 +34,35 @@ class AuthController extends GetxController {
   Future<void> _checkAuthStatus() async {
     try {
       _isLoading.value = true;
-      
-      final token = await _storageService.getString(AppConstants.tokenKey);
-      if (token != null && token.isNotEmpty) {
-        final userData = await _storageService.getString(AppConstants.userKey);
-        if (userData != null && userData.isNotEmpty) {
-          _user.value = UserModel.fromJson(userData as Map<String, dynamic>);
+
+      // Check if user is authenticated with Firebase
+      final UserEntity? currentUser = await _authService.getCurrentUser();
+
+      if (currentUser != null) {
+        try {
+          // Try to get user profile from backend
+          final userProfile = await _userApiService.getCurrentUserProfile();
+          final String idToken = await _authService.getIdToken();
+
+          // Store data locally
+          await _storageService.setString(AppConstants.tokenKey, idToken);
+          await _storageService.setString(
+            AppConstants.userKey,
+            userProfile.toJson().toString(),
+          );
+
+          // Update controller state
+          _user.value = UserModel.fromUserModel(userProfile);
           _isAuthenticated.value = true;
-          
-          // Validar token com o servidor
-          final isValid = await _authService.validateToken();
-          if (!isValid) {
-            await logout();
-          }
+        } catch (backendError) {
+          // If backend fails but Firebase is authenticated, logout completely
+          await logout();
         }
+      } else {
+        // No Firebase user, clear any local data
+        await _storageService.remove(AppConstants.tokenKey);
+        await _storageService.remove(AppConstants.userKey);
+        _isAuthenticated.value = false;
       }
     } catch (e) {
       _error.value = 'Erro ao verificar autenticação: $e';
@@ -59,15 +77,38 @@ class AuthController extends GetxController {
       _isLoading.value = true;
       _error.value = '';
 
-      final response = await _authService.loginWithEmail(email, password);
-      
-      if (response['success']) {
-        await _handleSuccessfulAuth(response['data']);
-        return true;
+      // Step 1: Authenticate with Firebase
+      final UserEntity firebaseUser = await _authService.signInWithEmail(
+        email: email,
+        password: password,
+      );
+
+      // Step 2: Get Firebase ID token
+      final String idToken = await _authService.getIdToken(forceRefresh: true);
+
+      // Step 3: Get user profile from backend (this will sync with Firebase token via interceptor)
+      final userProfile = await _userApiService.getCurrentUserProfile();
+
+      // Step 4: Store user data locally
+      await _storageService.setString(AppConstants.tokenKey, idToken);
+      await _storageService.setString(
+        AppConstants.userKey,
+        userProfile.toJson().toString(),
+      );
+
+      // Step 5: Update controller state
+      _user.value = UserModel.fromUserModel(userProfile);
+      _isAuthenticated.value = true;
+
+      // Step 6: Navigate to appropriate screen
+      final onboardingCompleted = await isOnboardingCompleted();
+      if (onboardingCompleted) {
+        Get.offAllNamed(AppRoutes.dashboard);
       } else {
-        _error.value = response['message'] ?? 'Erro no login';
-        return false;
+        Get.offAllNamed(AppRoutes.onboarding);
       }
+
+      return true;
     } catch (e) {
       _error.value = 'Erro no login: $e';
       return false;
@@ -82,15 +123,35 @@ class AuthController extends GetxController {
       _isLoading.value = true;
       _error.value = '';
 
-      final response = await _authService.loginWithGoogle();
-      
-      if (response['success']) {
-        await _handleSuccessfulAuth(response['data']);
-        return true;
+      // Step 1: Authenticate with Firebase via Google
+      final UserEntity firebaseUser = await _authService.signInWithGoogle();
+
+      // Step 2: Get Firebase ID token
+      final String idToken = await _authService.getIdToken(forceRefresh: true);
+
+      // Step 3: Get user profile from backend
+      final userProfile = await _userApiService.getCurrentUserProfile();
+
+      // Step 4: Store user data locally
+      await _storageService.setString(AppConstants.tokenKey, idToken);
+      await _storageService.setString(
+        AppConstants.userKey,
+        userProfile.toJson().toString(),
+      );
+
+      // Step 5: Update controller state
+      _user.value = UserModel.fromUserModel(userProfile);
+      _isAuthenticated.value = true;
+
+      // Step 6: Navigate to appropriate screen
+      final onboardingCompleted = await isOnboardingCompleted();
+      if (onboardingCompleted) {
+        Get.offAllNamed(AppRoutes.dashboard);
       } else {
-        _error.value = response['message'] ?? 'Erro no login com Google';
-        return false;
+        Get.offAllNamed(AppRoutes.onboarding);
       }
+
+      return true;
     } catch (e) {
       _error.value = 'Erro no login com Google: $e';
       return false;
@@ -186,23 +247,23 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     try {
       _isLoading.value = true;
-      
-      // Logout do servidor
-      await _authService.logout();
-      
-      // Limpar dados locais
+
+      // Logout from Firebase
+      await _authService.signOut();
+
+      // Clear local data
       await _storageService.remove(AppConstants.tokenKey);
       await _storageService.remove(AppConstants.userKey);
       await _storageService.remove(AppConstants.creditsKey);
-      
+
       // Reset controller state
       _user.value = null;
       _isAuthenticated.value = false;
       _error.value = '';
-      
-      // Navegar para login
+
+      // Navigate to login
       Get.offAllNamed(AppRoutes.login);
-      
+
     } catch (e) {
       _error.value = 'Erro no logout: $e';
     } finally {

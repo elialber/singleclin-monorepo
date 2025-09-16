@@ -1,18 +1,18 @@
 import 'package:get/get.dart';
-import '../../../core/services/api_service.dart';
+import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
 import '../../../features/auth/controllers/auth_controller.dart';
-import '../../../features/discovery/models/clinic_model.dart';
+import '../../../features/clinic_discovery/models/clinic.dart';
 import '../../../features/appointment/models/appointment_model.dart';
 import '../../../core/constants/app_constants.dart';
 
 class DashboardController extends GetxController {
-  final ApiService _apiService = Get.find<ApiService>();
+  final ClinicApiService _clinicApiService = ClinicApiService();
   final AuthController _authController = Get.find<AuthController>();
 
   // Observable properties
   final RxBool _isLoading = false.obs;
   final RxString _error = ''.obs;
-  final RxList<ClinicModel> _nearbyClinic = <ClinicModel>[].obs;
+  final RxList<Clinic> _nearbyClinics = <Clinic>[].obs;
   final RxList<ServiceModel> _recommendedServices = <ServiceModel>[].obs;
   final RxList<ServiceModel> _popularServices = <ServiceModel>[].obs;
   final Rx<AppointmentModel?> _nextAppointment = Rx<AppointmentModel?>(null);
@@ -22,7 +22,7 @@ class DashboardController extends GetxController {
   // Getters
   bool get isLoading => _isLoading.value;
   String get error => _error.value;
-  List<ClinicModel> get nearbyClinic => _nearbyClinic;
+  List<Clinic> get nearbyClinics => _nearbyClinics;
   List<ServiceModel> get recommendedServices => _recommendedServices;
   List<ServiceModel> get popularServices => _popularServices;
   AppointmentModel? get nextAppointment => _nextAppointment.value;
@@ -48,7 +48,7 @@ class DashboardController extends GetxController {
 
       // Carregar dados em paralelo
       await Future.wait([
-        _loadNearbyClinic(),
+        _loadNearbyClinics(),
         _loadRecommendedServices(),
         _loadPopularServices(),
         _loadNextAppointment(),
@@ -62,21 +62,10 @@ class DashboardController extends GetxController {
   }
 
   /// Carregar clínicas próximas
-  Future<void> _loadNearbyClinic() async {
+  Future<void> _loadNearbyClinics() async {
     try {
-      final response = await _apiService.get('/clinic/nearby', queryParameters: {
-        'latitude': AppConstants.defaultLatitude,
-        'longitude': AppConstants.defaultLongitude,
-        'radius': 10, // 10km
-        'limit': 5,
-      });
-
-      if (response.statusCode == 200) {
-        final List<dynamic> clinicData = response.data['data'];
-        _nearbyClinic.value = clinicData
-            .map((clinic) => ClinicModel.fromJson(clinic))
-            .toList();
-      }
+      final clinics = await _clinicApiService.getActiveClinics();
+      _nearbyClinics.value = clinics.take(5).toList();
     } catch (e) {
       print('Erro ao carregar clínicas próximas: $e');
     }
@@ -88,19 +77,8 @@ class DashboardController extends GetxController {
       final userId = _authController.user?.id;
       if (userId == null) return;
 
-      final response = await _apiService.get('/services/recommended', 
-        queryParameters: {
-          'userId': userId,
-          'limit': 10,
-        }
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> serviceData = response.data['data'];
-        _recommendedServices.value = serviceData
-            .map((service) => ServiceModel.fromJson(service))
-            .toList();
-      }
+      // TODO: Implementar serviço real quando API estiver disponível
+      _recommendedServices.clear();
     } catch (e) {
       print('Erro ao carregar serviços recomendados: $e');
     }
@@ -109,18 +87,8 @@ class DashboardController extends GetxController {
   /// Carregar serviços populares
   Future<void> _loadPopularServices() async {
     try {
-      final response = await _apiService.get('/services/popular',
-        queryParameters: {
-          'limit': 10,
-        }
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> serviceData = response.data['data'];
-        _popularServices.value = serviceData
-            .map((service) => ServiceModel.fromJson(service))
-            .toList();
-      }
+      // TODO: Implementar serviço real quando API estiver disponível
+      _popularServices.clear();
     } catch (e) {
       print('Erro ao carregar serviços populares: $e');
     }
@@ -132,15 +100,8 @@ class DashboardController extends GetxController {
       final userId = _authController.user?.id;
       if (userId == null) return;
 
-      final response = await _apiService.get('/appointments/next',
-        queryParameters: {
-          'userId': userId,
-        }
-      );
-
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        _nextAppointment.value = AppointmentModel.fromJson(response.data['data']);
-      }
+      // TODO: Implementar serviço real quando API estiver disponível
+      _nextAppointment.value = null;
     } catch (e) {
       print('Erro ao carregar próximo agendamento: $e');
     }
@@ -163,7 +124,7 @@ class DashboardController extends GetxController {
 
     try {
       _searchQuery.value = query;
-      
+
       // Adicionar à lista de buscas recentes
       if (!_recentSearches.contains(query)) {
         _recentSearches.insert(0, query);
@@ -172,9 +133,13 @@ class DashboardController extends GetxController {
         }
       }
 
-      // Navegar para tela de resultados
+      // Buscar clínicas usando serviço real
+      final results = await _clinicApiService.searchClinics(query);
+
+      // Navegar para tela de resultados com os dados reais
       Get.toNamed('/search-results', arguments: {
         'query': query,
+        'clinics': results,
       });
     } catch (e) {
       _error.value = 'Erro na busca: $e';
@@ -182,17 +147,33 @@ class DashboardController extends GetxController {
   }
 
   /// Navegar para categoria específica
-  void navigateToCategory(String category) {
-    Get.toNamed('/discovery', arguments: {
-      'category': category,
-    });
+  Future<void> navigateToCategory(String category) async {
+    try {
+      // Buscar clínicas da categoria usando serviço real
+      final clinics = await _clinicApiService.getActiveClinics();
+
+      Get.toNamed('/discovery', arguments: {
+        'category': category,
+        'clinics': clinics,
+      });
+    } catch (e) {
+      _error.value = 'Erro ao carregar categoria: $e';
+    }
   }
 
   /// Navegar para detalhes da clínica
-  void navigateToClinic(String clinicId) {
-    Get.toNamed('/clinic-details', arguments: {
-      'clinicId': clinicId,
-    });
+  Future<void> navigateToClinic(String clinicId) async {
+    try {
+      // Buscar dados da clínica usando serviço real
+      final clinic = await _clinicApiService.getClinicById(clinicId);
+
+      Get.toNamed('/clinic-details', arguments: {
+        'clinicId': clinicId,
+        'clinic': clinic,
+      });
+    } catch (e) {
+      _error.value = 'Erro ao carregar detalhes da clínica: $e';
+    }
   }
 
   /// Navegar para detalhes do serviço

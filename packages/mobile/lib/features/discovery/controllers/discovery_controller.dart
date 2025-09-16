@@ -2,17 +2,17 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
 
-import '../../../core/services/api_service.dart';
 import '../../../core/services/location_service.dart';
 import '../../../core/constants/app_constants.dart';
-import '../models/clinic.dart';
+import '../../../features/clinic_discovery/models/clinic.dart';
 import '../models/service.dart';
 import '../models/filter_options.dart';
 
 /// Main discovery controller managing clinic search, filtering, and display modes
 class DiscoveryController extends GetxController {
-  final ApiService _apiService = Get.find<ApiService>();
+  final ClinicApiService _clinicApiService = ClinicApiService();
   final LocationService _locationService = Get.find<LocationService>();
 
   // Observables
@@ -117,13 +117,10 @@ class DiscoveryController extends GetxController {
   /// Load available categories
   Future<void> _loadCategories() async {
     try {
-      final response = await _apiService.get('/categories');
-      if (response.isSuccess && response.data != null) {
-        _categories.value = List<String>.from(response.data['categories'] ?? []);
-      }
+      // TODO: Implementar endpoint de categorias quando disponível
+      _categories.value = CategoryFilter.availableCategories;
     } catch (e) {
       debugPrint('Erro ao carregar categorias: $e');
-      // Use fallback categories
       _categories.value = CategoryFilter.availableCategories;
     }
   }
@@ -131,13 +128,8 @@ class DiscoveryController extends GetxController {
   /// Load popular services for quick access
   Future<void> _loadPopularServices() async {
     try {
-      final response = await _apiService.get('/services/popular');
-      if (response.isSuccess && response.data != null) {
-        final servicesData = response.data['services'] as List;
-        _popularServices.value = servicesData
-            .map((s) => Service.fromJson(s))
-            .toList();
-      }
+      // TODO: Implementar endpoint de serviços quando disponível
+      _popularServices.clear();
     } catch (e) {
       debugPrint('Erro ao carregar serviços populares: $e');
     }
@@ -146,19 +138,13 @@ class DiscoveryController extends GetxController {
   /// Load initial clinics based on location
   Future<void> _loadInitialClinics() async {
     try {
-      final searchQuery = SearchQuery(
-        filters: _filterOptions.value,
-        page: 1,
-        limit: 20,
-      );
-      
-      final response = await _searchClinics(searchQuery);
-      _clinics.value = response.clinics;
-      _filteredClinics.value = response.clinics;
-      _searchResultsCount.value = response.totalCount;
-      _hasMoreData.value = response.hasMore;
+      final clinics = await _clinicApiService.getActiveClinics();
+      _clinics.value = clinics;
+      _filteredClinics.value = clinics;
+      _searchResultsCount.value = clinics.length;
+      _hasMoreData.value = false;
       _currentPage.value = 1;
-      
+
     } catch (e) {
       debugPrint('Erro ao carregar clínicas iniciais: $e');
     }
@@ -185,7 +171,7 @@ class DiscoveryController extends GetxController {
   void _performSearch(String query) async {
     try {
       _lastSearchTimestamp.value = DateTime.now();
-      
+
       // Check cache first
       final cacheKey = _buildCacheKey(query, _filterOptions.value);
       if (_isCacheValid(cacheKey)) {
@@ -197,20 +183,13 @@ class DiscoveryController extends GetxController {
       _isLoading.value = true;
       _currentPage.value = 1;
 
-      final searchQuery = SearchQuery(
-        query: query,
-        filters: _filterOptions.value,
-        page: 1,
-        limit: 20,
-      );
+      final clinics = await _clinicApiService.searchClinics(query);
 
-      final response = await _searchClinics(searchQuery);
-      
       // Cache results
-      _searchCache[cacheKey] = response.clinics;
+      _searchCache[cacheKey] = clinics;
       _cacheTimestamps[cacheKey] = DateTime.now();
 
-      _updateSearchResults(response.clinics, response.totalCount, response.hasMore);
+      _updateSearchResults(clinics, clinics.length, false);
 
     } catch (e) {
       _handleError('Erro na pesquisa', e);
@@ -237,21 +216,10 @@ class DiscoveryController extends GetxController {
 
     try {
       _isLoadingMore.value = true;
-      final nextPage = _currentPage.value + 1;
 
-      final searchQuery = SearchQuery(
-        query: _searchQuery.value,
-        filters: _filterOptions.value,
-        page: nextPage,
-        limit: 20,
-      );
-
-      final response = await _searchClinics(searchQuery);
-      
-      _clinics.addAll(response.clinics);
-      _filteredClinics.addAll(response.clinics);
-      _hasMoreData.value = response.hasMore;
-      _currentPage.value = nextPage;
+      // TODO: Implementar paginação quando API suportar
+      // Por enquanto, não há mais dados para carregar
+      _hasMoreData.value = false;
 
     } catch (e) {
       _handleError('Erro ao carregar mais clínicas', e);
@@ -300,11 +268,10 @@ class DiscoveryController extends GetxController {
     try {
       // First check if clinic is already in memory
       final existingClinic = _clinics.firstWhereOrNull((c) => c.id == clinicId);
-      
-      final response = await _apiService.get('/clinics/$clinicId');
-      if (response.isSuccess && response.data != null) {
-        final clinic = Clinic.fromJson(response.data);
-        
+
+      final clinic = await _clinicApiService.getClinicById(clinicId);
+
+      if (clinic != null) {
         // Update clinic in local list if exists
         if (existingClinic != null) {
           final index = _clinics.indexWhere((c) => c.id == clinicId);
@@ -313,7 +280,7 @@ class DiscoveryController extends GetxController {
             _filteredClinics[index] = clinic;
           }
         }
-        
+
         return clinic;
       }
     } catch (e) {
@@ -325,71 +292,14 @@ class DiscoveryController extends GetxController {
   /// Toggle clinic favorite status
   Future<void> toggleClinicFavorite(String clinicId) async {
     try {
-      final clinic = _clinics.firstWhereOrNull((c) => c.id == clinicId);
-      if (clinic == null) return;
-
-      final isFavorite = !clinic.isFavorite;
-      
-      // Optimistic update
-      final updatedClinic = clinic.copyWith(isFavorite: isFavorite);
-      final clinicIndex = _clinics.indexWhere((c) => c.id == clinicId);
-      if (clinicIndex != -1) {
-        _clinics[clinicIndex] = updatedClinic;
-        _filteredClinics[clinicIndex] = updatedClinic;
-      }
-
-      // API call
-      final endpoint = isFavorite ? '/clinics/$clinicId/favorite' : '/clinics/$clinicId/unfavorite';
-      await _apiService.post(endpoint, {});
-
+      // TODO: Implementar funcionalidade de favoritos quando API estiver disponível
+      _handleError('Funcionalidade de favoritos em desenvolvimento', 'coming_soon');
     } catch (e) {
-      // Revert optimistic update on error
-      final originalClinic = _clinics.firstWhereOrNull((c) => c.id == clinicId);
-      if (originalClinic != null) {
-        final revertedClinic = originalClinic.copyWith(isFavorite: !originalClinic.isFavorite);
-        final clinicIndex = _clinics.indexWhere((c) => c.id == clinicId);
-        if (clinicIndex != -1) {
-          _clinics[clinicIndex] = revertedClinic;
-          _filteredClinics[clinicIndex] = revertedClinic;
-        }
-      }
       _handleError('Erro ao atualizar favorito', e);
     }
   }
 
   /// Private helper methods
-
-  Future<SearchResponse> _searchClinics(SearchQuery query) async {
-    final response = await _apiService.get('/clinics/search', query.toQueryParams());
-    
-    if (!response.isSuccess) {
-      throw Exception('Erro na busca de clínicas');
-    }
-
-    final data = response.data;
-    final clinicsData = data['clinics'] as List;
-    final clinics = clinicsData.map((c) => Clinic.fromJson(c)).toList();
-    
-    // Calculate distances if user location is available
-    if (_userLocation.value != null) {
-      clinics.forEach((clinic) {
-        final distance = Geolocator.distanceBetween(
-          _userLocation.value!.latitude,
-          _userLocation.value!.longitude,
-          clinic.latitude,
-          clinic.longitude,
-        ) / 1000; // Convert to km
-        
-        clinic = clinic.copyWith(distanceKm: distance);
-      });
-    }
-
-    return SearchResponse(
-      clinics: clinics,
-      totalCount: data['totalCount'] as int? ?? clinics.length,
-      hasMore: data['hasMore'] as bool? ?? false,
-    );
-  }
 
   void _updateSearchResults(List<Clinic> clinics, int totalCount, bool hasMore) {
     _clinics.value = clinics;
