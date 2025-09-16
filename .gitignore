@@ -45,6 +45,14 @@ Release/
 *.userprefs
 .vs/
 
+# Test and Coverage Results
+TestResults/
+coverage/
+*.trx
+*.runsettings.user
+*.coverage
+*.coveragexml
+
 # Build outputs
 dist/
 build/
@@ -83,4 +91,9 @@ build/
 **/fastlane/test_output
 
 # Claude Flow
-.claude-flow/ 
+.claude-flow/
+
+# Swarm AI database files
+.swarm/
+*.db-shm
+*.db-wal 
