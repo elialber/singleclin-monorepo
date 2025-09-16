@@ -19,42 +19,42 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     /// Clinics registered in the system
     /// </summary>
     public DbSet<Clinic> Clinics => Set<Clinic>();
-    
+
     /// <summary>
     /// Images associated with clinics
     /// </summary>
     public DbSet<ClinicImage> ClinicImages => Set<ClinicImage>();
-    
+
     /// <summary>
     /// Services offered by clinics
     /// </summary>
     public DbSet<Service> ClinicServices => Set<Service>();
-    
+
     /// <summary>
     /// Available plans for purchase
     /// </summary>
     public DbSet<Plan> Plans => Set<Plan>();
-    
+
     /// <summary>
     /// User purchased plans
     /// </summary>
     public DbSet<UserPlan> UserPlans => Set<UserPlan>();
-    
+
     /// <summary>
     /// Transactions (credit usage)
     /// </summary>
     public DbSet<Transaction> Transactions => Set<Transaction>();
-    
+
     /// <summary>
     /// Refresh tokens for JWT authentication
     /// </summary>
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
-    
+
     /// <summary>
     /// Notification logs
     /// </summary>
     public DbSet<NotificationLog> NotificationLogs => Set<NotificationLog>();
-    
+
     /// <summary>
     /// User notification preferences
     /// </summary>

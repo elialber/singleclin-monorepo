@@ -41,7 +41,7 @@ public class HealthController : ControllerBase
                 new
                 {
                     path = "/health/detailed",
-                    method = "GET", 
+                    method = "GET",
                     description = "Detailed health check with JSON response",
                     response = "Returns detailed JSON with status of all health checks, timing, and diagnostic data"
                 },
@@ -70,7 +70,7 @@ public class HealthController : ControllerBase
                 },
                 new
                 {
-                    name = "firebase", 
+                    name = "firebase",
                     description = "Firebase Admin SDK connectivity and authentication service",
                     tags = new string[] { "firebase", "auth" },
                     note = "Returns Degraded if Firebase is not configured (internal JWT still works)"
@@ -106,7 +106,7 @@ public class HealthController : ControllerBase
                 allowedOrigins = new[]
                 {
                     "http://localhost:3000",
-                    "http://localhost:4200", 
+                    "http://localhost:4200",
                     "http://localhost:5173",
                     "capacitor://localhost",
                     "http://localhost"

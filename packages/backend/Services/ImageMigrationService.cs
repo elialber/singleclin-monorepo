@@ -44,7 +44,7 @@ public class ImageMigrationService
                     {
                         // Generate fresh SAS URL
                         var newUrl = await _imageUploadService.GetImageUrlAsync(image.StorageFileName, "clinics");
-                        
+
                         if (image.ImageUrl != newUrl)
                         {
                             image.ImageUrl = newUrl;
@@ -56,7 +56,7 @@ public class ImageMigrationService
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Error updating URL for image {ImageId} with storage file {StorageFileName}", 
+                        _logger.LogError(ex, "Error updating URL for image {ImageId} with storage file {StorageFileName}",
                             image.Id, image.StorageFileName);
                     }
                 }
@@ -99,7 +99,7 @@ public class ImageMigrationService
                 if (!string.IsNullOrEmpty(image.StorageFileName))
                 {
                     var newUrl = await _imageUploadService.GetImageUrlAsync(image.StorageFileName, "clinics");
-                    
+
                     if (image.ImageUrl != newUrl)
                     {
                         image.ImageUrl = newUrl;

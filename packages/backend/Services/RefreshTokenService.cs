@@ -58,7 +58,7 @@ public class RefreshTokenService : IRefreshTokenService
 
         if (!refreshToken.IsActive)
         {
-            _logger.LogWarning("Refresh token is not active. Token: {TokenId}, Revoked: {IsRevoked}, Expired: {IsExpired}", 
+            _logger.LogWarning("Refresh token is not active. Token: {TokenId}, Revoked: {IsRevoked}, Expired: {IsExpired}",
                 refreshToken.Id, refreshToken.IsRevoked, refreshToken.ExpiresAt < DateTime.UtcNow);
             return null;
         }
@@ -86,10 +86,10 @@ public class RefreshTokenService : IRefreshTokenService
 
         refreshToken.IsRevoked = true;
         refreshToken.RevokedAt = DateTime.UtcNow;
-        
+
         await _context.SaveChangesAsync();
         _logger.LogInformation("Revoked refresh token {TokenId}", refreshToken.Id);
-        
+
         return true;
     }
 
@@ -113,7 +113,7 @@ public class RefreshTokenService : IRefreshTokenService
 
         await _context.SaveChangesAsync();
         _logger.LogInformation("Revoked {Count} refresh tokens for user {UserId}", tokens.Count, userId);
-        
+
         return tokens.Count;
     }
 
@@ -138,7 +138,7 @@ public class RefreshTokenService : IRefreshTokenService
 
         _context.RefreshTokens.RemoveRange(expiredTokens);
         await _context.SaveChangesAsync();
-        
+
         _logger.LogInformation("Cleaned up {Count} expired refresh tokens", expiredTokens.Count);
         return expiredTokens.Count;
     }
@@ -155,7 +155,7 @@ public class RefreshTokenService : IRefreshTokenService
 
         refreshToken.DeviceInfo = deviceInfo;
         refreshToken.UpdatedAt = DateTime.UtcNow;
-        
+
         await _context.SaveChangesAsync();
         return true;
     }

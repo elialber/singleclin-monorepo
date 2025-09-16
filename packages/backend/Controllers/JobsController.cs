@@ -66,10 +66,10 @@ namespace SingleClin.API.Controllers
                 _logger.LogInformation("Admin executing balance check job synchronously");
 
                 var startTime = DateTime.UtcNow;
-                
+
                 // Execute job synchronously
                 await _balanceCheckJob.ExecuteAsync();
-                
+
                 var endTime = DateTime.UtcNow;
                 var duration = endTime - startTime;
 

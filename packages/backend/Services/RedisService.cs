@@ -41,7 +41,7 @@ public class RedisService : IRedisService
             };
 
             await _distributedCache.SetStringAsync(key, userData, options);
-            
+
             _logger.LogInformation("Nonce stored successfully with {ExpirationMinutes} minutes expiration", expirationMinutes);
             return true;
         }
@@ -66,10 +66,10 @@ public class RedisService : IRedisService
             }
 
             var key = GetNonceKey(nonce);
-            
+
             // Get the value first
             var userData = await _distributedCache.GetStringAsync(key);
-            
+
             if (userData == null)
             {
                 _logger.LogWarning("Nonce {Nonce} not found or expired", nonce);
@@ -78,7 +78,7 @@ public class RedisService : IRedisService
 
             // Remove the nonce to prevent reuse
             await _distributedCache.RemoveAsync(key);
-            
+
             _logger.LogInformation("Nonce consumed successfully");
             return userData;
         }
@@ -103,7 +103,7 @@ public class RedisService : IRedisService
 
             var key = GetNonceKey(nonce);
             var value = await _distributedCache.GetStringAsync(key);
-            
+
             return value != null;
         }
         catch (Exception ex)
@@ -154,17 +154,17 @@ public class RedisService : IRedisService
             // Try to perform a simple operation to test connectivity
             var testKey = "health_check_" + Guid.NewGuid().ToString("N");
             var testValue = "test";
-            
+
             await _distributedCache.SetStringAsync(testKey, testValue, new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
             });
-            
+
             var retrievedValue = await _distributedCache.GetStringAsync(testKey);
             await _distributedCache.RemoveAsync(testKey);
-            
+
             var isConnected = retrievedValue == testValue;
-            
+
             if (isConnected)
             {
                 _logger.LogDebug("Redis health check passed");
@@ -173,7 +173,7 @@ public class RedisService : IRedisService
             {
                 _logger.LogWarning("Redis health check failed - value mismatch");
             }
-            
+
             return isConnected;
         }
         catch (Exception ex)

@@ -43,7 +43,7 @@ public static class RoleSeeder
                 }
                 else
                 {
-                    logger.LogError("Failed to create role: {RoleName}. Errors: {Errors}", 
+                    logger.LogError("Failed to create role: {RoleName}. Errors: {Errors}",
                         roleInfo.Name, string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
@@ -91,7 +91,7 @@ public static class RoleSeeder
             {
                 // Add role claim
                 await userManager.AddClaimAsync(adminUser, new System.Security.Claims.Claim("role", UserRole.Administrator.ToString()));
-                
+
                 // Add admin permissions claim
                 var permissions = new[]
                 {
@@ -100,7 +100,7 @@ public static class RoleSeeder
                     "patients.read", "patients.write", "patients.delete",
                     "system.configure", "system.monitor", "system.backup"
                 };
-                
+
                 await userManager.AddClaimAsync(adminUser, new System.Security.Claims.Claim("permissions", string.Join(",", permissions)));
 
                 logger.LogInformation("Created default admin user: {Email}", adminEmail);

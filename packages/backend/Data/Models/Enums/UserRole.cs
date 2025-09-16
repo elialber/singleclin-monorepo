@@ -9,22 +9,22 @@ public enum UserRole
     /// Patient user - can purchase and use plans
     /// </summary>
     Patient = 0,
-    
+
     /// <summary>
     /// Clinic user - can validate QR codes
     /// </summary>
     Clinic = 1,
-    
+
     /// <summary>
     /// Clinic origin - special clinic type
     /// </summary>
     ClinicOrigin = 2,
-    
+
     /// <summary>
     /// Clinic partner - partner clinic type
     /// </summary>
     ClinicPartner = 3,
-    
+
     /// <summary>
     /// System administrator
     /// </summary>

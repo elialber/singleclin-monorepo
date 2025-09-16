@@ -24,7 +24,7 @@ public class AuditingInterceptor : SaveChangesInterceptor
         {
             LogChanges(eventData.Context);
         }
-        
+
         return base.SavingChanges(eventData, result);
     }
 
@@ -37,15 +37,15 @@ public class AuditingInterceptor : SaveChangesInterceptor
         {
             LogChanges(eventData.Context);
         }
-        
+
         return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
     private void LogChanges(DbContext context)
     {
         var entries = context.ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Added || 
-                       e.State == EntityState.Modified || 
+            .Where(e => e.State == EntityState.Added ||
+                       e.State == EntityState.Modified ||
                        e.State == EntityState.Deleted)
             .ToList();
 
@@ -53,11 +53,11 @@ public class AuditingInterceptor : SaveChangesInterceptor
         {
             var entityName = entry.Metadata.ClrType.Name;
             var state = entry.State.ToString();
-            
+
             _logger.LogInformation(
-                "Entity {EntityName} was {State}. Key: {Key}", 
-                entityName, 
-                state, 
+                "Entity {EntityName} was {State}. Key: {Key}",
+                entityName,
+                state,
                 GetPrimaryKeyValue(entry));
 
             // Log property changes for modified entities

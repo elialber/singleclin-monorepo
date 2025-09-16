@@ -78,14 +78,14 @@ public class QRCodeTokenService : IQRCodeTokenService
             });
 
             var stored = await _redisService.StoreNonceAsync(nonce, nonceData, expirationMinutes);
-            
+
             if (!stored)
             {
                 _logger.LogError("Failed to store nonce in Redis for user plan {UserPlanId}", userPlanId);
                 throw new InvalidOperationException("Failed to store QR Code nonce");
             }
 
-            _logger.LogInformation("Generated QR Code token for user plan {UserPlanId} with expiration {ExpiresAt}", 
+            _logger.LogInformation("Generated QR Code token for user plan {UserPlanId} with expiration {ExpiresAt}",
                 userPlanId, expiresAt);
 
             return (tokenString, nonce);
@@ -126,7 +126,7 @@ public class QRCodeTokenService : IQRCodeTokenService
                 return null;
             }
 
-            _logger.LogInformation("Successfully validated and consumed QR Code token for user plan {UserPlanId}", 
+            _logger.LogInformation("Successfully validated and consumed QR Code token for user plan {UserPlanId}",
                 claims.UserPlanId);
 
             return claims;
@@ -181,7 +181,7 @@ public class QRCodeTokenService : IQRCodeTokenService
             var expClaim = principal.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
 
             // Validate required claims
-            if (string.IsNullOrEmpty(userPlanIdClaim) || 
+            if (string.IsNullOrEmpty(userPlanIdClaim) ||
                 string.IsNullOrEmpty(userIdClaim) ||
                 string.IsNullOrEmpty(nonceClaim) ||
                 tokenTypeClaim != "qr_code")

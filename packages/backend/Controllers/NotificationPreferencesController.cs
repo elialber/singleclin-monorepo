@@ -104,7 +104,7 @@ namespace SingleClin.API.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(ResponseWrapper<NotificationPreferencesResponseDto>.ErrorResponse(
                         $"Validation failed: {string.Join(", ", errors)}", 400));
                 }
@@ -149,7 +149,7 @@ namespace SingleClin.API.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(ResponseWrapper<NotificationPreferencesResponseDto>.ErrorResponse(
                         $"Validation failed: {string.Join(", ", errors)}", 400));
                 }
@@ -199,12 +199,12 @@ namespace SingleClin.API.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(ResponseWrapper<bool>.ErrorResponse(
                         $"Validation failed: {string.Join(", ", errors)}", 400));
                 }
 
-                _logger.LogInformation("Updating device token for user {UserId}, platform: {Platform}", 
+                _logger.LogInformation("Updating device token for user {UserId}, platform: {Platform}",
                     userId, deviceTokenDto.DevicePlatform);
 
                 var result = await _preferencesService.UpdateDeviceTokenAsync(
@@ -248,12 +248,12 @@ namespace SingleClin.API.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(ResponseWrapper<bool>.ErrorResponse(
                         $"Validation failed: {string.Join(", ", errors)}", 400));
                 }
 
-                _logger.LogInformation("Admin updating device token for user {UserId}, platform: {Platform}", 
+                _logger.LogInformation("Admin updating device token for user {UserId}, platform: {Platform}",
                     userId, deviceTokenDto.DevicePlatform);
 
                 var result = await _preferencesService.UpdateDeviceTokenAsync(

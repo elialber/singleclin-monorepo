@@ -22,7 +22,7 @@ public class FirebaseTestController : ControllerBase
     public IActionResult GetFirebaseStatus()
     {
         _logger.LogInformation("Checking Firebase status...");
-        
+
         var status = new
         {
             IsConfigured = _firebaseAuthService.IsConfigured,
@@ -33,9 +33,9 @@ public class FirebaseTestController : ControllerBase
             ConfigServiceAccount = _configuration["Firebase:ServiceAccountKeyPath"],
             Timestamp = DateTime.UtcNow
         };
-        
+
         _logger.LogInformation("Firebase Status: {@Status}", status);
-        
+
         return Ok(status);
     }
 
@@ -43,7 +43,7 @@ public class FirebaseTestController : ControllerBase
     public async Task<IActionResult> TestCreateUser([FromBody] TestUserDto dto)
     {
         _logger.LogInformation("Test create user called for email: {Email}", dto.Email);
-        
+
         if (!_firebaseAuthService.IsConfigured)
         {
             return BadRequest(new { error = "Firebase is not configured" });

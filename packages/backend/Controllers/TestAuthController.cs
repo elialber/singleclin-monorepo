@@ -39,8 +39,8 @@ public class TestAuthController : ControllerBase
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var role = User.FindFirst("role")?.Value;
-        return Ok(new 
-        { 
+        return Ok(new
+        {
             message = "You are authenticated",
             userId,
             role
@@ -65,8 +65,8 @@ public class TestAuthController : ControllerBase
     public IActionResult ClinicOnlyEndpoint()
     {
         var clinicId = User.FindFirst("clinicId")?.Value;
-        return Ok(new 
-        { 
+        return Ok(new
+        {
             message = "Welcome Clinic User!",
             clinicId
         });
@@ -90,8 +90,8 @@ public class TestAuthController : ControllerBase
     public IActionResult AdminOrClinicEndpoint()
     {
         var role = User.FindFirst("role")?.Value;
-        return Ok(new 
-        { 
+        return Ok(new
+        {
             message = "Welcome Admin or Clinic User!",
             role
         });
@@ -104,8 +104,8 @@ public class TestAuthController : ControllerBase
     [AuthorizeClinicOwner("clinicId")]
     public IActionResult GetClinicDetails(Guid clinicId)
     {
-        return Ok(new 
-        { 
+        return Ok(new
+        {
             message = "You have access to this clinic",
             clinicId,
             userClinicId = User.FindFirst("clinicId")?.Value
@@ -120,8 +120,8 @@ public class TestAuthController : ControllerBase
     public IActionResult GetClinicAdminAccess(Guid clinicId)
     {
         var role = User.FindFirst("role")?.Value;
-        return Ok(new 
-        { 
+        return Ok(new
+        {
             message = "You have admin or owner access to this clinic",
             clinicId,
             accessType = role == UserRole.Administrator.ToString() ? "Admin" : "Owner"
@@ -136,8 +136,8 @@ public class TestAuthController : ControllerBase
     public IActionResult CheckClaims()
     {
         var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
-        return Ok(new 
-        { 
+        return Ok(new
+        {
             message = "Your claims",
             claims
         });

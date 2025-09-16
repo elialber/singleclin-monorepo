@@ -11,7 +11,7 @@ namespace SingleClin.API.Controllers;
 public abstract class BaseController : ControllerBase
 {
     private ILogger<BaseController>? _logger;
-    protected ILogger<BaseController> Logger => 
+    protected ILogger<BaseController> Logger =>
         _logger ??= HttpContext.RequestServices.GetService<ILogger<BaseController>>()!;
 
     /// <summary>

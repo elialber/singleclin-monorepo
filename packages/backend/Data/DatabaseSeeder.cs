@@ -10,12 +10,12 @@ namespace SingleClin.API.Data;
 public class DatabaseSeeder
 {
     private readonly AppDbContext _context;
-    
+
     public DatabaseSeeder(AppDbContext context)
     {
         _context = context;
     }
-    
+
     /// <summary>
     /// Seed all initial data
     /// </summary>
@@ -25,15 +25,15 @@ public class DatabaseSeeder
         await SeedPlansAsync();
         await SeedClinicsAsync();
         await SeedUsersAsync();
-        
+
         await _context.SaveChangesAsync();
     }
-    
+
     private async Task SeedPlansAsync()
     {
         if (await _context.Plans.AnyAsync())
             return;
-            
+
         var plans = new List<Plan>
         {
             new Plan
@@ -74,22 +74,22 @@ public class DatabaseSeeder
                 IsFeatured = false
             }
         };
-        
+
         await _context.Plans.AddRangeAsync(plans);
     }
-    
+
     private async Task SeedClinicsAsync()
     {
         // Clinics are now managed by ApplicationDbContext, not AppDbContext
         // This seeding is handled in the ApplicationDbContext setup
         await Task.CompletedTask;
     }
-    
+
     private async Task SeedUsersAsync()
     {
         if (await _context.Users.AnyAsync())
             return;
-            
+
         var adminUser = new User
         {
             Id = Guid.NewGuid(),
@@ -99,7 +99,7 @@ public class DatabaseSeeder
             PhoneNumber = "(11) 9999-9999",
             IsActive = true
         };
-        
+
         await _context.Users.AddAsync(adminUser);
     }
 }

@@ -82,10 +82,10 @@ public class PlanService : IPlanService
         };
 
         var createdPlan = await _planRepository.CreateAsync(plan);
-        
-        _logger.LogInformation("Plan created successfully: {PlanName} (ID: {PlanId}), DisplayOrder: {DisplayOrder}", 
+
+        _logger.LogInformation("Plan created successfully: {PlanName} (ID: {PlanId}), DisplayOrder: {DisplayOrder}",
             createdPlan.Name, createdPlan.Id, createdPlan.DisplayOrder);
-        
+
         return MapToResponseDto(createdPlan);
     }
 
@@ -120,16 +120,16 @@ public class PlanService : IPlanService
         };
 
         var updatedPlan = await _planRepository.UpdateAsync(plan);
-        
+
         _logger.LogInformation("Plan updated successfully: {PlanName} (ID: {PlanId})", updatedPlan.Name, updatedPlan.Id);
-        
+
         return MapToResponseDto(updatedPlan);
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
         var deleted = await _planRepository.DeleteAsync(id);
-        
+
         if (deleted)
         {
             _logger.LogInformation("Plan deleted successfully: ID {PlanId}", id);
@@ -138,7 +138,7 @@ public class PlanService : IPlanService
         {
             _logger.LogWarning("Attempted to delete non-existent plan: ID {PlanId}", id);
         }
-        
+
         return deleted;
     }
 
@@ -209,7 +209,7 @@ public class PlanService : IPlanService
     {
         var maxDisplayOrder = await _context.Plans
             .MaxAsync(p => (int?)p.DisplayOrder) ?? -1;
-        
+
         return maxDisplayOrder + 1;
     }
 

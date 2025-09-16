@@ -60,25 +60,25 @@ public class GlobalExceptionHandlerMiddleware
         {
             // FluentValidation exceptions
             ValidationException validationEx => ResponseWrapper.ErrorResponse(
-                "Validation failed", 
-                400, 
+                "Validation failed",
+                400,
                 validationEx.Errors.Select(e => e.ErrorMessage).ToList()),
 
             // Plan-specific exceptions
             PlanNotFoundException planNotFoundEx => ResponseWrapper.ErrorResponse(planNotFoundEx.Message, 404),
             DuplicatePlanNameException duplicateNameEx => ResponseWrapper.ErrorResponse(duplicateNameEx.Message, 409),
             PlanValidationException planValidationEx => ResponseWrapper.ErrorResponse(
-                "Plan validation failed", 
-                400, 
+                "Plan validation failed",
+                400,
                 planValidationEx.ValidationErrors.ToList()),
             InvalidPlanOperationException invalidOpEx => ResponseWrapper.ErrorResponse(invalidOpEx.Message, 400),
 
             // General exceptions
             UnauthorizedAccessException => ResponseWrapper.ErrorResponse(exception.Message, 401),
             KeyNotFoundException => ResponseWrapper.ErrorResponse(exception.Message, 404),
-            InvalidOperationException invalidOpEx when invalidOpEx.Message.Contains("not found") => 
+            InvalidOperationException invalidOpEx when invalidOpEx.Message.Contains("not found") =>
                 ResponseWrapper.ErrorResponse(invalidOpEx.Message, 404),
-            InvalidOperationException invalidOpEx when invalidOpEx.Message.Contains("already exists") => 
+            InvalidOperationException invalidOpEx when invalidOpEx.Message.Contains("already exists") =>
                 ResponseWrapper.ErrorResponse(invalidOpEx.Message, 409),
             InvalidOperationException invalidOpEx => ResponseWrapper.ErrorResponse(invalidOpEx.Message, 400),
             ArgumentException or ArgumentNullException => ResponseWrapper.ErrorResponse(exception.Message, 400),
@@ -90,8 +90,8 @@ public class GlobalExceptionHandlerMiddleware
 
     private ResponseWrapper GetDefaultErrorResponse(Exception exception)
     {
-        var message = _environment.IsDevelopment() 
-            ? exception.Message 
+        var message = _environment.IsDevelopment()
+            ? exception.Message
             : "An error occurred while processing your request";
 
         var errors = new List<string>();
@@ -99,7 +99,7 @@ public class GlobalExceptionHandlerMiddleware
         if (_environment.IsDevelopment())
         {
             errors.Add($"Exception Type: {exception.GetType().Name}");
-            
+
             if (!string.IsNullOrEmpty(exception.StackTrace))
             {
                 errors.Add($"Stack Trace: {exception.StackTrace}");

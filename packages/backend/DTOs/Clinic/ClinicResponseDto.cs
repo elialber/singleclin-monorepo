@@ -111,7 +111,7 @@ public class ClinicResponseDto
     {
         ClinicType.Regular => "Regular",
         ClinicType.Origin => "Origin",
-        ClinicType.Partner => "Partner", 
+        ClinicType.Partner => "Partner",
         ClinicType.Administrative => "Administrative",
         _ => "Unknown"
     };

@@ -23,7 +23,6 @@ import {
   Person as PersonIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
-  Business as BusinessIcon,
   Lock as LockIcon,
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
@@ -209,7 +208,7 @@ export default function PatientFormDialog({ open, onClose, patient }: PatientFor
         onSuccess: () => {
           onClose()
         },
-        onError: (error: any) => {
+        onError: (error: AxiosError) => {
           if (error.response?.status === 400 && error.response.data?.errors) {
             handleBackendValidationErrors(error)
           }
@@ -229,7 +228,7 @@ export default function PatientFormDialog({ open, onClose, patient }: PatientFor
         onSuccess: () => {
           onClose()
         },
-        onError: (error: any) => {
+        onError: (error: AxiosError) => {
           if (error.response?.status === 400 && error.response.data?.errors) {
             handleBackendValidationErrors(error)
           }
@@ -369,7 +368,7 @@ export default function PatientFormDialog({ open, onClose, patient }: PatientFor
                 control={control}
                 rules={{
                   pattern: {
-                    value: /^(\+?[\d\s\-\(\)\.]+(\s?(x|ext\.?)\s?\d+)?)$/,
+                    value: /^(\+?[\d\s-().]+(\s?(x|ext\.?)\s?\d+)?)$/,
                     message: 'Formato de telefone inválido. Use apenas números, espaços, parênteses, hifens e pontos'
                   },
                   maxLength: { value: 20, message: 'Telefone deve ter no máximo 20 caracteres' }

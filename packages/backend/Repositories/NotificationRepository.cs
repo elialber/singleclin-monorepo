@@ -21,10 +21,10 @@ namespace SingleClin.API.Repositories
             {
                 _context.NotificationLogs.Add(log);
                 await _context.SaveChangesAsync(cancellationToken);
-                
-                _logger.LogInformation("Notification log saved. Id: {LogId}, User: {UserId}, Type: {Type}", 
+
+                _logger.LogInformation("Notification log saved. Id: {LogId}, User: {UserId}, Type: {Type}",
                     log.Id, log.UserId, log.Type);
-                
+
                 return log;
             }
             catch (Exception ex)
@@ -54,7 +54,7 @@ namespace SingleClin.API.Repositories
             try
             {
                 var skip = (page - 1) * pageSize;
-                
+
                 return await _context.NotificationLogs
                     .Where(n => n.UserId == userId)
                     .OrderByDescending(n => n.SentAt)
@@ -74,11 +74,11 @@ namespace SingleClin.API.Repositories
             try
             {
                 var cutoffTime = DateTime.UtcNow.AddMinutes(-thresholdMinutes);
-                
+
                 return await _context.NotificationLogs
-                    .AnyAsync(n => n.UserId == userId 
-                                && n.Type == type 
-                                && n.IsSuccess 
+                    .AnyAsync(n => n.UserId == userId
+                                && n.Type == type
+                                && n.IsSuccess
                                 && n.SentAt >= cutoffTime, cancellationToken);
             }
             catch (Exception ex)

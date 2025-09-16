@@ -35,7 +35,7 @@ public static class EnsureTablesExist
             // Drop and recreate tables to fix schema issues
             await context.Database.ExecuteSqlRawAsync(@"DROP TABLE IF EXISTS user_plans CASCADE;");
             await context.Database.ExecuteSqlRawAsync(@"DROP TABLE IF EXISTS users CASCADE;");
-            
+
             // Recreate users table with all required columns
             await context.Database.ExecuteSqlRawAsync(@"
                 CREATE TABLE users (
@@ -57,7 +57,7 @@ public static class EnsureTablesExist
                     CONSTRAINT uq_users_application_user_id UNIQUE (application_user_id)
                 );
             ");
-            
+
             // Create user_plans table  
             await context.Database.ExecuteSqlRawAsync(@"
                 CREATE TABLE user_plans (

@@ -24,7 +24,7 @@ namespace SingleClin.API.Services
                 _logger.LogInformation("Retrieving notification preferences for user {UserId}", userId);
 
                 var preferences = await _preferencesRepository.GetOrCreateDefaultAsync(userId, cancellationToken);
-                
+
                 return MapToResponseDto(preferences);
             }
             catch (Exception ex)
@@ -51,9 +51,9 @@ namespace SingleClin.API.Services
 
                 // Get existing preferences or create new ones
                 var existingPreferences = await _preferencesRepository.GetByUserIdAsync(userId, cancellationToken);
-                
+
                 UserNotificationPreferences updatedPreferences;
-                
+
                 if (existingPreferences == null)
                 {
                     // Create new preferences
@@ -66,7 +66,7 @@ namespace SingleClin.API.Services
                     var preferencesToUpdate = MapToEntity(preferences, userId);
                     preferencesToUpdate.Id = existingPreferences.Id;
                     preferencesToUpdate.CreatedAt = existingPreferences.CreatedAt;
-                    
+
                     updatedPreferences = await _preferencesRepository.UpdateAsync(preferencesToUpdate, cancellationToken);
                 }
 
@@ -87,7 +87,7 @@ namespace SingleClin.API.Services
                 _logger.LogInformation("Updating device token for user {UserId}, platform: {Platform}", userId, platform);
 
                 var result = await _preferencesRepository.UpdateDeviceTokenAsync(userId, deviceToken, platform, cancellationToken);
-                
+
                 if (result)
                 {
                     _logger.LogInformation("Successfully updated device token for user {UserId}", userId);
@@ -127,7 +127,7 @@ namespace SingleClin.API.Services
 
                 // Get users who have low balance threshold >= current balance and have notifications enabled
                 var users = await _preferencesRepository.GetUsersWithLowBalanceThresholdAsync(currentBalance, cancellationToken);
-                
+
                 _logger.LogInformation("Found {Count} users for low balance notification", users.Count);
                 return users;
             }
@@ -143,13 +143,13 @@ namespace SingleClin.API.Services
             try
             {
                 var preferences = await _preferencesRepository.GetOrCreateDefaultAsync(userId, cancellationToken);
-                
+
                 // Check if user wants this type of notification
                 var shouldReceive = preferences.ShouldReceiveNotification(notificationType, isPushNotification);
-                
+
                 if (!shouldReceive)
                 {
-                    _logger.LogDebug("User {UserId} has disabled {NotificationType} notifications via {Channel}", 
+                    _logger.LogDebug("User {UserId} has disabled {NotificationType} notifications via {Channel}",
                         userId, notificationType, isPushNotification ? "push" : "email");
                     return false;
                 }

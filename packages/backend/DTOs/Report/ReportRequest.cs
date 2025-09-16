@@ -89,8 +89,8 @@ namespace SingleClin.API.DTOs.Report
         /// </summary>
         public bool IsValid()
         {
-            return StartDate <= EndDate && 
-                   EndDate <= DateTime.UtcNow && 
+            return StartDate <= EndDate &&
+                   EndDate <= DateTime.UtcNow &&
                    (EndDate - StartDate).TotalDays <= 365; // Max 1 year
         }
     }

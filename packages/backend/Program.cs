@@ -30,7 +30,7 @@ public class Program
     {
         // Load .env file for development
         Env.Load();
-        
+
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
@@ -40,7 +40,7 @@ public class Program
         builder.Services.AddFluentValidationAutoValidation()
             .AddFluentValidationClientsideAdapters()
             .AddValidatorsFromAssemblyContaining<Program>();
-        
+
         // Add Entity Framework Core with PostgreSQL
         builder.Services.AddSingleton<SingleClin.API.Data.Interceptors.AuditingInterceptor>();
         builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
@@ -48,7 +48,7 @@ public class Program
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
                 .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
                 .EnableDetailedErrors(builder.Environment.IsDevelopment());
-            
+
             // Add auditing interceptor in development
             if (builder.Environment.IsDevelopment())
             {
@@ -63,7 +63,7 @@ public class Program
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
                 .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
                 .EnableDetailedErrors(builder.Environment.IsDevelopment());
-            
+
             // Add auditing interceptor in development
             if (builder.Environment.IsDevelopment())
             {
@@ -91,14 +91,14 @@ public class Program
             // User settings
             options.User.RequireUniqueEmail = true;
             options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            
+
             // Sign in settings
             options.SignIn.RequireConfirmedEmail = false; // Set to true in production
             options.SignIn.RequireConfirmedPhoneNumber = false;
         })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
-        
+
         // Add CORS
         builder.Services.AddCors(options =>
         {
@@ -125,7 +125,7 @@ public class Program
         builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IFirebaseAuthService, FirebaseAuthService>();
-        
+
         // Firebase initialization will be done after app build
 
         // Add Plan services
@@ -177,22 +177,22 @@ public class Program
         // Add notification providers
         builder.Services.AddScoped<IPushNotificationProvider, FcmProvider>();
         builder.Services.AddScoped<IEmailNotificationProvider, SendGridProvider>();
-        
+
         // Add email template service
         builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
-        
+
         // Add notification services
         builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
         builder.Services.AddScoped<INotificationService, NotificationService>();
-        
+
         // Add notification preferences services
         builder.Services.AddScoped<IUserNotificationPreferencesRepository, UserNotificationPreferencesRepository>();
         builder.Services.AddScoped<INotificationPreferencesService, NotificationPreferencesService>();
-        
+
         // Configure notification options
         builder.Services.Configure<NotificationOptions>(
             builder.Configuration.GetSection(NotificationOptions.SectionName));
-        
+
         // Register notification providers collection
         builder.Services.AddScoped<IEnumerable<INotificationProvider>>(provider =>
             new List<INotificationProvider>
@@ -240,7 +240,7 @@ public class Program
 
         // Add Image Upload Service with Azure Blob Storage
         builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
-        
+
         // Add image migration service
         builder.Services.AddScoped<ImageMigrationService>();
 
@@ -248,13 +248,13 @@ public class Program
         builder.Services.AddAuthorization(options =>
         {
             // Role-based policies
-            options.AddPolicy("RequirePatientRole", policy => 
+            options.AddPolicy("RequirePatientRole", policy =>
                 policy.RequireClaim("role", "Patient"));
-            
-            options.AddPolicy("RequireClinicRole", policy => 
+
+            options.AddPolicy("RequireClinicRole", policy =>
                 policy.RequireClaim("role", "ClinicOrigin", "ClinicPartner"));
-            
-            options.AddPolicy("RequireAdministratorRole", policy => 
+
+            options.AddPolicy("RequireAdministratorRole", policy =>
                 policy.RequireClaim("role", "Administrator"));
 
             // Clinic owner policy - requires clinic role and clinicId claim
@@ -267,7 +267,7 @@ public class Program
                     var isAdmin = roleClaim == "Administrator";
                     var isClinicUser = roleClaim == "ClinicOrigin" || roleClaim == "ClinicPartner";
                     var hasClinicId = context.User.HasClaim(c => c.Type == "clinicId");
-                    
+
                     return isAdmin || (isClinicUser && hasClinicId);
                 });
             });
@@ -282,7 +282,7 @@ public class Program
                     var isAdmin = roleClaim == "Administrator";
                     var isClinicUser = roleClaim == "ClinicOrigin" || roleClaim == "ClinicPartner";
                     var hasClinicId = context.User.HasClaim(c => c.Type == "clinicId");
-                    
+
                     return isAdmin || (isClinicUser && hasClinicId);
                 });
             });
@@ -290,13 +290,13 @@ public class Program
             // Permission-based policies
             options.AddPolicy("CanManageUsers", policy =>
                 policy.RequireClaim("permissions", "users.manage"));
-            
+
             options.AddPolicy("CanManageClinics", policy =>
                 policy.RequireClaim("permissions", "clinics.manage"));
-            
+
             options.AddPolicy("CanValidateQR", policy =>
                 policy.RequireClaim("permissions", "qr.validate"));
-            
+
             options.AddPolicy("CanGenerateQR", policy =>
                 policy.RequireClaim("permissions", "qr.generate"));
 
@@ -365,7 +365,7 @@ public class Program
 
             // Custom operation filter for better documentation
             c.OperationFilter<SwaggerDefaultValues>();
-            
+
             // Use full type names to avoid schema conflicts
             c.CustomSchemaIds(type => type.FullName?.Replace('+', '.'));
         });
@@ -373,7 +373,7 @@ public class Program
         // Add health checks
         builder.Services.AddHealthChecks()
             .AddCheck<SingleClin.API.HealthChecks.ApiHealthCheck>("api", tags: new[] { "api", "live" })
-            .AddCheck<SingleClin.API.HealthChecks.FirebaseHealthCheck>("firebase", 
+            .AddCheck<SingleClin.API.HealthChecks.FirebaseHealthCheck>("firebase",
                 failureStatus: HealthStatus.Degraded,
                 tags: new[] { "firebase", "auth" })
             .AddCheck<SingleClin.API.HealthChecks.RedisHealthCheck>("redis",
@@ -389,10 +389,10 @@ public class Program
         {
             var logger = app.Services.GetRequiredService<ILogger<Program>>();
             var configuration = app.Configuration;
-            
+
             logger.LogInformation("=== Initializing Firebase ===");
             logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
-            
+
             try
             {
                 // Debug configuration sources
@@ -405,12 +405,12 @@ public class Program
                         logger.LogInformation("  Provider: {Provider}", provider.GetType().Name);
                     }
                 }
-                
+
                 // Test configuration loading
                 logger.LogInformation("Testing configuration:");
                 logger.LogInformation("  ConnectionString: {HasValue}", !string.IsNullOrEmpty(configuration.GetConnectionString("DefaultConnection")));
                 logger.LogInformation("  JWT:SecretKey: {HasValue}", !string.IsNullOrEmpty(configuration["JWT:SecretKey"]));
-                
+
                 // Debug Firebase configuration
                 var firebaseSection = configuration.GetSection("Firebase");
                 logger.LogInformation("Firebase Section exists: {Exists}", firebaseSection.Exists());
@@ -419,7 +419,7 @@ public class Program
                 foreach (var child in firebaseSection.GetChildren())
                 {
                     logger.LogInformation("  {Key}: '{Value}' (Path: {Path})", child.Key, child.Value, child.Path);
-                    
+
                     // For nested sections, log their children too
                     if (child.GetChildren().Any())
                     {
@@ -429,27 +429,27 @@ public class Program
                         }
                     }
                 }
-                
+
                 // Try different ways to access ProjectId
                 var projectId1 = configuration["Firebase:ProjectId"];
                 var projectId2 = configuration.GetValue<string>("Firebase:ProjectId");
                 var projectId3 = firebaseSection["ProjectId"];
                 var projectId4 = firebaseSection.GetValue<string>("ProjectId");
-                
+
                 logger.LogInformation("ProjectId access methods:");
                 logger.LogInformation("  Method 1 (indexer): '{Value}'", projectId1 ?? "NULL");
                 logger.LogInformation("  Method 2 (GetValue): '{Value}'", projectId2 ?? "NULL");
                 logger.LogInformation("  Method 3 (section indexer): '{Value}'", projectId3 ?? "NULL");
                 logger.LogInformation("  Method 4 (section GetValue): '{Value}'", projectId4 ?? "NULL");
-                
+
                 var projectId = projectId1 ?? projectId2 ?? projectId3 ?? projectId4;
                 var serviceAccountPath = configuration["Firebase:ServiceAccountKeyPath"];
-                
+
                 logger.LogInformation("Firebase Configuration:");
                 logger.LogInformation("  ProjectId: '{ProjectId}'", projectId ?? "NULL");
                 logger.LogInformation("  ServiceAccountKeyPath: '{Path}'", serviceAccountPath ?? "NULL");
                 logger.LogInformation("  Current Directory: {Dir}", Directory.GetCurrentDirectory());
-                
+
                 if (!string.IsNullOrEmpty(projectId))
                 {
                     if (FirebaseApp.DefaultInstance == null)
@@ -458,14 +458,14 @@ public class Program
                         {
                             logger.LogInformation("Service account file exists: {Exists}", File.Exists(serviceAccountPath));
                             logger.LogInformation("Initializing Firebase Admin SDK...");
-                            
+
                             var credential = GoogleCredential.FromFile(serviceAccountPath);
                             FirebaseApp.Create(new AppOptions
                             {
                                 Credential = credential,
                                 ProjectId = projectId
                             });
-                            
+
                             logger.LogInformation("✅ Firebase Admin SDK initialized successfully!");
                             logger.LogInformation("Firebase Project: {ProjectId}", FirebaseApp.DefaultInstance.Options.ProjectId);
                         }
@@ -478,7 +478,7 @@ public class Program
                     }
                     else
                     {
-                        logger.LogInformation("Firebase already initialized for project: {ProjectId}", 
+                        logger.LogInformation("Firebase already initialized for project: {ProjectId}",
                             FirebaseApp.DefaultInstance.Options.ProjectId);
                     }
                 }
@@ -491,7 +491,7 @@ public class Program
             {
                 logger.LogError(ex, "Failed to initialize Firebase");
             }
-            
+
             logger.LogInformation("=== Firebase Initialization Complete ===");
         }
 
@@ -511,7 +511,7 @@ public class Program
                 c.EnableTryItOutByDefault();
                 c.ShowCommonExtensions();
             });
-            
+
             // Add Hangfire Dashboard in development
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
@@ -549,14 +549,14 @@ public class Program
 
         // Map health check endpoints
         app.MapHealthChecks("/health");
-        
+
         // Detailed health check endpoint with JSON response
         app.MapHealthChecks("/health/detailed", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
             ResponseWriter = async (context, report) =>
             {
                 context.Response.ContentType = "application/json";
-                
+
                 var response = new
                 {
                     status = report.Status.ToString(),
@@ -573,23 +573,23 @@ public class Program
                         exception = x.Value.Exception?.Message
                     })
                 };
-                
+
                 await context.Response.WriteAsync(
-                    System.Text.Json.JsonSerializer.Serialize(response, 
-                        new System.Text.Json.JsonSerializerOptions 
-                        { 
+                    System.Text.Json.JsonSerializer.Serialize(response,
+                        new System.Text.Json.JsonSerializerOptions
+                        {
                             WriteIndented = true,
                             PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
                         }));
             }
         });
-        
+
         // Liveness probe endpoint
         app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
             Predicate = check => check.Tags.Contains("live")
         });
-        
+
         // Readiness probe endpoint  
         app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
@@ -601,7 +601,7 @@ public class Program
 
         // Schedule recurring jobs
         var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
-        
+
         // Schedule balance check job to run every 4 hours
         recurringJobManager.AddOrUpdate<BalanceCheckJob>(
             "balance-check-job",

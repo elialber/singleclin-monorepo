@@ -117,7 +117,7 @@ public class TransactionFilterValidator : AbstractValidator<TransactionFilterDto
 
         // Warn if date range is too large
         RuleFor(x => x)
-            .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue || 
+            .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue ||
                       (x.EndDate.Value - x.StartDate.Value).TotalDays <= 365)
             .WithMessage("Date range should not exceed 365 days for better performance")
             .WithSeverity(Severity.Warning)

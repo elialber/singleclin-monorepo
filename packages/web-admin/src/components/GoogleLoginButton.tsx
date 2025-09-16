@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button, CircularProgress, Typography, Box } from '@mui/material';
 import { PrivacyTip as PrivacyIcon } from '@mui/icons-material';
+import { FirebaseError } from 'firebase/app';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotification } from '@/hooks/useNotification';
 
@@ -26,20 +27,24 @@ export function GoogleLoginButton() {
       // Use popup method for Google login
       await loginWithGoogle();
       showSuccess('Login com Google realizado com sucesso!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Google login error:', err);
-      
+
       let message = 'Erro ao fazer login com Google. Tente novamente.';
-      
-      if (err.code === 'auth/popup-blocked') {
-        message = 'Por favor, permita popups para fazer login com Google';
-      } else if (err.code === 'auth/cancelled-popup-request') {
-        message = 'Login cancelado';
-      } else if (err.code === 'auth/popup-closed-by-user') {
-        message = 'Popup fechado antes de concluir o login';
-      } else if (err.code === 'auth/operation-not-allowed') {
-        message = 'Login com Google não está habilitado. Entre em contato com o suporte.';
-      } else if (err.message) {
+
+      if (err instanceof FirebaseError) {
+        if (err.code === 'auth/popup-blocked') {
+          message = 'Por favor, permita popups para fazer login com Google';
+        } else if (err.code === 'auth/cancelled-popup-request') {
+          message = 'Login cancelado';
+        } else if (err.code === 'auth/popup-closed-by-user') {
+          message = 'Popup fechado antes de concluir o login';
+        } else if (err.code === 'auth/operation-not-allowed') {
+          message = 'Login com Google não está habilitado. Entre em contato com o suporte.';
+        } else if (err.message) {
+          message = err.message;
+        }
+      } else if (err instanceof Error && err.message) {
         message = err.message;
       }
       

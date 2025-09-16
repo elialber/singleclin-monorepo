@@ -82,7 +82,7 @@ public class ImageUploadService : IImageUploadService
                 // Ensure container exists (without public access)
                 var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
                 await containerClient.CreateIfNotExistsAsync();
-                
+
                 // Upload to Azure Blob Storage
                 var blobClient = containerClient.GetBlobClient(uniqueFileName);
                 var uploadOptions = new BlobUploadOptions
@@ -91,10 +91,10 @@ public class ImageUploadService : IImageUploadService
                 };
 
                 await blobClient.UploadAsync(processedImageStream, uploadOptions, cancellationToken);
-                
+
                 // Set blob to hot access tier for better performance
                 await blobClient.SetAccessTierAsync(AccessTier.Hot);
-                
+
                 // Generate a SAS URL for the image with 1 year expiration
                 var imageUrl = GenerateSasUrl(blobClient);
 
@@ -157,12 +157,12 @@ public class ImageUploadService : IImageUploadService
     public async Task<string> GetImageUrlAsync(string fileName, string folder)
     {
         await Task.CompletedTask; // Placeholder for async pattern
-        
+
         if (_blobServiceClient != null)
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
             var blobClient = containerClient.GetBlobClient(fileName);
-            
+
             // Generate a fresh SAS URL
             return GenerateSasUrl(blobClient);
         }
@@ -204,11 +204,11 @@ public class ImageUploadService : IImageUploadService
             try
             {
                 using var image = await Image.LoadAsync(stream);
-                
+
                 // Additional checks can be added here
-                _logger.LogInformation("Image validation successful: {Width}x{Height}, Format: {Format}", 
+                _logger.LogInformation("Image validation successful: {Width}x{Height}, Format: {Format}",
                     image.Width, image.Height, image.Metadata.DecodedImageFormat?.Name);
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -266,7 +266,7 @@ public class ImageUploadService : IImageUploadService
 
             outputStream.Position = 0;
             _logger.LogInformation("Image processed successfully, final size: {Size} bytes", outputStream.Length);
-            
+
             return outputStream;
         }
         catch (Exception ex)

@@ -17,11 +17,11 @@ public static class DatabaseExtensions
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        
+
         try
         {
             logger.LogInformation("Checking database migrations...");
-            
+
             // Apply pending migrations in development
             if (app.Environment.IsDevelopment())
             {
@@ -38,13 +38,13 @@ public static class DatabaseExtensions
                 // In production, just ensure database exists but don't auto-migrate
                 await context.Database.EnsureCreatedAsync();
             }
-            
+
             // Seed roles and default admin user
             logger.LogInformation("Seeding roles and default admin...");
             await RoleSeeder.SeedRolesAsync(scope.ServiceProvider);
             await RoleSeeder.SeedDefaultAdminAsync(scope.ServiceProvider);
             logger.LogInformation("Roles and admin seeding completed");
-            
+
             // Create missing AppDbContext tables to resolve schema conflicts
             logger.LogInformation("Creating missing AppDbContext tables...");
             try
@@ -60,10 +60,10 @@ public static class DatabaseExtensions
             {
                 logger.LogWarning(tableEx, "Could not create AppDbContext tables - will use mock data");
             }
-            
+
             // Manually create ClinicServices table due to migration issues
             logger.LogInformation("Creating ClinicServices table if it doesn't exist...");
-            try 
+            try
             {
                 await CreateClinicServicesTableAsync(context);
                 logger.LogInformation("ClinicServices table creation completed");
@@ -72,10 +72,10 @@ public static class DatabaseExtensions
             {
                 logger.LogWarning(tableEx, "Could not create ClinicServices table");
             }
-            
+
             // Seed sample clinics if none exist
             logger.LogInformation("Seeding sample clinics...");
-            try 
+            try
             {
                 await SeedSampleClinicsAsync(context);
                 logger.LogInformation("Sample clinics seeding completed");
@@ -84,7 +84,7 @@ public static class DatabaseExtensions
             {
                 logger.LogWarning(clinicEx, "Could not seed sample clinics");
             }
-            
+
             logger.LogInformation("Database seeding completed");
         }
         catch (Exception ex)
@@ -93,7 +93,7 @@ public static class DatabaseExtensions
             throw;
         }
     }
-    
+
     /// <summary>
     /// Manually create ClinicServices table to resolve migration issues
     /// </summary>
@@ -129,10 +129,10 @@ public static class DatabaseExtensions
                 END IF;
             END $$;
         ";
-        
+
         await context.Database.ExecuteSqlRawAsync(sql);
     }
-    
+
     /// <summary>
     /// Seed sample clinic data if none exists
     /// </summary>
@@ -168,7 +168,7 @@ public static class DatabaseExtensions
                 END IF;
             END $$;
         ";
-        
+
         await context.Database.ExecuteSqlRawAsync(checkSql);
     }
 }

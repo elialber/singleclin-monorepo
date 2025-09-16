@@ -30,7 +30,7 @@ namespace SingleClin.API.Repositories
                 // Try to get from cache first
                 var cacheKey = GetCacheKey(userId);
                 var cachedPreferences = await _cache.GetStringAsync(cacheKey, cancellationToken);
-                
+
                 if (!string.IsNullOrEmpty(cachedPreferences))
                 {
                     _logger.LogDebug("Retrieved notification preferences from cache for user {UserId}", userId);
@@ -174,7 +174,7 @@ namespace SingleClin.API.Repositories
             try
             {
                 return await _context.UserNotificationPreferences
-                    .Where(p => p.LowBalanceThreshold >= balanceThreshold && 
+                    .Where(p => p.LowBalanceThreshold >= balanceThreshold &&
                                (p.EnablePush || p.EnableEmail))
                     .Include(p => p.User)
                     .ToListAsync(cancellationToken);

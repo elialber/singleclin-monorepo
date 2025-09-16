@@ -235,7 +235,7 @@ namespace SingleClin.API.Services
                 foreach (var report in reports)
                 {
                     var worksheet = package.Workbook.Worksheets.Add(report.Key);
-                    
+
                     // Use reflection to handle generic report data
                     var reportType = report.Value.GetType();
                     if (reportType.IsGenericType && reportType.GetGenericTypeDefinition() == typeof(ReportResponse<>))
@@ -327,7 +327,7 @@ namespace SingleClin.API.Services
                     }
                     break;
 
-                // Add other report types as needed
+                    // Add other report types as needed
             }
 
             return currentRow;

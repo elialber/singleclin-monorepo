@@ -45,7 +45,7 @@ public class UserService : IUserService
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
             var searchLower = filter.Search.ToLower();
-            query = query.Where(u => 
+            query = query.Where(u =>
                 u.FullName.ToLower().Contains(searchLower) ||
                 u.Email!.ToLower().Contains(searchLower) ||
                 (u.PhoneNumber != null && u.PhoneNumber.Contains(filter.Search)));
@@ -135,7 +135,7 @@ public class UserService : IUserService
         if (appUser == null)
         {
             _logger.LogInformation("Creating User in AppDbContext for ApplicationUser {UserId}", id);
-            
+
             appUser = new User
             {
                 Id = Guid.NewGuid(),
@@ -150,10 +150,10 @@ public class UserService : IUserService
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
-            
+
             _appDbContext.Users.Add(appUser);
             await _appDbContext.SaveChangesAsync();
-            
+
             _logger.LogInformation("User created in AppDbContext with ID {AppUserId}", appUser.Id);
         }
 
@@ -189,7 +189,7 @@ public class UserService : IUserService
         };
 
         var result = await _userManager.CreateAsync(user, dto.Password);
-        
+
         if (!result.Succeeded)
         {
             return (false, null, result.Errors.Select(e => e.Description));
@@ -199,7 +199,7 @@ public class UserService : IUserService
         _logger.LogInformation("=== FIREBASE USER CREATION START ===");
         _logger.LogInformation("Firebase IsConfigured: {IsConfigured}", _firebaseAuthService.IsConfigured);
         _logger.LogInformation("Email: {Email}, FullName: {FullName}", dto.Email, user.FullName);
-        
+
         if (_firebaseAuthService.IsConfigured)
         {
             _logger.LogInformation("Firebase is configured. Attempting to create user...");
@@ -217,7 +217,7 @@ public class UserService : IUserService
                     // Update user with Firebase UID
                     user.FirebaseUid = firebaseUser.Uid;
                     await _userManager.UpdateAsync(user);
-                    _logger.LogInformation("✅ SUCCESS: Created user in Firebase - Email: {Email}, UID: {FirebaseUid}", 
+                    _logger.LogInformation("✅ SUCCESS: Created user in Firebase - Email: {Email}, UID: {FirebaseUid}",
                         dto.Email, firebaseUser.Uid);
                 }
                 else
@@ -291,7 +291,7 @@ public class UserService : IUserService
         user.UpdatedAt = DateTime.UtcNow;
 
         var result = await _userManager.UpdateAsync(user);
-        
+
         if (!result.Succeeded)
         {
             return (false, null, result.Errors.Select(e => e.Description));
@@ -309,7 +309,7 @@ public class UserService : IUserService
         }
 
         var result = await _userManager.DeleteAsync(user);
-        
+
         if (!result.Succeeded)
         {
             return (false, result.Errors.Select(e => e.Description));
@@ -330,7 +330,7 @@ public class UserService : IUserService
         user.UpdatedAt = DateTime.UtcNow;
 
         var result = await _userManager.UpdateAsync(user);
-        
+
         if (!result.Succeeded)
         {
             return (false, null, result.Errors.Select(e => e.Description));
@@ -352,7 +352,7 @@ public class UserService : IUserService
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             // TODO: Implement password reset email sending
             _logger.LogInformation("Password reset token generated for user {UserId}", user.Id);
-            
+
             return (true, "Password reset email sent successfully");
         }
         catch (Exception ex)
@@ -368,7 +368,7 @@ public class UserService : IUserService
 
         var user = await _userManager.FindByIdAsync(userId.ToString());
         var currentUser = await _userManager.FindByIdAsync(currentUserId.ToString());
-        
+
         if (user == null || currentUser == null) return false;
 
         // Users can access their own data
@@ -441,7 +441,7 @@ public class UserService : IUserService
             if (user == null)
             {
                 _logger.LogInformation("Creating new User in AppDbContext for ApplicationUser {UserId}", userId);
-                
+
                 user = new User
                 {
                     Id = Guid.NewGuid(), // Explicitly set ID
@@ -453,10 +453,10 @@ public class UserService : IUserService
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
-                
+
                 _appDbContext.Users.Add(user);
                 await _appDbContext.SaveChangesAsync();
-                
+
                 _logger.LogInformation("User created in AppDbContext with ID {UserId}", user.Id);
             }
             else
@@ -466,7 +466,7 @@ public class UserService : IUserService
 
             // Create UserPlan
             _logger.LogInformation("Creating UserPlan for User {UserId} and Plan {PlanId}", user.Id, plan.Id);
-            
+
             var userPlan = new UserPlan
             {
                 Id = Guid.NewGuid(), // Explicitly set ID
@@ -485,7 +485,7 @@ public class UserService : IUserService
             };
 
             _appDbContext.UserPlans.Add(userPlan);
-            
+
             try
             {
                 await _appDbContext.SaveChangesAsync();
@@ -705,17 +705,17 @@ public class UserService : IUserService
             // Deactivate the plan instead of deleting it (for audit purposes)
             userPlan.IsActive = false;
             userPlan.UpdatedAt = DateTime.UtcNow;
-            
+
             // Add cancellation reason if provided
             if (!string.IsNullOrWhiteSpace(reason))
             {
-                userPlan.Notes = string.IsNullOrWhiteSpace(userPlan.Notes) 
-                    ? $"Cancelled: {reason}" 
+                userPlan.Notes = string.IsNullOrWhiteSpace(userPlan.Notes)
+                    ? $"Cancelled: {reason}"
                     : $"{userPlan.Notes}\nCancelled: {reason}";
             }
 
             await _appDbContext.SaveChangesAsync();
-            
+
             _logger.LogInformation("User plan {UserPlanId} cancelled successfully", userPlanId);
             return (true, Array.Empty<string>());
         }

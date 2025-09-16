@@ -20,7 +20,7 @@ public class ClinicService : IClinicService
     private readonly ApplicationDbContext _context;
 
     public ClinicService(
-        IClinicRepository clinicRepository, 
+        IClinicRepository clinicRepository,
         IImageUploadService imageUploadService,
         ILogger<ClinicService> logger,
         ApplicationDbContext context)
@@ -147,20 +147,20 @@ public class ClinicService : IClinicService
             // Handle services update if provided
             if (clinicRequest.Services != null)
             {
-                _logger.LogInformation("Updating services for clinic: {ClinicName} (ID: {ClinicId}) - {ServiceCount} services provided", 
+                _logger.LogInformation("Updating services for clinic: {ClinicName} (ID: {ClinicId}) - {ServiceCount} services provided",
                     existingClinic.Name, existingClinic.Id, clinicRequest.Services.Count);
 
                 // Remove existing services for this clinic
                 var existingServices = await _context.ClinicServices
                     .Where(s => s.ClinicId == id)
                     .ToListAsync();
-                
+
                 if (existingServices.Any())
                 {
                     _context.ClinicServices.RemoveRange(existingServices);
-                    _logger.LogInformation("Removed {ExistingServiceCount} existing services for clinic: {ClinicId}", 
+                    _logger.LogInformation("Removed {ExistingServiceCount} existing services for clinic: {ClinicId}",
                         existingServices.Count, id);
-                    
+
                     // Save changes to ensure deletions are committed before insertions
                     await _context.SaveChangesAsync();
                     _logger.LogInformation("Deletion saved to database for clinic: {ClinicId}", id);
@@ -187,7 +187,7 @@ public class ClinicService : IClinicService
                     _context.ClinicServices.Add(service);
                 }
 
-                _logger.LogInformation("Added {NewServiceCount} new services for clinic: {ClinicName} (ID: {ClinicId})", 
+                _logger.LogInformation("Added {NewServiceCount} new services for clinic: {ClinicName} (ID: {ClinicId})",
                     clinicRequest.Services.Count, existingClinic.Name, existingClinic.Id);
             }
 
@@ -349,7 +349,7 @@ public class ClinicService : IClinicService
 
                 await _clinicRepository.UpdateAsync(clinic);
 
-                _logger.LogInformation("Successfully updated image for clinic {ClinicId}: {ImageUrl}", 
+                _logger.LogInformation("Successfully updated image for clinic {ClinicId}: {ImageUrl}",
                     id, uploadResult.Url);
             }
             else
@@ -425,11 +425,11 @@ public class ClinicService : IClinicService
             for (int i = 0; i < uploadDto.Images.Length; i++)
             {
                 var imageFile = uploadDto.Images[i];
-                
+
                 try
                 {
                     var uploadResult = await _imageUploadService.UploadImageAsync(imageFile, "clinics");
-                    
+
                     if (uploadResult.Success)
                     {
                         var clinicImage = new ClinicImage
@@ -453,13 +453,13 @@ public class ClinicService : IClinicService
                         clinic.Images.Add(clinicImage);
                         uploadedImages.Add(MapToImageDto(clinicImage));
 
-                        _logger.LogInformation("Successfully uploaded image {Index} for clinic {ClinicId}: {ImageUrl}", 
+                        _logger.LogInformation("Successfully uploaded image {Index} for clinic {ClinicId}: {ImageUrl}",
                             i + 1, clinicId, uploadResult.Url);
                     }
                     else
                     {
                         errorMessages.Add($"Image {i + 1}: {uploadResult.ErrorMessage}");
-                        _logger.LogWarning("Failed to upload image {Index} for clinic {ClinicId}: {Error}", 
+                        _logger.LogWarning("Failed to upload image {Index} for clinic {ClinicId}: {Error}",
                             i + 1, clinicId, uploadResult.ErrorMessage);
                     }
                 }
@@ -475,20 +475,20 @@ public class ClinicService : IClinicService
             if (uploadedImages.Any())
             {
                 _logger.LogInformation("Saving {Count} new images to database for clinic {ClinicId}", uploadedImages.Count, clinicId);
-                
+
                 // Add the new ClinicImage entities to the context
                 foreach (var newImage in clinic.Images.Where(img => img.CreatedAt > DateTime.UtcNow.AddMinutes(-1)))
                 {
                     _context.ClinicImages.Add(newImage);
                     _logger.LogInformation("Added image {ImageId} to context for clinic {ClinicId}", newImage.Id, clinicId);
                 }
-                
+
                 // Save changes to persist the images
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Successfully saved {Count} images to database for clinic {ClinicId}", uploadedImages.Count, clinicId);
             }
 
-            return errorMessages.Any() 
+            return errorMessages.Any()
                 ? MultipleImageUploadResponseDto.CreatePartialSuccess(uploadedImages, errorMessages)
                 : MultipleImageUploadResponseDto.CreateSuccess(uploadedImages);
         }
@@ -503,13 +503,13 @@ public class ClinicService : IClinicService
     {
         // Get clinic with images explicitly loaded
         var clinic = await _clinicRepository.GetByIdAsync(clinicId);
-        
+
         if (clinic?.Images == null)
         {
             _logger.LogInformation("No images found for clinic {ClinicId}", clinicId);
             return new List<ClinicImageDto>();
         }
-        
+
         var images = clinic.Images.OrderBy(i => i.DisplayOrder).ToList();
         _logger.LogInformation("Found {Count} images for clinic {ClinicId}", images.Count, clinicId);
         return images.Select(MapToImageDto).ToList();
@@ -575,7 +575,7 @@ public class ClinicService : IClinicService
             await _clinicRepository.UpdateAsync(clinic);
 
             _logger.LogInformation("Successfully deleted image {ImageId} from clinic {ClinicId}", imageId, clinicId);
-            
+
             return true;
         }
         catch (Exception ex)
@@ -772,7 +772,7 @@ public class ClinicService : IClinicService
             // Likely multiplied by 10, normalize to SG format
             return price / 10m;
         }
-        
+
         // For other cases, ensure it's a reasonable SG value
         // Typical SG values are 1.0, 2.0, 3.0 (occasionally 1.5, 2.5, etc.)
         if (price > 10.0m)
@@ -780,7 +780,7 @@ public class ClinicService : IClinicService
             // If still too high, assume it needs to be divided by 10
             return Math.Round(price / 10m, 1);
         }
-        
+
         // Price is already in correct SG format
         return price;
     }

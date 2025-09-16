@@ -17,7 +17,7 @@ public class FirebaseHealthCheck : IHealthCheck
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(
-        HealthCheckContext context, 
+        HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
         try
@@ -44,7 +44,7 @@ public class FirebaseHealthCheck : IHealthCheck
             };
 
             var token = await auth.CreateCustomTokenAsync("health-check-user", testClaims, cancellationToken);
-            
+
             if (string.IsNullOrEmpty(token))
             {
                 return HealthCheckResult.Unhealthy("Failed to create test token");

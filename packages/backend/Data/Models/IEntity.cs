@@ -9,12 +9,12 @@ public interface IEntity
     /// Unique identifier for the entity
     /// </summary>
     Guid Id { get; set; }
-    
+
     /// <summary>
     /// Date and time when the entity was created
     /// </summary>
     DateTime CreatedAt { get; set; }
-    
+
     /// <summary>
     /// Date and time when the entity was last updated
     /// </summary>

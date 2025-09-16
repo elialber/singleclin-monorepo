@@ -20,28 +20,28 @@ namespace SingleClin.API.Services
         /// Generate usage by period report
         /// </summary>
         Task<ReportResponse<UsageReportData>> GenerateUsageReportAsync(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Generate clinic ranking report
         /// </summary>
         Task<ReportResponse<ClinicRankingData>> GenerateClinicRankingAsync(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Generate top services report
         /// </summary>
         Task<ReportResponse<ServiceReportData>> GenerateServiceReportAsync(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Generate plan utilization report
         /// </summary>
         Task<ReportResponse<PlanUtilizationData>> GeneratePlanUtilizationAsync(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace SingleClin.API.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>File content as byte array</returns>
         Task<byte[]> ExportReportAsync(
-            object reportData, 
-            ExportFormat format, 
+            object reportData,
+            ExportFormat format,
             CancellationToken cancellationToken = default);
 
         /// <summary>

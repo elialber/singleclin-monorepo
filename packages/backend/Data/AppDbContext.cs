@@ -19,32 +19,32 @@ public class AppDbContext : DbContext
     /// Users in the system (separate from ApplicationUser Identity)
     /// </summary>
     public DbSet<User> Users => Set<User>();
-    
+
     /// <summary>
     /// Available plans for purchase
     /// </summary>
     public DbSet<Plan> Plans => Set<Plan>();
-    
+
     /// <summary>
     /// User purchased plans
     /// </summary>
     public DbSet<UserPlan> UserPlans => Set<UserPlan>();
-    
+
     /// <summary>
     /// Transactions (credit usage)
     /// </summary>
     public DbSet<Transaction> Transactions => Set<Transaction>();
-    
+
     /// <summary>
     /// Clinics in the system
     /// </summary>
     public DbSet<Clinic> Clinics => Set<Clinic>();
-    
+
     /// <summary>
     /// Clinic images
     /// </summary>
     public DbSet<ClinicImage> ClinicImages => Set<ClinicImage>();
-    
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -84,7 +84,7 @@ public class AppDbContext : DbContext
         // Apply specific configurations only for AppDbContext entities
         // NOTE: We explicitly avoid ApplicationUser configurations to prevent conflicts
         // with ApplicationDbContext which handles Identity entities
-        
+
         // Apply entity configurations
         modelBuilder.ApplyConfiguration(new Data.Configurations.ClinicImageConfiguration());
     }

@@ -9,17 +9,17 @@ public enum ClinicType
     /// Regular clinic
     /// </summary>
     Regular = 0,
-    
+
     /// <summary>
     /// Origin clinic - provides services
     /// </summary>
     Origin = 1,
-    
+
     /// <summary>
     /// Partner clinic - has special agreements
     /// </summary>
     Partner = 2,
-    
+
     /// <summary>
     /// Administrative clinic
     /// </summary>

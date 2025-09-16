@@ -12,7 +12,7 @@ public abstract class QRCodeValidationException : Exception
         ErrorCode = errorCode;
     }
 
-    protected QRCodeValidationException(string errorCode, string message, Exception innerException) 
+    protected QRCodeValidationException(string errorCode, string message, Exception innerException)
         : base(message, innerException)
     {
         ErrorCode = errorCode;
@@ -26,7 +26,7 @@ public class QRExpiredException : QRCodeValidationException
 {
     public DateTime ExpiresAt { get; }
 
-    public QRExpiredException(DateTime expiresAt) 
+    public QRExpiredException(DateTime expiresAt)
         : base("QR_EXPIRED", $"QR Code expired at {expiresAt:yyyy-MM-dd HH:mm:ss} UTC")
     {
         ExpiresAt = expiresAt;
@@ -40,7 +40,7 @@ public class QRAlreadyUsedException : QRCodeValidationException
 {
     public string Nonce { get; }
 
-    public QRAlreadyUsedException(string nonce) 
+    public QRAlreadyUsedException(string nonce)
         : base("QR_ALREADY_USED", $"QR Code with nonce {nonce} has already been used")
     {
         Nonce = nonce;
@@ -52,12 +52,12 @@ public class QRAlreadyUsedException : QRCodeValidationException
 /// </summary>
 public class InvalidQRException : QRCodeValidationException
 {
-    public InvalidQRException(string message) 
+    public InvalidQRException(string message)
         : base("INVALID_QR", $"Invalid QR Code: {message}")
     {
     }
 
-    public InvalidQRException(string message, Exception innerException) 
+    public InvalidQRException(string message, Exception innerException)
         : base("INVALID_QR", $"Invalid QR Code: {message}", innerException)
     {
     }
@@ -71,7 +71,7 @@ public class InsufficientCreditsException : QRCodeValidationException
     public int AvailableCredits { get; }
     public int RequiredCredits { get; }
 
-    public InsufficientCreditsException(int availableCredits, int requiredCredits) 
+    public InsufficientCreditsException(int availableCredits, int requiredCredits)
         : base("INSUFFICIENT_CREDITS", $"Insufficient credits. Available: {availableCredits}, Required: {requiredCredits}")
     {
         AvailableCredits = availableCredits;
@@ -86,7 +86,7 @@ public class InvalidUserPlanException : QRCodeValidationException
 {
     public Guid UserPlanId { get; }
 
-    public InvalidUserPlanException(Guid userPlanId) 
+    public InvalidUserPlanException(Guid userPlanId)
         : base("INVALID_USER_PLAN", $"User plan {userPlanId} is not found or inactive")
     {
         UserPlanId = userPlanId;
@@ -100,7 +100,7 @@ public class UnauthorizedClinicException : QRCodeValidationException
 {
     public Guid ClinicId { get; }
 
-    public UnauthorizedClinicException(Guid clinicId) 
+    public UnauthorizedClinicException(Guid clinicId)
         : base("UNAUTHORIZED_CLINIC", $"Clinic {clinicId} is not authorized for this operation")
     {
         ClinicId = clinicId;

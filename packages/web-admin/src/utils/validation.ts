@@ -5,25 +5,25 @@
 // Regex patterns
 export const REGEX_PATTERNS = {
   // Nome: letras, números, espaços, acentos, hífens e pontos
-  NAME: /^[a-zA-ZÀ-ÿ0-9\s\-\.]{3,200}$/,
+  NAME: /^[a-zA-ZÀ-ÿ0-9\s-.]{3,200}$/,
   
   // Email RFC compliant
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   
   // CNPJ formatado: XX.XXX.XXX/XXXX-XX
-  CNPJ_FORMATTED: /^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$/,
+  CNPJ_FORMATTED: /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/,
   
   // CNPJ apenas números
   CNPJ_NUMBERS_ONLY: /^\d{14}$/,
   
   // Telefone formatado: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
-  PHONE_FORMATTED: /^\(\d{2}\)\s\d{4,5}\-\d{4}$/,
+  PHONE_FORMATTED: /^\(\d{2}\)\s\d{4,5}-\d{4}$/,
   
   // Telefone apenas números (com DDD)
   PHONE_NUMBERS_ONLY: /^\d{10,11}$/,
   
   // CEP formatado: XXXXX-XXX
-  CEP_FORMATTED: /^\d{5}\-\d{3}$/,
+  CEP_FORMATTED: /^\d{5}-\d{3}$/,
   
   // CEP apenas números
   CEP_NUMBERS_ONLY: /^\d{8}$/,
@@ -228,7 +228,7 @@ export function validatePhone(phone: string): {
  */
 export async function checkClinicNameExists(
   name: string,
-  excludeId?: string
+  _excludeId?: string
 ): Promise<boolean> {
   // Mock - substituir por chamada API real
   await new Promise(resolve => setTimeout(resolve, 500))
@@ -251,7 +251,7 @@ export async function checkClinicNameExists(
  */
 export async function checkCNPJExists(
   cnpj: string,
-  excludeId?: string
+  _excludeId?: string
 ): Promise<boolean> {
   // Mock - substituir por chamada API real
   await new Promise(resolve => setTimeout(resolve, 500))

@@ -59,7 +59,7 @@ export default function ClinicStepperPage() {
     // Padrão básico: tentar identificar CEP (formato brasileiro: XXXXX-XXX ou XXXXXXXX)
     const cepPattern = /\d{5}-?\d{3}/
     let cep = ''
-    let remainingParts = [...parts]
+    const remainingParts = [...parts]
     
     // Procurar CEP nos últimos elementos (mais comum)
     for (let i = parts.length - 1; i >= 0; i--) {
@@ -88,7 +88,7 @@ export default function ClinicStepperPage() {
     }
     
     // Estratégia de distribuição baseada na quantidade de partes restantes
-    let result = {
+    const result = {
       cep,
       street: '',
       number: '',

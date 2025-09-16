@@ -57,7 +57,7 @@ public class ClinicRateLimitingMiddleware
 
             if (!isAllowed)
             {
-                _logger.LogWarning("Rate limit exceeded for clinic {ClinicId}. Limit: {Limit}, Window: {Window}min", 
+                _logger.LogWarning("Rate limit exceeded for clinic {ClinicId}. Limit: {Limit}, Window: {Window}min",
                     clinicId, rateLimitInfo.Limit, rateLimitInfo.WindowMinutes);
 
                 await HandleRateLimitExceeded(context, rateLimitInfo);

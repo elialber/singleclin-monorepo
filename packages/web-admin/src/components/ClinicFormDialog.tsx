@@ -201,7 +201,7 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
           }
           onClose()
         },
-        onError: (error: any) => {
+        onError: (error: AxiosError) => {
           if (error.response?.status === 400 && error.response.data?.errors) {
             handleBackendValidationErrors(error)
           }
@@ -229,7 +229,7 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
           }
           onClose()
         },
-        onError: (error: any) => {
+        onError: (error: AxiosError) => {
           if (error.response?.status === 400 && error.response.data?.errors) {
             handleBackendValidationErrors(error)
           }
@@ -242,10 +242,10 @@ export default function ClinicFormDialog({ open, onClose, clinic }: ClinicFormDi
   const submitError = createClinic.error || updateClinic.error || imageError
 
   // CNPJ validation regex
-  const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$|^\d{14}$/
+  const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$|^\d{14}$/
 
   // Phone validation regex  
-  const phoneRegex = /^\+?[\d\s\-\(\)]+$/
+  const phoneRegex = /^\+?[\d\s-()]+$/
 
   return (
     <Dialog

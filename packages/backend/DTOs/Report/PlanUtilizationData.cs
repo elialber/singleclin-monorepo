@@ -36,7 +36,7 @@ namespace SingleClin.API.DTOs.Report
         public int TotalCreditsUsed { get; set; }
         public int TotalCreditsExpired { get; set; }
         public int TotalCreditsAvailable { get; set; }
-        public decimal UtilizationRate => TotalCreditsAvailable > 0 ? 
+        public decimal UtilizationRate => TotalCreditsAvailable > 0 ?
             (decimal)TotalCreditsUsed / TotalCreditsAvailable : 0;
         public decimal AverageCreditsPerUser { get; set; }
         public decimal MedianCreditsPerUser { get; set; }

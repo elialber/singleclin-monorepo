@@ -14,6 +14,7 @@
     "db:update": "dotnet ef database update",
     "db:drop": "dotnet ef database drop",
     "test": "dotnet test",
+    "lint": "dotnet format --verify-no-changes --severity error",
     "format": "dotnet format",
     "restore": "dotnet restore",
     "clean": "dotnet clean"

@@ -79,7 +79,7 @@ namespace SingleClin.API.Data.Models
         public bool IsQuietHour(DateTime? time = null)
         {
             var checkTime = time ?? DateTime.Now;
-            
+
             // Use custom quiet hours if set, otherwise return false (let system handle it)
             if (string.IsNullOrEmpty(QuietHoursStart) || string.IsNullOrEmpty(QuietHoursEnd))
                 return false;

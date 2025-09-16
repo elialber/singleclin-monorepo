@@ -46,7 +46,7 @@ namespace SingleClin.API.Services
         {
             try
             {
-                _logger.LogInformation("Generating report of type {ReportType} for period {StartDate} to {EndDate}", 
+                _logger.LogInformation("Generating report of type {ReportType} for period {StartDate} to {EndDate}",
                     request.Type, request.StartDate, request.EndDate);
 
                 // Validate request
@@ -73,7 +73,7 @@ namespace SingleClin.API.Services
         }
 
         public async Task<ReportResponse<UsageReportData>> GenerateUsageReportAsync(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken = default)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -94,7 +94,7 @@ namespace SingleClin.API.Services
                 // Build base query
                 var transactionsQuery = _context.Transactions
                     .AsNoTracking()
-                    .Where(t => t.CreatedAt >= request.StartDate && 
+                    .Where(t => t.CreatedAt >= request.StartDate &&
                                t.CreatedAt <= request.EndDate);
 
                 // Apply filters
@@ -160,7 +160,7 @@ namespace SingleClin.API.Services
                         Averages = new Dictionary<string, decimal>
                         {
                             ["AverageTransactionsPerDay"] = trend.AverageDailyTransactions,
-                            ["AverageCreditsPerTransaction"] = periodData.Any() ? 
+                            ["AverageCreditsPerTransaction"] = periodData.Any() ?
                                 periodData.Average(p => p.AverageCreditsPerTransaction) : 0
                         }
                     },
@@ -187,7 +187,7 @@ namespace SingleClin.API.Services
         }
 
         public async Task<ReportResponse<ClinicRankingData>> GenerateClinicRankingAsync(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken = default)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -285,7 +285,7 @@ namespace SingleClin.API.Services
         }
 
         public async Task<ReportResponse<ServiceReportData>> GenerateServiceReportAsync(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken = default)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -309,7 +309,7 @@ namespace SingleClin.API.Services
                     .Include(t => t.Clinic)
                     .Include(t => t.UserPlan)
                     .ThenInclude(up => up.User)
-                    .Where(t => t.CreatedAt >= request.StartDate && 
+                    .Where(t => t.CreatedAt >= request.StartDate &&
                                t.CreatedAt <= request.EndDate &&
                                t.Status == Data.Models.Enums.TransactionStatus.Validated);
 
@@ -363,9 +363,9 @@ namespace SingleClin.API.Services
                         },
                         Averages = new Dictionary<string, decimal>
                         {
-                            ["AverageCreditsPerService"] = topServices.Any() ? 
+                            ["AverageCreditsPerService"] = topServices.Any() ?
                                 topServices.Average(s => s.AverageCreditsPerUse) : 0,
-                            ["AverageUsagePerService"] = topServices.Any() ? 
+                            ["AverageUsagePerService"] = topServices.Any() ?
                                 (decimal)topServices.Average(s => s.UsageCount) : 0
                         }
                     },
@@ -392,7 +392,7 @@ namespace SingleClin.API.Services
         }
 
         public async Task<ReportResponse<PlanUtilizationData>> GeneratePlanUtilizationAsync(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken = default)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -481,8 +481,8 @@ namespace SingleClin.API.Services
         }
 
         public async Task<byte[]> ExportReportAsync(
-            object reportData, 
-            ExportFormat format, 
+            object reportData,
+            ExportFormat format,
             CancellationToken cancellationToken = default)
         {
             // Implementation for export functionality
@@ -563,13 +563,13 @@ namespace SingleClin.API.Services
         private string GenerateCacheKey(ReportRequest request)
         {
             var key = $"{CacheKeyPrefix}{request.Type}_{request.StartDate:yyyyMMdd}_{request.EndDate:yyyyMMdd}";
-            
+
             if (request.ClinicIds?.Any() == true)
                 key += $"_C{string.Join(",", request.ClinicIds)}";
-            
+
             if (request.ServiceTypes?.Any() == true)
                 key += $"_S{string.Join(",", request.ServiceTypes)}";
-            
+
             if (request.PlanIds?.Any() == true)
                 key += $"_P{string.Join(",", request.PlanIds)}";
 
@@ -579,8 +579,8 @@ namespace SingleClin.API.Services
         }
 
         private async Task<List<UsagePeriodData>> GetUsagePeriodData(
-            IQueryable<Transaction> query, 
-            ReportRequest request, 
+            IQueryable<Transaction> query,
+            ReportRequest request,
             CancellationToken cancellationToken)
         {
             var periodData = new List<UsagePeriodData>();
@@ -612,7 +612,7 @@ namespace SingleClin.API.Services
                             CreditsUsed = item.CreditsUsed,
                             UniquePatients = item.UniquePatients,
                             ActiveClinics = item.ActiveClinics,
-                            AverageCreditsPerTransaction = item.TotalTransactions > 0 ? 
+                            AverageCreditsPerTransaction = item.TotalTransactions > 0 ?
                                 (decimal)item.CreditsUsed / item.TotalTransactions : 0
                         });
                     }
@@ -620,7 +620,8 @@ namespace SingleClin.API.Services
 
                 case ReportPeriod.Weekly:
                     var weeklyData = await query
-                        .GroupBy(t => new { 
+                        .GroupBy(t => new
+                        {
                             Year = t.CreatedAt.Year,
                             // Using ISO week calculation for PostgreSQL
                             Week = ((t.CreatedAt.DayOfYear - ((int)t.CreatedAt.DayOfWeek + 6) % 7 + 9) / 7)
@@ -648,7 +649,7 @@ namespace SingleClin.API.Services
                             CreditsUsed = item.CreditsUsed,
                             UniquePatients = item.UniquePatients,
                             ActiveClinics = item.ActiveClinics,
-                            AverageCreditsPerTransaction = item.TotalTransactions > 0 ? 
+                            AverageCreditsPerTransaction = item.TotalTransactions > 0 ?
                                 (decimal)item.CreditsUsed / item.TotalTransactions : 0
                         });
                     }
@@ -680,7 +681,7 @@ namespace SingleClin.API.Services
                             CreditsUsed = item.CreditsUsed,
                             UniquePatients = item.UniquePatients,
                             ActiveClinics = item.ActiveClinics,
-                            AverageCreditsPerTransaction = item.TotalTransactions > 0 ? 
+                            AverageCreditsPerTransaction = item.TotalTransactions > 0 ?
                                 (decimal)item.CreditsUsed / item.TotalTransactions : 0
                         });
                     }
@@ -699,7 +700,7 @@ namespace SingleClin.API.Services
 
                 if (previous.TotalTransactions > 0)
                 {
-                    current.GrowthRate = ((decimal)current.TotalTransactions - previous.TotalTransactions) 
+                    current.GrowthRate = ((decimal)current.TotalTransactions - previous.TotalTransactions)
                         / previous.TotalTransactions * 100;
                 }
             }
@@ -708,7 +709,7 @@ namespace SingleClin.API.Services
         }
 
         private async Task<List<UsageByClinic>> GetTopClinicsUsage(
-            IQueryable<Transaction> query, 
+            IQueryable<Transaction> query,
             CancellationToken cancellationToken)
         {
             var totalTransactions = await query.CountAsync(cancellationToken);
@@ -731,7 +732,7 @@ namespace SingleClin.API.Services
             // Calculate market share
             foreach (var clinic in clinicData)
             {
-                clinic.MarketShare = totalTransactions > 0 ? 
+                clinic.MarketShare = totalTransactions > 0 ?
                     (decimal)clinic.TotalTransactions / totalTransactions * 100 : 0;
             }
 
@@ -739,7 +740,7 @@ namespace SingleClin.API.Services
         }
 
         private async Task<List<UsageByPlan>> GetPlanDistribution(
-            IQueryable<Transaction> query, 
+            IQueryable<Transaction> query,
             CancellationToken cancellationToken)
         {
             return await query
@@ -750,7 +751,7 @@ namespace SingleClin.API.Services
                     PlanName = g.Key.Name,
                     ActiveUsers = g.Select(t => t.UserPlan.UserId).Distinct().Count(),
                     TotalCreditsUsed = g.Sum(t => t.CreditsUsed),
-                    AverageUsagePerUser = g.Count() > 0 ? 
+                    AverageUsagePerUser = g.Count() > 0 ?
                         (decimal)g.Sum(t => t.CreditsUsed) / g.Select(t => t.UserPlan.UserId).Distinct().Count() : 0
                 })
                 .OrderByDescending(p => p.TotalCreditsUsed)
@@ -777,10 +778,10 @@ namespace SingleClin.API.Services
             {
                 var firstPeriod = periodData.First();
                 var lastPeriod = periodData.Last();
-                
+
                 if (firstPeriod.TotalTransactions > 0)
                 {
-                    trend.OverallGrowthRate = ((decimal)lastPeriod.TotalTransactions - firstPeriod.TotalTransactions) 
+                    trend.OverallGrowthRate = ((decimal)lastPeriod.TotalTransactions - firstPeriod.TotalTransactions)
                         / firstPeriod.TotalTransactions * 100;
                 }
 
@@ -839,7 +840,7 @@ namespace SingleClin.API.Services
         }
 
         private async Task<List<ClinicRankingItem>> GetClinicMetrics(
-            ReportRequest request, 
+            ReportRequest request,
             CancellationToken cancellationToken)
         {
             var clinicData = await _context.Clinics
@@ -853,15 +854,15 @@ namespace SingleClin.API.Services
                     Metrics = new ClinicMetrics
                     {
                         TotalTransactions = c.Transactions
-                            .Where(t => t.CreatedAt >= request.StartDate && 
+                            .Where(t => t.CreatedAt >= request.StartDate &&
                                        t.CreatedAt <= request.EndDate)
                             .Count(),
                         CreditsProcessed = c.Transactions
-                            .Where(t => t.CreatedAt >= request.StartDate && 
+                            .Where(t => t.CreatedAt >= request.StartDate &&
                                        t.CreatedAt <= request.EndDate)
                             .Sum(t => t.CreditsUsed),
                         UniquePatients = c.Transactions
-                            .Where(t => t.CreatedAt >= request.StartDate && 
+                            .Where(t => t.CreatedAt >= request.StartDate &&
                                        t.CreatedAt <= request.EndDate)
                             .Select(t => t.UserPlan.UserId)
                             .Distinct()
@@ -875,10 +876,10 @@ namespace SingleClin.API.Services
             foreach (var clinic in clinicData)
             {
                 var metrics = clinic.Metrics;
-                
+
                 metrics.AverageTransactionValue = metrics.TotalTransactions > 0 ?
                     (decimal)metrics.CreditsProcessed / metrics.TotalTransactions : 0;
-                
+
                 metrics.AverageDailyTransactions = metrics.DaysActive > 0 ?
                     (decimal)metrics.TotalTransactions / metrics.DaysActive : 0;
 
@@ -901,7 +902,7 @@ namespace SingleClin.API.Services
                 ["dailyAvg"] = 0.15m
             };
 
-            var score = 
+            var score =
                 (metrics.TotalTransactions * weights["transactions"]) +
                 (metrics.CreditsProcessed * weights["credits"] / 100) + // Normalize by dividing by 100
                 (metrics.UniquePatients * weights["patients"]) +
@@ -1022,7 +1023,7 @@ namespace SingleClin.API.Services
         }
 
         private async Task<List<ServiceUsageItem>> GetTopServicesAsync(
-            IQueryable<Transaction> query, 
+            IQueryable<Transaction> query,
             CancellationToken cancellationToken)
         {
             var totalTransactions = await query.CountAsync(cancellationToken);
@@ -1064,7 +1065,7 @@ namespace SingleClin.API.Services
         }
 
         private async Task<ServiceDistribution> GetServiceDistributionAsync(
-            IQueryable<Transaction> query, 
+            IQueryable<Transaction> query,
             CancellationToken cancellationToken)
         {
             var services = await query
@@ -1110,7 +1111,7 @@ namespace SingleClin.API.Services
         }
 
         private async Task<List<ServiceTrend>> GetServiceTrendsAsync(
-            IQueryable<Transaction> query, 
+            IQueryable<Transaction> query,
             ReportRequest request,
             CancellationToken cancellationToken)
         {
@@ -1128,7 +1129,7 @@ namespace SingleClin.API.Services
             foreach (var service in topServices)
             {
                 var trendData = await GetServiceTrendData(query, service!, request, cancellationToken);
-                
+
                 // Calculate trend direction
                 var trendDirection = "stable";
                 var projectedGrowth = 0m;
@@ -1137,7 +1138,7 @@ namespace SingleClin.API.Services
                 {
                     var firstHalf = trendData.Take(trendData.Count / 2).Average(t => t.Count);
                     var secondHalf = trendData.Skip(trendData.Count / 2).Average(t => t.Count);
-                    
+
                     if (secondHalf > firstHalf * 1.1)
                         trendDirection = "up";
                     else if (secondHalf < firstHalf * 0.9)
@@ -1189,8 +1190,8 @@ namespace SingleClin.API.Services
 
                 case ReportPeriod.Weekly:
                     var weeklyData = await serviceQuery
-                        .GroupBy(t => new 
-                        { 
+                        .GroupBy(t => new
+                        {
                             Year = t.CreatedAt.Year,
                             Week = ((t.CreatedAt.DayOfYear - ((int)t.CreatedAt.DayOfWeek + 6) % 7 + 9) / 7)
                         })
@@ -1227,7 +1228,7 @@ namespace SingleClin.API.Services
         }
 
         private ServiceInsights GenerateServiceInsights(
-            List<ServiceUsageItem> topServices, 
+            List<ServiceUsageItem> topServices,
             List<ServiceTrend> trends,
             ServiceDistribution distribution)
         {
@@ -1321,13 +1322,13 @@ namespace SingleClin.API.Services
                     .Where(up => up.CreatedAt <= request.EndDate);
 
                 var activeUserPlans = userPlans
-                    .Where(up => up.Transactions.Any(t => 
-                        t.CreatedAt >= request.StartDate && 
+                    .Where(up => up.Transactions.Any(t =>
+                        t.CreatedAt >= request.StartDate &&
                         t.CreatedAt <= request.EndDate));
 
                 var transactions = userPlans
                     .SelectMany(up => up.Transactions)
-                    .Where(t => t.CreatedAt >= request.StartDate && 
+                    .Where(t => t.CreatedAt >= request.StartDate &&
                                t.CreatedAt <= request.EndDate);
 
                 var totalCreditsUsed = transactions.Sum(t => t.CreditsUsed);
@@ -1363,7 +1364,7 @@ namespace SingleClin.API.Services
                     TotalCreditsUsed = totalCreditsUsed,
                     TotalCreditsExpired = totalCreditsExpired,
                     TotalCreditsAvailable = totalCreditsAvailable,
-                    AverageCreditsPerUser = activeUserPlans.Any() ? 
+                    AverageCreditsPerUser = activeUserPlans.Any() ?
                         (decimal)totalCreditsUsed / activeUserPlans.Count() : 0,
                     AverageTimeBetweenUses = avgTimeBetweenUses
                 };
@@ -1391,23 +1392,23 @@ namespace SingleClin.API.Services
             var efficiency = new PlanEfficiency();
 
             // Credit efficiency (used vs expired)
-            var totalCreditsIssued = usage.TotalCreditsUsed + usage.TotalCreditsExpired + 
+            var totalCreditsIssued = usage.TotalCreditsUsed + usage.TotalCreditsExpired +
                                    userPlans.Where(up => up.ExpiresAt > DateTime.UtcNow).Sum(up => up.CreditsRemaining);
-            
-            efficiency.CreditEfficiency = totalCreditsIssued > 0 ? 
+
+            efficiency.CreditEfficiency = totalCreditsIssued > 0 ?
                 (decimal)usage.TotalCreditsUsed / totalCreditsIssued * 100 : 0;
 
             // Value per credit
-            efficiency.ValuePerCredit = usage.TotalCreditsUsed > 0 ? 
+            efficiency.ValuePerCredit = usage.TotalCreditsUsed > 0 ?
                 plan.Price / usage.TotalCreditsUsed : 0;
 
             // Churn rate (simplified - users who didn't renew)
             var expiredUserPlans = userPlans.Where(up => up.ExpiresAt < DateTime.UtcNow).ToList();
             if (expiredUserPlans.Any())
             {
-                var renewedCount = expiredUserPlans.Count(up => 
+                var renewedCount = expiredUserPlans.Count(up =>
                     userPlans.Any(up2 => up2.UserId == up.UserId && up2.CreatedAt > up.ExpiresAt));
-                
+
                 efficiency.RenewalRate = (decimal)renewedCount / expiredUserPlans.Count * 100;
                 efficiency.ChurnRate = 100 - efficiency.RenewalRate;
             }
@@ -1422,7 +1423,7 @@ namespace SingleClin.API.Services
                 var totalDays = fullyUtilizedPlans
                     .Select(up => (up.UpdatedAt - up.CreatedAt).TotalDays)
                     .Average();
-                
+
                 efficiency.AverageDaysToFullUtilization = (int)totalDays;
             }
 
@@ -1467,7 +1468,7 @@ namespace SingleClin.API.Services
             // Overall utilization rate
             var totalCreditsUsed = planData.Sum(p => p.Usage.TotalCreditsUsed);
             var totalCreditsAvailable = planData.Sum(p => p.Usage.TotalCreditsAvailable);
-            summary.OverallUtilizationRate = totalCreditsAvailable > 0 ? 
+            summary.OverallUtilizationRate = totalCreditsAvailable > 0 ?
                 (decimal)totalCreditsUsed / totalCreditsAvailable * 100 : 0;
 
             // Average utilization per plan
@@ -1480,9 +1481,9 @@ namespace SingleClin.API.Services
 
             // Waste metrics
             summary.TotalCreditsWasted = planData.Sum(p => p.Usage.TotalCreditsExpired);
-            var totalCreditsIssued = totalCreditsUsed + summary.TotalCreditsWasted + 
+            var totalCreditsIssued = totalCreditsUsed + summary.TotalCreditsWasted +
                                    planData.Sum(p => p.Usage.TotalCreditsAvailable - p.Usage.TotalCreditsUsed);
-            summary.WastePercentage = totalCreditsIssued > 0 ? 
+            summary.WastePercentage = totalCreditsIssued > 0 ?
                 summary.TotalCreditsWasted / totalCreditsIssued * 100 : 0;
 
             // Utilization by plan type
@@ -1512,10 +1513,10 @@ namespace SingleClin.API.Services
             }
 
             // Pattern 2: Early depletion
-            var earlyDepletionPlans = planData.Where(p => 
-                p.Efficiency.AverageDaysToFullUtilization > 0 && 
+            var earlyDepletionPlans = planData.Where(p =>
+                p.Efficiency.AverageDaysToFullUtilization > 0 &&
                 p.Efficiency.AverageDaysToFullUtilization < 20).ToList();
-            
+
             if (earlyDepletionPlans.Any())
             {
                 patterns.Add(new UtilizationPattern
@@ -1529,9 +1530,9 @@ namespace SingleClin.API.Services
             }
 
             // Pattern 3: Inactive users
-            var inactivePlans = planData.Where(p => 
+            var inactivePlans = planData.Where(p =>
                 p.Usage.ActivationRate < 0.7m && p.Usage.TotalUsers > 10).ToList();
-            
+
             if (inactivePlans.Any())
             {
                 patterns.Add(new UtilizationPattern
@@ -1575,8 +1576,8 @@ namespace SingleClin.API.Services
             var efficientPlans = planData
                 .Where(p => p.Efficiency.RenewalRate > 70 && p.Efficiency.ChurnRate < 20)
                 .ToList();
-            
-            metrics.OptimalUtilizationThreshold = efficientPlans.Any() ? 
+
+            metrics.OptimalUtilizationThreshold = efficientPlans.Any() ?
                 efficientPlans.Average(p => p.Usage.UtilizationRate * 100) : 75m;
 
             // Underutilized plans
@@ -1587,14 +1588,14 @@ namespace SingleClin.API.Services
 
             // Overutilized plans
             metrics.OverutilizedPlans = planData
-                .Where(p => p.Efficiency.AverageDaysToFullUtilization > 0 && 
+                .Where(p => p.Efficiency.AverageDaysToFullUtilization > 0 &&
                            p.Efficiency.AverageDaysToFullUtilization < 15)
                 .Select(p => p.PlanName)
                 .ToList();
 
             // Efficiency trends (simplified - comparing to previous metrics if available)
             metrics.EfficiencyTrends = planData
-                .ToDictionary(p => p.PlanName, p => 
+                .ToDictionary(p => p.PlanName, p =>
                     p.Efficiency.CreditEfficiency > metrics.AverageCreditEfficiency ? 1m : -1m);
 
             return metrics;

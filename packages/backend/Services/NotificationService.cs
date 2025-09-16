@@ -45,19 +45,19 @@ namespace SingleClin.API.Services
 
                 // Get user preferences to determine if they want low balance notifications
                 var userPreferences = await _preferencesService.GetOrCreateUserPreferencesAsync(userId, cancellationToken);
-                
+
                 // Check if user's threshold allows for notification at this balance level
                 if (currentBalance > userPreferences.LowBalanceThreshold)
                 {
-                    _logger.LogInformation("User {UserId} threshold is {Threshold}, current balance {Balance} doesn't qualify for notification", 
+                    _logger.LogInformation("User {UserId} threshold is {Threshold}, current balance {Balance} doesn't qualify for notification",
                         userId, userPreferences.LowBalanceThreshold, currentBalance);
                     return NotificationResponse.Failed("Balance above user threshold", NotificationChannel.Push);
                 }
 
                 // Check if user was recently notified for this balance threshold
                 var recentNotification = await _notificationRepository.HasRecentNotificationAsync(
-                    userId, 
-                    $"LowBalance_{currentBalance}", 
+                    userId,
+                    $"LowBalance_{currentBalance}",
                     60, // 1 hour threshold
                     cancellationToken);
 
@@ -84,7 +84,7 @@ namespace SingleClin.API.Services
 
                 // Determine the best channel for notification
                 var channel = await DetermineOptimalChannelAsync(userId, NotificationType.LowBalance, cancellationToken);
-                
+
                 NotificationResponse response;
 
                 // Send via email using template
@@ -155,7 +155,7 @@ namespace SingleClin.API.Services
                         Type = NotificationType.LowBalance,
                         Priority = currentBalance <= 1 ? 3 : 2
                     };
-                    
+
                     var specificLog = NotificationLog.FromRequest(logRequest, userId, response);
                     specificLog.Type = $"LowBalance_{currentBalance}"; // Override type for specific threshold tracking
                     await _notificationRepository.AddNotificationLogAsync(specificLog, cancellationToken);
@@ -177,7 +177,7 @@ namespace SingleClin.API.Services
                 _logger.LogInformation("Sending email notification to user {UserId}", userId);
 
                 var response = await _emailProvider.SendAsync(request, cancellationToken);
-                
+
                 // Log the notification
                 var log = NotificationLog.FromRequest(request, userId, response);
                 await _notificationRepository.AddNotificationLogAsync(log, cancellationToken);
@@ -205,7 +205,7 @@ namespace SingleClin.API.Services
                 }
 
                 var response = await _pushProvider.SendAsync(request, cancellationToken);
-                
+
                 // Log the notification
                 var log = NotificationLog.FromRequest(request, userId, response);
                 await _notificationRepository.AddNotificationLogAsync(log, cancellationToken);
@@ -322,7 +322,7 @@ namespace SingleClin.API.Services
                 _logger.LogInformation("Starting retry of failed notifications");
 
                 var failedNotifications = await _notificationRepository.GetFailedNotificationsAsync(maxRetries, DateTime.UtcNow.AddHours(-24), cancellationToken);
-                
+
                 if (!failedNotifications.Any())
                 {
                     _logger.LogInformation("No failed notifications to retry");
@@ -330,7 +330,7 @@ namespace SingleClin.API.Services
                 }
 
                 var successCount = 0;
-                
+
                 foreach (var failedLog in failedNotifications)
                 {
                     try
@@ -347,13 +347,13 @@ namespace SingleClin.API.Services
 
                         // Retry the notification
                         var retryResponse = await SendNotificationAsync(failedLog.UserId, request, cancellationToken);
-                        
+
                         // Update retry count
                         var newRetryCount = (failedLog.RetryCount ?? 0) + 1;
                         await _notificationRepository.UpdateRetryCountAsync(
-                            failedLog.Id, 
-                            newRetryCount, 
-                            retryResponse.Success ? null : retryResponse.Error, 
+                            failedLog.Id,
+                            newRetryCount,
+                            retryResponse.Success ? null : retryResponse.Error,
                             cancellationToken);
 
                         if (retryResponse.Success)
@@ -416,7 +416,7 @@ namespace SingleClin.API.Services
             {
                 // Get user preferences to determine preferred channel
                 var userPreferences = await _preferencesService.GetOrCreateUserPreferencesAsync(userId, cancellationToken);
-                
+
                 switch (type)
                 {
                     case NotificationType.LowBalance:
@@ -435,7 +435,7 @@ namespace SingleClin.API.Services
                             return NotificationChannel.Email;
                         }
                         break;
-                    
+
                     case NotificationType.Payment:
                         // For payments, prefer email for record-keeping but respect user preferences
                         if (userPreferences.EnablePayment)
@@ -450,7 +450,7 @@ namespace SingleClin.API.Services
                             }
                         }
                         break;
-                    
+
                     case NotificationType.General:
                     default:
                         // For general notifications, check user preferences
@@ -483,7 +483,7 @@ namespace SingleClin.API.Services
     public class NotificationOptions
     {
         public const string SectionName = "Notifications";
-        
+
         public bool EnablePush { get; set; } = true;
         public bool EnableEmail { get; set; } = true;
         public int DefaultRetryAttempts { get; set; } = 3;

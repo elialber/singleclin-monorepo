@@ -68,8 +68,8 @@ public class PlanResponseDto
     /// <summary>
     /// Calculated discount percentage (if OriginalPrice is set)
     /// </summary>
-    public decimal? DiscountPercentage => OriginalPrice.HasValue && OriginalPrice > Price && OriginalPrice > 0 
-        ? Math.Round(((OriginalPrice.Value - Price) / OriginalPrice.Value) * 100, 2) 
+    public decimal? DiscountPercentage => OriginalPrice.HasValue && OriginalPrice > Price && OriginalPrice > 0
+        ? Math.Round(((OriginalPrice.Value - Price) / OriginalPrice.Value) * 100, 2)
         : null;
 
     /// <summary>

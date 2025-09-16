@@ -23,8 +23,8 @@ namespace SingleClin.API.Services
         }
 
         public async Task<RenderedEmailTemplate> RenderLowBalanceNotificationAsync(
-            LowBalanceTemplateData templateData, 
-            bool includeHtml = true, 
+            LowBalanceTemplateData templateData,
+            bool includeHtml = true,
             CancellationToken cancellationToken = default)
         {
             try
@@ -32,7 +32,7 @@ namespace SingleClin.API.Services
                 _logger.LogInformation("Rendering low balance notification template for user {UserId}", templateData.UserId);
 
                 const string templateName = "LowBalanceNotification";
-                
+
                 // Generate subject
                 var subject = GenerateLowBalanceSubject(templateData);
 
@@ -65,9 +65,9 @@ namespace SingleClin.API.Services
         }
 
         public async Task<RenderedEmailTemplate> RenderTemplateAsync(
-            string templateName, 
-            object templateData, 
-            bool includeHtml = true, 
+            string templateName,
+            object templateData,
+            bool includeHtml = true,
             CancellationToken cancellationToken = default)
         {
             try
@@ -110,14 +110,14 @@ namespace SingleClin.API.Services
             try
             {
                 var filePath = Path.Combine(_templatesPath, $"{templateName}.html");
-                
+
                 if (!File.Exists(filePath))
                 {
                     throw new FileNotFoundException($"HTML template file not found: {filePath}");
                 }
 
                 var content = await File.ReadAllTextAsync(filePath, cancellationToken);
-                
+
                 _logger.LogDebug("Loaded HTML template {TemplateName} from {FilePath}", templateName, filePath);
                 return content;
             }
@@ -133,14 +133,14 @@ namespace SingleClin.API.Services
             try
             {
                 var filePath = Path.Combine(_templatesPath, $"{templateName}.txt");
-                
+
                 if (!File.Exists(filePath))
                 {
                     throw new FileNotFoundException($"Text template file not found: {filePath}");
                 }
 
                 var content = await File.ReadAllTextAsync(filePath, cancellationToken);
-                
+
                 _logger.LogDebug("Loaded text template {TemplateName} from {FilePath}", templateName, filePath);
                 return content;
             }
@@ -163,7 +163,7 @@ namespace SingleClin.API.Services
             {
                 // Convert object to dictionary for easier processing
                 var properties = GetObjectProperties(data);
-                
+
                 // Replace simple variables {{variableName}}
                 var result = Regex.Replace(template, @"\{\{(\w+)\}\}", match =>
                 {
@@ -172,7 +172,7 @@ namespace SingleClin.API.Services
                     {
                         return value?.ToString() ?? string.Empty;
                     }
-                    
+
                     _logger.LogWarning("Template variable {PropertyName} not found in data", propertyName);
                     return match.Value; // Keep original if not found
                 });
@@ -199,12 +199,12 @@ namespace SingleClin.API.Services
         {
             // Handle {{#condition}}content{{/condition}} blocks
             var conditionalPattern = @"\{\{#(\w+)\}\}(.*?)\{\{/\1\}\}";
-            
+
             return Regex.Replace(template, conditionalPattern, match =>
             {
                 var conditionName = match.Groups[1].Value;
                 var content = match.Groups[2].Value;
-                
+
                 if (properties.TryGetValue(conditionName, out var value))
                 {
                     // Check if condition is true
@@ -221,10 +221,10 @@ namespace SingleClin.API.Services
                     {
                         isTrue = true;
                     }
-                    
+
                     return isTrue ? content : string.Empty;
                 }
-                
+
                 return string.Empty;
             }, RegexOptions.Singleline);
         }
@@ -237,13 +237,13 @@ namespace SingleClin.API.Services
         private Dictionary<string, object?> GetObjectProperties(object obj)
         {
             var properties = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
-            
+
             if (obj == null)
                 return properties;
 
             var type = obj.GetType();
             var propertyInfos = type.GetProperties();
-            
+
             foreach (var propertyInfo in propertyInfos)
             {
                 try
@@ -256,7 +256,7 @@ namespace SingleClin.API.Services
                     _logger.LogWarning(ex, "Error getting property {PropertyName} from object", propertyInfo.Name);
                 }
             }
-            
+
             return properties;
         }
 

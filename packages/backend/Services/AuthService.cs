@@ -83,7 +83,7 @@ public class AuthService : IAuthService
 
                 _context.Clinics.Add(clinic);
                 await _context.SaveChangesAsync(); // Save to get the clinic ID
-                
+
                 user.ClinicId = clinic.Id;
             }
 
@@ -100,7 +100,7 @@ public class AuthService : IAuthService
             _logger.LogInformation("=== FIREBASE USER CREATION START ===");
             _logger.LogInformation("Firebase IsConfigured: {IsConfigured}", _firebaseAuthService.IsConfigured);
             _logger.LogInformation("Email: {Email}, FullName: {FullName}", registerDto.Email, registerDto.FullName);
-            
+
             if (_firebaseAuthService.IsConfigured)
             {
                 _logger.LogInformation("Firebase is configured. Attempting to create user...");
@@ -118,7 +118,7 @@ public class AuthService : IAuthService
                         // Update user with Firebase UID
                         user.FirebaseUid = firebaseUser.Uid;
                         await _userManager.UpdateAsync(user);
-                        _logger.LogInformation("✅ SUCCESS: Created user in Firebase - Email: {Email}, UID: {FirebaseUid}", 
+                        _logger.LogInformation("✅ SUCCESS: Created user in Firebase - Email: {Email}, UID: {FirebaseUid}",
                             registerDto.Email, firebaseUser.Uid);
                     }
                     else
@@ -139,7 +139,7 @@ public class AuthService : IAuthService
 
             // Add role claim
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", user.Role.ToString()));
-            
+
             // Add clinic claim if applicable
             if (user.ClinicId.HasValue)
             {
@@ -353,7 +353,7 @@ public class AuthService : IAuthService
             var email = firebaseToken.Claims.TryGetValue("email", out var emailClaim) ? emailClaim?.ToString() : null;
             var firebaseUid = firebaseToken.Uid;
             var displayName = firebaseToken.Claims.TryGetValue("name", out var nameClaim) ? nameClaim?.ToString() : socialLoginDto.FullName;
-            var emailVerified = firebaseToken.Claims.TryGetValue("email_verified", out var verifiedClaim) && 
+            var emailVerified = firebaseToken.Claims.TryGetValue("email_verified", out var verifiedClaim) &&
                               verifiedClaim?.ToString()?.ToLower() == "true";
 
             if (string.IsNullOrEmpty(email))
@@ -371,13 +371,13 @@ public class AuthService : IAuthService
                 // User exists - update last login
                 user = existingUser;
                 user.LastLoginAt = DateTime.UtcNow;
-                
+
                 // Update email confirmed status if verified by social provider
                 if (emailVerified && !user.EmailConfirmed)
                 {
                     user.EmailConfirmed = true;
                 }
-                
+
                 await _userManager.UpdateAsync(user);
             }
             else
@@ -407,25 +407,25 @@ public class AuthService : IAuthService
 
                 // Add role claim
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", user.Role.ToString()));
-                
+
                 // Add external login info
                 var loginInfo = new Microsoft.AspNetCore.Identity.ExternalLoginInfo(
                     new System.Security.Claims.ClaimsPrincipal(),
                     socialLoginDto.Provider.ToLower(),
                     firebaseUid,
                     socialLoginDto.Provider);
-                    
+
                 await _userManager.AddLoginAsync(user, loginInfo);
             }
 
             // Generate tokens
             var accessToken = _jwtService.GenerateAccessToken(user);
             var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(
-                user.Id, 
-                ipAddress, 
+                user.Id,
+                ipAddress,
                 socialLoginDto.DeviceInfo);
 
-            _logger.LogInformation("Social login successful for user: {UserId}, Provider: {Provider}, IsNew: {IsNew}", 
+            _logger.LogInformation("Social login successful for user: {UserId}, Provider: {Provider}, IsNew: {IsNew}",
                 user.Id, socialLoginDto.Provider, isNewUser);
 
             return (true, new AuthResponseDto
@@ -477,7 +477,7 @@ public class AuthService : IAuthService
             if ((user.Role == Data.Enums.UserRole.ClinicOrigin || user.Role == Data.Enums.UserRole.ClinicPartner) && user.ClinicId.HasValue)
             {
                 claims["clinicId"] = user.ClinicId.Value.ToString();
-                
+
                 if (user.Clinic != null)
                 {
                     claims["clinicName"] = user.Clinic.Name;
@@ -609,7 +609,7 @@ public class AuthService : IAuthService
             {
                 // Get additional user info from Firebase if creating new user
                 var firebaseUser = await _firebaseAuthService.GetUserAsync(firebaseToken.Uid);
-                
+
                 // Create new user from Firebase data
                 isNewUser = true;
                 user = new ApplicationUser
@@ -645,7 +645,7 @@ public class AuthService : IAuthService
                 {
                     user.FirebaseUid = firebaseToken.Uid;
                 }
-                
+
                 // Get additional info from Firebase if needed
                 if (!user.EmailConfirmed)
                 {
@@ -655,7 +655,7 @@ public class AuthService : IAuthService
                         user.EmailConfirmed = true;
                     }
                 }
-                
+
                 await _userManager.UpdateAsync(user);
             }
 
@@ -670,11 +670,11 @@ public class AuthService : IAuthService
             var accessToken = _jwtService.GenerateAccessToken(user);
             var refreshToken = _jwtService.GenerateRefreshToken();
             var expiresIn = Convert.ToInt32(_configuration["JWT:AccessTokenExpiresInMinutes"] ?? "60") * 60; // Convert to seconds
-            
+
             // Create and store refresh token
             var refreshTokenEntity = await _refreshTokenService.CreateRefreshTokenAsync(
-                user.Id, 
-                ipAddress, 
+                user.Id,
+                ipAddress,
                 firebaseLoginDto.DeviceInfo,
                 Convert.ToInt32(_configuration["JWT:RefreshTokenExpiresInDays"] ?? "7")
             );

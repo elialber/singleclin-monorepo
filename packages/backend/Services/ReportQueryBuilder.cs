@@ -66,16 +66,16 @@ namespace SingleClin.API.Services
         {
             var parameter = Expression.Parameter(typeof(T), "x");
             var member = Expression.Invoke(dateSelector, parameter);
-            
+
             var startConstant = Expression.Constant(startDate, typeof(TDate));
             var endConstant = Expression.Constant(endDate, typeof(TDate));
-            
+
             var startComparison = Expression.GreaterThanOrEqual(member, startConstant);
             var endComparison = Expression.LessThanOrEqual(member, endConstant);
-            
+
             var combined = Expression.AndAlso(startComparison, endComparison);
             var lambda = Expression.Lambda<Func<T, bool>>(combined, parameter);
-            
+
             _filters.Add(lambda);
             return this;
         }

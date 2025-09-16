@@ -62,7 +62,7 @@ public class UserController : BaseController
             // Check if user can access this user's data
             var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
             var isAdmin = User.IsInRole("Administrator");
-            
+
             if (!await _userService.CanAccessUserAsync(id, currentUserId, isAdmin))
             {
                 return Forbid();
@@ -96,7 +96,7 @@ public class UserController : BaseController
             {
                 var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
                 var isAdmin = User.IsInRole("Administrator");
-                
+
                 if (!await _userService.CanAccessClinicAsync(dto.ClinicId.Value, currentUserId, isAdmin))
                 {
                     return Forbid();
@@ -104,19 +104,19 @@ public class UserController : BaseController
             }
 
             var result = await _userService.CreateUserAsync(dto);
-            
+
             if (!result.Success)
             {
-                return BadRequest(new 
-                { 
-                    message = "Failed to create user", 
-                    errors = result.Errors 
+                return BadRequest(new
+                {
+                    message = "Failed to create user",
+                    errors = result.Errors
                 });
             }
 
             return CreatedAtAction(
-                nameof(GetUser), 
-                new { id = result.User!.Id }, 
+                nameof(GetUser),
+                new { id = result.User!.Id },
                 new ResponseWrapper<UserResponseDto>
                 {
                     Data = result.User,
@@ -136,14 +136,14 @@ public class UserController : BaseController
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrator,ClinicOrigin,ClinicPartner")]
     public async Task<ActionResult<ResponseWrapper<UserResponseDto>>> UpdateUser(
-        Guid id, 
+        Guid id,
         [FromBody] UpdateUserDto dto)
     {
         try
         {
             var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
             var isAdmin = User.IsInRole("Administrator");
-            
+
             if (!await _userService.CanAccessUserAsync(id, currentUserId, isAdmin))
             {
                 return Forbid();
@@ -162,18 +162,18 @@ public class UserController : BaseController
             }
 
             var result = await _userService.UpdateUserAsync(id, dto);
-            
+
             if (!result.Success)
             {
                 if (result.Errors.Any(e => e.Contains("not found", StringComparison.OrdinalIgnoreCase)))
                 {
                     return NotFound(new { message = "User not found" });
                 }
-                
-                return BadRequest(new 
-                { 
-                    message = "Failed to update user", 
-                    errors = result.Errors 
+
+                return BadRequest(new
+                {
+                    message = "Failed to update user",
+                    errors = result.Errors
                 });
             }
 
@@ -200,18 +200,18 @@ public class UserController : BaseController
         try
         {
             var result = await _userService.DeleteUserAsync(id);
-            
+
             if (!result.Success)
             {
                 if (result.Errors.Any(e => e.Contains("not found", StringComparison.OrdinalIgnoreCase)))
                 {
                     return NotFound(new { message = "User not found" });
                 }
-                
-                return BadRequest(new 
-                { 
-                    message = "Failed to delete user", 
-                    errors = result.Errors 
+
+                return BadRequest(new
+                {
+                    message = "Failed to delete user",
+                    errors = result.Errors
                 });
             }
 
@@ -235,21 +235,21 @@ public class UserController : BaseController
         {
             var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
             var isAdmin = User.IsInRole("Administrator");
-            
+
             if (!await _userService.CanAccessUserAsync(id, currentUserId, isAdmin))
             {
                 return Forbid();
             }
 
             var result = await _userService.SendPasswordResetEmailAsync(id);
-            
+
             if (!result.Success)
             {
                 if (result.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
                 {
                     return NotFound(new { message = result.Message });
                 }
-                
+
                 return BadRequest(new { message = result.Message });
             }
 
@@ -268,32 +268,32 @@ public class UserController : BaseController
     [HttpPatch("{id}/status")]
     [Authorize(Roles = "Administrator,ClinicOrigin")]
     public async Task<ActionResult<ResponseWrapper<UserResponseDto>>> ToggleStatus(
-        Guid id, 
+        Guid id,
         [FromBody] ToggleStatusDto dto)
     {
         try
         {
             var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
             var isAdmin = User.IsInRole("Administrator");
-            
+
             if (!await _userService.CanAccessUserAsync(id, currentUserId, isAdmin))
             {
                 return Forbid();
             }
 
             var result = await _userService.ToggleUserStatusAsync(id, dto.IsActive);
-            
+
             if (!result.Success)
             {
                 if (result.Errors.Any(e => e.Contains("not found", StringComparison.OrdinalIgnoreCase)))
                 {
                     return NotFound(new { message = "User not found" });
                 }
-                
-                return BadRequest(new 
-                { 
-                    message = "Failed to update user status", 
-                    errors = result.Errors 
+
+                return BadRequest(new
+                {
+                    message = "Failed to update user status",
+                    errors = result.Errors
                 });
             }
 
@@ -323,7 +323,7 @@ public class UserController : BaseController
         {
             var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
             var isAdmin = User.IsInRole("Administrator");
-            
+
             // Users can only purchase plans for themselves, admins can purchase for anyone
             if (!isAdmin && currentUserId != id)
             {
@@ -331,7 +331,7 @@ public class UserController : BaseController
             }
 
             var result = await _userService.PurchasePlanAsync(id, purchaseDto);
-            
+
             if (!result.Success)
             {
                 return BadRequest(new ResponseWrapper<UserPlanResponseDto>
@@ -367,7 +367,7 @@ public class UserController : BaseController
         {
             var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
             var isAdmin = User.IsInRole("Administrator");
-            
+
             // Users can only view their own plans, admins can view anyone's
             if (!isAdmin && currentUserId != id)
             {
@@ -375,7 +375,7 @@ public class UserController : BaseController
             }
 
             var userPlans = await _userService.GetUserPlansAsync(id);
-            
+
             return Ok(new ResponseWrapper<IEnumerable<UserPlanResponseDto>>
             {
                 Data = userPlans,
@@ -401,7 +401,7 @@ public class UserController : BaseController
         {
             var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
             var isAdmin = User.IsInRole("Administrator");
-            
+
             // Users can only view their own plans, admins can view anyone's
             if (!isAdmin && currentUserId != id)
             {
@@ -409,7 +409,7 @@ public class UserController : BaseController
             }
 
             var userPlan = await _userService.GetUserPlanAsync(id, planId);
-            
+
             if (userPlan == null)
             {
                 return NotFound(new ResponseWrapper<UserPlanResponseDto>
@@ -442,7 +442,7 @@ public class UserController : BaseController
         try
         {
             _logger.LogInformation("Getting credits for user: {UserId}", id);
-            
+
             // For Firebase UIDs (like ATp3HykPuYMosiLapAKP6QEsB622), return mock credits for now
             // In production, this would need to map Firebase UID to internal User ID
             if (!Guid.TryParse(id, out var userId))
@@ -451,12 +451,12 @@ public class UserController : BaseController
                 // Return mock credits for Firebase users
                 return Ok(new { credits = 100 });
             }
-            
+
             var userPlans = await _userService.GetUserPlansAsync(userId);
             var totalCredits = userPlans.Sum(up => up.CreditsRemaining);
-            
+
             _logger.LogInformation("Found {TotalCredits} credits for user {UserId}", totalCredits, id);
-            
+
             return Ok(new { credits = totalCredits });
         }
         catch (Exception ex)
@@ -475,12 +475,12 @@ public class UserController : BaseController
     {
         try
         {
-            _logger.LogInformation("Consuming {Amount} credits for user {UserId} for service {ServiceId}", 
+            _logger.LogInformation("Consuming {Amount} credits for user {UserId} for service {ServiceId}",
                 request.Amount, id, request.ServiceId);
-            
+
             // For now, just return success - this would need proper implementation
             // with transaction creation and credit deduction
-            
+
             return Ok(new { success = true, message = "Credits consumed successfully" });
         }
         catch (Exception ex)
@@ -500,18 +500,18 @@ public class UserController : BaseController
         try
         {
             var result = await _userService.CancelUserPlanAsync(id, userPlanId, request?.Reason);
-            
+
             if (!result.Success)
             {
                 if (result.Errors.Any(e => e.Contains("not found")))
                 {
                     return NotFound(new { message = "User plan not found" });
                 }
-                
-                return BadRequest(new 
-                { 
-                    message = "Failed to cancel user plan", 
-                    errors = result.Errors 
+
+                return BadRequest(new
+                {
+                    message = "Failed to cancel user plan",
+                    errors = result.Errors
                 });
             }
 
@@ -549,7 +549,7 @@ public class ConsumeCreditsRequest
     /// ID of the service being booked
     /// </summary>
     public string ServiceId { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Amount of credits to consume
     /// </summary>

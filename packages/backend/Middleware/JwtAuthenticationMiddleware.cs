@@ -70,7 +70,7 @@ public class JwtAuthenticationMiddleware
             // If not a Firebase token, try to validate as our internal JWT
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"] ?? "");
-            
+
             tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
@@ -84,7 +84,7 @@ public class JwtAuthenticationMiddleware
 
             var jwtToken = (JwtSecurityToken)validatedToken;
             var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
-            
+
             if (userIdClaim == null)
             {
                 _logger.LogWarning("JWT token does not contain NameIdentifier claim");

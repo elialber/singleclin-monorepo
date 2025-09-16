@@ -17,14 +17,14 @@ namespace SingleClin.API.Services
         public NotificationChannel Channel => NotificationChannel.Email;
 
         public SendGridProvider(
-            IOptions<SendGridOptions> options, 
+            IOptions<SendGridOptions> options,
             ILogger<SendGridProvider> logger,
             IEmailTemplateService templateService)
         {
             _options = options.Value;
             _logger = logger;
             _templateService = templateService;
-            
+
             if (string.IsNullOrEmpty(_options.ApiKey))
             {
                 _logger.LogWarning("SendGrid API key not configured. Email provider will not be functional.");
@@ -41,7 +41,7 @@ namespace SingleClin.API.Services
             if (request is not EmailNotificationRequest emailRequest)
             {
                 return NotificationResponse.Failed(
-                    "Invalid request type for email notification", 
+                    "Invalid request type for email notification",
                     Channel
                 );
             }
@@ -60,8 +60,8 @@ namespace SingleClin.API.Services
                 }
 
                 var message = BuildEmailMessage(request);
-                
-                _logger.LogInformation("Sending email to: {Email}, Subject: {Subject}", 
+
+                _logger.LogInformation("Sending email to: {Email}, Subject: {Subject}",
                     request.Email, request.Subject);
 
                 var response = await _sendGridClient.SendEmailAsync(message, cancellationToken);
@@ -84,7 +84,7 @@ namespace SingleClin.API.Services
                 else
                 {
                     var errorBody = await response.Body.ReadAsStringAsync();
-                    _logger.LogError("SendGrid API error. Status: {StatusCode}, Body: {Body}", 
+                    _logger.LogError("SendGrid API error. Status: {StatusCode}, Body: {Body}",
                         response.StatusCode, errorBody);
 
                     var errorMessage = ParseSendGridError(errorBody) ?? $"SendGrid API error: {response.StatusCode}";
@@ -136,8 +136,8 @@ namespace SingleClin.API.Services
 
                 // Render the template
                 var renderedTemplate = await _templateService.RenderLowBalanceNotificationAsync(
-                    templateData, 
-                    includeHtml: true, 
+                    templateData,
+                    includeHtml: true,
                     cancellationToken);
 
                 // Create email request using rendered content
@@ -206,9 +206,9 @@ namespace SingleClin.API.Services
 
                 // Render the template
                 var renderedTemplate = await _templateService.RenderTemplateAsync(
-                    templateName, 
-                    templateData, 
-                    includeHtml: true, 
+                    templateName,
+                    templateData,
+                    includeHtml: true,
                     cancellationToken);
 
                 // Create email request using rendered content
@@ -252,12 +252,12 @@ namespace SingleClin.API.Services
         {
             var from = new EmailAddress(request.FromEmail, request.FromName);
             var to = new EmailAddress(request.Email, request.Recipient);
-            
+
             var message = MailHelper.CreateSingleEmail(
-                from, 
-                to, 
-                request.Subject, 
-                request.PlainTextContent ?? request.Message, 
+                from,
+                to,
+                request.Subject,
+                request.PlainTextContent ?? request.Message,
                 request.HtmlContent
             );
 
@@ -276,17 +276,17 @@ namespace SingleClin.API.Services
             if (request.Data?.Any() == true)
             {
                 message.Headers ??= new Dictionary<string, string>();
-                
+
                 // Add notification type and ID for tracking
                 message.Headers["X-Notification-Type"] = request.Type.ToString();
                 message.Headers["X-Notification-ID"] = Guid.NewGuid().ToString();
-                
+
                 // Add custom data (limit to safe header values)
                 foreach (var item in request.Data.Take(5)) // Limit to 5 custom headers
                 {
                     var headerKey = $"X-Custom-{item.Key}";
                     var headerValue = item.Value?.ToString();
-                    
+
                     if (!string.IsNullOrEmpty(headerValue) && headerValue.Length <= 100)
                     {
                         message.Headers[headerKey] = headerValue;
@@ -318,7 +318,7 @@ namespace SingleClin.API.Services
             if (request.Attachments?.Any() == true)
             {
                 message.Attachments = new List<Attachment>();
-                
+
                 foreach (var attachmentPath in request.Attachments.Take(5)) // Limit to 5 attachments
                 {
                     try
@@ -327,7 +327,7 @@ namespace SingleClin.API.Services
                         {
                             var fileBytes = File.ReadAllBytes(attachmentPath);
                             var fileName = Path.GetFileName(attachmentPath);
-                            
+
                             message.Attachments.Add(new Attachment
                             {
                                 Content = Convert.ToBase64String(fileBytes),
@@ -362,7 +362,7 @@ namespace SingleClin.API.Services
             {
                 // Ignore header parsing errors
             }
-            
+
             return Guid.NewGuid().ToString();
         }
 
@@ -375,7 +375,7 @@ namespace SingleClin.API.Services
 
                 var errorResponse = JsonSerializer.Deserialize<SendGridErrorResponse>(errorBody);
                 var firstError = errorResponse?.Errors?.FirstOrDefault();
-                
+
                 return firstError?.Message ?? "Unknown SendGrid error";
             }
             catch
@@ -387,7 +387,7 @@ namespace SingleClin.API.Services
         private static string GetMimeType(string fileName)
         {
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
-            
+
             return extension switch
             {
                 ".pdf" => "application/pdf",
@@ -408,7 +408,7 @@ namespace SingleClin.API.Services
     public class SendGridOptions
     {
         public const string SectionName = "SendGrid";
-        
+
         public string? ApiKey { get; set; }
         public string DefaultFromEmail { get; set; } = "noreply@singleclin.com";
         public string DefaultFromName { get; set; } = "SingleClin";

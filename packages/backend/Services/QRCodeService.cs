@@ -44,7 +44,7 @@ public class QRCodeService : IQRCodeService
     public async Task<QRCodeResult> GenerateQRCodeAsync(Guid userPlanId, string userId, int size = 300, int expirationMinutes = 30)
     {
         var startTime = DateTime.UtcNow;
-        
+
         try
         {
             _logger.LogInformation("Starting QR Code generation for user plan {UserPlanId}", userPlanId);
@@ -103,11 +103,11 @@ public class QRCodeService : IQRCodeService
             RecordMetrics(true);
 
             var duration = DateTime.UtcNow - startTime;
-            _logger.LogInformation("QR Code generated successfully for user plan {UserPlanId} in {Duration}ms", 
+            _logger.LogInformation("QR Code generated successfully for user plan {UserPlanId} in {Duration}ms",
                 userPlanId, duration.TotalMilliseconds);
 
             // Audit log
-            _logger.LogInformation("AUDIT: QR Code generated - UserPlan: {UserPlanId}, User: {UserId}, Nonce: {Nonce}, ExpiresAt: {ExpiresAt}", 
+            _logger.LogInformation("AUDIT: QR Code generated - UserPlan: {UserPlanId}, User: {UserId}, Nonce: {Nonce}, ExpiresAt: {ExpiresAt}",
                 userPlanId, userId, nonce, result.ExpiresAt);
 
             return result;
@@ -115,7 +115,7 @@ public class QRCodeService : IQRCodeService
         catch (Exception ex)
         {
             RecordMetrics(false);
-            
+
             var errorResult = new QRCodeResult
             {
                 Success = false,
@@ -123,7 +123,7 @@ public class QRCodeService : IQRCodeService
             };
 
             var duration = DateTime.UtcNow - startTime;
-            _logger.LogError(ex, "QR Code generation failed for user plan {UserPlanId} after {Duration}ms", 
+            _logger.LogError(ex, "QR Code generation failed for user plan {UserPlanId} after {Duration}ms",
                 userPlanId, duration.TotalMilliseconds);
 
             return errorResult;
@@ -156,10 +156,10 @@ public class QRCodeService : IQRCodeService
 
             // Check if plan is active and not expired
             var isValid = userPlan.IsActive && !userPlan.IsExpired && userPlan.CreditsRemaining > 0;
-            
+
             if (!isValid)
             {
-                _logger.LogWarning("User plan {UserPlanId} validation failed - Active: {IsActive}, Expired: {IsExpired}, Credits: {Credits}", 
+                _logger.LogWarning("User plan {UserPlanId} validation failed - Active: {IsActive}, Expired: {IsExpired}, Credits: {Credits}",
                     userPlanId, userPlan.IsActive, userPlan.IsExpired, userPlan.CreditsRemaining);
             }
             else

@@ -67,11 +67,11 @@ public class PlanController : ControllerBase
             }
 
             var result = await _planService.GetAllAsync(filter);
-            
+
             _logger.LogInformation(
-                "Retrieved {Count} plans (page {PageNumber} of {TotalPages})", 
-                result.ItemCount, 
-                result.PageNumber, 
+                "Retrieved {Count} plans (page {PageNumber} of {TotalPages})",
+                result.ItemCount,
+                result.PageNumber,
                 result.TotalPages
             );
 
@@ -102,7 +102,7 @@ public class PlanController : ControllerBase
         try
         {
             var result = await _planService.GetActiveAsync();
-            
+
             _logger.LogInformation("Retrieved {Count} active plans", result.Count());
 
             return Ok(result);
@@ -140,7 +140,7 @@ public class PlanController : ControllerBase
         try
         {
             var plan = await _planService.GetByIdAsync(id);
-            
+
             if (plan == null)
             {
                 _logger.LogWarning("Plan not found: {PlanId}", id);
@@ -214,10 +214,10 @@ public class PlanController : ControllerBase
             }
 
             var createdPlan = await _planService.CreateAsync(planRequest);
-            
+
             _logger.LogInformation(
-                "Plan created successfully: {PlanName} (ID: {PlanId}) by user {UserId}", 
-                createdPlan.Name, 
+                "Plan created successfully: {PlanName} (ID: {PlanId}) by user {UserId}",
+                createdPlan.Name,
                 createdPlan.Id,
                 User.Identity?.Name
             );
@@ -279,10 +279,10 @@ public class PlanController : ControllerBase
             }
 
             var updatedPlan = await _planService.UpdateAsync(id, planRequest);
-            
+
             _logger.LogInformation(
-                "Plan updated successfully: {PlanName} (ID: {PlanId}) by user {UserId}", 
-                updatedPlan.Name, 
+                "Plan updated successfully: {PlanName} (ID: {PlanId}) by user {UserId}",
+                updatedPlan.Name,
                 updatedPlan.Id,
                 User.Identity?.Name
             );
@@ -337,7 +337,7 @@ public class PlanController : ControllerBase
         try
         {
             var deleted = await _planService.DeleteAsync(id);
-            
+
             if (!deleted)
             {
                 _logger.LogWarning("Attempted to delete non-existent plan: {PlanId}", id);
@@ -345,7 +345,7 @@ public class PlanController : ControllerBase
             }
 
             _logger.LogInformation(
-                "Plan deleted successfully: ID {PlanId} by user {UserId}", 
+                "Plan deleted successfully: ID {PlanId} by user {UserId}",
                 id,
                 User.Identity?.Name
             );
@@ -380,7 +380,7 @@ public class PlanController : ControllerBase
         try
         {
             var statistics = await _planService.GetStatisticsAsync();
-            
+
             _logger.LogInformation("Retrieved plan statistics: {@Statistics}", statistics);
 
             return Ok(statistics);

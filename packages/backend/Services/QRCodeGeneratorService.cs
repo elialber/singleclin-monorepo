@@ -27,7 +27,7 @@ public class QRCodeGeneratorService : IQRCodeGeneratorService
             var qrCodeBytes = GenerateQRCodeBytes(token, size);
             var base64String = Convert.ToBase64String(qrCodeBytes);
             var dataUrl = $"data:image/png;base64,{base64String}";
-            
+
             _logger.LogDebug("Generated QR Code Data URL with size {Size}px", size);
             return dataUrl;
         }
@@ -77,7 +77,7 @@ public class QRCodeGeneratorService : IQRCodeGeneratorService
             using var qrGenerator = new QRCodeGenerator();
             using var qrCodeData = qrGenerator.CreateQrCode(payloadJson, QRCodeGenerator.ECCLevel.M);
             using var qrCode = new PngByteQRCode(qrCodeData);
-            
+
             // Generate PNG bytes with configuration
             var qrCodeBytes = qrCode.GetGraphic(
                 pixelsPerModule: CalculatePixelsPerModule(size),
@@ -86,7 +86,7 @@ public class QRCodeGeneratorService : IQRCodeGeneratorService
                 drawQuietZones: true
             );
 
-            _logger.LogInformation("Generated QR Code with {Size}px size and {ByteSize} bytes", 
+            _logger.LogInformation("Generated QR Code with {Size}px size and {ByteSize} bytes",
                 size, qrCodeBytes.Length);
 
             return qrCodeBytes;
@@ -108,10 +108,10 @@ public class QRCodeGeneratorService : IQRCodeGeneratorService
         // For our use case (JWT tokens), we'll likely use Version 3-5 (29-41 modules)
         // We'll use a conservative estimate of 33 modules per side
         const int estimatedModules = 33;
-        
+
         // Calculate pixels per module to achieve desired size
         var pixelsPerModule = Math.Max(1, desiredSize / estimatedModules);
-        
+
         // Ensure minimum quality (at least 4 pixels per module for readability)
         return Math.Max(4, pixelsPerModule);
     }

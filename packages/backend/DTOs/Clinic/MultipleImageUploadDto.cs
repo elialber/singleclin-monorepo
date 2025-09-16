@@ -120,7 +120,7 @@ public class MultipleImageUploadResponseDto
     /// Create a partial success response
     /// </summary>
     public static MultipleImageUploadResponseDto CreatePartialSuccess(
-        List<ClinicImageDto> uploadedImages, 
+        List<ClinicImageDto> uploadedImages,
         List<string> errorMessages)
     {
         return new MultipleImageUploadResponseDto

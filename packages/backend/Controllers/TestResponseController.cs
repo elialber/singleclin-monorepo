@@ -162,7 +162,7 @@ public class TestResponseController : BaseController
     [AllowAnonymous]
     public IActionResult TestConflict()
     {
-        return ConflictResponse("A resource with this name already exists", 
+        return ConflictResponse("A resource with this name already exists",
             new List<string> { "Duplicate name detected" });
     }
 }
@@ -178,7 +178,7 @@ public class CreateItemRequest
     /// <example>Test Item 1</example>
     [SwaggerSchema("The name of the item", Nullable = false)]
     public string Name { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Optional description of the item
     /// </summary>

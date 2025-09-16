@@ -81,8 +81,8 @@ namespace SingleClin.API.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ResponseWrapper.ErrorResponse(
-                        "Invalid request parameters", 
-                        400, 
+                        "Invalid request parameters",
+                        400,
                         GetModelStateErrors()));
                 }
 
@@ -96,7 +96,7 @@ namespace SingleClin.API.Controllers
                 // Check permissions for specific report type
                 var userRole = GetUserRole() ?? "Unknown";
                 var availableTypes = await _reportService.GetAvailableReportTypesAsync(userRole);
-                
+
                 if (!availableTypes.Any(rt => rt.Type == request.Type))
                 {
                     return StatusCode(403, ResponseWrapper.ErrorResponse(
@@ -155,8 +155,8 @@ namespace SingleClin.API.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ResponseWrapper.ErrorResponse(
-                        "Invalid request parameters", 
-                        400, 
+                        "Invalid request parameters",
+                        400,
                         GetModelStateErrors()));
                 }
 
@@ -208,8 +208,8 @@ namespace SingleClin.API.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ResponseWrapper.ErrorResponse(
-                        "Invalid request parameters", 
-                        400, 
+                        "Invalid request parameters",
+                        400,
                         GetModelStateErrors()));
                 }
 
@@ -249,8 +249,8 @@ namespace SingleClin.API.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ResponseWrapper.ErrorResponse(
-                        "Invalid request parameters", 
-                        400, 
+                        "Invalid request parameters",
+                        400,
                         GetModelStateErrors()));
                 }
 
@@ -344,8 +344,8 @@ namespace SingleClin.API.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ResponseWrapper.ErrorResponse(
-                        "Invalid request parameters", 
-                        400, 
+                        "Invalid request parameters",
+                        400,
                         GetModelStateErrors()));
                 }
 
@@ -454,7 +454,7 @@ namespace SingleClin.API.Controllers
             {
                 await _reportService.ClearReportCacheAsync(reportType);
 
-                var message = reportType.HasValue 
+                var message = reportType.HasValue
                     ? $"Cache cleared for {reportType.Value} reports"
                     : "All report caches cleared";
 

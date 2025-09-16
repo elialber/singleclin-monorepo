@@ -68,7 +68,7 @@ public class AuthorizeClinicOwnerAttribute : AuthorizeAttribute, IAuthorizationF
 
         // Get clinic ID from route or query
         string? requestedClinicId = null;
-        
+
         // Try route values first
         if (context.RouteData.Values.TryGetValue(_clinicIdParameterName, out var routeValue))
         {
@@ -129,7 +129,7 @@ public class AuthorizeClinicOwnerAttribute : AuthorizeAttribute, IAuthorizationF
 /// </summary>
 public class AuthorizeAdminOrClinicOwnerAttribute : AuthorizeClinicOwnerAttribute
 {
-    public AuthorizeAdminOrClinicOwnerAttribute(string clinicIdParameterName = "clinicId") 
+    public AuthorizeAdminOrClinicOwnerAttribute(string clinicIdParameterName = "clinicId")
         : base(clinicIdParameterName, allowAdmin: true)
     {
     }

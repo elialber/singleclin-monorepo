@@ -23,11 +23,11 @@ public interface IPlanRepository
     /// <param name="sortDirection">Sort direction (asc or desc)</param>
     /// <returns>Paginated list of plans</returns>
     Task<(IEnumerable<Plan> Plans, int TotalCount)> GetAllAsync(
-        int pageNumber = 1, 
-        int pageSize = 10, 
-        bool? isActive = null, 
-        string? searchTerm = null, 
-        decimal? minPrice = null, 
+        int pageNumber = 1,
+        int pageSize = 10,
+        bool? isActive = null,
+        string? searchTerm = null,
+        decimal? minPrice = null,
         decimal? maxPrice = null,
         bool? isFeatured = null,
         int? minCredits = null,

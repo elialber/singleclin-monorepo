@@ -17,7 +17,7 @@ public static class AuthenticationExtensions
         // Firebase initialization moved to FirebaseAuthService to centralize the logic
 
         // Configure JWT Bearer authentication
-        var key = Encoding.ASCII.GetBytes(configuration["JWT:SecretKey"] ?? 
+        var key = Encoding.ASCII.GetBytes(configuration["JWT:SecretKey"] ??
             throw new InvalidOperationException("JWT:SecretKey is not configured"));
 
         services.AddAuthentication(options =>

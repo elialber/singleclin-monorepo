@@ -77,7 +77,7 @@ public class QRCodeController : BaseController
 
             // Get user's active plan - we need the plan ID for QR Code generation
             var userGuid = Guid.Parse(userId);
-            
+
             // For now, we'll need to get the user's current plan to get the plan ID
             // This could be optimized by storing plan ID in the user's JWT claims
             var userPlan = await _qrCodeService.ValidateUserPlanAsync(userGuid);
@@ -97,9 +97,9 @@ public class QRCodeController : BaseController
             // Check if QR Code generation was successful
             if (!qrCodeResult.Success)
             {
-                _logger.LogWarning("QR Code generation failed for user {UserId}: {ErrorMessage}", 
+                _logger.LogWarning("QR Code generation failed for user {UserId}: {ErrorMessage}",
                     userId, qrCodeResult.ErrorMessage);
-                
+
                 var errorResponse = new QRCodeGenerateResponseDto
                 {
                     Success = false,
@@ -121,7 +121,7 @@ public class QRCodeController : BaseController
                 GeneratedAt = qrCodeResult.GeneratedAt
             };
 
-            _logger.LogInformation("QR Code generated successfully for user {UserId} with nonce {Nonce}", 
+            _logger.LogInformation("QR Code generated successfully for user {UserId} with nonce {Nonce}",
                 userId, qrCodeResult.Nonce);
 
             return Ok(ResponseWrapper<QRCodeGenerateResponseDto>.CreateSuccess(response));
@@ -129,7 +129,7 @@ public class QRCodeController : BaseController
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to generate QR Code");
-            
+
             var errorResponse = new QRCodeGenerateResponseDto
             {
                 Success = false,
@@ -192,7 +192,7 @@ public class QRCodeController : BaseController
                 }
             };
 
-            _logger.LogInformation("QR Code token validated and consumed for user plan {UserPlanId}", 
+            _logger.LogInformation("QR Code token validated and consumed for user plan {UserPlanId}",
                 claims.UserPlanId);
 
             return Ok(ResponseWrapper<object>.CreateSuccess(result));

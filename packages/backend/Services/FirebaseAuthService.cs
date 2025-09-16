@@ -135,9 +135,9 @@ public class FirebaseAuthService : IFirebaseAuthService
     public async Task<UserRecord?> CreateUserAsync(string email, string password, string? displayName = null, bool emailVerified = false)
     {
         _logger.LogInformation("CreateUserAsync called - Email: {Email}, DisplayName: {DisplayName}", email, displayName);
-        _logger.LogInformation("Firebase IsConfigured: {IsConfigured}, FirebaseApp.DefaultInstance: {HasInstance}", 
+        _logger.LogInformation("Firebase IsConfigured: {IsConfigured}, FirebaseApp.DefaultInstance: {HasInstance}",
             IsConfigured, FirebaseApp.DefaultInstance != null);
-        
+
         if (!IsConfigured)
         {
             _logger.LogError("Firebase is not configured! Cannot create user.");
@@ -147,7 +147,7 @@ public class FirebaseAuthService : IFirebaseAuthService
         try
         {
             _logger.LogInformation("Creating user in Firebase Authentication...");
-            
+
             var args = new UserRecordArgs
             {
                 Email = email,
@@ -161,27 +161,27 @@ public class FirebaseAuthService : IFirebaseAuthService
                 args.DisplayName = displayName;
             }
 
-            _logger.LogInformation("Calling Firebase CreateUserAsync with args: Email={Email}, DisplayName={DisplayName}, EmailVerified={EmailVerified}", 
+            _logger.LogInformation("Calling Firebase CreateUserAsync with args: Email={Email}, DisplayName={DisplayName}, EmailVerified={EmailVerified}",
                 args.Email, args.DisplayName, args.EmailVerified);
-            
+
             var userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(args);
-            
-            _logger.LogInformation("Firebase user created successfully! UID: {Uid}, Email: {Email}", 
+
+            _logger.LogInformation("Firebase user created successfully! UID: {Uid}, Email: {Email}",
                 userRecord.Uid, userRecord.Email);
-            
+
             return userRecord;
         }
         catch (FirebaseAuthException ex)
         {
-            _logger.LogError(ex, "Firebase Authentication Error - Code: {ErrorCode}, Message: {Message}, Email: {Email}", 
+            _logger.LogError(ex, "Firebase Authentication Error - Code: {ErrorCode}, Message: {Message}, Email: {Email}",
                 ex.ErrorCode, ex.Message, email);
-            
+
             // Log more details about the error
             if (ex.Message.Contains("EMAIL_EXISTS") || ex.Message.Contains("already exists"))
             {
                 _logger.LogWarning("User with email {Email} already exists in Firebase", email);
             }
-            
+
             return null;
         }
         catch (Exception ex)

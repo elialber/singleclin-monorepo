@@ -133,8 +133,8 @@ namespace SingleClin.API.Jobs
             {
                 // Get all active user plans with remaining credits <= 5 (maximum threshold)
                 var lowBalanceUserPlans = await _context.UserPlans
-                    .Where(up => up.CreditsRemaining <= 5 && 
-                                up.CreditsRemaining > 0 && 
+                    .Where(up => up.CreditsRemaining <= 5 &&
+                                up.CreditsRemaining > 0 &&
                                 up.IsActive)
                     .Include(up => up.User)
                     .Include(up => up.Plan)
@@ -162,7 +162,7 @@ namespace SingleClin.API.Jobs
                 var specificNotificationType = $"LowBalance_{balanceLevel}";
 
                 var recentNotification = await _context.NotificationLogs
-                    .Where(nl => nl.UserId == userId && 
+                    .Where(nl => nl.UserId == userId &&
                                 nl.Type == specificNotificationType &&
                                 nl.SentAt >= cutoffTime &&
                                 nl.IsSuccess)
@@ -198,20 +198,20 @@ namespace SingleClin.API.Jobs
                     var count = await _context.UserPlans
                         .Where(up => up.IsActive && up.CreditsRemaining == balance)
                         .CountAsync();
-                    
+
                     stats.UserPlansByBalance[balance] = count;
                 }
 
                 // Get notification statistics for the last 24 hours
                 var last24Hours = DateTime.UtcNow.AddHours(-24);
                 stats.NotificationsSentLast24h = await _context.NotificationLogs
-                    .Where(nl => nl.Type.StartsWith("LowBalance_") && 
+                    .Where(nl => nl.Type.StartsWith("LowBalance_") &&
                                 nl.SentAt >= last24Hours &&
                                 nl.IsSuccess)
                     .CountAsync();
 
                 stats.NotificationsFailedLast24h = await _context.NotificationLogs
-                    .Where(nl => nl.Type.StartsWith("LowBalance_") && 
+                    .Where(nl => nl.Type.StartsWith("LowBalance_") &&
                                 nl.SentAt >= last24Hours &&
                                 !nl.IsSuccess)
                     .CountAsync();

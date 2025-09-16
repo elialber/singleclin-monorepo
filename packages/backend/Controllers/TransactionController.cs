@@ -57,7 +57,7 @@ public class TransactionController : BaseController
             var authenticatedClinicId = GetAuthenticatedClinicId();
             if (authenticatedClinicId != request.ClinicId)
             {
-                _logger.LogWarning("Clinic ID mismatch: authenticated {AuthenticatedId}, requested {RequestedId}", 
+                _logger.LogWarning("Clinic ID mismatch: authenticated {AuthenticatedId}, requested {RequestedId}",
                     authenticatedClinicId, request.ClinicId);
                 return Forbid("Clinic ID in request does not match authenticated clinic");
             }
@@ -69,16 +69,16 @@ public class TransactionController : BaseController
 
             if (result.Success)
             {
-                _logger.LogInformation("QR Code validation successful - Transaction: {TransactionCode}, Clinic: {ClinicId}", 
+                _logger.LogInformation("QR Code validation successful - Transaction: {TransactionCode}, Clinic: {ClinicId}",
                     result.TransactionCode, request.ClinicId);
-                
+
                 return Ok(ResponseWrapper<QRCodeValidateResponseDto>.CreateSuccess(result, "QR Code validated successfully"));
             }
             else
             {
-                _logger.LogWarning("QR Code validation failed for clinic {ClinicId}: {ErrorCode} - {ErrorMessage}", 
+                _logger.LogWarning("QR Code validation failed for clinic {ClinicId}: {ErrorCode} - {ErrorMessage}",
                     request.ClinicId, result.Error?.Code, result.Error?.Message);
-                
+
                 return BadRequest(ResponseWrapper<QRCodeValidateResponseDto>.CreateFailure(
                     result.Error?.Message ?? "QR Code validation failed", result));
             }
@@ -86,7 +86,7 @@ public class TransactionController : BaseController
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error during QR Code validation for clinic {ClinicId}", request.ClinicId);
-            
+
             var errorResult = new QRCodeValidateResponseDto
             {
                 Success = false,
@@ -218,20 +218,21 @@ public class TransactionController : BaseController
         try
         {
             _logger.LogInformation("Retrieving transactions with filters: {@Filter}", filter);
-            
+
             // TODO: Fix database schema conflicts and uncomment this line
             // var result = await _transactionService.GetTransactionsAsync(filter);
-            
+
             // TEMPORARY MOCK RESPONSE for demonstration - returning empty result to avoid DTO structure issues
-            var mockResult = new { 
-                transactions = new object[0], 
-                totalCount = 0, 
-                page = 1, 
-                pageSize = 20, 
+            var mockResult = new
+            {
+                transactions = new object[0],
+                totalCount = 0,
+                page = 1,
+                pageSize = 20,
                 totalPages = 0,
-                message = "Mock data - database schema conflicts need to be resolved" 
+                message = "Mock data - database schema conflicts need to be resolved"
             };
-            
+
             return Ok(ResponseWrapper<object>.CreateSuccess(mockResult, "Mock transactions data returned successfully"));
         }
         catch (Exception ex)
@@ -260,13 +261,13 @@ public class TransactionController : BaseController
         try
         {
             _logger.LogInformation("Retrieving transaction with ID: {TransactionId}", id);
-            
+
             var result = await _transactionService.GetTransactionByIdAsync(id);
             if (result == null)
             {
                 return NotFound(ResponseWrapper<TransactionResponseDto>.CreateFailure("Transaction not found"));
             }
-            
+
             return Ok(ResponseWrapper<TransactionResponseDto>.CreateSuccess(result));
         }
         catch (Exception ex)
@@ -297,13 +298,13 @@ public class TransactionController : BaseController
         try
         {
             _logger.LogInformation("Updating transaction {TransactionId} with data: {@Request}", id, request);
-            
+
             var result = await _transactionService.UpdateTransactionAsync(id, request);
             if (result == null)
             {
                 return NotFound(ResponseWrapper<TransactionResponseDto>.CreateFailure("Transaction not found"));
             }
-            
+
             return Ok(ResponseWrapper<TransactionResponseDto>.CreateSuccess(result, "Transaction updated successfully"));
         }
         catch (Exception ex)
@@ -334,15 +335,15 @@ public class TransactionController : BaseController
         try
         {
             var adminUserId = GetAuthenticatedUserId();
-            _logger.LogInformation("Admin {AdminId} cancelling transaction {TransactionId} with reason: {Reason}", 
+            _logger.LogInformation("Admin {AdminId} cancelling transaction {TransactionId} with reason: {Reason}",
                 adminUserId, id, request.CancellationReason);
-            
+
             var result = await _transactionService.CancelTransactionAsync(id, request, adminUserId.ToString());
             if (result == null)
             {
                 return NotFound(ResponseWrapper<TransactionResponseDto>.CreateFailure("Transaction not found"));
             }
-            
+
             return Ok(ResponseWrapper<TransactionResponseDto>.CreateSuccess(result, "Transaction cancelled successfully"));
         }
         catch (InvalidOperationException ex)
@@ -372,16 +373,16 @@ public class TransactionController : BaseController
     [SwaggerResponse(200, "Metrics retrieved successfully", typeof(ResponseWrapper<DashboardMetricsDto>))]
     [SwaggerResponse(403, "Insufficient permissions")]
     public async Task<ActionResult<ResponseWrapper<DashboardMetricsDto>>> GetDashboardMetrics(
-        [FromQuery] DateTime? startDate = null, 
+        [FromQuery] DateTime? startDate = null,
         [FromQuery] DateTime? endDate = null)
     {
         try
         {
             _logger.LogInformation("Retrieving dashboard metrics from {StartDate} to {EndDate}", startDate, endDate);
-            
+
             // TODO: Fix database schema conflicts and uncomment this line
             // var result = await _transactionService.GetDashboardMetricsAsync(startDate, endDate);
-            
+
             // TEMPORARY MOCK DATA for demonstration
             var mockResult = new DashboardMetricsDto
             {
@@ -422,7 +423,7 @@ public class TransactionController : BaseController
                     new() { Month = "2024-10", TransactionCount = 31, Revenue = 2410.00m, CreditsUsed = 69 }
                 }
             };
-            
+
             return Ok(ResponseWrapper<DashboardMetricsDto>.CreateSuccess(mockResult));
         }
         catch (Exception ex)
@@ -452,9 +453,9 @@ public class TransactionController : BaseController
         try
         {
             _logger.LogInformation("Exporting transactions in {Format} format with filters: {@Filter}", format, filter);
-            
+
             var (fileBytes, fileName, contentType) = await _transactionService.ExportTransactionsAsync(filter, format);
-            
+
             return File(fileBytes, contentType, fileName);
         }
         catch (ArgumentException ex)

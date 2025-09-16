@@ -32,7 +32,7 @@ public class ClinicController : ControllerBase
     private readonly ApplicationDbContext _context;
 
     public ClinicController(
-        IClinicService clinicService, 
+        IClinicService clinicService,
         IImageUploadService imageUploadService,
         ILogger<ClinicController> logger,
         IConfiguration configuration,
@@ -88,11 +88,11 @@ public class ClinicController : ControllerBase
             }
 
             var result = await _clinicService.GetAllAsync(filter);
-            
+
             _logger.LogInformation(
-                "Retrieved {Count} clinics (page {PageNumber} of {TotalPages})", 
-                result.ItemCount, 
-                result.PageNumber, 
+                "Retrieved {Count} clinics (page {PageNumber} of {TotalPages})",
+                result.ItemCount,
+                result.PageNumber,
                 result.TotalPages
             );
 
@@ -133,11 +133,11 @@ public class ClinicController : ControllerBase
             }
 
             var result = await _clinicService.GetAllAsync(filter);
-            
+
             _logger.LogInformation(
-                "[DEV] Retrieved {Count} clinics (page {PageNumber} of {TotalPages})", 
-                result.ItemCount, 
-                result.PageNumber, 
+                "[DEV] Retrieved {Count} clinics (page {PageNumber} of {TotalPages})",
+                result.ItemCount,
+                result.PageNumber,
                 result.TotalPages
             );
 
@@ -175,7 +175,7 @@ public class ClinicController : ControllerBase
             }
 
             var token = jwtService.GenerateAccessToken(user);
-            
+
             return Ok(new
             {
                 token,
@@ -212,16 +212,19 @@ public class ClinicController : ControllerBase
     )]
     public IActionResult DebugToken()
     {
-        var claims = HttpContext.User.Claims.Select(c => new { 
-            Type = c.Type, 
-            Value = c.Value 
+        var claims = HttpContext.User.Claims.Select(c => new
+        {
+            Type = c.Type,
+            Value = c.Value
         }).ToList();
 
-        return Ok(new {
+        return Ok(new
+        {
             IsAuthenticated = HttpContext.User.Identity.IsAuthenticated,
             AuthenticationType = HttpContext.User.Identity.AuthenticationType,
             Claims = claims,
-            Policies = new {
+            Policies = new
+            {
                 HasAdminRole = HttpContext.User.HasClaim(ClaimTypes.Role, "Administrator") || HttpContext.User.HasClaim("role", "Administrator"),
                 HasAnyRole = HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Role || c.Type == "role"),
                 HasAdminRoleStandard = HttpContext.User.HasClaim(ClaimTypes.Role, "Administrator"),
@@ -245,17 +248,17 @@ public class ClinicController : ControllerBase
 
             var users = new[]
             {
-                new { 
-                    Email = "elialberlopes@gmail.com", 
-                    Password = "Aguia97003325!", 
-                    Role = Data.Enums.UserRole.Administrator, 
-                    FullName = "Eli Alber Lopes" 
+                new {
+                    Email = "elialberlopes@gmail.com",
+                    Password = "Aguia97003325!",
+                    Role = Data.Enums.UserRole.Administrator,
+                    FullName = "Eli Alber Lopes"
                 },
-                new { 
-                    Email = "poliveira.psico@gmail.com", 
-                    Password = "Aguia97003325!", 
-                    Role = Data.Enums.UserRole.Patient, 
-                    FullName = "P. Oliveira" 
+                new {
+                    Email = "poliveira.psico@gmail.com",
+                    Password = "Aguia97003325!",
+                    Role = Data.Enums.UserRole.Patient,
+                    FullName = "P. Oliveira"
                 }
             };
 
@@ -264,7 +267,7 @@ public class ClinicController : ControllerBase
                 try
                 {
                     _logger.LogInformation("Creating Identity user: {Email}", userInfo.Email);
-                    
+
                     // Check if user already exists and delete
                     var existingUser = await userManager.FindByEmailAsync(userInfo.Email);
                     if (existingUser != null)
@@ -290,13 +293,13 @@ public class ClinicController : ControllerBase
                     };
 
                     var result = await userManager.CreateAsync(user, userInfo.Password);
-                    
+
                     if (result.Succeeded)
                     {
                         // Add role claims
                         await userManager.AddClaimAsync(user, new Claim("role", userInfo.Role.ToString()));
                         await userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, userInfo.Role.ToString()));
-                        
+
                         // Add admin permissions if needed
                         if (userInfo.Role == Data.Enums.UserRole.Administrator)
                         {
@@ -307,11 +310,12 @@ public class ClinicController : ControllerBase
                                 "patients.read", "patients.write", "patients.delete",
                                 "system.configure", "system.monitor", "system.backup"
                             };
-                            
+
                             await userManager.AddClaimAsync(user, new Claim("permissions", string.Join(",", permissions)));
                         }
 
-                        results.Add(new {
+                        results.Add(new
+                        {
                             Email = userInfo.Email,
                             Role = userInfo.Role.ToString(),
                             UserId = user.Id,
@@ -323,7 +327,8 @@ public class ClinicController : ControllerBase
                     else
                     {
                         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                        results.Add(new {
+                        results.Add(new
+                        {
                             Email = userInfo.Email,
                             Role = userInfo.Role.ToString(),
                             UserId = (Guid?)null,
@@ -335,7 +340,8 @@ public class ClinicController : ControllerBase
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Exception creating user: {Email}", userInfo.Email);
-                    results.Add(new {
+                    results.Add(new
+                    {
                         Email = userInfo.Email,
                         Role = userInfo.Role.ToString(),
                         UserId = (Guid?)null,
@@ -344,7 +350,8 @@ public class ClinicController : ControllerBase
                 }
             }
 
-            return Ok(new {
+            return Ok(new
+            {
                 Message = "Identity user creation completed",
                 Users = results,
                 Note = "Firebase users need to be created separately",
@@ -354,9 +361,10 @@ public class ClinicController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Identity user creation failed");
-            return StatusCode(500, new { 
-                Message = "Identity user creation failed", 
-                Error = ex.Message 
+            return StatusCode(500, new
+            {
+                Message = "Identity user creation failed",
+                Error = ex.Message
             });
         }
     }
@@ -446,9 +454,9 @@ public class ClinicController : ControllerBase
         try
         {
             var clinics = await _clinicService.GetActiveAsync();
-            
+
             _logger.LogInformation("Retrieved {Count} active clinics", clinics.Count());
-            
+
             return Ok(clinics);
         }
         catch (Exception ex)
@@ -480,7 +488,7 @@ public class ClinicController : ControllerBase
         try
         {
             var clinic = await _clinicService.GetByIdAsync(id);
-            
+
             if (clinic == null)
             {
                 _logger.LogWarning("Clinic not found: {ClinicId}", id);
@@ -488,7 +496,7 @@ public class ClinicController : ControllerBase
             }
 
             _logger.LogInformation("Retrieved clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
-            
+
             return Ok(clinic);
         }
         catch (Exception ex)
@@ -530,9 +538,9 @@ public class ClinicController : ControllerBase
             }
 
             var clinic = await _clinicService.CreateAsync(clinicRequest);
-            
+
             _logger.LogInformation("Created new clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
-            
+
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = clinic.Id },
@@ -586,9 +594,9 @@ public class ClinicController : ControllerBase
             }
 
             var clinic = await _clinicService.UpdateAsync(id, clinicRequest);
-            
+
             _logger.LogInformation("Updated clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
-            
+
             return Ok(clinic);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -633,7 +641,7 @@ public class ClinicController : ControllerBase
         try
         {
             var deleted = await _clinicService.DeleteAsync(id);
-            
+
             if (!deleted)
             {
                 _logger.LogWarning("Clinic not found for deletion: {ClinicId}", id);
@@ -641,7 +649,7 @@ public class ClinicController : ControllerBase
             }
 
             _logger.LogInformation("Deleted clinic: {ClinicId}", id);
-            
+
             return NoContent();
         }
         catch (Exception ex)
@@ -676,10 +684,10 @@ public class ClinicController : ControllerBase
         try
         {
             var clinic = await _clinicService.ToggleStatusAsync(id);
-            
-            _logger.LogInformation("Toggled status for clinic: {ClinicName} (ID: {ClinicId}) - Active: {IsActive}", 
+
+            _logger.LogInformation("Toggled status for clinic: {ClinicName} (ID: {ClinicId}) - Active: {IsActive}",
                 clinic.Name, clinic.Id, clinic.IsActive);
-            
+
             return Ok(clinic);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -716,9 +724,9 @@ public class ClinicController : ControllerBase
         try
         {
             var statistics = await _clinicService.GetStatisticsAsync();
-            
+
             _logger.LogInformation("Retrieved clinic statistics");
-            
+
             return Ok(statistics);
         }
         catch (Exception ex)
@@ -777,9 +785,9 @@ public class ClinicController : ControllerBase
 
             // Upload image via service
             var clinic = await _clinicService.UpdateImageAsync(id, image);
-            
+
             _logger.LogInformation("Successfully uploaded image for clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
-            
+
             return Ok(clinic);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -824,9 +832,9 @@ public class ClinicController : ControllerBase
         try
         {
             var clinic = await _clinicService.DeleteImageAsync(id);
-            
+
             _logger.LogInformation("Successfully deleted image for clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
-            
+
             return Ok(clinic);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -873,7 +881,7 @@ public class ClinicController : ControllerBase
     [SwaggerResponse(404, "Clinic not found")]
     [SwaggerResponse(413, "Payload Too Large - File exceeds size limit")]
     public async Task<ActionResult<MultipleImageUploadResponseDto>> UploadImages(
-        [Required] Guid id, 
+        [Required] Guid id,
         [FromForm] MultipleImageUploadDto uploadDto)
     {
         try
@@ -896,7 +904,7 @@ public class ClinicController : ControllerBase
             {
                 if (!await _imageUploadService.ValidateImageAsync(image))
                 {
-                    _logger.LogWarning("Invalid image file in batch upload for clinic: {ClinicId}, FileName: {FileName}", 
+                    _logger.LogWarning("Invalid image file in batch upload for clinic: {ClinicId}, FileName: {FileName}",
                         id, image.FileName);
                     return BadRequest(new { message = $"Invalid image file: {image.FileName}. Please ensure all files are valid JPEG, PNG, or WebP images under 5MB." });
                 }
@@ -904,9 +912,9 @@ public class ClinicController : ControllerBase
 
             // Upload images via service
             var result = await _clinicService.AddImagesAsync(id, uploadDto);
-            
+
             _logger.LogInformation("Uploaded {SuccessCount} images for clinic: {ClinicId}", result.SuccessCount, id);
-            
+
             return Ok(result);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -975,16 +983,16 @@ public class ClinicController : ControllerBase
     [SwaggerResponse(403, "Forbidden - Admin role required")]
     [SwaggerResponse(404, "Clinic or image not found")]
     public async Task<ActionResult<ClinicImageDto>> UpdateImage(
-        [Required] Guid id, 
-        [Required] Guid imageId, 
+        [Required] Guid id,
+        [Required] Guid imageId,
         [FromBody] ClinicImageUpdateDto updateDto)
     {
         try
         {
             var image = await _clinicService.UpdateImageAsync(id, imageId, updateDto);
-            
+
             _logger.LogInformation("Successfully updated image {ImageId} for clinic: {ClinicId}", imageId, id);
-            
+
             return Ok(image);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -1025,15 +1033,15 @@ public class ClinicController : ControllerBase
         try
         {
             var deleted = await _clinicService.DeleteImageAsync(id, imageId);
-            
+
             if (!deleted)
             {
                 _logger.LogWarning("Clinic or image not found for deletion: ClinicId={ClinicId}, ImageId={ImageId}", id, imageId);
                 return NotFound(new { message = "Clinic or image not found" });
             }
-            
+
             _logger.LogInformation("Successfully deleted image {ImageId} from clinic: {ClinicId}", imageId, id);
-            
+
             return NoContent();
         }
         catch (Exception ex)
@@ -1069,9 +1077,9 @@ public class ClinicController : ControllerBase
         try
         {
             var image = await _clinicService.SetFeaturedImageAsync(id, imageId);
-            
+
             _logger.LogInformation("Successfully set featured image {ImageId} for clinic: {ClinicId}", imageId, id);
-            
+
             return Ok(image);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -1110,7 +1118,7 @@ public class ClinicController : ControllerBase
     [SwaggerResponse(403, "Forbidden - Admin role required")]
     [SwaggerResponse(404, "Clinic not found")]
     public async Task<ActionResult<List<ClinicImageDto>>> ReorderImages(
-        [Required] Guid id, 
+        [Required] Guid id,
         [FromBody] Dictionary<Guid, int> imageOrders)
     {
         try
@@ -1121,9 +1129,9 @@ public class ClinicController : ControllerBase
             }
 
             var images = await _clinicService.ReorderImagesAsync(id, imageOrders);
-            
+
             _logger.LogInformation("Successfully reordered {Count} images for clinic: {ClinicId}", imageOrders.Count, id);
-            
+
             return Ok(images);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -1152,13 +1160,13 @@ public class ClinicController : ControllerBase
         OperationId = "TestUploadClinicImages"
     )]
     public async Task<ActionResult<MultipleImageUploadResponseDto>> TestUploadImages(
-        [Required] Guid id, 
+        [Required] Guid id,
         [FromForm] MultipleImageUploadDto uploadDto)
     {
         try
         {
             _logger.LogWarning("⚠️  TEST ENDPOINT: Using non-authenticated image upload for clinic {ClinicId}", id);
-            
+
             // Validate that images are provided
             if (uploadDto.Images == null || uploadDto.Images.Length == 0)
             {
@@ -1177,7 +1185,7 @@ public class ClinicController : ControllerBase
             {
                 if (!await _imageUploadService.ValidateImageAsync(image))
                 {
-                    _logger.LogWarning("Invalid image file in batch upload for clinic: {ClinicId}, FileName: {FileName}", 
+                    _logger.LogWarning("Invalid image file in batch upload for clinic: {ClinicId}, FileName: {FileName}",
                         id, image.FileName);
                     return BadRequest(new { message = $"Invalid image file: {image.FileName}. Please ensure all files are valid JPEG, PNG, or WebP images under 5MB." });
                 }
@@ -1185,9 +1193,9 @@ public class ClinicController : ControllerBase
 
             // Upload images via service
             var result = await _clinicService.AddImagesAsync(id, uploadDto);
-            
+
             _logger.LogInformation("✅ TEST: Uploaded {SuccessCount} images for clinic: {ClinicId}", result.SuccessCount, id);
-            
+
             return Ok(result);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
@@ -1214,9 +1222,9 @@ public class ClinicController : ControllerBase
         {
             using var httpClient = new HttpClient();
             httpClient.Timeout = TimeSpan.FromSeconds(10);
-            
+
             var response = await httpClient.GetAsync(imageUrl);
-            
+
             return Ok(new
             {
                 url = imageUrl,
@@ -1268,8 +1276,8 @@ public class ClinicController : ControllerBase
         try
         {
             var updatedCount = await migrationService.UpdateImageUrlsAsync();
-            return Ok(new 
-            { 
+            return Ok(new
+            {
                 message = $"Successfully updated {updatedCount} image URLs",
                 updatedCount,
                 timestamp = DateTime.UtcNow
@@ -1327,9 +1335,9 @@ public class ClinicController : ControllerBase
                     ImageUrl = s.ImageUrl
                 })
                 .ToListAsync();
-            
+
             _logger.LogInformation("Retrieved {Count} services for clinic: {ClinicId}", services.Count, id);
-            
+
             return Ok(services);
         }
         catch (Exception ex)

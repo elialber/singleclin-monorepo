@@ -29,10 +29,10 @@ public class TransactionService : ITransactionService
         try
         {
             _logger.LogInformation("Getting transactions with filters: {@Filter}", filter);
-            
+
             // Validate and normalize filter parameters
             ValidateFilter(filter);
-            
+
             return await _transactionRepository.GetTransactionsAsync(filter);
         }
         catch (Exception ex)
@@ -47,7 +47,7 @@ public class TransactionService : ITransactionService
         try
         {
             _logger.LogInformation("Getting transaction by ID: {TransactionId}", id);
-            
+
             var transaction = await _transactionRepository.GetTransactionByIdAsync(id);
             if (transaction == null)
                 return null;
@@ -66,7 +66,7 @@ public class TransactionService : ITransactionService
         try
         {
             _logger.LogInformation("Updating transaction {TransactionId} with data: {@UpdateDto}", id, updateDto);
-            
+
             var transaction = await _transactionRepository.GetTransactionByIdAsync(id);
             if (transaction == null)
                 return null;
@@ -80,18 +80,18 @@ public class TransactionService : ITransactionService
             // Apply updates
             if (!string.IsNullOrEmpty(updateDto.ServiceDescription))
                 transaction.ServiceDescription = updateDto.ServiceDescription;
-            
+
             if (!string.IsNullOrEmpty(updateDto.ServiceType))
                 transaction.ServiceType = updateDto.ServiceType;
-            
+
             if (!string.IsNullOrEmpty(updateDto.ValidationNotes))
                 transaction.ValidationNotes = updateDto.ValidationNotes;
-            
+
             if (updateDto.Amount.HasValue)
                 transaction.Amount = updateDto.Amount.Value;
 
             var updatedTransaction = await _transactionRepository.UpdateTransactionAsync(transaction);
-            
+
             _logger.LogInformation("Transaction {TransactionId} updated successfully", id);
             return MapToResponseDto(updatedTransaction);
         }
@@ -106,9 +106,9 @@ public class TransactionService : ITransactionService
     {
         try
         {
-            _logger.LogInformation("Cancelling transaction {TransactionId} by user {CancelledBy} with reason: {Reason}", 
+            _logger.LogInformation("Cancelling transaction {TransactionId} by user {CancelledBy} with reason: {Reason}",
                 id, cancelledBy, cancelDto.CancellationReason);
-            
+
             var transaction = await _transactionRepository.GetTransactionByIdAsync(id);
             if (transaction == null)
                 return null;
@@ -136,10 +136,10 @@ public class TransactionService : ITransactionService
             }
 
             var updatedTransaction = await _transactionRepository.UpdateTransactionAsync(transaction);
-            
-            _logger.LogInformation("Transaction {TransactionId} cancelled successfully, credits refunded: {RefundCredits}", 
+
+            _logger.LogInformation("Transaction {TransactionId} cancelled successfully, credits refunded: {RefundCredits}",
                 id, cancelDto.RefundCredits);
-                
+
             return MapToResponseDto(updatedTransaction);
         }
         catch (Exception ex)
@@ -154,7 +154,7 @@ public class TransactionService : ITransactionService
         try
         {
             _logger.LogInformation("Getting dashboard metrics from {StartDate} to {EndDate}", startDate, endDate);
-            
+
             return await _transactionRepository.GetDashboardMetricsAsync(startDate, endDate);
         }
         catch (Exception ex)
@@ -169,7 +169,7 @@ public class TransactionService : ITransactionService
         try
         {
             _logger.LogInformation("Exporting transactions in {Format} format with filters: {@Filter}", format, filter);
-            
+
             // Validate export format
             var validFormats = new[] { "excel", "csv", "pdf" };
             if (!validFormats.Contains(format.ToLower()))
@@ -206,12 +206,12 @@ public class TransactionService : ITransactionService
             // Generate timestamp for filename
             var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
             var fileName = $"transactions_export_{timestamp}";
-            
+
             // Para agora, vou retornar um placeholder até implementarmos a integração correta com ExportService
             // TODO: Implementar integração correta com ExportService usando ReportResponse e ExportRequest
             var data = System.Text.Json.JsonSerializer.Serialize(transactions);
             var bytes = System.Text.Encoding.UTF8.GetBytes(data);
-            
+
             return format.ToLower() switch
             {
                 "excel" => (bytes, $"{fileName}.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
@@ -232,7 +232,7 @@ public class TransactionService : ITransactionService
         try
         {
             _logger.LogInformation("Getting transactions for clinic {ClinicId}, page {Page}, size {PageSize}", clinicId, page, pageSize);
-            
+
             return await _transactionRepository.GetClinicTransactionsAsync(clinicId, page, pageSize);
         }
         catch (Exception ex)
@@ -247,7 +247,7 @@ public class TransactionService : ITransactionService
         try
         {
             _logger.LogInformation("Getting transactions for patient {PatientId}, page {Page}, size {PageSize}", patientId, page, pageSize);
-            
+
             return await _transactionRepository.GetPatientTransactionsAsync(patientId, page, pageSize);
         }
         catch (Exception ex)
@@ -275,7 +275,7 @@ public class TransactionService : ITransactionService
         try
         {
             _logger.LogInformation("Getting transaction statistics from {StartDate} to {EndDate}", startDate, endDate);
-            
+
             return await _transactionRepository.GetTransactionStatisticsAsync(startDate, endDate);
         }
         catch (Exception ex)
@@ -297,7 +297,7 @@ public class TransactionService : ITransactionService
             throw new ArgumentException("Start date cannot be after end date");
         }
 
-        if (filter.ValidationStartDate.HasValue && filter.ValidationEndDate.HasValue && 
+        if (filter.ValidationStartDate.HasValue && filter.ValidationEndDate.HasValue &&
             filter.ValidationStartDate > filter.ValidationEndDate)
         {
             throw new ArgumentException("Validation start date cannot be after validation end date");
@@ -318,10 +318,10 @@ public class TransactionService : ITransactionService
         // Normalize sort parameters
         if (string.IsNullOrWhiteSpace(filter.SortBy))
             filter.SortBy = "CreatedAt";
-        
+
         if (string.IsNullOrWhiteSpace(filter.SortOrder))
             filter.SortOrder = "desc";
-        
+
         filter.SortOrder = filter.SortOrder.ToLower() == "asc" ? "asc" : "desc";
     }
 
@@ -330,15 +330,15 @@ public class TransactionService : ITransactionService
         // This would typically update the UserPlan to refund the credits
         // For now, we'll just log the action - this needs to be implemented
         // when we have the UserPlan repository/service integrated
-        
+
         _logger.LogInformation("Refunding {Credits} credits to UserPlan {UserPlanId} for cancelled transaction {TransactionId}",
             transaction.CreditsUsed, transaction.UserPlanId, transaction.Id);
-        
+
         // TODO: Implement actual credit refund logic
         // var userPlan = await _userPlanRepository.GetByIdAsync(transaction.UserPlanId);
         // userPlan.CreditsRemaining += transaction.CreditsUsed;
         // await _userPlanRepository.UpdateAsync(userPlan);
-        
+
         await Task.CompletedTask;
     }
 

@@ -26,7 +26,7 @@ public class SwaggerDefaultValues : IOperationFilter
         foreach (var response in operation.Responses.Values)
         {
             response.Headers ??= new Dictionary<string, OpenApiHeader>();
-            
+
             if (!response.Headers.ContainsKey("X-Request-Id"))
             {
                 response.Headers.Add("X-Request-Id", new OpenApiHeader
@@ -46,7 +46,7 @@ public class SwaggerDefaultValues : IOperationFilter
         foreach (var parameter in operation.Parameters)
         {
             var description = apiDescription.ParameterDescriptions.FirstOrDefault(p => p.Name == parameter.Name);
-            
+
             if (description != null)
             {
                 // Set defaults

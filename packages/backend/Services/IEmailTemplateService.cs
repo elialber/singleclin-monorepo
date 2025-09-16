@@ -15,8 +15,8 @@ namespace SingleClin.API.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Rendered email template</returns>
         Task<RenderedEmailTemplate> RenderLowBalanceNotificationAsync(
-            LowBalanceTemplateData templateData, 
-            bool includeHtml = true, 
+            LowBalanceTemplateData templateData,
+            bool includeHtml = true,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -28,9 +28,9 @@ namespace SingleClin.API.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Rendered email template</returns>
         Task<RenderedEmailTemplate> RenderTemplateAsync(
-            string templateName, 
-            object templateData, 
-            bool includeHtml = true, 
+            string templateName,
+            object templateData,
+            bool includeHtml = true,
             CancellationToken cancellationToken = default);
 
         /// <summary>

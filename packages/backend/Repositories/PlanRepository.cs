@@ -19,11 +19,11 @@ public class PlanRepository : IPlanRepository
     }
 
     public async Task<(IEnumerable<Plan> Plans, int TotalCount)> GetAllAsync(
-        int pageNumber = 1, 
-        int pageSize = 10, 
-        bool? isActive = null, 
-        string? searchTerm = null, 
-        decimal? minPrice = null, 
+        int pageNumber = 1,
+        int pageSize = 10,
+        bool? isActive = null,
+        string? searchTerm = null,
+        decimal? minPrice = null,
         decimal? maxPrice = null,
         bool? isFeatured = null,
         int? minCredits = null,
@@ -41,7 +41,7 @@ public class PlanRepository : IPlanRepository
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(p => EF.Functions.ILike(p.Name, $"%{searchTerm}%") || 
+            query = query.Where(p => EF.Functions.ILike(p.Name, $"%{searchTerm}%") ||
                                    EF.Functions.ILike(p.Description ?? "", $"%{searchTerm}%"));
         }
 
@@ -83,7 +83,7 @@ public class PlanRepository : IPlanRepository
             .AsNoTracking()
             .ToListAsync();
 
-        _logger.LogDebug("Retrieved {Count} plans from database with filters: Active={IsActive}, Search={SearchTerm}, MinPrice={MinPrice}, MaxPrice={MaxPrice}, IsFeatured={IsFeatured}, SortBy={SortBy}, SortDirection={SortDirection}", 
+        _logger.LogDebug("Retrieved {Count} plans from database with filters: Active={IsActive}, Search={SearchTerm}, MinPrice={MinPrice}, MaxPrice={MaxPrice}, IsFeatured={IsFeatured}, SortBy={SortBy}, SortDirection={SortDirection}",
             plans.Count, isActive, searchTerm, minPrice, maxPrice, isFeatured, sortBy, sortDirection);
 
         return (plans, totalCount);
@@ -239,7 +239,7 @@ public class PlanRepository : IPlanRepository
             "updatedat" => isDescending ? query.OrderByDescending(p => p.UpdatedAt) : query.OrderBy(p => p.UpdatedAt),
             "isfeatured" => isDescending ? query.OrderByDescending(p => p.IsFeatured) : query.OrderBy(p => p.IsFeatured),
             "isactive" => isDescending ? query.OrderByDescending(p => p.IsActive) : query.OrderBy(p => p.IsActive),
-            "displayorder" or _ => isDescending 
+            "displayorder" or _ => isDescending
                 ? query.OrderByDescending(p => p.DisplayOrder).ThenByDescending(p => p.Name)
                 : query.OrderBy(p => p.DisplayOrder).ThenBy(p => p.Name)
         };

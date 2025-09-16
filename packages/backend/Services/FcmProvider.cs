@@ -18,7 +18,7 @@ namespace SingleClin.API.Services
         {
             _options = options.Value;
             _logger = logger;
-            
+
             if (FirebaseApp.DefaultInstance == null)
             {
                 _logger.LogWarning("Firebase app not initialized. FCM provider will not be functional.");
@@ -35,7 +35,7 @@ namespace SingleClin.API.Services
             if (request is not PushNotificationRequest pushRequest)
             {
                 return NotificationResponse.Failed(
-                    "Invalid request type for push notification", 
+                    "Invalid request type for push notification",
                     Channel
                 );
             }
@@ -54,8 +54,8 @@ namespace SingleClin.API.Services
                 }
 
                 var message = BuildMessage(request);
-                
-                _logger.LogInformation("Sending push notification to device: {DeviceToken}", 
+
+                _logger.LogInformation("Sending push notification to device: {DeviceToken}",
                     MaskDeviceToken(request.DeviceToken));
 
                 var messageId = await _messaging.SendAsync(message, cancellationToken);
@@ -74,12 +74,12 @@ namespace SingleClin.API.Services
             catch (FirebaseMessagingException ex)
             {
                 _logger.LogError(ex, "Firebase messaging error: {Error}", ex.Message);
-                
+
                 // Handle specific Firebase errors  
                 var errorMessage = ex.ErrorCode.ToString() switch
                 {
                     "InvalidArgument" => "Invalid device token or message format",
-                    "Unregistered" => "Device token is no longer valid", 
+                    "Unregistered" => "Device token is no longer valid",
                     "SenderIdMismatch" => "Invalid sender ID configuration",
                     "QuotaExceeded" => "Message quota exceeded",
                     "Unavailable" => "FCM service temporarily unavailable",
@@ -153,7 +153,7 @@ namespace SingleClin.API.Services
             if (request.CustomData?.Any() == true || request.Data?.Any() == true)
             {
                 var data = new Dictionary<string, string>();
-                
+
                 // Add custom data
                 if (request.CustomData?.Any() == true)
                 {
@@ -162,7 +162,7 @@ namespace SingleClin.API.Services
                         data[item.Key] = item.Value;
                     }
                 }
-                
+
                 // Add general data (convert to strings)
                 if (request.Data?.Any() == true)
                 {
@@ -182,7 +182,7 @@ namespace SingleClin.API.Services
         {
             if (string.IsNullOrEmpty(deviceToken) || deviceToken.Length < 10)
                 return "***";
-            
+
             return $"{deviceToken[..4]}...{deviceToken[^4..]}";
         }
     }
@@ -190,7 +190,7 @@ namespace SingleClin.API.Services
     public class FcmOptions
     {
         public const string SectionName = "Firebase:CloudMessaging";
-        
+
         public string? ServerKey { get; set; }
         public string? SenderId { get; set; }
         public bool EnableLogging { get; set; } = true;

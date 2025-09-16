@@ -124,7 +124,7 @@ public class TransactionRepository : ITransactionRepository
         {
             _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
-            
+
             // Load related entities for complete object
             await _context.Entry(transaction)
                 .Reference(t => t.UserPlan)
@@ -326,7 +326,7 @@ public class TransactionRepository : ITransactionRepository
 
             // Apply filters
             query = ApplyFilters(query, filter);
-            
+
             // Apply sorting
             query = ApplySorting(query, filter.SortBy, filter.SortOrder);
 
@@ -404,7 +404,7 @@ public class TransactionRepository : ITransactionRepository
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
             var searchLower = filter.Search.ToLower();
-            query = query.Where(t => 
+            query = query.Where(t =>
                 t.Code.ToLower().Contains(searchLower) ||
                 ($"{t.UserPlan.User.FirstName} {t.UserPlan.User.LastName}").ToLower().Contains(searchLower) ||
                 t.UserPlan.User.Email.ToLower().Contains(searchLower) ||

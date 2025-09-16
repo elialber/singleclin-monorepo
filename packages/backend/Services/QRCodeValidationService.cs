@@ -51,7 +51,7 @@ public class QRCodeValidationService : IQRCodeValidationService
 
             // Use database transaction to ensure consistency
             using var transaction = await _context.Database.BeginTransactionAsync();
-            
+
             try
             {
                 // Get user plan and validate
@@ -157,7 +157,7 @@ public class QRCodeValidationService : IQRCodeValidationService
         catch (QRCodeValidationException ex)
         {
             _logger.LogWarning("QR Code validation failed: {ErrorCode} - {Message}", ex.ErrorCode, ex.Message);
-            
+
             return new QRCodeValidateResponseDto
             {
                 Success = false,
@@ -173,7 +173,7 @@ public class QRCodeValidationService : IQRCodeValidationService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error during QR Code validation for clinic {ClinicId}", request.ClinicId);
-            
+
             return new QRCodeValidateResponseDto
             {
                 Success = false,

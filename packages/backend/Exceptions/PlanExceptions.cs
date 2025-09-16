@@ -7,19 +7,19 @@ public class PlanNotFoundException : Exception
 {
     public Guid PlanId { get; }
 
-    public PlanNotFoundException(Guid planId) 
+    public PlanNotFoundException(Guid planId)
         : base($"Plan with ID '{planId}' was not found")
     {
         PlanId = planId;
     }
 
-    public PlanNotFoundException(Guid planId, string message) 
+    public PlanNotFoundException(Guid planId, string message)
         : base(message)
     {
         PlanId = planId;
     }
 
-    public PlanNotFoundException(Guid planId, string message, Exception innerException) 
+    public PlanNotFoundException(Guid planId, string message, Exception innerException)
         : base(message, innerException)
     {
         PlanId = planId;
@@ -33,19 +33,19 @@ public class DuplicatePlanNameException : Exception
 {
     public string PlanName { get; }
 
-    public DuplicatePlanNameException(string planName) 
+    public DuplicatePlanNameException(string planName)
         : base($"A plan with the name '{planName}' already exists")
     {
         PlanName = planName;
     }
 
-    public DuplicatePlanNameException(string planName, string message) 
+    public DuplicatePlanNameException(string planName, string message)
         : base(message)
     {
         PlanName = planName;
     }
 
-    public DuplicatePlanNameException(string planName, string message, Exception innerException) 
+    public DuplicatePlanNameException(string planName, string message, Exception innerException)
         : base(message, innerException)
     {
         PlanName = planName;
@@ -59,19 +59,19 @@ public class PlanValidationException : Exception
 {
     public IEnumerable<string> ValidationErrors { get; }
 
-    public PlanValidationException(IEnumerable<string> validationErrors) 
+    public PlanValidationException(IEnumerable<string> validationErrors)
         : base($"Plan validation failed: {string.Join("; ", validationErrors)}")
     {
         ValidationErrors = validationErrors;
     }
 
-    public PlanValidationException(string validationError) 
+    public PlanValidationException(string validationError)
         : base($"Plan validation failed: {validationError}")
     {
         ValidationErrors = new[] { validationError };
     }
 
-    public PlanValidationException(IEnumerable<string> validationErrors, Exception innerException) 
+    public PlanValidationException(IEnumerable<string> validationErrors, Exception innerException)
         : base($"Plan validation failed: {string.Join("; ", validationErrors)}", innerException)
     {
         ValidationErrors = validationErrors;
@@ -86,26 +86,26 @@ public class InvalidPlanOperationException : Exception
     public Guid? PlanId { get; }
     public string Operation { get; }
 
-    public InvalidPlanOperationException(string operation, string message) 
+    public InvalidPlanOperationException(string operation, string message)
         : base(message)
     {
         Operation = operation;
     }
 
-    public InvalidPlanOperationException(Guid planId, string operation, string message) 
+    public InvalidPlanOperationException(Guid planId, string operation, string message)
         : base(message)
     {
         PlanId = planId;
         Operation = operation;
     }
 
-    public InvalidPlanOperationException(string operation, string message, Exception innerException) 
+    public InvalidPlanOperationException(string operation, string message, Exception innerException)
         : base(message, innerException)
     {
         Operation = operation;
     }
 
-    public InvalidPlanOperationException(Guid planId, string operation, string message, Exception innerException) 
+    public InvalidPlanOperationException(Guid planId, string operation, string message, Exception innerException)
         : base(message, innerException)
     {
         PlanId = planId;

@@ -24,7 +24,7 @@ public class RedisHealthCheck : IHealthCheck
         try
         {
             var isConnected = await _redisService.IsConnectedAsync();
-            
+
             if (isConnected)
             {
                 _logger.LogDebug("Redis health check passed");

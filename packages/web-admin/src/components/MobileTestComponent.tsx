@@ -41,8 +41,8 @@ export const MobileTestComponent: React.FC = () => {
     shouldUseCardLayout
   } = useMobileOptimizations()
   
-  const currentDevice = isMobile ? 'Mobile' : isTablet ? 'Tablet' : 'Desktop'
-  const deviceIcon = isMobile ? <PhoneIcon /> : isTablet ? <TabletIcon /> : <ComputerIcon />
+  const currentDevice = isMobile ? 'Mobile' : isTablet ? 'Tablet' : isDesktop ? 'Desktop' : 'Unknown'
+  const deviceIcon = isMobile ? <PhoneIcon /> : isTablet ? <TabletIcon /> : isDesktop ? <ComputerIcon /> : null
   
   const responsiveSpacing = getSpacing(1, 2, 3)
   const responsiveColumns = getGridColumns(1, 2, 4)

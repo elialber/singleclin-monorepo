@@ -9,12 +9,12 @@ public class TransactionCancelDto
     /// Reason for cancelling the transaction (required)
     /// </summary>
     public string CancellationReason { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Additional notes about the cancellation
     /// </summary>
     public string? Notes { get; set; }
-    
+
     /// <summary>
     /// Whether to refund credits to the patient's plan (default: true)
     /// </summary>

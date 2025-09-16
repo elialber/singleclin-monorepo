@@ -14,9 +14,9 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
     {
         // Load .env file
         Env.Load();
-        
+
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        
+
         // Build configuration
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -24,18 +24,18 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
             .AddJsonFile("appsettings.Development.json", optional: true)
             .AddEnvironmentVariables()
             .Build();
-        
+
         // Get connection string from environment variable first, then from configuration
-        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
+        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
             ?? configuration.GetConnectionString("PostgreSQL");
-            
+
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException("Connection string 'DATABASE_URL' not found.");
         }
-        
+
         optionsBuilder.UseNpgsql(connectionString);
-        
+
         return new AppDbContext(optionsBuilder.Options);
     }
 }

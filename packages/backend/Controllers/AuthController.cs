@@ -53,7 +53,7 @@ public class AuthController : ControllerBase
             }
 
             // Validate clinic name for clinic users
-            if ((registerDto.Role == UserRole.ClinicOrigin || registerDto.Role == UserRole.ClinicPartner) 
+            if ((registerDto.Role == UserRole.ClinicOrigin || registerDto.Role == UserRole.ClinicPartner)
                 && string.IsNullOrWhiteSpace(registerDto.ClinicName))
             {
                 return BadRequest(new ProblemDetails
@@ -390,7 +390,7 @@ public class AuthController : ControllerBase
                 });
             }
 
-            _logger.LogInformation("Social login successful: {Email}, Provider: {Provider}", 
+            _logger.LogInformation("Social login successful: {Email}, Provider: {Provider}",
                 result.Response!.Email, socialLoginDto.Provider);
             return Ok(result.Response);
         }
@@ -478,7 +478,7 @@ public class AuthController : ControllerBase
         {
             // Force Administrator role
             adminDto.Role = UserRole.Administrator;
-            
+
             var ipAddress = GetIpAddress();
             var result = await _authService.RegisterAsync(adminDto, ipAddress);
 
