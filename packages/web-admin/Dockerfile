@@ -20,6 +20,25 @@ COPY public ./public
 COPY src ./src
 COPY index.html ./
 
+# Set Firebase environment variables for build
+ARG VITE_FIREBASE_API_KEY
+ARG VITE_FIREBASE_AUTH_DOMAIN
+ARG VITE_FIREBASE_PROJECT_ID
+ARG VITE_FIREBASE_STORAGE_BUCKET
+ARG VITE_FIREBASE_MESSAGING_SENDER_ID
+ARG VITE_FIREBASE_APP_ID
+ARG VITE_GOOGLE_MAPS_API_KEY
+ARG VITE_BACKEND_URL
+
+ENV VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY
+ENV VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN
+ENV VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID
+ENV VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET
+ENV VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID
+ENV VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID
+ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
 # Build the application (skip TypeScript check for deployment)
 RUN npx vite build
 
@@ -66,16 +85,16 @@ server {
         }
     }
 
-    # API proxy (if needed for same-origin requests)
-    location /api/ {
-        # Proxy to backend Container App
-        proxy_pass https://singleclin-backend.proudbay-ea4166c5.eastus.azurecontainerapps.io/;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_ssl_verify off;
-    }
+    # API proxy disabled for now - frontend will call backend directly
+    # Frontend will use BACKEND_URL environment variable
+    # location /api/ {
+    #     proxy_pass https://singleclin-backend.proudbay-ea4166c5.eastus.azurecontainerapps.io/api/;
+    #     proxy_set_header Host \$host;
+    #     proxy_set_header X-Real-IP \$remote_addr;
+    #     proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    #     proxy_set_header X-Forwarded-Proto \$scheme;
+    #     proxy_ssl_verify off;
+    # }
 
     # Health check endpoint
     location /health {
