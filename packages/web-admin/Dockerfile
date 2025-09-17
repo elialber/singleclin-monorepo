@@ -68,12 +68,13 @@ server {
 
     # API proxy (if needed for same-origin requests)
     location /api/ {
-        # This will be configured via environment variables in Container Apps
-        proxy_pass http://backend:8080/api/;
+        # Proxy to backend Container App
+        proxy_pass https://singleclin-backend.proudbay-ea4166c5.eastus.azurecontainerapps.io/api/;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_ssl_verify off;
     }
 
     # Health check endpoint
@@ -90,11 +91,10 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 # Create non-root user
 RUN addgroup -g 1001 -S singleclin && \
-    adduser -S singleclin -u 1001
+    adduser -S singleclin -u 1001 -G singleclin
 
 # Update nginx to run as non-root
 RUN sed -i 's/user  nginx;/user  singleclin;/' /etc/nginx/nginx.conf && \
-    sed -i 's/listen       80;/listen       8080;/' /etc/nginx/conf.d/default.conf && \
     chown -R singleclin:singleclin /var/cache/nginx && \
     chown -R singleclin:singleclin /var/log/nginx && \
     chown -R singleclin:singleclin /etc/nginx/conf.d && \
