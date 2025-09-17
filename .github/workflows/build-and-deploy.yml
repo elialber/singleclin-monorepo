@@ -100,14 +100,13 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '9.0.x'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: 'packages/web-admin/package-lock.json'
 
       - name: Restore backend dependencies
         run: |
