@@ -37,11 +37,7 @@ public static class KeyVaultConfigurationExtensions
 
             var secretClient = new SecretClient(new Uri(keyVaultUrl), credential);
 
-            builder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions
-            {
-                // Convert Key Vault secret names to configuration keys
-                KeyVaultSecretManager = new PrefixedKeyVaultSecretManager()
-            });
+            builder.AddAzureKeyVault(secretClient, new PrefixedKeyVaultSecretManager());
         }
         catch (Exception ex)
         {

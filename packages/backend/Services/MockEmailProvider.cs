@@ -20,8 +20,9 @@ public class MockEmailProvider : IEmailNotificationProvider
 
     public Task<NotificationResponse> SendAsync(NotificationRequest request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("MOCK NOTIFICATION: Would send {Type} notification", request.GetType().Name);
-        _logger.LogDebug("MOCK NOTIFICATION Content: {Content}", request.Content);
+        _logger.LogInformation("MOCK NOTIFICATION: Would send {Type} notification to {Recipient}",
+            request.GetType().Name, request.Recipient);
+        _logger.LogDebug("MOCK NOTIFICATION Content: {Message}", request.Message);
 
         // Simulate successful notification sending
         return Task.FromResult(NotificationResponse.Successful($"Mock notification sent", Channel));
@@ -29,12 +30,12 @@ public class MockEmailProvider : IEmailNotificationProvider
 
     public Task<NotificationResponse> SendEmailAsync(EmailNotificationRequest request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("MOCK EMAIL: Would send email to {ToEmail} with subject '{Subject}'",
-            request.ToEmail, request.Subject);
+        _logger.LogInformation("MOCK EMAIL: Would send email to {Email} with subject '{Subject}'",
+            request.Email, request.Subject);
 
-        _logger.LogDebug("MOCK EMAIL Content: {Content}", request.Content);
+        _logger.LogDebug("MOCK EMAIL Content: {Message}", request.Message);
 
         // Simulate successful email sending
-        return Task.FromResult(NotificationResponse.Successful($"Mock email sent to {request.ToEmail}", Channel));
+        return Task.FromResult(NotificationResponse.Successful($"Mock email sent to {request.Email}", Channel));
     }
 }
