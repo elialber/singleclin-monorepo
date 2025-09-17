@@ -65,6 +65,12 @@ jobs:
         run: |
           IMAGE_NAME="${{ env.CONTAINER_REGISTRY }}.azurecr.io/singleclin-frontend:${{ steps.vars.outputs.tag }}"
 
+          # Get backend URL dynamically for build
+          BACKEND_FQDN=$(az containerapp show \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.BACKEND_APP_NAME }} \
+            --query 'properties.configuration.ingress.fqdn' -o tsv 2>/dev/null || echo "singleclin-backend.proudbay-ea4166c5.eastus.azurecontainerapps.io")
+
           docker build \
             -t $IMAGE_NAME \
             -f packages/web-admin/Dockerfile \
@@ -75,7 +81,7 @@ jobs:
             --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}" \
             --build-arg VITE_FIREBASE_APP_ID="${{ secrets.VITE_FIREBASE_APP_ID }}" \
             --build-arg VITE_GOOGLE_MAPS_API_KEY="${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}" \
-            --build-arg VITE_BACKEND_URL="https://singleclin-backend.proudbay-ea4166c5.eastus.azurecontainerapps.io" \
+            --build-arg VITE_BACKEND_URL="https://$BACKEND_FQDN" \
             packages/web-admin
 
           docker push $IMAGE_NAME
@@ -224,8 +230,6 @@ jobs:
             --max-replicas 2 \
             --cpu 0.5 \
             --memory 1Gi \
-            --env-vars \
-              BACKEND_URL=https://$BACKEND_URL \
             --query 'properties.configuration.ingress.fqdn' -o tsv
 
       - name: Verify deployment
