@@ -1,10 +1,16 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__read_text_file"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "taskmaster-ai",
     "postgresql",
     "filesystem",
     "memory",
     "github"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

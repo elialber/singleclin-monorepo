@@ -1,0 +1,79 @@
+# Docker Compose override for development
+# This file is automatically loaded with docker-compose.yml
+
+version: '3.8'
+
+services:
+  # Development overrides for backend
+  backend:
+    # Mount source code for development (if needed for debugging)
+    volumes:
+      - ./packages/backend/firebase-service-account.json:/app/firebase-service-account.json:ro
+      - ./packages/backend/wwwroot:/app/wwwroot
+    environment:
+      # Development-specific environment variables
+      ASPNETCORE_ENVIRONMENT: "Development"
+      Logging__LogLevel__Default: "Debug"
+      Logging__LogLevel__Microsoft: "Warning"
+      Logging__LogLevel__System: "Warning"
+
+  # Development overrides for frontend
+  frontend:
+    environment:
+      # Development-specific environment variables
+      NODE_ENV: "development"
+
+  # Add development database with seed data
+  postgres:
+    environment:
+      # Enable extensions that might be useful for development
+      POSTGRES_EXTENSIONS: "uuid-ossp,pgcrypto"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Mount any seed SQL scripts
+      - ./packages/backend/Scripts:/docker-entrypoint-initdb.d:ro
+
+  # Development-specific Redis configuration
+  redis:
+    # Enable Redis modules that might be useful for development
+    command: redis-server --appendonly yes --requirepass redis123 --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+# Add development tools (uncomment as needed)
+
+# services:
+  # # Redis Commander - Redis GUI
+  # redis-commander:
+  #   image: rediscommander/redis-commander:latest
+  #   container_name: singleclin-redis-commander
+  #   environment:
+  #     - REDIS_HOSTS=redis:redis:6379:0:redis123
+  #   ports:
+  #     - "8081:8081"
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - singleclin-network
+
+  # # pgAdmin - PostgreSQL GUI
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: singleclin-pgadmin
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@singleclin.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin123
+  #   ports:
+  #     - "8082:80"
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - singleclin-network
+
+  # # Mailhog - Email testing
+  # mailhog:
+  #   image: mailhog/mailhog:latest
+  #   container_name: singleclin-mailhog
+  #   ports:
+  #     - "1025:1025"  # SMTP server
+  #     - "8025:8025"  # Web UI
+  #   networks:
+  #     - singleclin-network

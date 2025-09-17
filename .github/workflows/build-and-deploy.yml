@@ -1,0 +1,291 @@
+name: Build and Deploy to Azure Container Apps
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RESOURCE_GROUP: singleclin-prod-rg
+  CONTAINER_REGISTRY: singleclinprodacr
+  CONTAINER_APPS_ENV: singleclin-prod-env
+  BACKEND_APP_NAME: singleclin-backend
+  FRONTEND_APP_NAME: singleclin-frontend
+
+jobs:
+  # Build and push Docker images
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      backend-image: ${{ steps.build-backend.outputs.image }}
+      frontend-image: ${{ steps.build-frontend.outputs.image }}
+      image-tag: ${{ steps.vars.outputs.tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up variables
+        id: vars
+        run: |
+          echo "tag=main-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date -u +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to Azure Container Registry
+        run: az acr login --name ${{ env.CONTAINER_REGISTRY }}
+
+      - name: Build and push backend image
+        id: build-backend
+        run: |
+          IMAGE_NAME="${{ env.CONTAINER_REGISTRY }}.azurecr.io/singleclin-backend:${{ steps.vars.outputs.tag }}"
+
+          docker build \
+            -t $IMAGE_NAME \
+            -f packages/backend/Dockerfile \
+            packages/backend
+
+          docker push $IMAGE_NAME
+
+          echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build and push frontend image
+        id: build-frontend
+        run: |
+          IMAGE_NAME="${{ env.CONTAINER_REGISTRY }}.azurecr.io/singleclin-frontend:${{ steps.vars.outputs.tag }}"
+
+          docker build \
+            -t $IMAGE_NAME \
+            -f packages/web-admin/Dockerfile \
+            packages/web-admin
+
+          docker push $IMAGE_NAME
+
+          echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
+  # Run tests
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: singleclin_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'packages/web-admin/package-lock.json'
+
+      - name: Restore backend dependencies
+        run: |
+          cd packages/backend
+          dotnet restore
+
+      - name: Build backend
+        run: |
+          cd packages/backend
+          dotnet build --no-restore
+
+      - name: Run backend tests
+        run: |
+          cd packages/backend-tests
+          dotnet test --no-build --verbosity normal
+        env:
+          ConnectionStrings__DefaultConnection: "Host=localhost;Database=singleclin_test;Username=postgres;Password=postgres"
+
+      - name: Install frontend dependencies
+        run: |
+          cd packages/web-admin
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd packages/web-admin
+          npm run build
+
+      - name: Run frontend tests
+        run: |
+          cd packages/web-admin
+          npm run test --if-present
+
+  # Deploy to Azure Container Apps
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get managed identity ID
+        id: identity
+        run: |
+          IDENTITY_ID=$(az identity show \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name singleclin-prod-identity \
+            --query id -o tsv)
+          echo "identity-id=$IDENTITY_ID" >> $GITHUB_OUTPUT
+
+      - name: Deploy backend to Container Apps
+        run: |
+          az containerapp update \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.BACKEND_APP_NAME }} \
+            --image ${{ needs.build.outputs.backend-image }} \
+            --query 'properties.configuration.ingress.fqdn' -o tsv || \
+          az containerapp create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.BACKEND_APP_NAME }} \
+            --environment ${{ env.CONTAINER_APPS_ENV }} \
+            --image ${{ needs.build.outputs.backend-image }} \
+            --registry-server ${{ env.CONTAINER_REGISTRY }}.azurecr.io \
+            --target-port 8080 \
+            --ingress external \
+            --min-replicas 0 \
+            --max-replicas 3 \
+            --cpu 1.0 \
+            --memory 2Gi \
+            --user-assigned ${{ steps.identity.outputs.identity-id }} \
+            --env-vars \
+              ASPNETCORE_ENVIRONMENT=Production \
+              AzureKeyVault__VaultUrl=https://singleclin-kv-prod.vault.azure.net/ \
+              AzureKeyVault__UseMangedIdentity=true \
+            --query 'properties.configuration.ingress.fqdn' -o tsv
+
+      - name: Deploy frontend to Container Apps
+        run: |
+          # Get backend URL for API proxy configuration
+          BACKEND_URL=$(az containerapp show \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.BACKEND_APP_NAME }} \
+            --query 'properties.configuration.ingress.fqdn' -o tsv)
+
+          az containerapp update \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.FRONTEND_APP_NAME }} \
+            --image ${{ needs.build.outputs.frontend-image }} \
+            --query 'properties.configuration.ingress.fqdn' -o tsv || \
+          az containerapp create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.FRONTEND_APP_NAME }} \
+            --environment ${{ env.CONTAINER_APPS_ENV }} \
+            --image ${{ needs.build.outputs.frontend-image }} \
+            --registry-server ${{ env.CONTAINER_REGISTRY }}.azurecr.io \
+            --target-port 8080 \
+            --ingress external \
+            --min-replicas 0 \
+            --max-replicas 2 \
+            --cpu 0.5 \
+            --memory 1Gi \
+            --env-vars \
+              BACKEND_URL=https://$BACKEND_URL \
+            --query 'properties.configuration.ingress.fqdn' -o tsv
+
+      - name: Verify deployment
+        run: |
+          echo "Deployment completed successfully!"
+
+          BACKEND_URL=$(az containerapp show \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.BACKEND_APP_NAME }} \
+            --query 'properties.configuration.ingress.fqdn' -o tsv)
+
+          FRONTEND_URL=$(az containerapp show \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.FRONTEND_APP_NAME }} \
+            --query 'properties.configuration.ingress.fqdn' -o tsv)
+
+          echo "Backend URL: https://$BACKEND_URL"
+          echo "Frontend URL: https://$FRONTEND_URL"
+          echo "Backend Health: https://$BACKEND_URL/health"
+          echo "API Documentation: https://$BACKEND_URL/swagger"
+
+          # Wait a bit for containers to start
+          sleep 30
+
+          # Test health endpoints
+          echo "Testing backend health..."
+          curl -f "https://$BACKEND_URL/health" || echo "Backend health check failed"
+
+          echo "Testing frontend health..."
+          curl -f "https://$FRONTEND_URL/health" || echo "Frontend health check failed"
+
+  # Cleanup old images
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+
+    steps:
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Cleanup old images
+        run: |
+          # Keep only the 5 most recent images for each repository
+          for repo in singleclin-backend singleclin-frontend; do
+            echo "Cleaning up $repo repository..."
+
+            # Get all tags sorted by creation date (newest first)
+            TAGS=$(az acr repository show-tags \
+              --name ${{ env.CONTAINER_REGISTRY }} \
+              --repository $repo \
+              --orderby time_desc \
+              --query '[].name' -o tsv)
+
+            # Skip first 5 (keep them), delete the rest
+            echo "$TAGS" | tail -n +6 | while read tag; do
+              if [ ! -z "$tag" ]; then
+                echo "Deleting $repo:$tag"
+                az acr repository delete \
+                  --name ${{ env.CONTAINER_REGISTRY }} \
+                  --image "$repo:$tag" \
+                  --yes || true
+              fi
+            done
+          done

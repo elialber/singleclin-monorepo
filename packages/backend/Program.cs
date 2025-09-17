@@ -33,6 +33,9 @@ public class Program
 
         var builder = WebApplication.CreateBuilder(args);
 
+        // Add Azure Key Vault configuration (must be done early)
+        builder.Configuration.AddAzureKeyVault(builder.Environment);
+
         // Add services to the container.
         builder.Services.AddControllers();
 
@@ -171,12 +174,12 @@ public class Program
         // Configure notification providers
         builder.Services.Configure<FcmOptions>(
             builder.Configuration.GetSection(FcmOptions.SectionName));
-        builder.Services.Configure<SendGridOptions>(
-            builder.Configuration.GetSection(SendGridOptions.SectionName));
 
         // Add notification providers
         builder.Services.AddScoped<IPushNotificationProvider, FcmProvider>();
-        builder.Services.AddScoped<IEmailNotificationProvider, SendGridProvider>();
+
+        // Use Mock Email Provider instead of SendGrid
+        builder.Services.AddScoped<IEmailNotificationProvider, MockEmailProvider>();
 
         // Add email template service
         builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
@@ -379,6 +382,9 @@ public class Program
             .AddCheck<SingleClin.API.HealthChecks.RedisHealthCheck>("redis",
                 failureStatus: HealthStatus.Degraded,
                 tags: new[] { "redis", "cache", "ready" })
+            .AddCheck<SingleClin.API.HealthChecks.KeyVaultHealthCheck>("keyvault",
+                failureStatus: HealthStatus.Degraded,
+                tags: new[] { "keyvault", "config", "ready" })
             .AddDbContextCheck<ApplicationDbContext>("database",
                 failureStatus: HealthStatus.Unhealthy,
                 tags: new[] { "database", "ready" });

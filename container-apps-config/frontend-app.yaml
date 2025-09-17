@@ -1,0 +1,91 @@
+# Azure Container App configuration for SingleClin Frontend
+# Usage: az containerapp create --yaml frontend-app.yaml
+
+properties:
+  environmentId: /subscriptions/{subscription-id}/resourceGroups/singleclin-prod-rg/providers/Microsoft.App/managedEnvironments/singleclin-prod-env
+  configuration:
+    ingress:
+      external: true
+      targetPort: 8080
+      transport: http
+      traffic:
+        - weight: 100
+          latestRevision: true
+      corsPolicy:
+        allowedOrigins:
+          - "*"
+        allowedMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        allowedHeaders:
+          - "*"
+        allowCredentials: true
+    registries:
+      - server: singleclinprodacr.azurecr.io
+        identity: /subscriptions/{subscription-id}/resourceGroups/singleclin-prod-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/singleclin-prod-identity
+    secrets: []
+  template:
+    containers:
+      - image: singleclinprodacr.azurecr.io/singleclin-frontend:latest
+        name: singleclin-frontend
+        resources:
+          cpu: 0.5
+          memory: 1Gi
+        env:
+          - name: NODE_ENV
+            value: "production"
+          - name: BACKEND_URL
+            value: "https://singleclin-backend.{environment-suffix}.azurecontainerapps.io"
+        probes:
+          - type: Liveness
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          - type: Readiness
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          - type: Startup
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 20
+    scale:
+      minReplicas: 0
+      maxReplicas: 2
+      rules:
+        - name: http-scaling
+          http:
+            metadata:
+              concurrentRequests: 20
+        - name: cpu-scaling
+          custom:
+            type: cpu
+            metadata:
+              type: Utilization
+              value: 70
+    revisionSuffix: ""
+  identity:
+    type: UserAssigned
+    userAssignedIdentities:
+      /subscriptions/{subscription-id}/resourceGroups/singleclin-prod-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/singleclin-prod-identity: {}
+location: East US
+tags:
+  Environment: Production
+  Application: SingleClin
+  Component: Frontend
+  CostCenter: SingleClin-Prod

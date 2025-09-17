@@ -1,0 +1,126 @@
+# Docker Compose for production-like testing
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+version: '3.8'
+
+services:
+  # Production-like backend configuration
+  backend:
+    environment:
+      # Production environment
+      ASPNETCORE_ENVIRONMENT: "Production"
+
+      # Logging
+      Logging__LogLevel__Default: "Information"
+      Logging__LogLevel__Microsoft: "Warning"
+      Logging__LogLevel__System: "Warning"
+      Logging__LogLevel__Azure: "Warning"
+
+      # Health checks
+      HealthChecks__Enabled: "true"
+
+      # Performance settings
+      DOTNET_GCServer: "1"
+      DOTNET_GCConcurrent: "1"
+      DOTNET_GCRetainVM: "1"
+
+    # Resource limits for production testing
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+    # Production health check intervals
+    healthcheck:
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Production-like frontend configuration
+  frontend:
+    environment:
+      NODE_ENV: "production"
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+    # Production health check intervals
+    healthcheck:
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Production-like database configuration
+  postgres:
+    # Use specific version tag instead of latest
+    image: postgres:15.5-alpine
+
+    environment:
+      # Production database settings
+      POSTGRES_DB: singleclin_prod
+      POSTGRES_USER: singleclin_user
+      POSTGRES_PASSWORD: ${POSTGRES_PROD_PASSWORD:-secure_prod_password}
+
+    # Production database optimizations
+    command: >
+      postgres
+      -c max_connections=100
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.7
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # Production-like Redis configuration
+  redis:
+    # Use specific version tag
+    image: redis:7.2-alpine
+
+    # Production Redis configuration
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PROD_PASSWORD:-secure_redis_password}
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 300
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+# Remove development tools in production
+# (Don't include override services like pgadmin, redis-commander, etc.)

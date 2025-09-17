@@ -1,0 +1,104 @@
+# SingleClin - Docker ignore file
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Documentation and README files
+*.md
+docs/
+**/*.md
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+**/.DS_Store
+
+# Environment files (should use Key Vault instead)
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Node.js
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# .NET
+**/bin/
+**/obj/
+**/.vs/
+**/TestResults/
+**/*.user
+**/*.suo
+**/*.cache
+**/*.log
+
+# Build artifacts
+**/dist/
+**/build/
+**/coverage/
+
+# Testing
+**/.nyc_output
+**/*.lcov
+**/coverage/
+**/.coverage
+**/TestResults/
+**/*.trx
+
+# Logs
+logs/
+**/*.log
+**/*.logs
+
+# Runtime files
+**/*.pid
+**/*.seed
+
+# Azure and deployment
+azure-pipelines.yml
+.azure/
+**/*.publish.xml
+
+# CI/CD
+.github/
+.taskmaster/
+scripts/
+
+# Temporary files
+**/tmp/
+**/temp/
+**/*.tmp
+**/*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# JetBrains
+**/.idea/
+**/*.iml
+**/*.ipr
+**/*.iws
+
+# VS Code
+.vscode/
+
+# Firebase
+firebase-service-account*.json
+
+# Backup files
+**/*.bak
+**/*.backup

@@ -1,0 +1,154 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: singleclin-postgres
+    environment:
+      POSTGRES_DB: singleclin_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/backend/Scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d singleclin_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - singleclin-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: singleclin-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass redis123
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis123", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - singleclin-network
+
+  # Backend API (.NET)
+  backend:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    container_name: singleclin-backend
+    ports:
+      - "5010:8080"
+    environment:
+      # Database connection
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=singleclin_dev;Username=postgres;Password=postgres123"
+
+      # Redis connection
+      Redis__ConnectionString: "redis:6379,password=redis123"
+      Redis__InstanceName: "SingleClin_Dev"
+
+      # JWT configuration
+      JWT__SecretKey: "your-super-secret-key-for-development-only-min-32-characters"
+      JWT__Issuer: "SingleClin"
+      JWT__Audience: "SingleClinUsers"
+      JWT__ExpiryInMinutes: "60"
+      JWT__RefreshTokenExpiryInDays: "7"
+
+      # Firebase configuration (use local service account file)
+      Firebase__ProjectId: "your-firebase-project-id"
+      Firebase__ServiceAccountKeyPath: "/app/firebase-service-account.json"
+
+      # Azure Storage (for development, you can use local storage or Azurite)
+      AzureStorage__ConnectionString: "UseDevelopmentStorage=true"
+
+      # SendGrid disabled - not used in this project
+      # SendGrid__ApiKey: "not-configured"
+
+      # Environment
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:8080"
+
+      # Disable Key Vault for local development
+      AzureKeyVault__VaultUrl: ""
+
+    volumes:
+      # Mount Firebase service account file if it exists
+      - ./packages/backend/firebase-service-account.json:/app/firebase-service-account.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - singleclin-network
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./packages/web-admin
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=http://localhost:5010
+    container_name: singleclin-frontend
+    ports:
+      - "3000:8080"
+    environment:
+      - BACKEND_URL=http://backend:8080
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - singleclin-network
+
+  # Azurite (Azure Storage Emulator) - Optional for development
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    container_name: singleclin-azurite
+    ports:
+      - "10000:10000"  # Blob service
+      - "10001:10001"  # Queue service
+      - "10002:10002"  # Table service
+    volumes:
+      - azurite_data:/data
+    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --location /data --debug /data/debug.log"
+    networks:
+      - singleclin-network
+
+  # Hangfire Dashboard (Background Jobs) - Optional
+  # hangfire-dashboard:
+  #   image: nginx:alpine
+  #   container_name: singleclin-hangfire
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - backend
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  azurite_data:
+    driver: local
+
+networks:
+  singleclin-network:
+    driver: bridge

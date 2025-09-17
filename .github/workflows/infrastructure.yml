@@ -1,0 +1,187 @@
+name: Deploy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: 'Destroy infrastructure instead of creating it'
+        required: false
+        default: false
+        type: boolean
+
+# Required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RESOURCE_GROUP: singleclin-prod-rg
+  SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+jobs:
+  infrastructure:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set Azure Subscription
+        run: |
+          az account set --subscription ${{ env.SUBSCRIPTION_ID }}
+          echo "Using subscription: $(az account show --query name -o tsv)"
+
+      - name: Create Infrastructure
+        if: ${{ !inputs.destroy }}
+        run: |
+          echo "Creating Azure infrastructure..."
+
+          # Make sure script is executable
+          chmod +x ./scripts/create-infrastructure.sh
+
+          # Update subscription ID in script
+          sed -i 's/SUBSCRIPTION_ID=""/SUBSCRIPTION_ID="${{ env.SUBSCRIPTION_ID }}"/' ./scripts/create-infrastructure.sh
+
+          # Run infrastructure creation
+          ./scripts/create-infrastructure.sh
+
+      - name: Verify Infrastructure
+        if: ${{ !inputs.destroy }}
+        run: |
+          echo "Verifying infrastructure..."
+
+          # Check if resource group exists
+          if az group exists --name ${{ env.RESOURCE_GROUP }}; then
+            echo "✅ Resource group created successfully"
+          else
+            echo "❌ Resource group not found"
+            exit 1
+          fi
+
+          # List all resources
+          echo "Resources in ${{ env.RESOURCE_GROUP }}:"
+          az resource list --resource-group ${{ env.RESOURCE_GROUP }} --output table
+
+          # Verify Key Vault
+          VAULT_NAME="singleclin-kv-prod"
+          if az keyvault show --name $VAULT_NAME >/dev/null 2>&1; then
+            echo "✅ Key Vault accessible"
+
+            # List secrets (names only)
+            echo "Secrets in Key Vault:"
+            az keyvault secret list --vault-name $VAULT_NAME --query '[].name' -o table
+          else
+            echo "❌ Key Vault not accessible"
+          fi
+
+          # Verify Container Registry
+          REGISTRY_NAME="singleclinprodacr"
+          if az acr show --name $REGISTRY_NAME >/dev/null 2>&1; then
+            echo "✅ Container Registry accessible"
+          else
+            echo "❌ Container Registry not accessible"
+          fi
+
+          # Verify PostgreSQL
+          POSTGRES_NAME="singleclin-prod-postgres"
+          if az postgres flexible-server show --resource-group ${{ env.RESOURCE_GROUP }} --name $POSTGRES_NAME >/dev/null 2>&1; then
+            echo "✅ PostgreSQL server accessible"
+          else
+            echo "❌ PostgreSQL server not accessible"
+          fi
+
+          # Verify Redis
+          REDIS_NAME="singleclin-prod-redis"
+          if az redis show --resource-group ${{ env.RESOURCE_GROUP }} --name $REDIS_NAME >/dev/null 2>&1; then
+            echo "✅ Redis cache accessible"
+          else
+            echo "❌ Redis cache not accessible"
+          fi
+
+          # Verify Container Apps Environment
+          CONTAINER_ENV="singleclin-prod-env"
+          if az containerapp env show --resource-group ${{ env.RESOURCE_GROUP }} --name $CONTAINER_ENV >/dev/null 2>&1; then
+            echo "✅ Container Apps Environment accessible"
+          else
+            echo "❌ Container Apps Environment not accessible"
+          fi
+
+      - name: Setup Key Vault Secrets
+        if: ${{ !inputs.destroy }}
+        run: |
+          echo "Setting up Key Vault secrets..."
+
+          # Make scripts executable
+          chmod +x ./scripts/setup-keyvault.sh
+
+          # Validate all required secrets exist
+          ./scripts/setup-keyvault.sh validate
+
+          echo "Key Vault setup completed!"
+
+      - name: Destroy Infrastructure
+        if: ${{ inputs.destroy }}
+        run: |
+          echo "⚠️  DESTROYING Azure infrastructure..."
+
+          # Make sure script is executable
+          chmod +x ./scripts/cleanup-resources.sh
+
+          # Update subscription ID in script
+          sed -i 's/SUBSCRIPTION_ID=""/SUBSCRIPTION_ID="${{ env.SUBSCRIPTION_ID }}"/' ./scripts/cleanup-resources.sh
+
+          # Run cleanup with automatic confirmation
+          echo "DELETE" | ./scripts/cleanup-resources.sh cleanup
+
+          echo "🗑️  Infrastructure destruction initiated"
+
+      - name: Output Summary
+        if: ${{ !inputs.destroy }}
+        run: |
+          echo "## 🚀 Infrastructure Deployment Summary" >> $GITHUB_STEP_SUMMARY
+
+          # Get Key Vault URL
+          VAULT_URL="https://singleclin-kv-prod.vault.azure.net/"
+          echo "- **Key Vault**: $VAULT_URL" >> $GITHUB_STEP_SUMMARY
+
+          # Get Container Registry URL
+          REGISTRY_URL="singleclinprodacr.azurecr.io"
+          echo "- **Container Registry**: $REGISTRY_URL" >> $GITHUB_STEP_SUMMARY
+
+          # Get database connection info
+          POSTGRES_FQDN=$(az postgres flexible-server show \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name singleclin-prod-postgres \
+            --query fullyQualifiedDomainName -o tsv 2>/dev/null || echo "Not available")
+          echo "- **PostgreSQL FQDN**: $POSTGRES_FQDN" >> $GITHUB_STEP_SUMMARY
+
+          # Get Redis hostname
+          REDIS_HOSTNAME=$(az redis show \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name singleclin-prod-redis \
+            --query hostName -o tsv 2>/dev/null || echo "Not available")
+          echo "- **Redis Hostname**: $REDIS_HOSTNAME" >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚠️ Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Update Firebase service account secret in Key Vault" >> $GITHUB_STEP_SUMMARY
+          echo "2. Update SendGrid API key in Key Vault" >> $GITHUB_STEP_SUMMARY
+          echo "3. Run the build-and-deploy workflow to deploy applications" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Use \`./scripts/setup-keyvault.sh\` locally to manage secrets." >> $GITHUB_STEP_SUMMARY
+
+      - name: Cleanup Summary
+        if: ${{ inputs.destroy }}
+        run: |
+          echo "## 🗑️ Infrastructure Cleanup Summary" >> $GITHUB_STEP_SUMMARY
+          echo "All resources in resource group **${{ env.RESOURCE_GROUP }}** have been scheduled for deletion." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note**: The deletion process may take several minutes to complete." >> $GITHUB_STEP_SUMMARY
