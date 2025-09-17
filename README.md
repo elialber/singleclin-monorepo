@@ -211,3 +211,4 @@ git push origin main  # Triggera workflow automaticamente
 ---
 
 **💡 Desenvolvido com metodologia anti-procrastinação: tarefas de 25 minutos com escape hatches para manter momentum!**# Deploy test with correct OIDC
+# Testing OIDC fix 2
