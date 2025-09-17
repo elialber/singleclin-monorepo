@@ -1,7 +1,7 @@
 # SingleClin Backend - Multi-stage Docker build
 
 # Stage 1: Build environment
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 
 # Copy csproj and restore dependencies (cached layer)
@@ -17,12 +17,12 @@ RUN dotnet publish -c Release -o /app/publish \
     --self-contained false
 
 # Stage 2: Runtime environment
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup --system --gid 1001 singleclin && \
-    adduser --system --uid 1001 --ingroup singleclin singleclin
+# Create non-root user for security (using groupadd/useradd for newer images)
+RUN groupadd --system --gid 1001 singleclin && \
+    useradd --system --uid 1001 --gid singleclin --home /app --shell /bin/bash singleclin
 
 # Install necessary packages
 RUN apt-get update && \
