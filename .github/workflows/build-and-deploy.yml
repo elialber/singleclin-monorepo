@@ -209,6 +209,8 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --name ${{ env.FRONTEND_APP_NAME }} \
             --image ${{ needs.build.outputs.frontend-image }} \
+            --env-vars \
+              VITE_BACKEND_URL=https://api.singleclin.com.br/api \
             --query 'properties.configuration.ingress.fqdn' -o tsv || \
           az containerapp create \
             --resource-group ${{ env.RESOURCE_GROUP }} \
@@ -222,6 +224,8 @@ jobs:
             --max-replicas 2 \
             --cpu 0.5 \
             --memory 1Gi \
+            --env-vars \
+              VITE_BACKEND_URL=https://api.singleclin.com.br/api \
             --query 'properties.configuration.ingress.fqdn' -o tsv
 
       - name: Verify deployment
