@@ -65,11 +65,8 @@ jobs:
         run: |
           IMAGE_NAME="${{ env.CONTAINER_REGISTRY }}.azurecr.io/singleclin-frontend:${{ steps.vars.outputs.tag }}"
 
-          # Get backend URL dynamically for build
-          BACKEND_FQDN=$(az containerapp show \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --name ${{ env.BACKEND_APP_NAME }} \
-            --query 'properties.configuration.ingress.fqdn' -o tsv 2>/dev/null || echo "singleclin-backend.proudbay-ea4166c5.eastus.azurecontainerapps.io")
+          # Use custom domain for API to avoid CORS issues
+          API_DOMAIN="api.singleclin.com.br"
 
           docker build \
             -t $IMAGE_NAME \
@@ -81,7 +78,7 @@ jobs:
             --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}" \
             --build-arg VITE_FIREBASE_APP_ID="${{ secrets.VITE_FIREBASE_APP_ID }}" \
             --build-arg VITE_GOOGLE_MAPS_API_KEY="${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}" \
-            --build-arg VITE_BACKEND_URL="https://$BACKEND_FQDN" \
+            --build-arg VITE_BACKEND_URL="https://$API_DOMAIN/api" \
             packages/web-admin
 
           docker push $IMAGE_NAME
@@ -207,11 +204,6 @@ jobs:
 
       - name: Deploy frontend to Container Apps
         run: |
-          # Get backend URL for API proxy configuration
-          BACKEND_URL=$(az containerapp show \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --name ${{ env.BACKEND_APP_NAME }} \
-            --query 'properties.configuration.ingress.fqdn' -o tsv)
 
           az containerapp update \
             --resource-group ${{ env.RESOURCE_GROUP }} \
@@ -248,8 +240,9 @@ jobs:
 
           echo "Backend URL: https://$BACKEND_URL"
           echo "Frontend URL: https://$FRONTEND_URL"
+          echo "API Domain: https://api.singleclin.com.br/api"
           echo "Backend Health: https://$BACKEND_URL/health"
-          echo "API Documentation: https://$BACKEND_URL/swagger"
+          echo "API Documentation: https://api.singleclin.com.br/api/swagger"
 
           # Wait a bit for containers to start
           sleep 30
