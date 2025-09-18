@@ -182,6 +182,15 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --name ${{ env.BACKEND_APP_NAME }} \
             --image ${{ needs.build.outputs.backend-image }} \
+            --env-vars \
+              ASPNETCORE_ENVIRONMENT=Production \
+              AzureKeyVault__VaultUrl=https://singleclin-kv-prod.vault.azure.net/ \
+              AzureKeyVault__UseMangedIdentity=true \
+              Firebase__ProjectId=singleclin-app \
+              Firebase__ServiceAccount="${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" \
+              JWT__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
+              SendGrid__ApiKey="${{ secrets.SENDGRID_API_KEY }}" \
+              AzureStorage__ConnectionString="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
             --query 'properties.configuration.ingress.fqdn' -o tsv || \
           az containerapp create \
             --resource-group ${{ env.RESOURCE_GROUP }} \
@@ -200,6 +209,11 @@ jobs:
               ASPNETCORE_ENVIRONMENT=Production \
               AzureKeyVault__VaultUrl=https://singleclin-kv-prod.vault.azure.net/ \
               AzureKeyVault__UseMangedIdentity=true \
+              Firebase__ProjectId=singleclin-app \
+              Firebase__ServiceAccount="${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" \
+              JWT__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
+              SendGrid__ApiKey="${{ secrets.SENDGRID_API_KEY }}" \
+              AzureStorage__ConnectionString="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
             --query 'properties.configuration.ingress.fqdn' -o tsv
 
       - name: Deploy frontend to Container Apps
