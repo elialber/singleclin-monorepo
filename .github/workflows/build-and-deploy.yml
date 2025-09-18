@@ -189,7 +189,7 @@ jobs:
               JWT__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
               SendGrid__ApiKey="${{ secrets.SENDGRID_API_KEY }}" \
               AzureStorage__ConnectionString="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              ConnectionStrings__DefaultConnection="Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;" \
+              ConnectionStrings__DefaultConnection="Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;" \
               Redis__ConnectionString="${{ secrets.REDIS_CONNECTION_STRING }}" \
             --query 'properties.configuration.ingress.fqdn' -o tsv || \
           az containerapp create \
@@ -212,7 +212,7 @@ jobs:
               JWT__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
               SendGrid__ApiKey="${{ secrets.SENDGRID_API_KEY }}" \
               AzureStorage__ConnectionString="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              ConnectionStrings__DefaultConnection="Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;" \
+              ConnectionStrings__DefaultConnection="Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;" \
               Redis__ConnectionString="${{ secrets.REDIS_CONNECTION_STRING }}" \
             --query 'properties.configuration.ingress.fqdn' -o tsv
 
