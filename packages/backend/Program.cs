@@ -44,31 +44,13 @@ public class Program
             .AddFluentValidationClientsideAdapters()
             .AddValidatorsFromAssemblyContaining<Program>();
 
-        // Add Entity Framework Core
+        // Add Entity Framework Core with PostgreSQL
         builder.Services.AddSingleton<SingleClin.API.Data.Interceptors.AuditingInterceptor>();
-
-        var useInMemoryDatabase = builder.Configuration.GetValue<bool>("UseInMemoryDatabase", false);
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
         builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
-            if (useInMemoryDatabase)
-            {
-                options.UseInMemoryDatabase("SingleClinDb");
-            }
-            else if (connectionString?.Contains("Data Source=") == true)
-            {
-                // SQLite for production fallback
-                options.UseSqlite(connectionString);
-            }
-            else
-            {
-                // PostgreSQL for full production
-                options.UseNpgsql(connectionString);
-            }
-
-            options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
-                   .EnableDetailedErrors(builder.Environment.IsDevelopment());
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+                .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+                .EnableDetailedErrors(builder.Environment.IsDevelopment());
 
             // Add auditing interceptor in development
             if (builder.Environment.IsDevelopment())
@@ -81,23 +63,9 @@ public class Program
         // Add AppDbContext with the same configuration
         builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
         {
-            if (useInMemoryDatabase)
-            {
-                options.UseInMemoryDatabase("SingleClinAppDb");
-            }
-            else if (connectionString?.Contains("Data Source=") == true)
-            {
-                // SQLite for production fallback
-                options.UseSqlite(connectionString);
-            }
-            else
-            {
-                // PostgreSQL for full production
-                options.UseNpgsql(connectionString);
-            }
-
-            options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
-                   .EnableDetailedErrors(builder.Environment.IsDevelopment());
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+                .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+                .EnableDetailedErrors(builder.Environment.IsDevelopment());
 
             // Add auditing interceptor in development
             if (builder.Environment.IsDevelopment())
