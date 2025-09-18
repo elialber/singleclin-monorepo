@@ -256,6 +256,34 @@ jobs:
               VITE_GOOGLE_MAPS_API_KEY="${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}" \
             --query 'properties.configuration.ingress.fqdn' -o tsv
 
+      - name: Restore custom domains
+        run: |
+          echo "Restoring custom domains after deployment..."
+
+          # Restore frontend custom domain
+          az containerapp hostname add \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.FRONTEND_APP_NAME }} \
+            --hostname singleclin.com.br || true
+
+          az containerapp hostname bind \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.FRONTEND_APP_NAME }} \
+            --hostname singleclin.com.br \
+            --environment ${{ env.CONTAINER_APPS_ENV }} || true
+
+          # Restore backend custom domain if needed
+          az containerapp hostname add \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.BACKEND_APP_NAME }} \
+            --hostname api.singleclin.com.br || true
+
+          az containerapp hostname bind \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.BACKEND_APP_NAME }} \
+            --hostname api.singleclin.com.br \
+            --environment ${{ env.CONTAINER_APPS_ENV }} || true
+
       - name: Verify deployment
         run: |
           echo "Deployment completed successfully!"
