@@ -178,19 +178,34 @@ jobs:
 
       - name: Deploy backend to Container Apps
         run: |
+          # Create a temporary environment file to properly handle complex JSON values
+          cat > /tmp/env-vars.txt << 'EOF'
+          ASPNETCORE_ENVIRONMENT=Production
+          Firebase__ProjectId=singleclin-app
+          JWT__SecretKey=${{ secrets.JWT_SECRET_KEY }}
+          SendGrid__ApiKey=${{ secrets.SENDGRID_API_KEY }}
+          AzureStorage__ConnectionString=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          ConnectionStrings__DefaultConnection=Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;
+          Redis__ConnectionString=${{ secrets.REDIS_CONNECTION_STRING }}
+          EOF
+
+          # Add Firebase service account as base64 encoded to avoid JSON parsing issues
+          echo "Firebase__ServiceAccount=${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" >> /tmp/env-vars.txt
+
+          # Try to update existing container app
           az containerapp update \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --name ${{ env.BACKEND_APP_NAME }} \
             --image ${{ needs.build.outputs.backend-image }} \
-            --env-vars \
+            --replace-env-vars \
               ASPNETCORE_ENVIRONMENT=Production \
               Firebase__ProjectId=singleclin-app \
-              Firebase__ServiceAccount="${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" \
-              JWT__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
-              SendGrid__ApiKey="${{ secrets.SENDGRID_API_KEY }}" \
-              AzureStorage__ConnectionString="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              ConnectionStrings__DefaultConnection="Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;" \
-              Redis__ConnectionString="${{ secrets.REDIS_CONNECTION_STRING }}" \
+              'Firebase__ServiceAccount=${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' \
+              'JWT__SecretKey=${{ secrets.JWT_SECRET_KEY }}' \
+              'SendGrid__ApiKey=${{ secrets.SENDGRID_API_KEY }}' \
+              'AzureStorage__ConnectionString=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}' \
+              'ConnectionStrings__DefaultConnection=Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;' \
+              'Redis__ConnectionString=${{ secrets.REDIS_CONNECTION_STRING }}' \
             --query 'properties.configuration.ingress.fqdn' -o tsv || \
           az containerapp create \
             --resource-group ${{ env.RESOURCE_GROUP }} \
@@ -208,12 +223,12 @@ jobs:
             --env-vars \
               ASPNETCORE_ENVIRONMENT=Production \
               Firebase__ProjectId=singleclin-app \
-              Firebase__ServiceAccount="${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" \
-              JWT__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
-              SendGrid__ApiKey="${{ secrets.SENDGRID_API_KEY }}" \
-              AzureStorage__ConnectionString="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              ConnectionStrings__DefaultConnection="Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;" \
-              Redis__ConnectionString="${{ secrets.REDIS_CONNECTION_STRING }}" \
+              'Firebase__ServiceAccount=${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' \
+              'JWT__SecretKey=${{ secrets.JWT_SECRET_KEY }}' \
+              'SendGrid__ApiKey=${{ secrets.SENDGRID_API_KEY }}' \
+              'AzureStorage__ConnectionString=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}' \
+              'ConnectionStrings__DefaultConnection=Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;' \
+              'Redis__ConnectionString=${{ secrets.REDIS_CONNECTION_STRING }}' \
             --query 'properties.configuration.ingress.fqdn' -o tsv
 
       - name: Deploy frontend to Container Apps
