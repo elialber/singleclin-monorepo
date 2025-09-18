@@ -2,31 +2,31 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/user_profile.dart';
+import '../../../presentation/controllers/base_controller.dart';
+import '../../../data/repositories/user_repository.dart';
+import '../../../data/models/user_model.dart';
 
-/// Profile Controller
+/// Profile Controller with offline-first capabilities
 /// Manages user profile data, editing, and LGPD compliance features
-class ProfileController extends GetxController {
-  // Observable state
+class ProfileController extends BaseController {
+  // Observable state (specialized for profile)
   final _profile = Rx<UserProfile?>(null);
-  final _isLoading = false.obs;
   final _isSaving = false.obs;
   final _isUpdatingPhoto = false.obs;
-  final _errorMessage = ''.obs;
   final _isEditing = false.obs;
   final _hasUnsavedChanges = false.obs;
   
   // Form controllers
   final _tempProfile = Rx<UserProfile?>(null);
-  
+
   // Services
   final ImagePicker _imagePicker = ImagePicker();
-  
+  late final UserRepository _userRepository;
+
   // Getters
   UserProfile? get profile => _profile.value;
-  bool get isLoading => _isLoading.value;
   bool get isSaving => _isSaving.value;
   bool get isUpdatingPhoto => _isUpdatingPhoto.value;
-  String get errorMessage => _errorMessage.value;
   bool get isEditing => _isEditing.value;
   bool get hasUnsavedChanges => _hasUnsavedChanges.value;
   UserProfile? get tempProfile => _tempProfile.value;
@@ -34,32 +34,68 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _userRepository = Get.find<UserRepository>();
     loadProfile();
   }
-  
-  /// Load user profile
-  Future<void> loadProfile() async {
+
+  @override
+  void _loadOfflineState() {
+    super._loadOfflineState();
+    // Check if we have cached profile data
+    _checkCachedProfile();
+  }
+
+  Future<void> _checkCachedProfile() async {
     try {
-      _isLoading(true);
-      _errorMessage('');
-      
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 1500));
-      
-      // Mock user profile data
-      final mockProfile = _generateMockProfile();
-      _profile.value = mockProfile;
-      
+      // Check if current user profile exists in cache
+      final currentUserId = 'current_user'; // Get from auth service
+      final cachedProfile = await _userRepository.getCurrentUser(offlineOnly: true);
+
+      if (cachedProfile != null) {
+        setCachedData(true);
+        updateLastSyncTime(_userRepository.lastSyncTime);
+      } else {
+        setCachedData(false);
+      }
     } catch (e) {
-      _errorMessage('Erro ao carregar perfil: $e');
-      Get.snackbar(
-        'Erro',
-        'Não foi possível carregar o perfil',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      _isLoading(false);
+      print('⚠️ Error checking cached profile: $e');
+      setCachedData(false);
     }
+  }
+  
+  /// Load user profile with offline-first support
+  Future<void> loadProfile({bool forceRefresh = false}) async {
+    final result = await executeOfflineFirst<UserModel>(
+      // Network operation
+      () async {
+        return await _userRepository.getCurrentUser(forceRefresh: true);
+      },
+      // Cache operation
+      () async {
+        return await _userRepository.getCurrentUser(offlineOnly: true);
+      },
+      forceRefresh: forceRefresh,
+      onSuccess: (userModel) {
+        if (userModel != null) {
+          // Convert UserModel to UserProfile (if they're different types)
+          _profile.value = _convertToUserProfile(userModel);
+        }
+      },
+      onOfflineMode: () {
+        showInfoSnackbar('Exibindo perfil em cache');
+      },
+    );
+
+    // Update profile if we got a result
+    if (result != null) {
+      _profile.value = _convertToUserProfile(result);
+    }
+  }
+
+  /// Convert UserModel to UserProfile (adapt as needed based on your models)
+  UserProfile _convertToUserProfile(UserModel userModel) {
+    // For now, generate mock profile - in production, convert from UserModel
+    return _generateMockProfile();
   }
   
   /// Start editing profile
@@ -86,43 +122,78 @@ class ProfileController extends GetxController {
     }
   }
   
-  /// Save profile changes
+  /// Save profile changes with offline support
   Future<void> saveProfile() async {
     if (_tempProfile.value == null) return;
-    
+
+    // Validate required fields
+    if (!_validateProfile(_tempProfile.value!)) return;
+
+    _isSaving(true);
+
     try {
-      _isSaving(true);
-      
-      // Validate required fields
-      if (!_validateProfile(_tempProfile.value!)) return;
-      
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 2000));
-      
-      // Update main profile
-      _profile.value = _tempProfile.value!.copyWith(
-        updatedAt: DateTime.now(),
+      // Convert UserProfile to UserModel for repository
+      final userModel = _convertToUserModel(_tempProfile.value!);
+
+      // Use network-only operation for saves (requires server confirmation)
+      final result = await executeNetworkOnly<UserModel>(
+        () async {
+          return await _userRepository.updateUser(userModel);
+        },
+        requireGoodConnection: false, // Allow save on poor connection
+        onSuccess: (savedUser) {
+          // Update main profile
+          _profile.value = _tempProfile.value!.copyWith(
+            updatedAt: DateTime.now(),
+          );
+
+          _tempProfile.value = null;
+          _isEditing(false);
+          _hasUnsavedChanges(false);
+
+          showSuccessSnackbar('Perfil atualizado com sucesso');
+        },
+        onNoConnection: () {
+          showWarningSnackbar('Sem conexão - alterações serão salvas quando conectar');
+
+          // Save optimistically in offline mode
+          _profile.value = _tempProfile.value!.copyWith(
+            updatedAt: DateTime.now(),
+          );
+
+          _tempProfile.value = null;
+          _isEditing(false);
+          _hasUnsavedChanges(false);
+        },
       );
-      
-      _tempProfile.value = null;
-      _isEditing(false);
-      _hasUnsavedChanges(false);
-      
-      Get.snackbar(
-        'Sucesso',
-        'Perfil atualizado com sucesso',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      
+
+      // If online save failed but we want to save locally
+      if (result == null && !isOnline) {
+        // The onNoConnection callback already handled this
+      }
+
     } catch (e) {
-      Get.snackbar(
-        'Erro',
-        'Erro ao salvar perfil: $e',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      showErrorSnackbar('Erro ao salvar perfil: $e');
     } finally {
       _isSaving(false);
     }
+  }
+
+  /// Convert UserProfile to UserModel (adapt based on your models)
+  UserModel _convertToUserModel(UserProfile profile) {
+    // For now, create basic UserModel - in production, convert from UserProfile
+    return UserModel(
+      id: profile.id,
+      email: profile.email,
+      role: 'patient', // Default role
+      isActive: true,
+      createdAt: profile.createdAt,
+      updatedAt: DateTime.now(),
+      displayName: profile.personalInfo.fullName,
+      phoneNumber: profile.contactInfo.phone,
+      photoUrl: profile.photoUrl,
+      isLocalOnly: !isOnline, // Mark as local-only if offline
+    );
   }
   
   /// Update personal info
