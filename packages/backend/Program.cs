@@ -1,3 +1,4 @@
+using System.Text;
 using SingleClin.API.Extensions;
 using SingleClin.API.Middleware;
 using SingleClin.API.Services;
@@ -452,22 +453,46 @@ public class Program
 
                 var projectId = projectId1 ?? projectId2 ?? projectId3 ?? projectId4;
                 var serviceAccountPath = configuration["Firebase:ServiceAccountKeyPath"];
+                var serviceAccountJson = configuration["Firebase:ServiceAccount"];
 
                 logger.LogInformation("Firebase Configuration:");
                 logger.LogInformation("  ProjectId: '{ProjectId}'", projectId ?? "NULL");
                 logger.LogInformation("  ServiceAccountKeyPath: '{Path}'", serviceAccountPath ?? "NULL");
+                logger.LogInformation("  ServiceAccountJson: '{HasJson}'", !string.IsNullOrEmpty(serviceAccountJson) ? "PROVIDED" : "NULL");
                 logger.LogInformation("  Current Directory: {Dir}", Directory.GetCurrentDirectory());
 
                 if (!string.IsNullOrEmpty(projectId))
                 {
                     if (FirebaseApp.DefaultInstance == null)
                     {
-                        if (!string.IsNullOrEmpty(serviceAccountPath) && File.Exists(serviceAccountPath))
+                        GoogleCredential credential = null;
+
+                        // Try JSON string first (for container deployments)
+                        if (!string.IsNullOrEmpty(serviceAccountJson))
+                        {
+                            try
+                            {
+                                logger.LogInformation("Initializing Firebase Admin SDK from JSON string...");
+                                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(serviceAccountJson));
+                                credential = GoogleCredential.FromStream(stream);
+                                logger.LogInformation("✅ Firebase credential loaded from JSON string!");
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Failed to load Firebase credential from JSON string");
+                            }
+                        }
+                        // Fallback to file path (for local development)
+                        else if (!string.IsNullOrEmpty(serviceAccountPath) && File.Exists(serviceAccountPath))
                         {
                             logger.LogInformation("Service account file exists: {Exists}", File.Exists(serviceAccountPath));
-                            logger.LogInformation("Initializing Firebase Admin SDK...");
+                            logger.LogInformation("Initializing Firebase Admin SDK from file...");
+                            credential = GoogleCredential.FromFile(serviceAccountPath);
+                            logger.LogInformation("✅ Firebase credential loaded from file!");
+                        }
 
-                            var credential = GoogleCredential.FromFile(serviceAccountPath);
+                        if (credential != null)
+                        {
                             FirebaseApp.Create(new AppOptions
                             {
                                 Credential = credential,
@@ -479,9 +504,10 @@ public class Program
                         }
                         else
                         {
-                            logger.LogError("Firebase service account file not found!");
-                            logger.LogError("  Expected path: {Path}", serviceAccountPath);
-                            logger.LogError("  File exists: {Exists}", File.Exists(serviceAccountPath));
+                            logger.LogError("Firebase initialization failed - no valid credentials found!");
+                            logger.LogError("  Expected file path: {Path}", serviceAccountPath);
+                            logger.LogError("  File exists: {Exists}", !string.IsNullOrEmpty(serviceAccountPath) && File.Exists(serviceAccountPath));
+                            logger.LogError("  JSON provided: {HasJson}", !string.IsNullOrEmpty(serviceAccountJson));
                         }
                     }
                     else
