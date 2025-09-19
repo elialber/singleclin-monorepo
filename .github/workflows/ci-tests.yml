@@ -45,10 +45,10 @@ jobs:
 
       - name: Run backend tests
         run: |
-          cd packages/backend-tests
+          cd packages/backend
           dotnet test --no-build --verbosity normal
         env:
-          ConnectionStrings__DefaultConnection: "Host=localhost;Database=singleclin_test;Username=postgres;Password=postgres"
+          ConnectionStrings__DefaultConnection: 'Host=localhost;Database=singleclin_test;Username=postgres;Password=postgres'
 
   # Test frontend
   frontend-tests:
@@ -61,7 +61,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install frontend dependencies
