@@ -1,15 +1,16 @@
 import { useState, useEffect, useCallback } from 'react'
-import { 
-  Grid, 
-  Box, 
-  Typography, 
-  Card, 
+import {
+  Grid,
+  Box,
+  Typography,
+  Card,
   CardContent,
   Alert,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
+  Container,
 } from '@mui/material'
 import {
   People as PeopleIcon,
@@ -85,7 +86,8 @@ export default function Dashboard() {
   }
 
   return (
-    <Box>
+    <Container maxWidth="xl">
+      <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h4" fontWeight={600} gutterBottom>
@@ -290,6 +292,7 @@ export default function Dashboard() {
           )}
         </Grid>
       </Grid>
-    </Box>
+      </Box>
+    </Container>
   )
 }

@@ -8,6 +8,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  Container,
   TableHead,
   TableRow,
   IconButton,
@@ -220,7 +221,8 @@ export default function Plans() {
   }
 
   return (
-    <Box>
+    <Container maxWidth="xl">
+      <Box>
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
@@ -596,6 +598,7 @@ export default function Plans() {
         message={confirmDialogMessage}
         loading={deletePlan.isPending || toggleStatus.isPending}
       />
-    </Box>
+      </Box>
+    </Container>
   )
 }

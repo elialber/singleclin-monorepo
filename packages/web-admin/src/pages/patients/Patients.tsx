@@ -8,6 +8,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  Container,
   TableHead,
   TableRow,
   IconButton,
@@ -201,7 +202,8 @@ export default function Patients() {
   }
 
   return (
-    <Box>
+    <Container maxWidth="xl">
+      <Box>
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
@@ -661,6 +663,7 @@ export default function Patients() {
         message={confirmDialogMessage}
         loading={toggleStatus.isPending}
       />
-    </Box>
+      </Box>
+    </Container>
   )
 }
