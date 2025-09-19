@@ -12,7 +12,7 @@ COPY package*.json ./
 COPY tsconfig*.json ./
 COPY vite.config.ts ./
 
-# Install dependencies - use npm install to handle missing package-lock.json
+# Install dependencies
 RUN npm install
 
 # Copy source code
