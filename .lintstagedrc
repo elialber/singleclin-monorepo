@@ -1,0 +1,18 @@
+{
+  "*.{js,ts,tsx}": [
+    "eslint --fix",
+    "prettier --write"
+  ],
+  "*.{json,md,yml,yaml}": [
+    "prettier --write"
+  ],
+  "packages/shared/src/**/*.{js,ts}": [
+    "npm run typecheck --workspace=packages/shared"
+  ],
+  "packages/web-admin/src/**/*.{js,ts,tsx}": [
+    "npm run typecheck --workspace=packages/web-admin"
+  ],
+  "packages/backend/**/*.cs": [
+    "cd packages/backend && dotnet format --include"
+  ]
+}

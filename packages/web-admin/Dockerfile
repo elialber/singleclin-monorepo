@@ -85,15 +85,8 @@ server {
         }
     }
 
-    # API proxy to backend
-    location /api/ {
-        proxy_pass https://api.singleclin.com.br/api/;
-        proxy_set_header Host api.singleclin.com.br;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_ssl_verify off;
-    }
+    # API calls go directly to backend domain (api.singleclin.com.br)
+    # No proxy needed since we have separate domains
 
     # Health check endpoint
     location /health {

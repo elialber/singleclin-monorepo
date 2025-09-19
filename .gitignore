@@ -1,99 +1,156 @@
+# Dependencies and Package Managers
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
 # Logs
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
 dev-debug.log
 
-# Dependency directories
-node_modules/
+# Build outputs
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.cache/
 
 # Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Editor directories and files
-.idea
-.vscode
+.idea/
+.vscode/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.history/
 
 # OS specific
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Task files
-# tasks.json
-# tasks/
+# Task Master AI
+.taskmaster/tasks/
+.taskmaster/reports/
+.taskmaster/docs/research/
 
 # MCP configuration with secrets
 .mcp.json
 
-# Firebase service account credentials
+# Firebase and Authentication
 firebase-service-account.json
 firebase-service-account*.json
 serviceAccountKey.json
+.firebase/
+firebase-debug.log
+firestore-debug.log
 
-# .NET specific
-bin/
-obj/
-Debug/
-Release/
-*.user
-*.userprefs
-.vs/
+# Backend .NET specific
+packages/backend/bin/
+packages/backend/obj/
+packages/backend/Debug/
+packages/backend/Release/
+packages/backend/TestResults/
+packages/backend/*.user
+packages/backend/*.userprefs
+packages/backend/.vs/
+packages/backend/appsettings.Development.json
+packages/backend/appsettings.Production.json
 
-# Test and Coverage Results
-TestResults/
-coverage/
+# Frontend specific
+packages/shared/dist/
+packages/web-admin/dist/
+packages/web-admin/build/
+packages/web-admin/.vite/
+packages/web-admin/playwright-report/
+packages/web-admin/test-results/
+
+# Flutter Mobile specific
+packages/mobile/.dart_tool/
+packages/mobile/.flutter-plugins
+packages/mobile/.flutter-plugins-dependencies
+packages/mobile/build/
+packages/mobile/.fvm/
+packages/mobile/.flutter/
+
+# Flutter generated files
+packages/mobile/**/*.g.dart
+packages/mobile/**/*.freezed.dart
+packages/mobile/**/*.mocks.dart
+packages/mobile/**/*.iconfig
+
+# Flutter platform-specific
+packages/mobile/ios/Pods/
+packages/mobile/ios/.symlinks/
+packages/mobile/ios/Flutter/flutter_assets/
+packages/mobile/ios/ServiceDefinitions.json
+packages/mobile/macos/Flutter/ephemeral/
+packages/mobile/macos/.symlinks/
+packages/mobile/windows/flutter/ephemeral/
+packages/mobile/linux/flutter/ephemeral/
+packages/mobile/web/
+
+# Flutter build artifacts
+packages/mobile/flutter/ephemeral/
+packages/mobile/flutter/generated_plugin*
+packages/mobile/.plugin_symlinks/
+packages/mobile/GeneratedPluginRegistrant.*
+
+# Mobile deployment
+packages/mobile/fastlane/report.xml
+packages/mobile/fastlane/Preview.html
+packages/mobile/fastlane/screenshots
+packages/mobile/fastlane/test_output
+
+# Testing and Coverage
 *.trx
 *.runsettings.user
 *.coverage
 *.coveragexml
+junit.xml
 
-# Build outputs
-dist/
-build/
-*.tsbuildinfo
-
-# Flutter specific
-**/flutter/ephemeral/
-**/flutter/generated_plugin*
-**/.plugin_symlinks/
-**/GeneratedPluginRegistrant.*
-**/.flutter-plugins
-**/.flutter-plugins-dependencies
-*.g.dart
-*.freezed.dart
-*.mocks.dart
-*.iconfig
-*.fvm/
-.flutter/
-
-# Flutter iOS/macOS specific
-**/ios/Pods/
-**/ios/.symlinks/
-**/ios/Flutter/flutter_assets/
-**/ios/ServiceDefinitions.json
-**/macos/Flutter/ephemeral/
-**/macos/.symlinks/
-
-# Flutter Windows/Linux specific
-**/windows/flutter/ephemeral/
-**/linux/flutter/ephemeral/
-
-# Fastlane
-**/fastlane/report.xml
-**/fastlane/Preview.html
-**/fastlane/screenshots
-**/fastlane/test_output
-
-# Claude Flow
+# AI Tools and Workflows
 .claude-flow/
-
-# Swarm AI database files
 .swarm/
 *.db-shm
-*.db-wal 
+*.db-wal
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Security and certificates
+*.p12
+*.key
+*.pem
+*.crt
+*.cer
+
+# Temporary files
+tmp/
+temp/
+.tmp/ 

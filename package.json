@@ -1,27 +1,63 @@
 {
-  "name": "singleclin",
+  "name": "singleclin-monorepo",
   "version": "1.0.0",
-  "description": "SingleClin Healthcare Management System - Monorepo",
+  "description": "SingleClin Healthcare Management System - Credit-based healthcare platform",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build:all": "npm run build --workspaces",
-    "test:all": "npm run test --workspaces",
-    "lint:all": "npm run lint --workspaces",
-    "clean:all": "npm run clean --workspaces",
-    "dev:shared": "npm run dev -w @singleclin/shared",
-    "dev:web-admin": "npm run dev -w @singleclin/web-admin",
-    "build:shared": "npm run build -w @singleclin/shared",
-    "build:web-admin": "npm run build -w @singleclin/web-admin"
+    "build": "npm run build --workspaces --if-present",
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:web-admin": "npm run build --workspace=packages/web-admin",
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:shared": "npm run dev --workspace=packages/shared",
+    "dev:web-admin": "npm run dev --workspace=packages/web-admin",
+    "test": "npm run test --workspaces --if-present",
+    "test:shared": "npm run test --workspace=packages/shared",
+    "test:web-admin": "npm run test --workspace=packages/web-admin",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "prepare": "husky install",
+    "backend:run": "cd packages/backend && dotnet run",
+    "backend:build": "cd packages/backend && dotnet build",
+    "backend:test": "cd packages/backend && dotnet test",
+    "mobile:run": "cd packages/mobile && flutter run",
+    "mobile:build:android": "cd packages/mobile && flutter build apk",
+    "mobile:build:ios": "cd packages/mobile && flutter build ios"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
     "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
     "typescript": "^5.7.0"
   },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elialber/singleclin-monorepo.git"
+  },
+  "keywords": [
+    "healthcare",
+    "monorepo",
+    "typescript",
+    "react",
+    "flutter",
+    "dotnet"
+  ],
+  "author": "SingleClin Team",
+  "license": "MIT"
 }

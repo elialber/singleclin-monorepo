@@ -50,23 +50,36 @@ From `packages/shared/src/types/`:
 
 ### Monorepo Management
 ```bash
-# Note: Monorepo npm workspaces setup is pending (Task 1)
-# For now, manage each package individually
-
-# Install all dependencies (when npm workspaces is configured)
+# Install all dependencies across workspaces
 npm install
 
-# Build all packages (when npm workspaces is configured)
-npm run build:all
+# Build all packages
+npm run build
 
-# Run tests across all packages (when npm workspaces is configured)
-npm run test:all
+# Run development servers
+npm run dev
 
-# Lint all code (when npm workspaces is configured)
-npm run lint:all
+# Run tests across all packages
+npm run test
 
-# Clean build artifacts (when npm workspaces is configured)
-npm run clean:all
+# Lint and format code
+npm run lint
+npm run lint:fix
+npm run format
+
+# Type checking
+npm run typecheck
+
+# Clean build artifacts
+npm run clean
+
+# Individual package commands
+npm run build:shared
+npm run build:web-admin
+npm run dev:shared
+npm run dev:web-admin
+npm run test:shared
+npm run test:web-admin
 ```
 
 ### Backend (.NET 9)
@@ -90,13 +103,20 @@ dotnet ef database update
 
 ### Frontend Development
 ```bash
-# Shared package build
-cd packages/shared && npm run build
+# Shared package development
+npm run dev:shared
+npm run build:shared
 
 # Web admin development
-cd packages/web-admin && npm run dev
+npm run dev:web-admin
+npm run build:web-admin
 
-# Mobile (Flutter)
+# Mobile (Flutter) - from packages/mobile directory
+npm run mobile:run
+npm run mobile:build:android
+npm run mobile:build:ios
+
+# Or directly with Flutter
 cd packages/mobile
 flutter run
 flutter build apk
@@ -107,9 +127,20 @@ flutter build ios
 
 This project uses Task Master AI for systematic development workflow. Current progress:
 
-- ✅ **Task 1**: Complete monorepo setup with npm workspaces
+- ✅ **Task 1**: Complete monorepo setup with npm workspaces (COMPLETED)
 - 🔄 **Task 2**: Backend API with JWT authentication (in progress - subtask 2.2)
 - ⏳ **Task 3+**: Database setup, authentication system, QR code generation, mobile app development
+
+### Monorepo Setup Completion
+The monorepo structure is now fully configured with:
+- ✅ npm workspaces for dependency management
+- ✅ Shared TypeScript package with comprehensive types and utilities
+- ✅ Web admin package with React/Vite setup
+- ✅ Mobile Flutter package structure (existing)
+- ✅ ESLint 9 with flat config for modern linting
+- ✅ Prettier for consistent code formatting
+- ✅ Husky + lint-staged for pre-commit hooks
+- ✅ Comprehensive .gitignore for all package types
 
 ### Key Task Master Commands
 ```bash
@@ -195,6 +226,8 @@ The system uses Firebase for:
 - ESLint 9 with flat config for TypeScript
 - Prettier for code formatting
 - TypeScript strict mode enabled
+- Workspace-based dependency management
+- Consistent package structure across all TypeScript packages
 
 ### Git Workflow
 - Feature branches for task implementation
@@ -203,7 +236,14 @@ The system uses Firebase for:
 
 ## Current Development Status
 
+**Completed**: Task 1 - Complete monorepo setup with npm workspaces ✅
 **Active Task**: Subtask 2.2 - Firebase Admin SDK and JWT middleware configuration
 **Next Priority**: Complete backend authentication system, then proceed to database setup
+
+### Package Dependencies
+The shared package (`@singleclin/shared`) is now available to other packages via workspace references:
+- Web admin imports: `import { IUser, API_ENDPOINTS } from '@singleclin/shared'`
+- Backend can reference shared types for consistency
+- Mobile app can utilize shared constants and utilities
 
 Use Task Master AI workflow for systematic development following the established task hierarchy and dependencies.
