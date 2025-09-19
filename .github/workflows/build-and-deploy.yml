@@ -131,10 +131,10 @@ jobs:
 
       - name: Run backend tests
         run: |
-          cd packages/backend-tests
+          cd packages/backend
           dotnet test --no-build --verbosity normal
         env:
-          ConnectionStrings__DefaultConnection: "Host=localhost;Database=singleclin_test;Username=postgres;Password=postgres"
+          ConnectionStrings__DefaultConnection: 'Host=localhost;Database=singleclin_test;Username=postgres;Password=postgres'
 
       - name: Install frontend dependencies
         run: |
