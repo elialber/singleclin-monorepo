@@ -85,16 +85,15 @@ server {
         }
     }
 
-    # API proxy disabled for now - frontend will call backend directly
-    # Frontend will use BACKEND_URL environment variable
-    # location /api/ {
-    #     proxy_pass https://singleclin-backend.proudbay-ea4166c5.eastus.azurecontainerapps.io/api/;
-    #     proxy_set_header Host \$host;
-    #     proxy_set_header X-Real-IP \$remote_addr;
-    #     proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    #     proxy_set_header X-Forwarded-Proto \$scheme;
-    #     proxy_ssl_verify off;
-    # }
+    # API proxy to backend
+    location /api/ {
+        proxy_pass https://api.singleclin.com.br/api/;
+        proxy_set_header Host api.singleclin.com.br;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_ssl_verify off;
+    }
 
     # Health check endpoint
     location /health {
