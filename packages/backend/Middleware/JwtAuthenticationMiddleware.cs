@@ -43,6 +43,8 @@ public class JwtAuthenticationMiddleware
             var firebaseToken = await ValidateFirebaseToken(token);
             if (firebaseToken != null)
             {
+                _logger.LogDebug("Successfully validated Firebase token for user: {Uid}", firebaseToken.Uid);
+
                 // Convert Firebase token claims to our internal JWT claims
                 var claims = new List<Claim>
                 {
@@ -71,7 +73,7 @@ public class JwtAuthenticationMiddleware
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"] ?? "");
 
-            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -83,15 +85,37 @@ public class JwtAuthenticationMiddleware
             }, out SecurityToken validatedToken);
 
             var jwtToken = (JwtSecurityToken)validatedToken;
+
+            // Log all claims for debugging
+            _logger.LogDebug("JWT token claims: {Claims}",
+                string.Join(", ", jwtToken.Claims.Select(c => $"{c.Type}={c.Value}")));
+
             var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null)
             {
-                _logger.LogWarning("JWT token does not contain NameIdentifier claim");
+                // Try alternative claim names as fallback
+                userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == "sub") ??
+                             jwtToken.Claims.FirstOrDefault(x => x.Type == "user_id") ??
+                             jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub);
+
+                if (userIdClaim != null)
+                {
+                    _logger.LogInformation("Using fallback claim '{ClaimType}' as NameIdentifier", userIdClaim.Type);
+                    // Add the NameIdentifier claim with the fallback value
+                    var claimsList = jwtToken.Claims.ToList();
+                    claimsList.Add(new Claim(ClaimTypes.NameIdentifier, userIdClaim.Value));
+                    var identity = new ClaimsIdentity(claimsList, "Jwt");
+                    context.User = new ClaimsPrincipal(identity);
+                    return;
+                }
+
+                _logger.LogWarning("JWT token does not contain NameIdentifier claim. Available claims: {Claims}",
+                    string.Join(", ", jwtToken.Claims.Select(c => c.Type)));
                 return;
             }
 
-            var userId = userIdClaim.Value;
+            _logger.LogDebug("Successfully validated JWT token for user: {UserId}", userIdClaim.Value);
 
             // Attach user to context on successful jwt validation
             context.User = new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims, "Jwt"));

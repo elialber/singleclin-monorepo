@@ -37,6 +37,7 @@ public class JwtService : IJwtService
             new Claim(ClaimTypes.Name, user.FullName),
             new Claim(ClaimTypes.Role, user.Role.ToString()),
             new Claim("role", user.Role.ToString()), // Keep both for compatibility
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // Add sub claim as well for compatibility
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
@@ -47,17 +48,26 @@ public class JwtService : IJwtService
             claims.Add(new Claim("clinicId", user.ClinicId.Value.ToString()));
         }
 
+        var expirationMinutes = Convert.ToDouble(_configuration["JWT:AccessTokenExpirationInMinutes"]);
+        var expirationTime = DateTime.UtcNow.AddMinutes(expirationMinutes);
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JWT:AccessTokenExpirationInMinutes"])),
+            Expires = expirationTime,
             Issuer = _configuration["JWT:Issuer"],
             Audience = _configuration["JWT:Audience"],
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        var tokenString = tokenHandler.WriteToken(token);
+
+        _logger.LogDebug("Generated JWT token for user {UserId} with expiration {Expiration} (valid for {Minutes} minutes). Claims: {Claims}",
+            user.Id, expirationTime, expirationMinutes,
+            string.Join(", ", claims.Select(c => $"{c.Type}={c.Value}")));
+
+        return tokenString;
     }
 
     public string GenerateRefreshToken()

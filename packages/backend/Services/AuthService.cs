@@ -156,7 +156,7 @@ public class AuthService : IAuthService
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token,
-                ExpiresIn = _configuration.GetValue<int>("JWT:AccessTokenExpirationInMinutes", 15) * 60,
+                ExpiresIn = _configuration.GetValue<int>("JWT:AccessTokenExpirationInMinutes", 120) * 60,
                 UserId = user.Id,
                 Email = user.Email!,
                 FullName = user.FullName,
@@ -214,7 +214,7 @@ public class AuthService : IAuthService
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token,
-                ExpiresIn = _configuration.GetValue<int>("JWT:AccessTokenExpirationInMinutes", 15) * 60,
+                ExpiresIn = _configuration.GetValue<int>("JWT:AccessTokenExpirationInMinutes", 120) * 60,
                 UserId = user.Id,
                 Email = user.Email!,
                 FullName = user.FullName,
@@ -261,7 +261,7 @@ public class AuthService : IAuthService
             {
                 AccessToken = accessToken,
                 RefreshToken = newRefreshToken.Token,
-                ExpiresIn = _configuration.GetValue<int>("JWT:AccessTokenExpirationInMinutes", 15) * 60,
+                ExpiresIn = _configuration.GetValue<int>("JWT:AccessTokenExpirationInMinutes", 120) * 60,
                 UserId = user.Id,
                 Email = user.Email!,
                 FullName = user.FullName,
@@ -432,7 +432,7 @@ public class AuthService : IAuthService
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token,
-                ExpiresIn = _configuration.GetValue<int>("JWT:AccessTokenExpirationInMinutes", 15) * 60,
+                ExpiresIn = _configuration.GetValue<int>("JWT:AccessTokenExpirationInMinutes", 120) * 60,
                 UserId = user.Id,
                 Email = user.Email!,
                 FullName = user.FullName,
@@ -669,7 +669,7 @@ public class AuthService : IAuthService
             // Generate tokens
             var accessToken = _jwtService.GenerateAccessToken(user);
             var refreshToken = _jwtService.GenerateRefreshToken();
-            var expiresIn = Convert.ToInt32(_configuration["JWT:AccessTokenExpiresInMinutes"] ?? "60") * 60; // Convert to seconds
+            var expiresIn = Convert.ToInt32(_configuration["JWT:AccessTokenExpirationInMinutes"] ?? "120") * 60; // Convert to seconds
 
             // Create and store refresh token
             var refreshTokenEntity = await _refreshTokenService.CreateRefreshTokenAsync(
