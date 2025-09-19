@@ -151,7 +151,11 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate])
 
-  const handleLogin = async (data: LoginFormData) => {
+  const handleLogin = async (data: LoginFormData, e?: React.BaseSyntheticEvent) => {
+    if (e) {
+      e.preventDefault()
+    }
+
     try {
       setIsLoading(true)
       setError('')
@@ -159,9 +163,9 @@ export default function Login() {
       showSuccess('Login realizado com sucesso!')
     } catch (err: any) {
       console.error('Login error:', err)
-      
+
       let message = 'Erro ao fazer login. Tente novamente.'
-      
+
       // Handle Firebase specific errors
       if (err.message?.includes('Email ou senha incorretos')) {
         message = 'Email ou senha incorretos. Verifique suas credenciais.'
@@ -184,7 +188,7 @@ export default function Login() {
       } else if (err.message) {
         message = err.message
       }
-      
+
       setError(message)
       showError(message)
     } finally {
