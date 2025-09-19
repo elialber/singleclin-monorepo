@@ -62,7 +62,7 @@ public class ClinicController : ControllerBase
     /// GET /api/clinic?pageNumber=1&amp;pageSize=10&amp;isActive=true&amp;searchTerm=clinic&amp;type=Partner&amp;city=São Paulo&amp;sortBy=name&amp;sortDirection=asc
     /// </example>
     [HttpGet]
-    [AllowAnonymous]
+    [Authorize(Policy = "RequireAdministratorRole")]
     [SwaggerOperation(
         Summary = "Get all clinics with advanced filtering",
         Description = @"Retrieve all clinics with comprehensive filtering, pagination, and sorting options. Admin role required.

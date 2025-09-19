@@ -114,6 +114,7 @@ public class Program
                             "http://localhost:3001", // React web admin (alternative port)
                             "http://localhost:4200", // Alternative frontend
                             "http://localhost:5173", // Vite dev server
+                            "http://localhost:5010", // Backend self-reference for Swagger
                             "capacitor://localhost", // Capacitor mobile
                             "http://localhost",      // Mobile emulator
                             "https://singleclin.com.br", // Production frontend
