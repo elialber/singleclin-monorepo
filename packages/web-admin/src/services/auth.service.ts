@@ -57,25 +57,22 @@ export const authService = {
   async login(email: string, password: string): Promise<LoginResult> {
     try {
       console.log('Starting login process for:', email)
-      
-      // First authenticate with Firebase
-      const firebaseResult = await signInWithEmail(email, password)
-      console.log('Firebase authentication successful, got token')
-      
-      // Then authenticate with our backend using the Firebase token
-      console.log('Sending token to backend...')
-      const response = await api.post<AuthResponse>('/auth/login/firebase', {
-        firebaseToken: firebaseResult.token,
-        deviceInfo: navigator.userAgent,
-        rememberMe: true
+
+      // Direct authentication with our backend using email/password
+      console.log('Authenticating with backend...')
+      const response = await api.post<AuthResponse>('/auth/login', {
+        email,
+        password,
+        rememberMe: true,
+        deviceInfo: navigator.userAgent
       })
-      
+
       console.log('Backend authentication successful:', {
         userId: response.data.userId,
         email: response.data.email,
         role: response.data.role
       })
-      
+
       return transformAuthResponse(response.data)
     } catch (error: any) {
       console.error('Login error details:', {
@@ -85,7 +82,7 @@ export const authService = {
         status: error.response?.status,
         email,
       })
-      
+
       // Use standardized error handling
       throw createAuthError(error, 'backend_login')
     }

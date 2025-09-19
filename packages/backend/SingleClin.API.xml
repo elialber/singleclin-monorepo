@@ -4773,6 +4773,43 @@
             Seed sample clinic data if none exists
             </summary>
         </member>
+        <member name="T:SingleClin.API.Extensions.KeyVaultConfigurationExtensions">
+            <summary>
+            Extension methods for configuring Azure Key Vault integration
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Extensions.KeyVaultConfigurationExtensions.AddAzureKeyVault(Microsoft.Extensions.Configuration.IConfigurationBuilder,Microsoft.Extensions.Hosting.IHostEnvironment)">
+            <summary>
+            Adds Azure Key Vault as a configuration source
+            </summary>
+            <param name="builder">The configuration builder</param>
+            <param name="environment">The hosting environment</param>
+            <returns>The configuration builder</returns>
+        </member>
+        <member name="M:SingleClin.API.Extensions.KeyVaultConfigurationExtensions.GetAzureCredential(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Hosting.IHostEnvironment,System.Boolean)">
+            <summary>
+            Gets the appropriate Azure credential based on environment and configuration
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Extensions.PrefixedKeyVaultSecretManager">
+            <summary>
+            Custom Key Vault secret manager that handles secret name transformations
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Extensions.PrefixedKeyVaultSecretManager.GetKey(Azure.Security.KeyVault.Secrets.KeyVaultSecret)">
+            <summary>
+            Transforms Key Vault secret names to configuration keys
+            </summary>
+            <param name="secret">The Key Vault secret</param>
+            <returns>The configuration key</returns>
+        </member>
+        <member name="M:SingleClin.API.Extensions.PrefixedKeyVaultSecretManager.Load(Azure.Security.KeyVault.Secrets.SecretProperties)">
+            <summary>
+            Determines if a secret should be loaded
+            </summary>
+            <param name="secret">The Key Vault secret</param>
+            <returns>True if the secret should be loaded</returns>
+        </member>
         <member name="T:SingleClin.API.Filters.SwaggerDefaultValues">
             <summary>
             Swagger operation filter to improve API documentation
@@ -4792,6 +4829,19 @@
             <summary>
             Health check for Firebase Admin SDK connectivity
             </summary>
+        </member>
+        <member name="T:SingleClin.API.HealthChecks.KeyVaultHealthCheck">
+            <summary>
+            Health check for Azure Key Vault connectivity
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.HealthChecks.KeyVaultHealthCheck.CheckHealthAsync(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext,System.Threading.CancellationToken)">
+            <summary>
+            Checks the health of the Key Vault connection
+            </summary>
+            <param name="context">Health check context</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Health check result</returns>
         </member>
         <member name="T:SingleClin.API.HealthChecks.RedisHealthCheck">
             <summary>
@@ -6341,6 +6391,11 @@
         <member name="M:SingleClin.API.Services.IUserService.CancelUserPlanAsync(System.Guid,System.Guid,System.String)">
             <summary>
             Cancel/Remove a user's plan
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.MockEmailProvider">
+            <summary>
+            Mock email provider for development/testing when SendGrid is not configured
             </summary>
         </member>
         <member name="T:SingleClin.API.Services.PlanService">
