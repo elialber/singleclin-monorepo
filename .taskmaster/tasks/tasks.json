@@ -1015,11 +1015,26 @@
             "testStrategy": "Testar aplicação de filtros combinados. Verificar renderização de gráficos com diferentes volumes de dados. Validar interatividade e responsividade. Testar performance do dashboard."
           }
         ]
+      },
+      {
+        "id": 16,
+        "title": "Corrigir problema de autenticação JWT com erro 403",
+        "description": "Resolver erro 403 na API clinic endpoint corrigindo claim NameIdentifier ausente e aumentando tempo de expiração do token",
+        "status": "done",
+        "dependencies": [
+          2,
+          4,
+          7
+        ],
+        "priority": "high",
+        "details": "**IMPLEMENTAÇÃO CONCLUÍDA**: O problema de autenticação JWT foi totalmente resolvido com as seguintes correções aplicadas:\n\n## Problemas Resolvidos\n\n### 1. Token com Tempo de Expiração Muito Curto\n**Arquivos Modificados:**\n- `appsettings.json:31`: Alterado `AccessTokenExpirationInMinutes` de 15 para 120 minutos (produção)\n- `appsettings.Development.json:34`: Adicionada configuração específica com 480 minutos (8 horas) para desenvolvimento\n- `Services/AuthService.cs:159,217,264,435,672`: Atualizado cálculo de `ExpiresIn` para usar configuração dinâmica\n\n### 2. Claim NameIdentifier Ausente\n**Arquivos Modificados:**\n- `Services/JwtService.cs:33-43`: \n  - Adicionados múltiplos claims para compatibilidade: `ClaimTypes.NameIdentifier`, `JwtRegisteredClaimNames.Sub`, e claim \"role\" duplicado\n  - Implementado logging detalhado (linha 66-68) para debug de claims gerados\n  - Garantido que NameIdentifier sempre seja incluído com user.Id\n\n- `Middleware/JwtAuthenticationMiddleware.cs:93-115`:\n  - Implementado fallback robusto para claims alternativos quando NameIdentifier não está presente\n  - Ordem de fallback: NameIdentifier → \"sub\" → \"user_id\" → JwtRegisteredClaimNames.Sub\n  - Adicionado logging informativo quando fallback é usado (linha 104)\n  - Claims de fallback são adicionados como NameIdentifier para compatibilidade com controllers\n\n### 3. Melhorias de Debugging\n- Logs detalhados adicionados em pontos críticos do fluxo de autenticação\n- Logging de todos os claims presentes no token para facilitar diagnóstico\n- Mensagens de erro específicas quando claims obrigatórios estão ausentes\n\n## Configurações Aplicadas\n\n### Produção (`appsettings.json`)\n```json\n\"JWT\": {\n  \"AccessTokenExpirationInMinutes\": 120  // 2 horas\n}\n```\n\n### Desenvolvimento (`appsettings.Development.json`)\n```json\n\"JWT\": {\n  \"AccessTokenExpirationInMinutes\": 480  // 8 horas\n}\n```\n\n## Status do Build\n✅ **Build concluído com sucesso** - 0 erros (apenas warnings de estilo)\n\n## Próximos Passos\n**Deploy para Azure Container Apps**: As correções precisam ser aplicadas no ambiente de produção através de redeploy do container Docker atualizado.",
+        "testStrategy": "## Testes Realizados\n\n### 1. ✅ Geração de Token\n- Verificado via jwt.io que tokens contêm claims: NameIdentifier, sub, role (duplicado), email, name\n- Confirmado tempo de expiração correto: 2h (prod) / 8h (dev)\n\n### 2. ✅ Endpoint Clinic API\n- GET /api/clinic/{id} retornando 200 OK com token válido\n- Não mais retorna 403 Forbidden\n\n### 3. ✅ Compatibilidade com Firebase\n- Tokens Firebase corretamente convertidos mantendo identificação do usuário\n- Fallback funcionando para diferentes formatos de claims\n\n### 4. ✅ Controllers Dependentes\n- BaseController.CurrentUserId funcionando corretamente\n- AuthController endpoints operacionais\n- QRCodeController gerando códigos com sucesso\n- NotificationPreferencesController acessível\n\n### Testes Pendentes Pós-Deploy\n1. Verificar funcionamento em ambiente Azure\n2. Testar login social (Google/Apple) em produção\n3. Confirmar expiração de token após 2 horas em produção\n4. Validar que refresh tokens continuam funcionando",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-07-29T18:09:04.499Z",
-      "updated": "2025-07-30T14:35:49.771Z",
+      "updated": "2025-09-19T19:00:04.545Z",
       "description": "Tasks for master context"
     }
   }
