@@ -1,0 +1,48 @@
+========================================
+        BEM-VINDO AO SINGLECLIN! 🎉
+========================================
+
+Olá, {{userName}}!
+
+Estamos muito felizes em tê-lo(a) conosco! Sua conta no SingleClin foi criada com sucesso e você já pode começar a usar nossos serviços.
+
+📋 INFORMAÇÕES DA SUA CONTA
+========================================
+Nome: {{userName}}
+Email: {{userEmail}}
+Senha: {{userPassword}}
+{{#clinicName}}Clínica: {{clinicName}}{{/clinicName}}
+
+🔒 IMPORTANTE - SEGURANÇA
+========================================
+Por questões de segurança, recomendamos que você altere sua senha no primeiro acesso ao sistema. Mantenha suas credenciais em local seguro.
+
+✅ O QUE VOCÊ PODE FAZER NO SINGLECLIN
+========================================
+• Gerenciar seus planos de saúde e créditos
+• Acessar serviços em qualquer clínica parceira
+• Acompanhar histórico de consultas e tratamentos
+• Receber notificações importantes sobre sua saúde
+
+🚀 PRÓXIMOS PASSOS
+========================================
+1. Acesse o sistema usando suas credenciais
+2. Altere sua senha no primeiro login
+3. Explore os recursos disponíveis
+4. Entre em contato conosco se precisar de ajuda
+
+📞 SUPORTE
+========================================
+Precisa de ajuda? Nossa equipe está sempre disponível:
+Telefone: {{supportPhone}}
+Email: {{supportEmail}}
+Website: {{appUrl}}
+
+========================================
+        SINGLECLIN
+Sistema de Gestão de Saúde
+{{supportPhone}} | {{supportEmail}}
+========================================
+
+Esta é uma mensagem automática do sistema SingleClin.
+Você está recebendo este email porque uma conta foi criada para você no nosso sistema.

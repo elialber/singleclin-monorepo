@@ -46,6 +46,11 @@ public interface IUserService
     Task<(bool Success, string Message)> SendPasswordResetEmailAsync(Guid id);
 
     /// <summary>
+    /// Send user confirmation email with login credentials
+    /// </summary>
+    Task<bool> SendUserConfirmationEmailAsync(Guid userId, string password);
+
+    /// <summary>
     /// Check if current user can access specified user
     /// </summary>
     Task<bool> CanAccessUserAsync(Guid userId, Guid currentUserId, bool isAdmin);

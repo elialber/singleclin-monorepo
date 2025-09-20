@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data;
 using SingleClin.API.Data.Models;
 using SingleClin.API.DTOs.Common;
+using SingleClin.API.DTOs.EmailTemplate;
 using SingleClin.API.DTOs.Plan;
 using SingleClin.API.DTOs.User;
 using System.Linq.Expressions;
@@ -20,6 +21,7 @@ public class UserService : IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IEmailTemplateService _emailService;
     private readonly IFirebaseAuthService _firebaseAuthService;
+    private readonly IAzureCommunicationService _azureCommunicationService;
 
     public UserService(
         UserManager<ApplicationUser> userManager,
@@ -27,7 +29,8 @@ public class UserService : IUserService
         AppDbContext appDbContext,
         ILogger<UserService> logger,
         IEmailTemplateService emailService,
-        IFirebaseAuthService firebaseAuthService)
+        IFirebaseAuthService firebaseAuthService,
+        IAzureCommunicationService azureCommunicationService)
     {
         _userManager = userManager;
         _context = context;
@@ -35,6 +38,7 @@ public class UserService : IUserService
         _logger = logger;
         _emailService = emailService;
         _firebaseAuthService = firebaseAuthService;
+        _azureCommunicationService = azureCommunicationService;
     }
 
     public async Task<UserListResponseDto> GetUsersAsync(UserFilterDto filter)
@@ -723,6 +727,62 @@ public class UserService : IUserService
         {
             _logger.LogError(ex, "Error cancelling user plan {UserPlanId} for user {UserId}", userPlanId, userId);
             return (false, new[] { "An error occurred while cancelling the user plan" });
+        }
+    }
+
+    public async Task<bool> SendUserConfirmationEmailAsync(Guid userId, string password)
+    {
+        try
+        {
+            _logger.LogInformation("Sending user confirmation email for user {UserId}", userId);
+
+            // Get user information
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                _logger.LogError("User {UserId} not found for confirmation email", userId);
+                return false;
+            }
+
+            // Get clinic information if user belongs to a clinic
+            string? clinicName = null;
+            if (user.ClinicId.HasValue)
+            {
+                var clinic = await _appDbContext.Clinics
+                    .FirstOrDefaultAsync(c => c.Id == user.ClinicId.Value);
+                clinicName = clinic?.Name;
+            }
+
+            // Create template data
+            var templateData = UserConfirmationTemplateData.Create(
+                user.FullName,
+                user.Email!,
+                password,
+                clinicName);
+
+            // Render the email template
+            var renderedTemplate = await _emailService.RenderUserConfirmationAsync(templateData);
+
+            // Send the email using Azure Communication Services
+            var emailSent = await _azureCommunicationService.SendEmailAsync(
+                user.Email!,
+                renderedTemplate);
+
+            if (emailSent)
+            {
+                _logger.LogInformation("User confirmation email sent successfully to {UserEmail}", user.Email);
+                return true;
+            }
+            else
+            {
+                _logger.LogError("Failed to send user confirmation email to {UserEmail}", user.Email);
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending user confirmation email for user {UserId}", userId);
+            return false;
         }
     }
 }

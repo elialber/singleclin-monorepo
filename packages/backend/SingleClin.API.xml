@@ -3039,6 +3039,66 @@
             <param name="textContent">Text content</param>
             <returns>Rendered email template</returns>
         </member>
+        <member name="T:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData">
+            <summary>
+            Template data for user confirmation emails
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.UserName">
+            <summary>
+            User's name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.UserEmail">
+            <summary>
+            User's email address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.UserPassword">
+            <summary>
+            User's password (for confirmation email)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.ClinicName">
+            <summary>
+            Name of the associated clinic (optional)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.AppUrl">
+            <summary>
+            Application URL for accessing the system
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.SupportPhone">
+            <summary>
+            Support phone number
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.SupportEmail">
+            <summary>
+            Support email address
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.SupportUrl">
+            <summary>
+            Support URL for help documentation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.PreferencesUrl">
+            <summary>
+            URL for managing preferences
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData.Create(System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates a new instance with basic user information
+            </summary>
+            <param name="userName">User's name</param>
+            <param name="userEmail">User's email</param>
+            <param name="userPassword">User's password</param>
+            <param name="clinicName">Optional clinic name</param>
+            <returns>New UserConfirmationTemplateData instance</returns>
+        </member>
         <member name="T:SingleClin.API.DTOs.Export.ExportRequest">
             <summary>
             Export request model
@@ -5361,6 +5421,11 @@
             Service for handling authentication operations
             </summary>
         </member>
+        <member name="T:SingleClin.API.Services.AzureCommunicationService">
+            <summary>
+            Azure Communication Services email implementation
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.ClaimsTransformationService">
             <summary>
             Service for transforming and adding claims dynamically during authentication
@@ -5421,6 +5486,13 @@
             </summary>
             <param name="obj">Object to extract properties from</param>
             <returns>Dictionary of property name-value pairs</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.EmailTemplateService.GenerateUserConfirmationSubject(SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData)">
+            <summary>
+            Generates subject line for user confirmation emails
+            </summary>
+            <param name="templateData">Template data</param>
+            <returns>Generated subject line</returns>
         </member>
         <member name="M:SingleClin.API.Services.EmailTemplateService.GenerateLowBalanceSubject(SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData)">
             <summary>
@@ -5516,6 +5588,35 @@
             <param name="firebaseLoginDto">Firebase login data</param>
             <param name="ipAddress">Client IP address</param>
             <returns>Authentication response with tokens</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.IAzureCommunicationService">
+            <summary>
+            Interface for Azure Communication Services email functionality
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IAzureCommunicationService.SendEmailAsync(System.String,System.String,System.String,System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Send an email using Azure Communication Services
+            </summary>
+            <param name="to">Recipient email address</param>
+            <param name="subject">Email subject</param>
+            <param name="htmlContent">HTML content (optional)</param>
+            <param name="textContent">Plain text content</param>
+            <param name="fromEmail">Sender email address (optional, uses default if not provided)</param>
+            <param name="fromName">Sender name (optional, uses default if not provided)</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Task representing the send operation</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAzureCommunicationService.SendEmailAsync(System.String,SingleClin.API.DTOs.EmailTemplate.RenderedEmailTemplate,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Send a rendered email template using Azure Communication Services
+            </summary>
+            <param name="to">Recipient email address</param>
+            <param name="renderedTemplate">Rendered email template</param>
+            <param name="fromEmail">Sender email address (optional, uses default if not provided)</param>
+            <param name="fromName">Sender name (optional, uses default if not provided)</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Task representing the send operation</returns>
         </member>
         <member name="T:SingleClin.API.Services.IClinicService">
             <summary>
@@ -5661,6 +5762,15 @@
             <summary>
             Service for processing and rendering email templates
             </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IEmailTemplateService.RenderUserConfirmationAsync(SingleClin.API.DTOs.EmailTemplate.UserConfirmationTemplateData,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Renders a user confirmation email template
+            </summary>
+            <param name="templateData">Data to populate the template</param>
+            <param name="includeHtml">Whether to include HTML version</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Rendered email template</returns>
         </member>
         <member name="M:SingleClin.API.Services.IEmailTemplateService.RenderLowBalanceNotificationAsync(SingleClin.API.DTOs.EmailTemplate.LowBalanceTemplateData,System.Boolean,System.Threading.CancellationToken)">
             <summary>
@@ -6361,6 +6471,11 @@
         <member name="M:SingleClin.API.Services.IUserService.SendPasswordResetEmailAsync(System.Guid)">
             <summary>
             Send password reset email
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserService.SendUserConfirmationEmailAsync(System.Guid,System.String)">
+            <summary>
+            Send user confirmation email with login credentials
             </summary>
         </member>
         <member name="M:SingleClin.API.Services.IUserService.CanAccessUserAsync(System.Guid,System.Guid,System.Boolean)">

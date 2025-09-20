@@ -22,6 +22,48 @@ namespace SingleClin.API.Services
             _templatesPath = Path.Combine(_environment.ContentRootPath, "Templates", "Email");
         }
 
+        public async Task<RenderedEmailTemplate> RenderUserConfirmationAsync(
+            UserConfirmationTemplateData templateData,
+            bool includeHtml = true,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                _logger.LogInformation("Rendering user confirmation template for user {UserEmail}", templateData.UserEmail);
+
+                const string templateName = "UserConfirmation";
+
+                // Generate subject
+                var subject = GenerateUserConfirmationSubject(templateData);
+
+                // Render HTML content if requested
+                string? htmlContent = null;
+                if (includeHtml)
+                {
+                    var htmlTemplate = await GetHtmlTemplateAsync(templateName, cancellationToken);
+                    htmlContent = ProcessTemplate(htmlTemplate, templateData);
+                }
+
+                // Render text content
+                var textTemplate = await GetTextTemplateAsync(templateName, cancellationToken);
+                var textContent = ProcessTemplate(textTemplate, templateData);
+
+                var renderedTemplate = RenderedEmailTemplate.Create(
+                    templateName,
+                    subject,
+                    htmlContent,
+                    textContent);
+
+                _logger.LogInformation("Successfully rendered user confirmation template for user {UserEmail}", templateData.UserEmail);
+                return renderedTemplate;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error rendering user confirmation template for user {UserEmail}", templateData.UserEmail);
+                throw;
+            }
+        }
+
         public async Task<RenderedEmailTemplate> RenderLowBalanceNotificationAsync(
             LowBalanceTemplateData templateData,
             bool includeHtml = true,
@@ -258,6 +300,16 @@ namespace SingleClin.API.Services
             }
 
             return properties;
+        }
+
+        /// <summary>
+        /// Generates subject line for user confirmation emails
+        /// </summary>
+        /// <param name="templateData">Template data</param>
+        /// <returns>Generated subject line</returns>
+        private string GenerateUserConfirmationSubject(UserConfirmationTemplateData templateData)
+        {
+            return $"Bem-vindo ao SingleClin, {templateData.UserName}!";
         }
 
         /// <summary>

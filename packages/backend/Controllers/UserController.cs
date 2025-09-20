@@ -114,6 +114,18 @@ public class UserController : BaseController
                 });
             }
 
+            // Send confirmation email after successful user creation
+            try
+            {
+                await _userService.SendUserConfirmationEmailAsync(Guid.Parse(result.User!.Id), dto.Password!);
+                _logger.LogInformation("Confirmation email sent to user {UserId}", result.User.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send confirmation email to user {UserId}", result.User.Id);
+                // Don't fail the user creation if email fails - user is already created
+            }
+
             return CreatedAtAction(
                 nameof(GetUser),
                 new { id = result.User!.Id },

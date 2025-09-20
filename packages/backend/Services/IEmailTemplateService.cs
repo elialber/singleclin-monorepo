@@ -8,6 +8,18 @@ namespace SingleClin.API.Services
     public interface IEmailTemplateService
     {
         /// <summary>
+        /// Renders a user confirmation email template
+        /// </summary>
+        /// <param name="templateData">Data to populate the template</param>
+        /// <param name="includeHtml">Whether to include HTML version</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Rendered email template</returns>
+        Task<RenderedEmailTemplate> RenderUserConfirmationAsync(
+            UserConfirmationTemplateData templateData,
+            bool includeHtml = true,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Renders a low balance notification email template
         /// </summary>
         /// <param name="templateData">Data to populate the template</param>

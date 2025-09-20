@@ -188,6 +188,9 @@ public class Program
         // Add email template service
         builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 
+        // Add Azure Communication Services
+        builder.Services.AddScoped<IAzureCommunicationService, AzureCommunicationService>();
+
         // Add notification services
         builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
         builder.Services.AddScoped<INotificationService, NotificationService>();
