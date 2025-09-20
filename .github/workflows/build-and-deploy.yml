@@ -186,6 +186,7 @@ jobs:
           SendGrid__ApiKey=${{ secrets.SENDGRID_API_KEY }}
           AzureStorage__ConnectionString=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
           ConnectionStrings__DefaultConnection=Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;
+          ConnectionStrings__AzureCommunication=${{ secrets.AZURE_COMMUNICATION_CONNECTION_STRING }}
           Redis__ConnectionString=${{ secrets.REDIS_CONNECTION_STRING }}
           EOF
 
@@ -205,6 +206,7 @@ jobs:
               'SendGrid__ApiKey=${{ secrets.SENDGRID_API_KEY }}' \
               'AzureStorage__ConnectionString=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}' \
               'ConnectionStrings__DefaultConnection=Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;' \
+              'ConnectionStrings__AzureCommunication=${{ secrets.AZURE_COMMUNICATION_CONNECTION_STRING }}' \
               'Redis__ConnectionString=${{ secrets.REDIS_CONNECTION_STRING }}' \
             --query 'properties.configuration.ingress.fqdn' -o tsv || \
           az containerapp create \
@@ -215,7 +217,7 @@ jobs:
             --registry-server ${{ env.CONTAINER_REGISTRY }}.azurecr.io \
             --target-port 8080 \
             --ingress external \
-            --min-replicas 0 \
+            --min-replicas 1 \
             --max-replicas 3 \
             --cpu 1.0 \
             --memory 2Gi \
@@ -228,6 +230,7 @@ jobs:
               'SendGrid__ApiKey=${{ secrets.SENDGRID_API_KEY }}' \
               'AzureStorage__ConnectionString=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}' \
               'ConnectionStrings__DefaultConnection=Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=${{ secrets.POSTGRES_PASSWORD }};Port=5432;SSL Mode=Require;' \
+              'ConnectionStrings__AzureCommunication=${{ secrets.AZURE_COMMUNICATION_CONNECTION_STRING }}' \
               'Redis__ConnectionString=${{ secrets.REDIS_CONNECTION_STRING }}' \
             --query 'properties.configuration.ingress.fqdn' -o tsv
 
