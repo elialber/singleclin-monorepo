@@ -124,11 +124,11 @@ namespace SingleClin.API.DTOs.EmailTemplate
                 ClinicEmail = "contato@singleclin.com",
                 SupportPhone = "(11) 3456-7899",
                 SupportEmail = "suporte@singleclin.com",
-                RenewUrl = $"https://app.singleclin.com/plans/renew?userId={userId}&planId={planId}",
-                AppUrl = "https://app.singleclin.com",
-                SupportUrl = "https://app.singleclin.com/support",
-                PreferencesUrl = $"https://app.singleclin.com/profile/notifications?userId={userId}",
-                UnsubscribeUrl = $"https://app.singleclin.com/profile/notifications?userId={userId}",
+                RenewUrl = $"https://singleclin.com/plans/renew?userId={userId}&planId={planId}",
+                AppUrl = "https://singleclin.com",
+                SupportUrl = "https://singleclin.com/support",
+                PreferencesUrl = $"https://singleclin.com/profile/notifications?userId={userId}",
+                UnsubscribeUrl = $"https://singleclin.com/profile/notifications?userId={userId}",
                 CurrentYear = DateTime.Now.Year
             };
         }

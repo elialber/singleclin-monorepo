@@ -1,6 +1,7 @@
 # Guia de Configuração do Firebase - SingleClin
 
-Este guia detalha o processo de configuração do Firebase para os projetos backend (.NET) e web-admin (React) do SingleClin.
+Este guia detalha o processo de configuração do Firebase para os projetos backend (.NET) e web-admin
+(React) do SingleClin.
 
 ## 📋 Pré-requisitos
 
@@ -33,7 +34,7 @@ Este guia detalha o processo de configuração do Firebase para os projetos back
 1. Em Authentication > Settings > Authorized domains
 2. Adicione os domínios:
    - `localhost` (desenvolvimento)
-   - Seu domínio de produção (ex: `app.singleclin.com`)
+   - Seu domínio de produção (ex: `singleclin.com`)
 
 ## 🔧 Configuração do Backend (.NET)
 
@@ -254,7 +255,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const token = await user.getIdToken();
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
+
       await api.post('/auth/sync', {
         firebaseUid: user.uid,
         email: user.email,
@@ -276,7 +277,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Register new user
   const register = async (email: string, password: string, name: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    
+
     // Update display name
     await updateProfile(userCredential.user, {
       displayName: name
@@ -313,7 +314,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      
+
       if (user) {
         // Set default authorization header
         const token = await user.getIdToken();
@@ -321,7 +322,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         delete api.defaults.headers.common['Authorization'];
       }
-      
+
       setLoading(false);
     });
 
@@ -358,13 +359,13 @@ import { auth } from '../config/firebase';
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
 });
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  async (config) => {
+  async config => {
     const user = auth.currentUser;
     if (user) {
       const token = await user.getIdToken();
@@ -372,15 +373,15 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
   }
 );
 
 // Response interceptor to handle token refresh
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  response => response,
+  async error => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -440,10 +441,12 @@ export default App;
 **Nunca commite credenciais!** Use variáveis de ambiente:
 
 #### Backend (.NET)
+
 - Desenvolvimento: `appsettings.Development.json` (gitignored)
 - Produção: Variáveis de ambiente do sistema ou Azure Key Vault
 
 #### Frontend (React)
+
 - Desenvolvimento: `.env.local` (gitignored)
 - Produção: Variáveis de ambiente do servidor de build
 
@@ -512,20 +515,26 @@ npm start
 
 ## 📱 Configuração Adicional para Mobile
 
-Para o app mobile Flutter, consulte o arquivo `packages/mobile/README.md` para instruções específicas de configuração do Firebase no iOS e Android.
+Para o app mobile Flutter, consulte o arquivo `packages/mobile/README.md` para instruções
+específicas de configuração do Firebase no iOS e Android.
 
 ## 🚨 Troubleshooting
 
 ### Problema: "No Firebase App has been created"
+
 **Solução**: Certifique-se de que o Firebase está sendo inicializado antes de usar qualquer serviço.
 
 ### Problema: "Permission denied" no Firestore
+
 **Solução**: Verifique as regras de segurança do Firestore e se o usuário está autenticado.
 
 ### Problema: Token JWT inválido no backend
-**Solução**: Verifique se o `ProjectId` no appsettings.json corresponde ao ID do projeto no Firebase.
+
+**Solução**: Verifique se o `ProjectId` no appsettings.json corresponde ao ID do projeto no
+Firebase.
 
 ### Problema: CORS error no frontend
+
 **Solução**: Adicione a origem do frontend na política CORS do backend.
 
 ## 🔗 Links Úteis
@@ -537,4 +546,5 @@ Para o app mobile Flutter, consulte o arquivo `packages/mobile/README.md` para i
 
 ---
 
-**Importante**: Este guia assume que você está usando as credenciais de exemplo. Substitua todas as chaves e IDs pelos valores reais do seu projeto Firebase.
+**Importante**: Este guia assume que você está usando as credenciais de exemplo. Substitua todas as
+chaves e IDs pelos valores reais do seu projeto Firebase.

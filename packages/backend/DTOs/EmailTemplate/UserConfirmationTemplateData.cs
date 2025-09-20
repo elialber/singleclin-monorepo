@@ -28,7 +28,7 @@ namespace SingleClin.API.DTOs.EmailTemplate
         /// <summary>
         /// Application URL for accessing the system
         /// </summary>
-        public string AppUrl { get; set; } = "https://app.singleclin.com";
+        public string AppUrl { get; set; } = "https://singleclin.com";
 
         /// <summary>
         /// Support phone number
@@ -48,7 +48,7 @@ namespace SingleClin.API.DTOs.EmailTemplate
         /// <summary>
         /// URL for managing preferences
         /// </summary>
-        public string PreferencesUrl { get; set; } = "https://app.singleclin.com/preferences";
+        public string PreferencesUrl { get; set; } = "https://singleclin.com/preferences";
 
         /// <summary>
         /// Creates a new instance with basic user information
