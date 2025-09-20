@@ -5,6 +5,7 @@ using SingleClin.API.Data.Models;
 using SingleClin.API.Data.Models.Enums;
 using SingleClin.API.Data.Enums;
 using SingleClin.API.DTOs.Auth;
+using SingleClin.API.DTOs.EmailTemplate;
 
 namespace SingleClin.API.Services;
 
@@ -21,6 +22,8 @@ public class AuthService : IAuthService
     private readonly ApplicationDbContext _context;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthService> _logger;
+    private readonly IAzureCommunicationService _emailService;
+    private readonly IEmailTemplateService _emailTemplateService;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
@@ -30,7 +33,9 @@ public class AuthService : IAuthService
         IFirebaseAuthService firebaseAuthService,
         ApplicationDbContext context,
         IConfiguration configuration,
-        ILogger<AuthService> logger)
+        ILogger<AuthService> logger,
+        IAzureCommunicationService emailService,
+        IEmailTemplateService emailTemplateService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -40,6 +45,8 @@ public class AuthService : IAuthService
         _context = context;
         _configuration = configuration;
         _logger = logger;
+        _emailService = emailService;
+        _emailTemplateService = emailTemplateService;
     }
 
     public async Task<(bool Success, AuthResponseDto? Response, string? Error)> RegisterAsync(RegisterDto registerDto, string? ipAddress = null)
@@ -144,6 +151,34 @@ public class AuthService : IAuthService
             if (user.ClinicId.HasValue)
             {
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("clinicId", user.ClinicId.Value.ToString()));
+            }
+
+            // Send confirmation email after successful user creation
+            try
+            {
+                var clinicName = user.ClinicId.HasValue
+                    ? await _context.Clinics
+                        .Where(c => c.Id == user.ClinicId.Value)
+                        .Select(c => c.Name)
+                        .FirstOrDefaultAsync()
+                    : null;
+
+                var templateData = UserConfirmationTemplateData.Create(
+                    user.FullName,
+                    user.Email!,
+                    registerDto.Password,
+                    clinicName
+                );
+
+                var renderedTemplate = await _emailTemplateService.RenderUserConfirmationAsync(templateData);
+                await _emailService.SendEmailAsync(user.Email!, renderedTemplate);
+
+                _logger.LogInformation("Confirmation email sent to user {UserId}", user.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send confirmation email to user {UserId}", user.Id);
+                // Don't fail the registration if email fails - user is already created
             }
 
             // Generate tokens
