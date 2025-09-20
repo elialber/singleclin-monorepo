@@ -79,8 +79,8 @@ namespace SingleClin.API.Services
                 if (response.HasValue)
                 {
                     var operation = response.Value;
-                    _logger.LogInformation("Email operation started successfully. Operation ID: {OperationId}, To: {To}",
-                        operation.Id, to);
+                    _logger.LogInformation("Email operation started successfully. To: {To}",
+                        to);
                     return true;
                 }
                 else
