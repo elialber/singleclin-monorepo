@@ -144,20 +144,25 @@ class LoginScreen extends StatelessWidget {
                     // Login button
                     Obx(
                       () => SizedBox(
-                        height: 48,
+                        width: double.infinity,
+                        height: 50,
                         child: ElevatedButton(
                           onPressed: authController.isLoading
                               ? null
                               : authController.signInWithEmail,
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            foregroundColor: Colors.white,
+                            elevation: 8,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                           child: authController.isLoading
                               ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
+                                  height: 24,
+                                  width: 24,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
@@ -168,8 +173,9 @@ class LoginScreen extends StatelessWidget {
                               : const Text(
                                   'Entrar',
                                   style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
                         ),

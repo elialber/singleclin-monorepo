@@ -340,17 +340,18 @@ class _LoginScreenState extends State<LoginScreen> {
             // Login Button
             Obx(() => SizedBox(
               width: double.infinity,
-              height: 56,
+              height: 80,
               child: ElevatedButton(
                 onPressed: _authController.isLoading ? null : _handleEmailLogin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.primary,
-                  disabledBackgroundColor: Colors.white.withOpacity(0.5),
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+                  elevation: 8,
+                  shadowColor: AppColors.primary.withOpacity(0.3),
+                  padding: const EdgeInsets.symmetric(vertical: 28),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: _authController.isLoading
@@ -359,12 +360,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 24,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
                     : const Text(
                         'Entrar',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                       ),
               ),
             )),
