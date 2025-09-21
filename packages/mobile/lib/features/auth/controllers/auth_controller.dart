@@ -4,7 +4,7 @@ import 'package:singleclin_mobile/data/services/user_api_service.dart';
 import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/constants/app_constants.dart';
-import '../models/user_model.dart';
+import '../../../data/models/user_model.dart';
 import '../../../routes/app_routes.dart';
 
 class AuthController extends GetxController {
@@ -52,7 +52,7 @@ class AuthController extends GetxController {
           );
 
           // Update controller state
-          _user.value = UserModel.fromUserModel(userProfile);
+          _user.value = UserModel.fromEntity(userProfile);
           _isAuthenticated.value = true;
         } catch (backendError) {
           // If backend fails but Firebase is authenticated, logout completely
@@ -97,7 +97,7 @@ class AuthController extends GetxController {
       );
 
       // Step 5: Update controller state
-      _user.value = UserModel.fromUserModel(userProfile);
+      _user.value = UserModel.fromEntity(userProfile);
       _isAuthenticated.value = true;
 
       // Step 6: Navigate to appropriate screen
@@ -140,7 +140,7 @@ class AuthController extends GetxController {
       );
 
       // Step 5: Update controller state
-      _user.value = UserModel.fromUserModel(userProfile);
+      _user.value = UserModel.fromEntity(userProfile);
       _isAuthenticated.value = true;
 
       // Step 6: Navigate to appropriate screen
@@ -166,15 +166,9 @@ class AuthController extends GetxController {
       _isLoading.value = true;
       _error.value = '';
 
-      final response = await _authService.loginWithApple();
-      
-      if (response['success']) {
-        await _handleSuccessfulAuth(response['data']);
-        return true;
-      } else {
-        _error.value = response['message'] ?? 'Erro no login com Apple';
-        return false;
-      }
+      final userEntity = await _authService.signInWithApple();
+      await _handleSuccessfulAuth(userEntity);
+      return true;
     } catch (e) {
       _error.value = 'Erro no login com Apple: $e';
       return false;
@@ -194,20 +188,14 @@ class AuthController extends GetxController {
       _isLoading.value = true;
       _error.value = '';
 
-      final response = await _authService.register(
-        fullName: fullName,
+      final userEntity = await _authService.signUp(
+        name: fullName,
         email: email,
         password: password,
-        phone: phone,
       );
-      
-      if (response['success']) {
-        await _handleSuccessfulAuth(response['data']);
-        return true;
-      } else {
-        _error.value = response['message'] ?? 'Erro no registro';
-        return false;
-      }
+
+      await _handleSuccessfulAuth(userEntity);
+      return true;
     } catch (e) {
       _error.value = 'Erro no registro: $e';
       return false;
@@ -222,19 +210,14 @@ class AuthController extends GetxController {
       _isLoading.value = true;
       _error.value = '';
 
-      final response = await _authService.forgotPassword(email);
-      
-      if (response['success']) {
-        Get.snackbar(
-          'Sucesso',
-          'Email de recuperação enviado!',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        return true;
-      } else {
-        _error.value = response['message'] ?? 'Erro ao enviar email';
-        return false;
-      }
+      await _authService.sendPasswordResetEmail(email: email);
+
+      Get.snackbar(
+        'Sucesso',
+        'Email de recuperação enviado!',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return true;
     } catch (e) {
       _error.value = 'Erro na recuperação: $e';
       return false;
@@ -277,25 +260,23 @@ class AuthController extends GetxController {
       _isLoading.value = true;
       _error.value = '';
 
-      final response = await _authService.updateUser(updatedUser);
-      
-      if (response['success']) {
-        _user.value = UserModel.fromJson(response['data']);
-        await _storageService.setString(
-          AppConstants.userKey,
-          _user.value!.toJson().toString(),
-        );
-        
-        Get.snackbar(
-          'Sucesso',
-          'Perfil atualizado com sucesso!',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        return true;
-      } else {
-        _error.value = response['message'] ?? 'Erro ao atualizar perfil';
-        return false;
-      }
+      final response = await _authService.updateProfile(
+        name: updatedUser.displayName,
+        photoUrl: updatedUser.photoUrl,
+      );
+
+      _user.value = UserModel.fromEntity(response);
+      await _storageService.setString(
+        AppConstants.userKey,
+        _user.value!.toJson().toString(),
+      );
+
+      Get.snackbar(
+        'Sucesso',
+        'Perfil atualizado com sucesso!',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return true;
     } catch (e) {
       _error.value = 'Erro na atualização: $e';
       return false;
@@ -307,7 +288,8 @@ class AuthController extends GetxController {
   /// Atualizar créditos do usuário
   void updateCredits(int newCredits) {
     if (_user.value != null) {
-      _user.value = _user.value!.copyWith(sgCredits: newCredits);
+      // TODO: Implement credits update when UserModel supports it
+      // _user.value = _user.value!.copyWith(sgCredits: newCredits);
       _storageService.setString(
         AppConstants.userKey,
         _user.value!.toJson().toString(),
@@ -326,19 +308,16 @@ class AuthController extends GetxController {
   }
 
   /// Manipular autenticação bem-sucedida
-  Future<void> _handleSuccessfulAuth(Map<String, dynamic> data) async {
-    final token = data['token'];
-    final userData = data['user'];
-    
-    // Salvar token e dados do usuário
-    await _storageService.setString(AppConstants.tokenKey, token);
-    await _storageService.setString(AppConstants.userKey, userData.toString());
-    
-    // Atualizar estado
-    _user.value = UserModel.fromJson(userData);
+  Future<void> _handleSuccessfulAuth(UserEntity userEntity) async {
+    // Convert to UserModel and save
+    final userModel = UserModel.fromEntity(userEntity);
+    await _storageService.setString(AppConstants.userKey, userModel.toJson().toString());
+
+    // Update state
+    _user.value = userModel;
     _isAuthenticated.value = true;
-    
-    // Navegar para dashboard ou onboarding
+
+    // Navigate to dashboard or onboarding
     final onboardingCompleted = await isOnboardingCompleted();
     if (onboardingCompleted) {
       Get.offAllNamed(AppRoutes.dashboard);

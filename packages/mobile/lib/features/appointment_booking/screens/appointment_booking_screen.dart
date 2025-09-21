@@ -134,11 +134,7 @@ class AppointmentBookingScreen extends StatelessWidget {
                         // Subscription Section
                         SubscriptionSection(clinic: clinic),
                         
-                        const SizedBox(height: 24),
-                        
-                        // Location Section
-                        LocationSection(clinic: clinic),
-                        
+                                       
                         // Bottom spacing for fixed CTA button
                         const SizedBox(height: 80),
                       ],
