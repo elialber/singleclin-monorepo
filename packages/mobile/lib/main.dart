@@ -14,6 +14,7 @@ import 'data/services/auth_service.dart';
 import 'data/services/token_refresh_service.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
+import 'presentation/screens/auth/register_screen.dart';
 import 'presentation/screens/home_screen.dart';
 import 'features/clinic_discovery/screens/clinic_discovery_screen.dart';
 import 'features/clinic_discovery/screens/clinic_details_screen.dart';
@@ -118,11 +119,12 @@ class SingleClinApp extends StatelessWidget {
       locale: const Locale('pt', 'BR'),
       fallbackLocale: const Locale('pt', 'BR'),
       
-      // Navigation - Start directly on discovery (clinic list) to show menu
-      initialRoute: '/discovery',
+      // Navigation - Start with splash to check authentication
+      initialRoute: '/splash',
       getPages: [
         GetPage(name: '/splash', page: () => const SplashScreen()),
         GetPage(name: '/login', page: () => const LoginScreen()),
+        GetPage(name: '/register', page: () => const RegisterScreen()),
         GetPage(name: '/home', page: () => const ClinicDiscoveryScreen()),
         GetPage(name: '/dashboard', page: () => const TempDashboardScreen()),
         GetPage(name: '/discovery', page: () => const ClinicDiscoveryWithNavScreen()),

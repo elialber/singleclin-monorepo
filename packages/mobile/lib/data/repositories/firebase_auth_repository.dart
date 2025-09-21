@@ -36,20 +36,33 @@ class FirebaseAuthRepository implements AuthRepository {
     required String password,
   }) async {
     try {
+      print('🔑 Firebase Auth: Attempting signInWithEmailAndPassword');
+      print('📧 Email: $email');
+      print('🔒 Password length: ${password.length}');
+
       final UserCredential result = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
+      print('✅ Firebase Auth: signInWithEmailAndPassword completed');
+
       if (result.user == null) {
+        print('❌ Firebase Auth: No user returned from successful auth');
         throw const local_auth.EmailPasswordAuthException(
           'Sign in failed - no user returned',
           'sign-in-failed',
         );
       }
 
+      print('👤 Firebase Auth: User authenticated - UID: ${result.user!.uid}');
       return _mapFirebaseUserToEntity(result.user!);
     } on FirebaseAuthException catch (e) {
+      print('❌ Firebase Auth Exception:');
+      print('   Code: ${e.code}');
+      print('   Message: ${e.message}');
+      print('   Plugin: ${e.plugin}');
       throw local_auth.AuthExceptionMapper.fromFirebaseException(e);
     } catch (e) {
+      print('❌ Unexpected error in Firebase Auth: $e');
       throw local_auth.EmailPasswordAuthException(
         'An unexpected error occurred: ${e.toString()}',
         'unexpected-error',

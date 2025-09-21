@@ -57,8 +57,10 @@ class AuthController extends GetxController {
       if (user != null) {
         // Sync user with backend after authentication
         await _syncUserWithBackend(user);
-        // Navigate to clinic list (discovery) with menu when authenticated
-        Get.offAllNamed('/discovery');
+        // Only navigate after successful login, not on app start
+        if (Get.currentRoute == '/login') {
+          Get.offAllNamed('/discovery');
+        }
       }
     });
   }
@@ -83,15 +85,30 @@ class AuthController extends GetxController {
     _clearError();
 
     try {
+      if (kDebugMode) {
+        print('🔐 Attempting login with email: ${emailController.text.trim()}');
+      }
+
       await _authService.signInWithEmail(
         email: emailController.text.trim(),
         password: passwordController.text,
       );
+
+      if (kDebugMode) {
+        print('✅ Firebase authentication successful');
+      }
+
       _showSuccessMessage('Login realizado com sucesso!');
       _clearLoginForm();
     } on AuthException catch (e) {
+      if (kDebugMode) {
+        print('❌ Authentication failed - AuthException: ${e.code} - ${e.message}');
+      }
       _setError(_getLocalizedErrorMessage(e));
     } catch (e) {
+      if (kDebugMode) {
+        print('❌ Authentication failed - Unexpected error: $e');
+      }
       _setError('Erro inesperado. Tente novamente.');
     } finally {
       _setLoading(false);
@@ -108,16 +125,31 @@ class AuthController extends GetxController {
     _clearError();
 
     try {
+      if (kDebugMode) {
+        print('📝 Creating new account for: ${emailController.text.trim()}');
+      }
+
       await _authService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text,
         name: nameController.text.trim(),
       );
+
+      if (kDebugMode) {
+        print('✅ Account created successfully');
+      }
+
       _showSuccessMessage('Conta criada com sucesso! Verifique seu email.');
       _clearRegisterForm();
     } on AuthException catch (e) {
+      if (kDebugMode) {
+        print('❌ Account creation failed - AuthException: ${e.code} - ${e.message}');
+      }
       _setError(_getLocalizedErrorMessage(e));
     } catch (e) {
+      if (kDebugMode) {
+        print('❌ Account creation failed - Unexpected error: $e');
+      }
       _setError('Erro inesperado. Tente novamente.');
     } finally {
       _setLoading(false);
