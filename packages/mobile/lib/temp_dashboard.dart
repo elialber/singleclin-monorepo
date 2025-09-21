@@ -116,6 +116,22 @@ class TempPlansScreen extends StatelessWidget {
   }
 }
 
+
+class ClinicDiscoveryWithNavScreen extends StatelessWidget {
+  const ClinicDiscoveryWithNavScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: const ClinicDiscoveryScreen(),
+      bottomNavigationBar: CustomBottomNav(
+        currentIndex: 0, // Início é índice 0
+        onTap: (index) => Get.find<BottomNavController>().changePage(index),
+      ),
+    );
+  }
+}
+
 class TempProfileScreen extends StatelessWidget {
   const TempProfileScreen({Key? key}) : super(key: key);
 
@@ -146,24 +162,10 @@ class TempProfileScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: CustomBottomNav(
-        currentIndex: 3, // Perfil agora é índice 3
+        currentIndex: 3, // Perfil é índice 3
         onTap: (index) => Get.find<BottomNavController>().changePage(index),
       ),
     );
   }
 }
 
-class ClinicDiscoveryWithNavScreen extends StatelessWidget {
-  const ClinicDiscoveryWithNavScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: const ClinicDiscoveryScreen(),
-      bottomNavigationBar: CustomBottomNav(
-        currentIndex: 0, // Início é índice 0
-        onTap: (index) => Get.find<BottomNavController>().changePage(index),
-      ),
-    );
-  }
-}

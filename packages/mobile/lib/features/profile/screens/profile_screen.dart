@@ -62,7 +62,7 @@ class ProfileScreen extends GetView<ProfileController> {
       bottomNavigationBar: controller.isEditing
           ? _buildBottomBar()
           : CustomBottomNav(
-              currentIndex: 4,
+              currentIndex: 3, // Perfil é índice 3
               onTap: (index) => Get.find<BottomNavController>().changePage(index),
             ),
     );
