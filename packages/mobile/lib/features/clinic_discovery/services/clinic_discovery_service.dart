@@ -25,7 +25,11 @@ class ClinicDiscoveryService {
       isAvailable: true,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 2)),
       type: ClinicType.partner,
-      services: ['Consulta', 'Exames', 'Procedimentos'],
+      services: [
+        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
+        {'name': 'Exames', 'price': 1.5, 'category': 'Diagnóstico'},
+        {'name': 'Procedimentos', 'price': 2.0, 'category': 'Geral'}
+      ],
       contact: const ContactInfo(
         phone: '(11) 3456-7890',
         email: 'contato@clinicasaojoao.com.br',
@@ -49,7 +53,12 @@ class ClinicDiscoveryService {
       isAvailable: true,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 4)),
       type: ClinicType.origin,
-      services: ['Consulta', 'Cirurgia', 'UTI', 'Pronto Socorro'],
+      services: [
+        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
+        {'name': 'Cirurgia', 'price': 5.0, 'category': 'Cirúrgico'},
+        {'name': 'UTI', 'price': 10.0, 'category': 'Intensivo'},
+        {'name': 'Pronto Socorro', 'price': 3.0, 'category': 'Emergência'}
+      ],
       contact: const ContactInfo(
         phone: '(11) 2345-6789',
         email: 'atendimento@santamaria.com.br',
@@ -72,7 +81,11 @@ class ClinicDiscoveryService {
       isAvailable: true,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 1)),
       type: ClinicType.partner,
-      services: ['Consulta', 'Exames Estéticos', 'Laser'],
+      services: [
+        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
+        {'name': 'Exames Estéticos', 'price': 2.0, 'category': 'Estética'},
+        {'name': 'Laser', 'price': 3.5, 'category': 'Estética'}
+      ],
       contact: const ContactInfo(
         phone: '(11) 3333-4444',
         email: 'agendamento@esperanca.med.br',
@@ -95,7 +108,11 @@ class ClinicDiscoveryService {
       isAvailable: false,
       nextAvailableSlot: DateTime.now().add(const Duration(days: 1)),
       type: ClinicType.partner,
-      services: ['Consulta', 'Terapia', 'Grupos Terapêuticos'],
+      services: [
+        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
+        {'name': 'Terapia', 'price': 2.5, 'category': 'Psicológico'},
+        {'name': 'Grupos Terapêuticos', 'price': 1.5, 'category': 'Psicológico'}
+      ],
       contact: const ContactInfo(
         phone: '(11) 4444-5555',
         email: 'contato@vidasaude.com.br',
@@ -118,7 +135,12 @@ class ClinicDiscoveryService {
       isAvailable: true,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 6)),
       type: ClinicType.origin,
-      services: ['Consulta', 'Cateterismo', 'Cirurgia', 'Check-up'],
+      services: [
+        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
+        {'name': 'Cateterismo', 'price': 8.0, 'category': 'Cardiológico'},
+        {'name': 'Cirurgia', 'price': 12.0, 'category': 'Cirúrgico'},
+        {'name': 'Check-up', 'price': 2.0, 'category': 'Preventivo'}
+      ],
       contact: const ContactInfo(
         phone: '(11) 5555-6666',
         email: 'agendamento@cardioplus.com.br',
@@ -141,7 +163,11 @@ class ClinicDiscoveryService {
       isAvailable: true,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 3)),
       type: ClinicType.partner,
-      services: ['Consulta', 'Fisioterapia', 'Exames de Imagem'],
+      services: [
+        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
+        {'name': 'Fisioterapia', 'price': 1.5, 'category': 'Reabilitação'},
+        {'name': 'Exames de Imagem', 'price': 3.0, 'category': 'Diagnóstico'}
+      ],
       contact: const ContactInfo(
         phone: '(11) 6666-7777',
         email: 'contato@ortopedicasp.com.br',
@@ -290,9 +316,9 @@ class ClinicDiscoveryService {
     return _mockClinics.where((clinic) {
       return clinic.isAvailable && (
         clinic.services.any((service) =>
-            service.toLowerCase().contains('urgência') ||
-            service.toLowerCase().contains('pronto socorro') ||
-            service.toLowerCase().contains('emergência')
+            (service['name'] ?? '').toLowerCase().contains('urgência') ||
+            (service['name'] ?? '').toLowerCase().contains('pronto socorro') ||
+            (service['name'] ?? '').toLowerCase().contains('emergência')
         ) ||
         clinic.nextAvailableSlot?.isBefore(
           DateTime.now().add(const Duration(hours: 2))

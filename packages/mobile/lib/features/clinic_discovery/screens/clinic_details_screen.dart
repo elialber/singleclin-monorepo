@@ -585,7 +585,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  service,
+                                  service['name'] ?? '',
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: AppColors.textPrimary,

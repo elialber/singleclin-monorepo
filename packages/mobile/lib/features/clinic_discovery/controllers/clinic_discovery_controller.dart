@@ -205,7 +205,7 @@ class ClinicDiscoveryController extends GetxController {
           clinic.specializations.any((spec) =>
               spec.toLowerCase().contains(query)) ||
           clinic.services.any((service) =>
-              service.toLowerCase().contains(query));
+              (service['name'] ?? '').toLowerCase().contains(query));
 
       // Specialization filter
       bool matchesSpecialization = _selectedSpecializations.isEmpty ||
