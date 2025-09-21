@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/clinic.dart';
+import '../../../core/constants/app_colors.dart';
 
 class ClinicCard extends StatelessWidget {
   final Clinic clinic;
@@ -205,6 +206,10 @@ class ClinicCard extends StatelessWidget {
   }
 
   Widget _buildSpecializations() {
+    if (clinic.specializations.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Wrap(
       spacing: 6,
       runSpacing: 4,
@@ -212,19 +217,19 @@ class ClinicCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.blue[50],
+            color: AppColors.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: Colors.blue[200]!,
+              color: AppColors.primary.withOpacity(0.3),
               width: 1,
             ),
           ),
           child: Text(
             specialization,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Colors.blue[700],
+              color: AppColors.primary,
             ),
           ),
         );

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../models/clinic.dart';
 import '../widgets/clinic_card.dart';
 import '../controllers/clinic_discovery_controller.dart';
+import '../../../core/constants/app_colors.dart';
 
 class ClinicDiscoveryScreen extends StatelessWidget {
   const ClinicDiscoveryScreen({Key? key}) : super(key: key);
@@ -82,7 +83,7 @@ class ClinicDiscoveryScreen extends StatelessWidget {
           controller: controller.searchController,
           onChanged: controller.searchClinics,
           decoration: InputDecoration(
-            hintText: 'Buscar por especialidade ou nome da clínica',
+            hintText: 'Buscar por categoria, serviço ou nome da clínica',
             hintStyle: TextStyle(
               color: Colors.grey[500],
               fontSize: 14,
@@ -122,7 +123,7 @@ class ClinicDiscoveryScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: isSelected ? Colors.white : Colors.grey[700],
+                  color: isSelected ? AppColors.white : AppColors.textSecondary,
                 ),
               ),
               selected: isSelected,
@@ -133,8 +134,8 @@ class ClinicDiscoveryScreen extends StatelessWidget {
                   controller.removeSpecializationFilter(specialization);
                 }
               },
-              backgroundColor: Colors.grey[100],
-              selectedColor: Theme.of(context).primaryColor,
+              backgroundColor: AppColors.surface,
+              selectedColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),

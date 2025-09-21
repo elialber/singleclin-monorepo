@@ -94,12 +94,22 @@ class Clinic {
       clinicType = ClinicType.fromString(dto['type']);
     }
 
-    // Parse services from backend
+    // Parse services and extract categories from backend
     List<String> clinicServices = [];
+    Set<String> serviceCategories = {};
+
     if (dto['services'] != null && dto['services'] is List) {
       for (var service in dto['services'] as List) {
-        if (service is Map<String, dynamic> && service['name'] != null) {
-          clinicServices.add(service['name']);
+        if (service is Map<String, dynamic>) {
+          // Extract service name
+          if (service['name'] != null) {
+            clinicServices.add(service['name']);
+          }
+
+          // Extract service category for quick filters
+          if (service['category'] != null) {
+            serviceCategories.add(service['category']);
+          }
         }
       }
     }
@@ -125,7 +135,7 @@ class Clinic {
       distance: 0.0, // Will be calculated later based on user location
       rating: 4.5, // Default rating - TODO: implement real ratings
       reviewCount: 0, // Default review count - TODO: implement real reviews
-      specializations: [], // TODO: implement specializations from backend
+      specializations: serviceCategories.toList(), // Use service categories as specializations
       imageUrl: mainImageUrl,
       images: allImages,
       isAvailable: dto['isActive'] ?? false,

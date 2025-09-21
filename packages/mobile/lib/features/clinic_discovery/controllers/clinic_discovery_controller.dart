@@ -151,7 +151,16 @@ class ClinicDiscoveryController extends GetxController {
     for (final clinic in _clinics) {
       specializations.addAll(clinic.specializations);
     }
-    _availableSpecializations.assignAll(specializations.toList()..sort());
+
+    final sortedSpecializations = specializations.toList()..sort();
+    _availableSpecializations.assignAll(sortedSpecializations);
+
+    // Debug: Print extracted categories for verification
+    print('🏷️ Extracted service categories for quick filters:');
+    for (String category in sortedSpecializations) {
+      print('  - $category');
+    }
+    print('📊 Total categories found: ${sortedSpecializations.length}');
   }
 
   void searchClinics(String query) {
