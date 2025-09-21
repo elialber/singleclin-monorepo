@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/app_colors.dart';
 import '../../routes/app_routes.dart';
+import '../controllers/bottom_nav_controller.dart';
 
 class CustomBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -37,31 +38,24 @@ class CustomBottomNav extends StatelessWidget {
                 icon: Icons.home_outlined,
                 activeIcon: Icons.home,
                 label: 'Início',
-                route: AppRoutes.dashboard,
-              ),
-              _buildNavItem(
-                index: 1,
-                icon: Icons.search_outlined,
-                activeIcon: Icons.search,
-                label: 'Descobrir',
                 route: AppRoutes.discovery,
               ),
               _buildNavItem(
+                index: 1,
+                icon: Icons.receipt_long_outlined,
+                activeIcon: Icons.receipt_long,
+                label: 'Transações',
+                route: AppRoutes.creditHistory,
+              ),
+              _buildNavItem(
                 index: 2,
-                icon: Icons.calendar_today_outlined,
-                activeIcon: Icons.calendar_today,
-                label: 'Agendamentos',
-                route: AppRoutes.appointments,
+                icon: Icons.monetization_on_outlined,
+                activeIcon: Icons.monetization_on,
+                label: 'Planos',
+                route: AppRoutes.subscriptionPlans,
               ),
               _buildNavItem(
                 index: 3,
-                icon: Icons.account_balance_wallet_outlined,
-                activeIcon: Icons.account_balance_wallet,
-                label: 'Créditos',
-                route: AppRoutes.credits,
-              ),
-              _buildNavItem(
-                index: 4,
                 icon: Icons.person_outline,
                 activeIcon: Icons.person,
                 label: 'Perfil',
@@ -128,39 +122,3 @@ class CustomBottomNav extends StatelessWidget {
   }
 }
 
-class BottomNavController extends GetxController {
-  final RxInt _currentIndex = 0.obs;
-  
-  int get currentIndex => _currentIndex.value;
-  
-  void changePage(int index) {
-    if (_currentIndex.value != index) {
-      _currentIndex.value = index;
-      _navigateToPage(index);
-    }
-  }
-  
-  void _navigateToPage(int index) {
-    switch (index) {
-      case 0:
-        Get.offAllNamed(AppRoutes.dashboard);
-        break;
-      case 1:
-        Get.offAllNamed(AppRoutes.discovery);
-        break;
-      case 2:
-        Get.offAllNamed(AppRoutes.appointments);
-        break;
-      case 3:
-        Get.offAllNamed(AppRoutes.credits);
-        break;
-      case 4:
-        Get.offAllNamed(AppRoutes.profile);
-        break;
-    }
-  }
-  
-  void setIndex(int index) {
-    _currentIndex.value = index;
-  }
-}

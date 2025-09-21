@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../../routes/app_routes.dart';
 
 class BottomNavController extends GetxController {
   final RxInt _currentIndex = 0.obs;
@@ -6,29 +7,30 @@ class BottomNavController extends GetxController {
   int get currentIndex => _currentIndex.value;
 
   void changePage(int index) {
-    _currentIndex.value = index;
+    if (_currentIndex.value != index) {
+      _currentIndex.value = index;
+      _navigateToPage(index);
+    }
+  }
 
-    // Navigate to the corresponding route based on index
+  void _navigateToPage(int index) {
     switch (index) {
       case 0:
-        Get.toNamed('/dashboard');
+        Get.offAllNamed(AppRoutes.discovery); // Início = Lista de clínicas
         break;
       case 1:
-        Get.toNamed('/discovery');
+        Get.offAllNamed(AppRoutes.creditHistory); // Transações
         break;
       case 2:
-        Get.toNamed('/plans');
+        Get.offAllNamed(AppRoutes.subscriptionPlans); // Planos
         break;
       case 3:
-        Get.toNamed('/transactions');
-        break;
-      case 4:
-        Get.toNamed('/profile');
+        Get.offAllNamed(AppRoutes.profile); // Perfil
         break;
     }
   }
 
-  void setCurrentIndex(int index) {
+  void setIndex(int index) {
     _currentIndex.value = index;
   }
 }

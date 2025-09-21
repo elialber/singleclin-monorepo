@@ -4,6 +4,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/custom_bottom_nav.dart';
 import '../controllers/discovery_controller.dart';
 import '../controllers/filters_controller.dart';
 import '../models/clinic.dart';
@@ -106,6 +107,10 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: CustomBottomNav(
+        currentIndex: 1,
+        onTap: (index) => Get.find<BottomNavController>().changePage(index),
       ),
     );
   }

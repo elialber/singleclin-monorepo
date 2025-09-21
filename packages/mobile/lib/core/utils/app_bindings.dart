@@ -4,7 +4,7 @@ import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../services/location_service.dart';
 import '../../features/auth/controllers/auth_controller.dart';
-import '../../shared/widgets/custom_bottom_nav.dart';
+import '../../shared/controllers/bottom_nav_controller.dart';
 
 class AppBindings extends Bindings {
   @override

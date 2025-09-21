@@ -27,6 +27,11 @@ import '../features/profile/screens/profile_screen.dart';
 import '../features/profile/screens/health_history_screen.dart';
 import '../features/profile/screens/documents_screen.dart';
 
+// Credits screens
+import '../features/credits/screens/credit_history_screen.dart';
+import '../features/credits/screens/subscription_plans_screen.dart';
+import '../features/credits/bindings/credits_binding.dart';
+
 // Bindings
 import '../features/onboarding/controllers/onboarding_binding.dart';
 import '../features/auth/controllers/auth_binding.dart';
@@ -198,6 +203,17 @@ class AppPages {
       name: AppRoutes.trustCenter,
       page: () => const TrustCenterScreen(),
       binding: TrustCenterBinding(),
+    ),
+
+    // Credits Routes
+    GetPage(
+      name: AppRoutes.creditHistory,
+      page: () => const CreditHistoryScreen(),
+      binding: CreditsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.subscriptionPlans,
+      page: () => const SubscriptionPlansScreen(),
     ),
   ];
 }

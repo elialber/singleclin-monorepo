@@ -57,8 +57,8 @@ class AuthController extends GetxController {
       if (user != null) {
         // Sync user with backend after authentication
         await _syncUserWithBackend(user);
-        // Navigate to home screen when authenticated
-        Get.offAllNamed('/home');
+        // Navigate to clinic list (discovery) with menu when authenticated
+        Get.offAllNamed('/discovery');
       }
     });
   }

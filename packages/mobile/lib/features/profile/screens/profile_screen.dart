@@ -4,6 +4,7 @@ import '../controllers/profile_controller.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/lgpd_settings.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/custom_bottom_nav.dart';
 import '../../../core/constants/app_colors.dart';
 
 /// Profile Screen
@@ -58,7 +59,12 @@ class ProfileScreen extends GetView<ProfileController> {
           ),
         );
       }),
-      bottomNavigationBar: _buildBottomBar(),
+      bottomNavigationBar: controller.isEditing
+          ? _buildBottomBar()
+          : CustomBottomNav(
+              currentIndex: 4,
+              onTap: (index) => Get.find<BottomNavController>().changePage(index),
+            ),
     );
   }
 

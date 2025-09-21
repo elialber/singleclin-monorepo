@@ -35,9 +35,9 @@ class _SplashScreenState extends State<SplashScreen> {
       ]);
 
       if (result == true) {
-        // User is authenticated, go to home
+        // User is authenticated, go to clinic list (discovery) with menu
         if (mounted) {
-          Get.offAllNamed('/home');
+          Get.offAllNamed('/discovery');
         }
       } else {
         // Not authenticated or timeout occurred, go to login

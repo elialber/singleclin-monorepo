@@ -18,7 +18,9 @@ import 'presentation/screens/home_screen.dart';
 import 'features/clinic_discovery/screens/clinic_discovery_screen.dart';
 import 'features/clinic_discovery/screens/clinic_details_screen.dart';
 import 'features/appointment_booking/screens/appointment_booking_screen.dart';
+import 'temp_dashboard.dart';
 import 'presentation/controllers/auth_controller.dart';
+import 'shared/controllers/bottom_nav_controller.dart';
 import 'core/utils/app_bindings.dart';
 
 void main() async {
@@ -86,6 +88,9 @@ Future<void> _initServices() async {
     
     // Initialize auth controller
     Get.put(AuthController(), permanent: true);
+
+    // Initialize bottom navigation controller
+    Get.put(BottomNavController(), permanent: true);
     
     print('✅ All services initialized successfully');
   } catch (e) {
@@ -112,18 +117,20 @@ class SingleClinApp extends StatelessWidget {
       locale: const Locale('pt', 'BR'),
       fallbackLocale: const Locale('pt', 'BR'),
       
-      // Navigation
-      initialRoute: '/splash',
+      // Navigation - Start directly on discovery (clinic list) to show menu
+      initialRoute: '/discovery',
       getPages: [
         GetPage(name: '/splash', page: () => const SplashScreen()),
         GetPage(name: '/login', page: () => const LoginScreen()),
         GetPage(name: '/home', page: () => const ClinicDiscoveryScreen()),
+        GetPage(name: '/dashboard', page: () => const TempDashboardScreen()),
+        GetPage(name: '/discovery', page: () => const ClinicDiscoveryWithNavScreen()),
+        GetPage(name: '/credit-history', page: () => const TempTransactionsScreen()),
+        GetPage(name: '/subscription-plans', page: () => const TempPlansScreen()),
+        GetPage(name: '/profile', page: () => const TempProfileScreen()),
         GetPage(name: '/old-home', page: () => const HomeScreen()),
         GetPage(name: '/clinic-details', page: () => ClinicDetailsScreen(clinic: Get.arguments)),
         GetPage(name: '/appointment-booking', page: () => AppointmentBookingScreen(clinic: Get.arguments)),
-        // Add routes for other screens as needed
-        // GetPage(name: '/register', page: () => const RegisterScreen()),
-        // GetPage(name: '/forgot-password', page: () => const ForgotPasswordScreen()),
       ],
       
       // Global configuration
