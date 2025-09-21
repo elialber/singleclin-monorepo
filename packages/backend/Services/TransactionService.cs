@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using SingleClin.API.Data;
 using SingleClin.API.Data.Models;
 using SingleClin.API.Data.Models.Enums;
 using SingleClin.API.DTOs.Transaction;
@@ -12,15 +14,18 @@ public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _transactionRepository;
     private readonly IExportService _exportService;
+    private readonly AppDbContext _context;
     private readonly ILogger<TransactionService> _logger;
 
     public TransactionService(
         ITransactionRepository transactionRepository,
         IExportService exportService,
+        AppDbContext context,
         ILogger<TransactionService> logger)
     {
         _transactionRepository = transactionRepository;
         _exportService = exportService;
+        _context = context;
         _logger = logger;
     }
 
@@ -327,19 +332,84 @@ public class TransactionService : ITransactionService
 
     private async Task RefundCreditsToUserPlan(Transaction transaction)
     {
-        // This would typically update the UserPlan to refund the credits
-        // For now, we'll just log the action - this needs to be implemented
-        // when we have the UserPlan repository/service integrated
+        try
+        {
+            _logger.LogInformation("Refunding {Credits} credits to UserPlan {UserPlanId} for cancelled transaction {TransactionId}",
+                transaction.CreditsUsed, transaction.UserPlanId, transaction.Id);
 
-        _logger.LogInformation("Refunding {Credits} credits to UserPlan {UserPlanId} for cancelled transaction {TransactionId}",
-            transaction.CreditsUsed, transaction.UserPlanId, transaction.Id);
+            // Find the user plan that was debited
+            var userPlan = await _context.UserPlans
+                .FirstOrDefaultAsync(up => up.Id == transaction.UserPlanId);
 
-        // TODO: Implement actual credit refund logic
-        // var userPlan = await _userPlanRepository.GetByIdAsync(transaction.UserPlanId);
-        // userPlan.CreditsRemaining += transaction.CreditsUsed;
-        // await _userPlanRepository.UpdateAsync(userPlan);
+            if (userPlan == null)
+            {
+                _logger.LogError("UserPlan {UserPlanId} not found for credit refund", transaction.UserPlanId);
+                return;
+            }
 
-        await Task.CompletedTask;
+            // Validate that the plan is still active
+            if (!userPlan.IsActive)
+            {
+                _logger.LogWarning("Cannot refund credits to inactive UserPlan {UserPlanId}", transaction.UserPlanId);
+                return;
+            }
+
+            // Refund the credits
+            userPlan.CreditsRemaining += transaction.CreditsUsed;
+            userPlan.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Successfully refunded {Credits} credits to UserPlan {UserPlanId}. New remaining credits: {NewBalance}",
+                transaction.CreditsUsed, transaction.UserPlanId, userPlan.CreditsRemaining);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error refunding credits to UserPlan {UserPlanId} for transaction {TransactionId}",
+                transaction.UserPlanId, transaction.Id);
+            throw;
+        }
+    }
+
+    public async Task<(bool Success, TransactionResponseDto? Transaction, IEnumerable<string> Errors)> RefundAppointmentCreditsAsync(Guid transactionId, string reason)
+    {
+        try
+        {
+            _logger.LogInformation("Refunding appointment credits for transaction {TransactionId} with reason: {Reason}",
+                transactionId, reason);
+
+            var transaction = await _transactionRepository.GetTransactionByIdAsync(transactionId);
+            if (transaction == null)
+            {
+                return (false, null, new[] { "Transaction not found" });
+            }
+
+            // Validate that transaction is completed and not already cancelled
+            if (transaction.Status != TransactionStatus.Validated)
+            {
+                return (false, null, new[] { "Only completed transactions can be refunded" });
+            }
+
+            // Refund credits to user plan
+            await RefundCreditsToUserPlan(transaction);
+
+            // Update transaction status
+            transaction.Status = TransactionStatus.Cancelled;
+            transaction.CancellationReason = reason;
+            transaction.CancellationDate = DateTime.UtcNow;
+            transaction.ValidationNotes = $"{transaction.ValidationNotes ?? ""}\nRefunded for appointment cancellation: {reason}";
+
+            var updatedTransaction = await _transactionRepository.UpdateTransactionAsync(transaction);
+
+            _logger.LogInformation("Credits refunded successfully for transaction {TransactionId}", transactionId);
+
+            return (true, MapToResponseDto(updatedTransaction), Array.Empty<string>());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error refunding appointment credits for transaction {TransactionId}", transactionId);
+            return (false, null, new[] { "An error occurred while refunding credits" });
+        }
     }
 
     private TransactionResponseDto MapToResponseDto(Transaction transaction)

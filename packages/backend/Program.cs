@@ -241,6 +241,10 @@ public class Program
         // Add User Service
         builder.Services.AddScoped<IUserService, UserService>();
 
+        // Add Appointment services
+        builder.Services.AddScoped<ICreditValidationService, CreditValidationService>();
+        builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+
         // Add Azure Blob Storage Client
         builder.Services.AddSingleton<BlobServiceClient>(provider =>
         {

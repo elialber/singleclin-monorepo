@@ -60,6 +60,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     /// </summary>
     public DbSet<UserNotificationPreferences> UserNotificationPreferences => Set<UserNotificationPreferences>();
 
+    /// <summary>
+    /// Appointments made by users for services at clinics
+    /// </summary>
+    public DbSet<Appointment> Appointments => Set<Appointment>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

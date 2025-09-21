@@ -33,7 +33,7 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service>
             .IsRequired()
             .HasMaxLength(50);
 
-        builder.Property(cs => cs.IsAvailable)
+        builder.Property(cs => cs.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
 
@@ -53,7 +53,7 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service>
         builder.HasIndex(cs => cs.Category)
             .HasDatabaseName("IX_ClinicServices_Category");
 
-        builder.HasIndex(cs => cs.IsAvailable)
-            .HasDatabaseName("IX_ClinicServices_IsAvailable");
+        builder.HasIndex(cs => cs.IsActive)
+            .HasDatabaseName("IX_ClinicServices_IsActive");
     }
 }

@@ -88,7 +88,7 @@ public class ClinicService : IClinicService
                     Price = NormalizeServicePrice(serviceDto.Price),
                     Duration = serviceDto.Duration,
                     Category = serviceDto.Category,
-                    IsAvailable = serviceDto.IsAvailable,
+                    IsActive = serviceDto.IsActive,
                     ImageUrl = serviceDto.ImageUrl,
                     ClinicId = createdClinic.Id,
                     CreatedAt = DateTime.UtcNow,
@@ -177,7 +177,7 @@ public class ClinicService : IClinicService
                         Price = NormalizeServicePrice(serviceDto.Price),
                         Duration = serviceDto.Duration,
                         Category = serviceDto.Category,
-                        IsAvailable = serviceDto.IsAvailable,
+                        IsActive = serviceDto.IsActive,
                         ImageUrl = serviceDto.ImageUrl,
                         ClinicId = id,
                         CreatedAt = DateTime.UtcNow,
@@ -712,7 +712,7 @@ public class ClinicService : IClinicService
             Price = service.Price,
             Duration = service.Duration,
             Category = service.Category,
-            IsAvailable = service.IsAvailable,
+            IsActive = service.IsActive,
             ImageUrl = service.ImageUrl
         };
     }

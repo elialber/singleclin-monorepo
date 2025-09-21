@@ -86,4 +86,12 @@ public interface ITransactionService
     /// <param name="endDate">End date</param>
     /// <returns>Statistics object</returns>
     Task<object> GetTransactionStatisticsAsync(DateTime startDate, DateTime endDate);
+
+    /// <summary>
+    /// Refund credits for appointment cancellation
+    /// </summary>
+    /// <param name="transactionId">Transaction ID to refund</param>
+    /// <param name="reason">Refund reason</param>
+    /// <returns>Success status and updated transaction</returns>
+    Task<(bool Success, TransactionResponseDto? Transaction, IEnumerable<string> Errors)> RefundAppointmentCreditsAsync(Guid transactionId, string reason);
 }

@@ -1355,7 +1355,7 @@ public class ClinicController : ControllerBase
                     Price = s.Price,
                     Duration = s.Duration,
                     Category = s.Category,
-                    IsAvailable = s.IsAvailable,
+                    IsActive = s.IsActive,
                     ImageUrl = s.ImageUrl
                 })
                 .ToListAsync();
@@ -1418,7 +1418,7 @@ public class ClinicController : ControllerBase
                     Price = 3.0m, // SG format: 3 SG
                     Duration = 30,
                     Category = "Consulta",
-                    IsAvailable = true,
+                    IsActive = true,
                     ImageUrl = "https://via.placeholder.com/300x200?text=Consulta+Geral",
                     ClinicId = id,
                     CreatedAt = DateTime.UtcNow,
@@ -1432,7 +1432,7 @@ public class ClinicController : ControllerBase
                     Price = 2.0m, // SG format: 2 SG
                     Duration = 15,
                     Category = "Exame",
-                    IsAvailable = true,
+                    IsActive = true,
                     ImageUrl = "https://via.placeholder.com/300x200?text=Exame+Sangue",
                     ClinicId = id,
                     CreatedAt = DateTime.UtcNow,
@@ -1446,7 +1446,7 @@ public class ClinicController : ControllerBase
                     Price = 3.0m, // SG format: 3 SG
                     Duration = 45,
                     Category = "Exame",
-                    IsAvailable = true,
+                    IsActive = true,
                     ImageUrl = "https://via.placeholder.com/300x200?text=Ultrassom",
                     ClinicId = id,
                     CreatedAt = DateTime.UtcNow,
@@ -1460,7 +1460,7 @@ public class ClinicController : ControllerBase
                     Price = 2.0m, // SG format: 2 SG
                     Duration = 20,
                     Category = "Exame",
-                    IsAvailable = true,
+                    IsActive = true,
                     ImageUrl = "https://via.placeholder.com/300x200?text=ECG",
                     ClinicId = id,
                     CreatedAt = DateTime.UtcNow,
@@ -1474,7 +1474,7 @@ public class ClinicController : ControllerBase
                     Price = 3.0m, // SG format: 3 SG
                     Duration = 60,
                     Category = "Consulta",
-                    IsAvailable = true,
+                    IsActive = true,
                     ImageUrl = "https://via.placeholder.com/300x200?text=Cardiologia",
                     ClinicId = id,
                     CreatedAt = DateTime.UtcNow,
@@ -1494,7 +1494,7 @@ public class ClinicController : ControllerBase
                 Price = s.Price,
                 Duration = s.Duration,
                 Category = s.Category,
-                IsAvailable = s.IsAvailable,
+                IsActive = s.IsActive,
                 ImageUrl = s.ImageUrl
             }).ToList();
 

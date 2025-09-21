@@ -33,6 +33,13 @@ public class ClinicServiceDto
     public decimal Price { get; set; }
 
     /// <summary>
+    /// Cost in credits for this service
+    /// </summary>
+    [Required(ErrorMessage = "Credit cost is required")]
+    [Range(1, int.MaxValue, ErrorMessage = "Credit cost must be at least 1")]
+    public int CreditCost { get; set; }
+
+    /// <summary>
     /// Service duration in minutes
     /// </summary>
     [Required(ErrorMessage = "Service duration is required")]
@@ -47,9 +54,9 @@ public class ClinicServiceDto
     public string Category { get; set; } = string.Empty;
 
     /// <summary>
-    /// Indicates if the service is available
+    /// Indicates if the service is active
     /// </summary>
-    public bool IsAvailable { get; set; } = true;
+    public bool IsActive { get; set; } = true;
 
     /// <summary>
     /// Service image URL

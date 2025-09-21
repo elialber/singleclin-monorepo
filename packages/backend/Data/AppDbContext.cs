@@ -45,6 +45,16 @@ public class AppDbContext : DbContext
     /// </summary>
     public DbSet<ClinicImage> ClinicImages => Set<ClinicImage>();
 
+    /// <summary>
+    /// Services offered by clinics
+    /// </summary>
+    public DbSet<Service> Services => Set<Service>();
+
+    /// <summary>
+    /// Appointments scheduled by users
+    /// </summary>
+    public DbSet<Appointment> Appointments => Set<Appointment>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

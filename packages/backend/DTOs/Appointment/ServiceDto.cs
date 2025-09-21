@@ -1,10 +1,17 @@
-namespace SingleClin.API.Data.Models;
+using SingleClin.API.DTOs.Clinic;
+
+namespace SingleClin.API.DTOs.Appointment;
 
 /// <summary>
-/// Represents a service offered by a clinic
+/// Data transfer object for service information in appointment context
 /// </summary>
-public class Service : BaseEntity
+public class ServiceDto
 {
+    /// <summary>
+    /// Service unique identifier
+    /// </summary>
+    public Guid Id { get; set; }
+
     /// <summary>
     /// Service name
     /// </summary>
@@ -14,11 +21,6 @@ public class Service : BaseEntity
     /// Service description
     /// </summary>
     public string Description { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Service price
-    /// </summary>
-    public decimal Price { get; set; }
 
     /// <summary>
     /// Cost in credits for this service
@@ -36,22 +38,12 @@ public class Service : BaseEntity
     public string Category { get; set; } = string.Empty;
 
     /// <summary>
-    /// Indicates if the service is active
-    /// </summary>
-    public bool IsActive { get; set; } = true;
-
-    /// <summary>
     /// Service image URL
     /// </summary>
     public string? ImageUrl { get; set; }
 
     /// <summary>
-    /// Clinic ID that offers this service
+    /// Clinic information
     /// </summary>
-    public Guid ClinicId { get; set; }
-
-    /// <summary>
-    /// Navigation property to the clinic
-    /// </summary>
-    public Clinic Clinic { get; set; } = null!;
+    public ClinicResponseDto Clinic { get; set; } = null!;
 }

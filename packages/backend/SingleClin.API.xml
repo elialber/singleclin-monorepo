@@ -52,6 +52,96 @@
             Authorize attribute for any authenticated user
             </summary>
         </member>
+        <member name="T:SingleClin.API.Controllers.AppointmentsController">
+            <summary>
+            Controller for managing appointments
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.ScheduleAppointment(SingleClin.API.DTOs.Appointment.AppointmentScheduleDto)">
+            <summary>
+            Schedule a new appointment
+            </summary>
+            <param name="scheduleDto">Appointment scheduling data</param>
+            <returns>Appointment summary with confirmation details</returns>
+            <response code="201">Appointment scheduled successfully</response>
+            <response code="400">Invalid appointment data or insufficient credits</response>
+            <response code="401">Unauthorized</response>
+            <response code="404">Service or clinic not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.ConfirmAppointment(SingleClin.API.DTOs.Appointment.AppointmentConfirmationDto)">
+            <summary>
+            Confirm a scheduled appointment and debit credits
+            </summary>
+            <param name="confirmationDto">Appointment confirmation data</param>
+            <returns>Confirmed appointment details</returns>
+            <response code="200">Appointment confirmed successfully</response>
+            <response code="400">Invalid confirmation token or insufficient credits</response>
+            <response code="401">Unauthorized</response>
+            <response code="404">Appointment not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.GetAppointmentById(System.Guid)">
+            <summary>
+            Get appointment details by ID
+            </summary>
+            <param name="appointmentId">Appointment ID</param>
+            <returns>Appointment details</returns>
+            <response code="200">Returns appointment details</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Access forbidden - not your appointment</response>
+            <response code="404">Appointment not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.GetMyAppointments(System.Boolean)">
+            <summary>
+            Get user's appointments
+            </summary>
+            <param name="includeCompleted">Include completed appointments (default: false)</param>
+            <returns>List of user's appointments</returns>
+            <response code="200">Returns list of appointments</response>
+            <response code="401">Unauthorized</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.CancelAppointment(System.Guid,System.String)">
+            <summary>
+            Cancel an appointment
+            </summary>
+            <param name="appointmentId">Appointment ID</param>
+            <param name="reason">Cancellation reason (optional)</param>
+            <returns>Cancelled appointment details</returns>
+            <response code="200">Appointment cancelled successfully</response>
+            <response code="400">Cannot cancel appointment in current state</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Access forbidden - not your appointment</response>
+            <response code="404">Appointment not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.GetAppointmentByToken(System.String)">
+            <summary>
+            Get appointment summary by confirmation token (public endpoint)
+            </summary>
+            <param name="token">Confirmation token</param>
+            <returns>Appointment summary for confirmation</returns>
+            <response code="200">Returns appointment summary</response>
+            <response code="400">Invalid token</response>
+            <response code="404">Appointment not found or token expired</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.CompleteAppointment(System.Guid)">
+            <summary>
+            Complete an appointment (for clinic use)
+            </summary>
+            <param name="appointmentId">Appointment ID</param>
+            <returns>Completed appointment details</returns>
+            <response code="200">Appointment completed successfully</response>
+            <response code="400">Cannot complete appointment in current state</response>
+            <response code="401">Unauthorized</response>
+            <response code="403">Access forbidden - clinic access required</response>
+            <response code="404">Appointment not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.GetMyCredits">
+            <summary>
+            Get current user's available credits
+            </summary>
+            <returns>User's available credits information</returns>
+            <response code="200">Returns user's credit information</response>
+            <response code="401">Unauthorized</response>
+        </member>
         <member name="T:SingleClin.API.Controllers.AuthController">
             <summary>
             Controller for authentication endpoints
@@ -838,6 +928,57 @@
             <param name="reportType">Optional report type to clear</param>
             <returns>Success response</returns>
         </member>
+        <member name="T:SingleClin.API.Controllers.ServicesController">
+            <summary>
+            Controller for managing services
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ServicesController.GetServicesByClinic(System.Guid)">
+            <summary>
+            Get all services for a clinic
+            </summary>
+            <param name="clinicId">Clinic ID</param>
+            <returns>List of services for the clinic</returns>
+            <response code="200">Returns the list of services</response>
+            <response code="400">Invalid clinic ID</response>
+            <response code="401">Unauthorized</response>
+            <response code="404">Clinic not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ServicesController.GetServiceById(System.Guid)">
+            <summary>
+            Get service details by ID
+            </summary>
+            <param name="serviceId">Service ID</param>
+            <returns>Service details</returns>
+            <response code="200">Returns the service details</response>
+            <response code="400">Invalid service ID</response>
+            <response code="401">Unauthorized</response>
+            <response code="404">Service not found</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ServicesController.SearchServices(System.String,System.String,System.Nullable{System.Guid},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Int32,System.Int32)">
+            <summary>
+            Search services across all clinics
+            </summary>
+            <param name="query">Search query</param>
+            <param name="category">Service category filter</param>
+            <param name="clinicId">Clinic ID filter (optional)</param>
+            <param name="minCreditCost">Minimum credit cost filter</param>
+            <param name="maxCreditCost">Maximum credit cost filter</param>
+            <param name="page">Page number (default: 1)</param>
+            <param name="limit">Items per page (default: 20, max: 100)</param>
+            <returns>Paginated list of services matching the search criteria</returns>
+            <response code="200">Returns the paginated list of services</response>
+            <response code="400">Invalid search parameters</response>
+            <response code="401">Unauthorized</response>
+        </member>
+        <member name="M:SingleClin.API.Controllers.ServicesController.GetServiceCategories">
+            <summary>
+            Get service categories
+            </summary>
+            <returns>List of available service categories</returns>
+            <response code="200">Returns the list of service categories</response>
+            <response code="401">Unauthorized</response>
+        </member>
         <member name="T:SingleClin.API.Controllers.TestAuthController">
             <summary>
             Test controller to demonstrate authorization attributes
@@ -1169,6 +1310,16 @@
             Clinic images
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.Services">
+            <summary>
+            Services offered by clinics
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.AppDbContext.Appointments">
+            <summary>
+            Appointments scheduled by users
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Data.ApplicationDbContext">
             <summary>
             Main database context for the SingleClin application with Identity support
@@ -1217,6 +1368,11 @@
         <member name="P:SingleClin.API.Data.ApplicationDbContext.UserNotificationPreferences">
             <summary>
             User notification preferences
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.ApplicationDbContext.Appointments">
+            <summary>
+            Appointments made by users for services at clinics
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Configurations.ApplicationUserConfiguration">
@@ -1347,6 +1503,71 @@
         <member name="P:SingleClin.API.Data.Models.ApplicationUser.UserPlans">
             <summary>
             User plans (for patients)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Appointment">
+            <summary>
+            Represents an appointment between a user and a service at a clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.UserId">
+            <summary>
+            User who made the appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.ServiceId">
+            <summary>
+            Service being booked
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.ClinicId">
+            <summary>
+            Clinic where the service will be provided
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.ScheduledDate">
+            <summary>
+            Scheduled date and time for the appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.Status">
+            <summary>
+            Current status of the appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.TransactionId">
+            <summary>
+            Associated transaction ID when credits are debited
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.TotalCredits">
+            <summary>
+            Total credits required for this appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.ConfirmationToken">
+            <summary>
+            Unique token for appointment confirmation
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.User">
+            <summary>
+            Navigation property to the user
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.Service">
+            <summary>
+            Navigation property to the service
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.Clinic">
+            <summary>
+            Navigation property to the clinic
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.Data.Models.Appointment.Transaction">
+            <summary>
+            Navigation property to the transaction
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Models.BaseEntity">
@@ -1522,6 +1743,31 @@
         <member name="P:SingleClin.API.Data.Models.ClinicImage.Height">
             <summary>
             Height of the image in pixels
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Data.Models.Enums.AppointmentStatus">
+            <summary>
+            Represents the status of an appointment
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.AppointmentStatus.Scheduled">
+            <summary>
+            Appointment has been scheduled but not confirmed
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.AppointmentStatus.Confirmed">
+            <summary>
+            Appointment has been confirmed and credits debited
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.AppointmentStatus.Completed">
+            <summary>
+            Appointment has been completed
+            </summary>
+        </member>
+        <member name="F:SingleClin.API.Data.Models.Enums.AppointmentStatus.Cancelled">
+            <summary>
+            Appointment has been cancelled
             </summary>
         </member>
         <member name="T:SingleClin.API.Data.Models.Enums.ClinicType">
@@ -1749,6 +1995,11 @@
             Service price
             </summary>
         </member>
+        <member name="P:SingleClin.API.Data.Models.Service.CreditCost">
+            <summary>
+            Cost in credits for this service
+            </summary>
+        </member>
         <member name="P:SingleClin.API.Data.Models.Service.Duration">
             <summary>
             Service duration in minutes
@@ -1759,9 +2010,9 @@
             Service category
             </summary>
         </member>
-        <member name="P:SingleClin.API.Data.Models.Service.IsAvailable">
+        <member name="P:SingleClin.API.Data.Models.Service.IsActive">
             <summary>
-            Indicates if the service is available
+            Indicates if the service is active
             </summary>
         </member>
         <member name="P:SingleClin.API.Data.Models.Service.ImageUrl">
@@ -2100,6 +2351,186 @@
         <member name="M:SingleClin.API.Data.Seeders.RoleSeeder.SeedDefaultAdminAsync(System.IServiceProvider)">
             <summary>
             Seeds default admin user if it doesn't exist
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Appointment.AppointmentConfirmationDto">
+            <summary>
+            Data transfer object for confirming an appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentConfirmationDto.ConfirmationToken">
+            <summary>
+            Unique confirmation token for the appointment
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Appointment.AppointmentResponseDto">
+            <summary>
+            Data transfer object for appointment response
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.Id">
+            <summary>
+            Appointment unique identifier
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.UserId">
+            <summary>
+            User ID who made the appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.Service">
+            <summary>
+            Service details
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.ScheduledDate">
+            <summary>
+            Scheduled date and time
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.Status">
+            <summary>
+            Appointment status
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.TotalCredits">
+            <summary>
+            Total credits for this appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.TransactionId">
+            <summary>
+            Transaction ID if appointment is confirmed
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.ConfirmationToken">
+            <summary>
+            Confirmation token (only for scheduled appointments)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.CreatedAt">
+            <summary>
+            Appointment creation date
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentResponseDto.UpdatedAt">
+            <summary>
+            Last update date
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Appointment.AppointmentScheduleDto">
+            <summary>
+            Data transfer object for scheduling an appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentScheduleDto.ServiceId">
+            <summary>
+            Service ID for the appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentScheduleDto.ClinicId">
+            <summary>
+            Clinic ID where the service will be provided
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentScheduleDto.ScheduledDate">
+            <summary>
+            Scheduled date and time for the appointment
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto">
+            <summary>
+            Data transfer object for appointment summary (used in confirmation screen)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.Id">
+            <summary>
+            Appointment unique identifier
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.Service">
+            <summary>
+            Service details
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.Clinic">
+            <summary>
+            Clinic details
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.ScheduledDate">
+            <summary>
+            Scheduled date and time
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.TotalCredits">
+            <summary>
+            Total credits required for this appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.ConfirmationToken">
+            <summary>
+            Confirmation token for this appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.UserCurrentCredits">
+            <summary>
+            User's current available credits
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.UserRemainingCredits">
+            <summary>
+            User's remaining credits after this appointment
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.AppointmentSummaryDto.Status">
+            <summary>
+            Current appointment status
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Appointment.ServiceDto">
+            <summary>
+            Data transfer object for service information in appointment context
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.ServiceDto.Id">
+            <summary>
+            Service unique identifier
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.ServiceDto.Name">
+            <summary>
+            Service name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.ServiceDto.Description">
+            <summary>
+            Service description
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.ServiceDto.CreditCost">
+            <summary>
+            Cost in credits for this service
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.ServiceDto.Duration">
+            <summary>
+            Service duration in minutes
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.ServiceDto.Category">
+            <summary>
+            Service category
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.ServiceDto.ImageUrl">
+            <summary>
+            Service image URL
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Appointment.ServiceDto.Clinic">
+            <summary>
+            Clinic information
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.Auth.AuthResponseDto">
@@ -2667,6 +3098,11 @@
             Service price
             </summary>
         </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.CreditCost">
+            <summary>
+            Cost in credits for this service
+            </summary>
+        </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.Duration">
             <summary>
             Service duration in minutes
@@ -2677,9 +3113,9 @@
             Service category
             </summary>
         </member>
-        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.IsAvailable">
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.IsActive">
             <summary>
-            Indicates if the service is available
+            Indicates if the service is active
             </summary>
         </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.ImageUrl">
@@ -5416,6 +5852,11 @@
             Repository for transaction data access operations
             </summary>
         </member>
+        <member name="T:SingleClin.API.Services.AppointmentService">
+            <summary>
+            Service for managing appointments and credit debit operations
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.AuthService">
             <summary>
             Service for handling authentication operations
@@ -5458,6 +5899,11 @@
             </summary>
             <param name="price">The input price to normalize</param>
             <returns>The normalized price in SG format</returns>
+        </member>
+        <member name="T:SingleClin.API.Services.CreditValidationService">
+            <summary>
+            Service for validating user credits and plan information
+            </summary>
         </member>
         <member name="T:SingleClin.API.Services.EmailTemplateService">
             <summary>
@@ -5515,6 +5961,67 @@
             <summary>
             Check if Firebase is properly configured
             </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.IAppointmentService">
+            <summary>
+            Interface for appointment service
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IAppointmentService.ScheduleAppointmentAsync(System.Guid,SingleClin.API.DTOs.Appointment.AppointmentScheduleDto)">
+            <summary>
+            Schedule a new appointment
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="scheduleDto">Appointment schedule data</param>
+            <returns>Appointment summary with confirmation details</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAppointmentService.ConfirmAppointmentAsync(System.Guid,SingleClin.API.DTOs.Appointment.AppointmentConfirmationDto)">
+            <summary>
+            Confirm a scheduled appointment and debit credits
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="confirmationDto">Confirmation data</param>
+            <returns>Confirmed appointment details</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAppointmentService.GetAppointmentByIdAsync(System.Guid,System.Guid)">
+            <summary>
+            Get appointment by ID
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="appointmentId">Appointment ID</param>
+            <returns>Appointment details</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAppointmentService.GetUserAppointmentsAsync(System.Guid,System.Boolean)">
+            <summary>
+            Get user's appointments
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="includeCompleted">Include completed appointments</param>
+            <returns>List of appointments</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAppointmentService.CancelAppointmentAsync(System.Guid,System.Guid,System.String)">
+            <summary>
+            Cancel an appointment
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="appointmentId">Appointment ID</param>
+            <param name="reason">Cancellation reason</param>
+            <returns>Success status and updated appointment</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAppointmentService.CompleteAppointmentAsync(System.Guid,System.Guid)">
+            <summary>
+            Complete an appointment (for clinic use)
+            </summary>
+            <param name="appointmentId">Appointment ID</param>
+            <param name="clinicId">Clinic ID</param>
+            <returns>Success status and updated appointment</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAppointmentService.GetAppointmentByTokenAsync(System.String)">
+            <summary>
+            Get appointments by confirmation token
+            </summary>
+            <param name="confirmationToken">Confirmation token</param>
+            <returns>Appointment summary</returns>
         </member>
         <member name="T:SingleClin.API.Services.IAuthService">
             <summary>
@@ -5757,6 +6264,40 @@
             <param name="imageOrders">Dictionary of image ID to display order</param>
             <returns>List of updated images</returns>
             <exception cref="T:System.InvalidOperationException">Thrown when clinic not found</exception>
+        </member>
+        <member name="T:SingleClin.API.Services.ICreditValidationService">
+            <summary>
+            Interface for credit validation service
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.ICreditValidationService.ValidateUserCreditsAsync(System.Guid,System.Int32)">
+            <summary>
+            Validate if user has sufficient credits for a service
+            </summary>
+            <param name="userId">User ID</param>
+            <param name="creditsRequired">Credits required for the service</param>
+            <returns>Validation result with success status and available credits</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ICreditValidationService.GetAvailableCreditsAsync(System.Guid)">
+            <summary>
+            Get user's total available credits across all active plans
+            </summary>
+            <param name="userId">User ID</param>
+            <returns>Total available credits</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ICreditValidationService.GetUserActivePlansAsync(System.Guid)">
+            <summary>
+            Get user's active plans with credit information
+            </summary>
+            <param name="userId">User ID</param>
+            <returns>List of active user plans with credit details</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ICreditValidationService.HasActivePlansAsync(System.Guid)">
+            <summary>
+            Check if user has any active plans
+            </summary>
+            <param name="userId">User ID</param>
+            <returns>True if user has active plans</returns>
         </member>
         <member name="T:SingleClin.API.Services.IEmailTemplateService">
             <summary>
@@ -6432,6 +6973,14 @@
             <param name="startDate">Start date</param>
             <param name="endDate">End date</param>
             <returns>Statistics object</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.ITransactionService.RefundAppointmentCreditsAsync(System.Guid,System.String)">
+            <summary>
+            Refund credits for appointment cancellation
+            </summary>
+            <param name="transactionId">Transaction ID to refund</param>
+            <param name="reason">Refund reason</param>
+            <returns>Success status and updated transaction</returns>
         </member>
         <member name="T:SingleClin.API.Services.IUserService">
             <summary>
