@@ -88,7 +88,7 @@ class ClinicServicesController extends GetxController {
             id: 'service_${index}_${clinic.id}',
             name: serviceName,
             description: 'Serviço de $serviceName disponível na clínica',
-            price: 50.0 + (index * 10), // Mock prices
+            price: 1.0 + (index * 0.5), // Mock prices (1-3 SG créditos)
             duration: 30 + (index * 15), // Mock durations
             category: 'Serviços Gerais',
             isAvailable: true,
