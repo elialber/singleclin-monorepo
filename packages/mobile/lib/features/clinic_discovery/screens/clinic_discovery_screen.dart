@@ -20,6 +20,7 @@ class ClinicDiscoveryScreen extends StatelessWidget {
             _buildHeader(context, controller),
             _buildSearchBar(context, controller),
             _buildQuickFilters(controller),
+            _buildActiveFiltersIndicator(controller),
             Expanded(
               child: _buildClinicList(controller),
             ),
@@ -50,7 +51,9 @@ class ClinicDiscoveryScreen extends StatelessWidget {
                 Obx(() => Text(
                   controller.isLoadingLocation
                       ? 'Localizando...'
-                      : 'Clínicas próximas de você',
+                      : controller.selectedSpecializations.isEmpty
+                          ? 'Clínicas próximas de você'
+                          : '${controller.filteredClinics.length} clínicas encontradas',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -128,11 +131,16 @@ class ClinicDiscoveryScreen extends StatelessWidget {
               ),
               selected: isSelected,
               onSelected: (selected) {
+                print('🎯 Chip clicado: $specialization, selecionado: $selected');
+                print('🏷️ Estado antes: ${controller.selectedSpecializations}');
+
                 if (selected) {
                   controller.addSpecializationFilter(specialization);
                 } else {
                   controller.removeSpecializationFilter(specialization);
                 }
+
+                print('🏷️ Estado depois: ${controller.selectedSpecializations}');
               },
               backgroundColor: AppColors.surface,
               selectedColor: AppColors.primary,
@@ -145,6 +153,59 @@ class ClinicDiscoveryScreen extends StatelessWidget {
         },
       )),
     );
+  }
+
+  Widget _buildActiveFiltersIndicator(ClinicDiscoveryController controller) {
+    return Obx(() {
+      if (controller.selectedSpecializations.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: AppColors.primary.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.filter_list,
+              color: AppColors.primary,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Filtrando por: ${controller.selectedSpecializations.join(", ")}',
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: controller.clearFilters,
+              child: const Text(
+                'Limpar',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildClinicList(ClinicDiscoveryController controller) {

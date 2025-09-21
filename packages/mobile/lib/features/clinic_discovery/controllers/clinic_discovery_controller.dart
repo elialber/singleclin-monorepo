@@ -170,12 +170,16 @@ class ClinicDiscoveryController extends GetxController {
   void addSpecializationFilter(String specialization) {
     if (!_selectedSpecializations.contains(specialization)) {
       _selectedSpecializations.add(specialization);
+      print('🏷️ Filtro adicionado: $specialization');
+      print('📋 Filtros ativos: ${_selectedSpecializations.toList()}');
       _filterClinics();
     }
   }
 
   void removeSpecializationFilter(String specialization) {
     _selectedSpecializations.remove(specialization);
+    print('🗑️ Filtro removido: $specialization');
+    print('📋 Filtros ativos: ${_selectedSpecializations.toList()}');
     _filterClinics();
   }
 
@@ -187,7 +191,12 @@ class ClinicDiscoveryController extends GetxController {
 
   void _filterClinics({String? searchQuery}) {
     final query = searchQuery ?? searchController.text.toLowerCase();
-    
+
+    print('🔍 Filtrando clínicas...');
+    print('📝 Query de busca: "$query"');
+    print('🏷️ Filtros de categoria ativos: ${_selectedSpecializations.toList()}');
+    print('🏥 Total de clínicas: ${_clinics.length}');
+
     List<Clinic> filtered = _clinics.where((clinic) {
       // Text search filter
       bool matchesSearch = query.isEmpty ||
@@ -203,7 +212,13 @@ class ClinicDiscoveryController extends GetxController {
           clinic.specializations.any((spec) =>
               _selectedSpecializations.contains(spec));
 
-      return matchesSearch && matchesSpecialization;
+      bool passes = matchesSearch && matchesSpecialization;
+
+      if (_selectedSpecializations.isNotEmpty) {
+        print('  📍 ${clinic.name}: categorias = ${clinic.specializations}, passa filtro = $passes');
+      }
+
+      return passes;
     }).toList();
 
     // Sort filtered results
@@ -222,6 +237,11 @@ class ClinicDiscoveryController extends GetxController {
     });
 
     _filteredClinics.assignAll(filtered);
+
+    print('✅ Filtragem concluída: ${filtered.length} clínicas encontradas');
+    if (_selectedSpecializations.isNotEmpty) {
+      print('📊 Clínicas filtradas por categoria: ${filtered.map((c) => c.name).toList()}');
+    }
   }
 
   Future<void> refreshClinics() async {
