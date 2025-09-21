@@ -47,35 +47,156 @@ class TempTransactionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dados simulados de transações
+    final transactions = [
+      {
+        'id': 'TXN001',
+        'type': 'Consulta',
+        'clinic': 'Clínica São Paulo',
+        'amount': -2,
+        'date': DateTime.now().subtract(const Duration(days: 1)),
+        'status': 'Concluída',
+      },
+      {
+        'id': 'TXN002',
+        'type': 'Compra de Créditos',
+        'clinic': 'SingleClin',
+        'amount': 10,
+        'date': DateTime.now().subtract(const Duration(days: 3)),
+        'status': 'Concluída',
+      },
+      {
+        'id': 'TXN003',
+        'type': 'Consulta',
+        'clinic': 'Clínica Centro',
+        'amount': -1,
+        'date': DateTime.now().subtract(const Duration(days: 7)),
+        'status': 'Concluída',
+      },
+      {
+        'id': 'TXN004',
+        'type': 'Exame',
+        'clinic': 'Lab Diagnóstico',
+        'amount': -3,
+        'date': DateTime.now().subtract(const Duration(days: 15)),
+        'status': 'Concluída',
+      },
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transações'),
+        title: const Text('Histórico de Transações'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.receipt_long, size: 100, color: Colors.blue),
-            SizedBox(height: 20),
-            Text(
-              'Histórico de Transações',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      body: transactions.isEmpty
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.receipt_long, size: 100, color: Colors.grey),
+                  SizedBox(height: 20),
+                  Text(
+                    'Nenhuma transação encontrada',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Suas transações aparecerão aqui',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: transactions.length,
+              itemBuilder: (context, index) {
+                final transaction = transactions[index];
+                final amount = transaction['amount'] as int;
+                final isCredit = amount > 0;
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: isCredit ? Colors.green : Colors.red,
+                      child: Icon(
+                        isCredit ? Icons.add : Icons.remove,
+                        color: Colors.white,
+                      ),
+                    ),
+                    title: Text(
+                      transaction['type'] as String,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(transaction['clinic'] as String),
+                        Text(
+                          'ID: ${transaction['id']}',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        Text(
+                          _formatDate(transaction['date'] as DateTime),
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${isCredit ? '+' : ''}$amount créditos',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isCredit ? Colors.green : Colors.red,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            transaction['status'] as String,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    isThreeLine: true,
+                  ),
+                );
+              },
             ),
-            SizedBox(height: 10),
-            Text(
-              'Veja todas as suas transações de créditos',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: 1, // Transações agora é índice 1
         onTap: (index) => Get.find<BottomNavController>().changePage(index),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
+
+    if (difference == 0) {
+      return 'Hoje';
+    } else if (difference == 1) {
+      return 'Ontem';
+    } else if (difference < 7) {
+      return '$difference dias atrás';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
   }
 }
 
