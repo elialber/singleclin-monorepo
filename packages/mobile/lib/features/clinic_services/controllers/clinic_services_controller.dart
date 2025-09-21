@@ -10,6 +10,7 @@ class ClinicServicesController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   final RxInt userCredits = 0.obs;
+  final RxBool creditsLoaded = false.obs;
   
   Clinic? _clinic;
   final AuthController _authController = Get.find<AuthController>();
@@ -48,9 +49,11 @@ class ClinicServicesController extends GetxController {
       _clinic = arguments;
       print('DEBUG: Clinic set successfully: ${_clinic!.name}');
       
-      // Use services that already come from clinic data instead of making separate API call
-      loadServicesFromClinic();
-      loadUserCredits();
+      // Load credits first, then services to ensure proper validation
+      loadUserCredits().then((_) {
+        // Use services that already come from clinic data instead of making separate API call
+        loadServicesFromClinic();
+      });
     } catch (e) {
       print('DEBUG: Exception in onInit: $e');
       _handleNavigationError('Erro ao inicializar: $e');
@@ -149,6 +152,8 @@ class ClinicServicesController extends GetxController {
     } catch (e) {
       print('DEBUG: Error loading credits: $e');
       userCredits.value = 0;
+    } finally {
+      creditsLoaded.value = true; // Mark credits as loaded regardless of success/failure
     }
   }
 

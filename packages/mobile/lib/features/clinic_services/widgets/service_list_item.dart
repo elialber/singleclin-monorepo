@@ -5,12 +5,14 @@ import 'package:singleclin_mobile/core/constants/app_colors.dart';
 class ServiceListItem extends StatelessWidget {
   final ClinicService service;
   final int userCredits;
+  final bool creditsLoaded;
   final VoidCallback onBookPressed;
 
   const ServiceListItem({
     Key? key,
     required this.service,
     required this.userCredits,
+    required this.creditsLoaded,
     required this.onBookPressed,
   }) : super(key: key);
 
@@ -192,8 +194,8 @@ class ServiceListItem extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Credits indicator
-                if (!canAfford && service.isAvailable)
+                // Credits indicator - only show if credits are loaded and insufficient
+                if (creditsLoaded && !canAfford && service.isAvailable)
                   Expanded(
                     child: Row(
                       children: [

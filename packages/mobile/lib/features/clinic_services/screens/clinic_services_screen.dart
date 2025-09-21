@@ -338,6 +338,7 @@ class ClinicServicesScreen extends StatelessWidget {
                     return ServiceListItem(
                       service: service,
                       userCredits: controller.userCredits.value,
+                      creditsLoaded: controller.creditsLoaded.value,
                       onBookPressed: () => controller.showBookingConfirmation(service),
                     );
                   },
