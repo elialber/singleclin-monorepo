@@ -45,8 +45,7 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
   Future<void> _setupDio() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
-    const baseUrl =
-        'http://localhost:5000/api'; // TODO(config): Get from environment
+    const baseUrl = 'https://api.singleclin.com.br/api';
 
     _dio.options = BaseOptions(
       baseUrl: baseUrl,

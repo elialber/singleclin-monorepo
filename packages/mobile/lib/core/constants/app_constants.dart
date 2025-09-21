@@ -84,14 +84,7 @@ class AppConstants {
 
   /// Get base URL based on environment
   static String _getBaseUrl() {
-    // You can switch between different environments here
-    // Using kDebugMode to determine environment instead of String.fromEnvironment
-    // to avoid the do_not_use_environment linter warning
-    if (kReleaseMode) {
-      return 'https://api.singleclin.com.br'; // Production
-    } else {
-      // Android emulator uses 10.0.2.2 to access localhost on host machine
-      return 'https://10.0.2.2:5001/api'; // Development/Debug
-    }
+    // Always use production API for all environments
+    return 'https://api.singleclin.com.br/api';
   }
 }

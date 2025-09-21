@@ -52,17 +52,8 @@ class ApiConstants {
 
   /// Get base URL based on environment
   static String _getBaseUrl() {
-    // You can switch between different environments here
-    // Using kDebugMode to determine environment instead of String.fromEnvironment
-    // to avoid the do_not_use_environment linter warning
-    if (kReleaseMode) {
-      return 'https://api.singleclin.com.br'; // Production
-    } else {
-      // Development/Debug - Updated to match backend HTTP configuration
-      // Android emulator uses 10.0.2.2 to access localhost on host machine
-      // iOS simulator can use localhost directly
-      return 'http://10.0.2.2:5015/api'; // Development/Debug - HTTP on port 5015
-    }
+    // Always use production API for all environments
+    return 'https://api.singleclin.com.br/api';
   }
 
   /// API timeout durations

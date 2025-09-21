@@ -98,8 +98,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
   Future<void> _setupDio() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
-    const baseUrl =
-        'http://localhost:5000/api'; // TODO(api): Get from environment
+    const baseUrl = 'https://api.singleclin.com.br/api';
 
     _dio.options = BaseOptions(
       baseUrl: baseUrl,
