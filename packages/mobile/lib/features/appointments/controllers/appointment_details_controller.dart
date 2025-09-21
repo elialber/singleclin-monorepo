@@ -149,7 +149,7 @@ SingleClin - Detalhes do Agendamento
 🏥 ${appointment.clinicName}
 💉 ${appointment.serviceName}
 👨‍⚕️ ${appointment.professionalName ?? 'Profissional não informado'}
-💰 ${appointment.price.toStringAsFixed(2)} (${appointment.sgCreditsUsed.toStringAsFixed(0)} SG)
+💰 ${appointment.sgCreditsUsed.toStringAsFixed(0)} SG
 📍 Status: ${appointment.status.label}
 
 #SingleClin #SaúdeEBeleza

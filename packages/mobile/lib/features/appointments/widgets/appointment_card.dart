@@ -270,24 +270,22 @@ class AppointmentCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'R\$ ${appointment.price.toStringAsFixed(2)}',
+                  '${appointment.sgCreditsUsed.toStringAsFixed(0)} SG',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: AppColors.sgPrimary,
                   ),
                 ),
-                if (appointment.sgCreditsUsed > 0) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    '${appointment.sgCreditsUsed.toStringAsFixed(0)} SG créditos utilizados',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.sgPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                const SizedBox(height: 2),
+                Text(
+                  'Créditos utilizados',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.sgPrimary,
+                    fontWeight: FontWeight.w600,
                   ),
-                ],
+                ),
               ],
             ),
           ),

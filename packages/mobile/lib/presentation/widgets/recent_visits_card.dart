@@ -242,7 +242,7 @@ class RecentVisitsCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'R\$ ${transaction.value.toStringAsFixed(2)}',
+                '${transaction.creditsUsed} SG',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
                   fontSize: 11,
