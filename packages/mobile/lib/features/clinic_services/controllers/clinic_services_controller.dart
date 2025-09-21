@@ -79,25 +79,24 @@ class ClinicServicesController extends GetxController {
       
       // Check if clinic has services data from backend
       if (clinic.services.isNotEmpty) {
-        // TODO: Convert clinic.services (List<String>) to List<ClinicService>
-        // For now, create mock services based on the service names from clinic
-        final List<ClinicService> mockServices = clinic.services.asMap().entries.map((entry) {
+        // Convert clinic.services (List<Map<String, dynamic>>) to List<ClinicService>
+        final List<ClinicService> realServices = clinic.services.asMap().entries.map((entry) {
           final index = entry.key;
-          final serviceName = entry.value;
+          final serviceData = entry.value;
           return ClinicService(
             id: 'service_${index}_${clinic.id}',
-            name: serviceName,
-            description: 'Serviço de $serviceName disponível na clínica',
-            price: 1.0 + (index * 0.5), // Mock prices (1-3 SG créditos)
-            duration: 30 + (index * 15), // Mock durations
-            category: 'Serviços Gerais',
-            isAvailable: true,
-            imageUrl: null,
+            name: serviceData['name'] ?? 'Serviço',
+            description: serviceData['description'] ?? 'Serviço de ${serviceData['name']} disponível na clínica',
+            price: (serviceData['price'] ?? 1.0).toDouble(), // Use real price from backend
+            duration: serviceData['duration'] ?? 30, // Use real duration or default
+            category: serviceData['category'] ?? 'Serviços Gerais',
+            isAvailable: serviceData['isAvailable'] ?? true,
+            imageUrl: serviceData['imageUrl'],
           );
         }).toList();
         
-        services.value = mockServices;
-        print('DEBUG: Services loaded from clinic data: ${mockServices.length} services');
+        services.value = realServices;
+        print('DEBUG: Services loaded from clinic data: ${realServices.length} services');
       } else {
         print('DEBUG: No services found in clinic data, trying API fallback');
         loadServices();

@@ -11,7 +11,7 @@ class Clinic {
   final bool isAvailable;
   final DateTime? nextAvailableSlot;
   final ClinicType type;
-  final List<String> services;
+  final List<Map<String, dynamic>> services;
   final ContactInfo contact;
   final Location coordinates;
   final bool isPartner;
@@ -53,7 +53,11 @@ class Clinic {
           ? DateTime.parse(json['nextAvailableSlot'])
           : null,
       type: ClinicType.fromString(json['type'] ?? 'partner'),
-      services: List<String>.from(json['services'] ?? []),
+      services: List<Map<String, dynamic>>.from(
+        (json['services'] ?? []).map((service) =>
+          service is Map<String, dynamic> ? service : {'name': service.toString(), 'price': 1.0}
+        )
+      ),
       contact: ContactInfo.fromJson(json['contact'] ?? {}),
       coordinates: Location.fromJson(json['coordinates'] ?? {}),
       isPartner: json['isPartner'] ?? false,
@@ -95,16 +99,14 @@ class Clinic {
     }
 
     // Parse services and extract categories from backend
-    List<String> clinicServices = [];
+    List<Map<String, dynamic>> clinicServices = [];
     Set<String> serviceCategories = {};
 
     if (dto['services'] != null && dto['services'] is List) {
       for (var service in dto['services'] as List) {
         if (service is Map<String, dynamic>) {
-          // Extract service name
-          if (service['name'] != null) {
-            clinicServices.add(service['name']);
-          }
+          // Store the complete service object
+          clinicServices.add(service);
 
           // Extract service category for quick filters
           if (service['category'] != null) {
@@ -141,7 +143,10 @@ class Clinic {
       isAvailable: dto['isActive'] ?? false,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 2)), // Default next slot
       type: clinicType,
-      services: clinicServices.isNotEmpty ? clinicServices : ['Consulta', 'Exames'], // Use real services from backend
+      services: clinicServices.isNotEmpty ? clinicServices : [
+        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
+        {'name': 'Exames', 'price': 1.5, 'category': 'Geral'}
+      ], // Use real services from backend
       contact: contact,
       coordinates: coordinates,
       isPartner: clinicType == ClinicType.partner,
