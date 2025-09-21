@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:singleclin_mobile/core/routes/app_routes.dart';
+import 'package:get/get.dart';
+import '../../routes/app_routes.dart';
+import '../../shared/widgets/custom_bottom_nav.dart';
+import '../../shared/controllers/bottom_nav_controller.dart';
+import '../../core/constants/app_colors.dart';
 
 /// User profile screen
 class ProfileScreen extends StatelessWidget {
@@ -11,9 +14,11 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Meu Perfil'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
+          onPressed: () => Get.back(),
         ),
       ),
       body: SingleChildScrollView(
@@ -28,11 +33,11 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor: Theme.of(context).primaryColor,
+                      backgroundColor: AppColors.primary,
                       child: const Icon(
                         Icons.person,
                         size: 50,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -41,12 +46,13 @@ class ProfileScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     const Text(
                       'joao.silva@email.com',
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -78,21 +84,21 @@ class ProfileScreen extends StatelessWidget {
                     leading: const Icon(Icons.history),
                     title: const Text('Histórico de Transações'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go(AppRoutes.transactionHistory),
+                    onTap: () => Get.toNamed(AppRoutes.creditHistory),
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.settings),
                     title: const Text('Configurações'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go(AppRoutes.settings),
+                    onTap: () => Get.toNamed(AppRoutes.settings),
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.info),
                     title: const Text('Sobre'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go(AppRoutes.about),
+                    onTap: () => Get.toNamed(AppRoutes.about),
                   ),
                 ],
               ),
@@ -105,15 +111,19 @@ class ProfileScreen extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: () {
                   // TODO(auth): Implement logout
-                  context.go(AppRoutes.login);
+                  Get.offAllNamed(AppRoutes.login);
                 },
                 icon: const Icon(Icons.logout),
                 label: const Text('Sair'),
-                style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                style: OutlinedButton.styleFrom(foregroundColor: AppColors.error),
               ),
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: CustomBottomNav(
+        currentIndex: 3, // Perfil é índice 3
+        onTap: (index) => Get.find<BottomNavController>().changePage(index),
       ),
     );
   }

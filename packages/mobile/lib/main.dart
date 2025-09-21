@@ -19,6 +19,7 @@ import 'features/clinic_discovery/screens/clinic_discovery_screen.dart';
 import 'features/clinic_discovery/screens/clinic_details_screen.dart';
 import 'features/appointment_booking/screens/appointment_booking_screen.dart';
 import 'temp_dashboard.dart';
+import 'presentation/screens/profile_screen.dart';
 import 'presentation/controllers/auth_controller.dart';
 import 'shared/controllers/bottom_nav_controller.dart';
 import 'core/utils/app_bindings.dart';
@@ -127,7 +128,7 @@ class SingleClinApp extends StatelessWidget {
         GetPage(name: '/discovery', page: () => const ClinicDiscoveryWithNavScreen()),
         GetPage(name: '/credit-history', page: () => const TempTransactionsScreen()),
         GetPage(name: '/subscription-plans', page: () => const TempPlansScreen()),
-        GetPage(name: '/profile', page: () => const TempProfileScreen()),
+        GetPage(name: '/profile', page: () => const ProfileScreen()),
         GetPage(name: '/old-home', page: () => const HomeScreen()),
         GetPage(name: '/clinic-details', page: () => ClinicDetailsScreen(clinic: Get.arguments)),
         GetPage(name: '/appointment-booking', page: () => AppointmentBookingScreen(clinic: Get.arguments)),

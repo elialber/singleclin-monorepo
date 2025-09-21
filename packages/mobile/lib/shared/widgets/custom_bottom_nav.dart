@@ -80,9 +80,6 @@ class CustomBottomNav extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         onTap(index);
-        if (Get.currentRoute != route) {
-          Get.toNamed(route);
-        }
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
