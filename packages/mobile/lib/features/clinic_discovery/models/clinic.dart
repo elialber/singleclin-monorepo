@@ -67,27 +67,51 @@ class Clinic {
 
   /// Factory method to create from backend API response
   factory Clinic.fromBackendDto(Map<String, dynamic> dto) {
-    // Extract all image URLs from backend
+    print('🏥 Converting backend DTO for clinic: ${dto['name']}');
+    print('📄 Full DTO: $dto');
+
+    // Extract all image URLs from backend - using featuredImage from real API
     List<String> allImages = [];
     String mainImageUrl = '';
-    
+
+    print('🔍 Checking for images in DTO...');
+
+    // First check for featuredImage from real API response
+    if (dto['featuredImage'] != null && dto['featuredImage'] is Map<String, dynamic>) {
+      var featuredImage = dto['featuredImage'] as Map<String, dynamic>;
+      if (featuredImage['imageUrl'] != null && featuredImage['imageUrl'].toString().isNotEmpty) {
+        mainImageUrl = featuredImage['imageUrl'];
+        allImages.add(mainImageUrl);
+        print('✅ Found featuredImage URL: $mainImageUrl');
+      }
+    }
+
+    // Also check for additional images array
     if (dto['images'] != null && dto['images'] is List && (dto['images'] as List).isNotEmpty) {
       var imagesList = dto['images'] as List;
-      
+      print('📸 Found additional images list with ${imagesList.length} items');
+
       // Extract all image URLs from ClinicImageDto objects
       for (var imageItem in imagesList) {
-        if (imageItem is Map<String, dynamic> && imageItem['ImageUrl'] != null) {
-          allImages.add(imageItem['ImageUrl']);
+        if (imageItem is Map<String, dynamic> && imageItem['imageUrl'] != null) {
+          String imageUrl = imageItem['imageUrl'];
+          if (!allImages.contains(imageUrl)) {
+            print('🖼️ Adding additional image URL: $imageUrl');
+            allImages.add(imageUrl);
+          }
         }
       }
-      
-      // Set main image as the first one
-      if (allImages.isNotEmpty) {
-        mainImageUrl = allImages.first;
-      }
-    } else if (dto['imageUrl'] != null) {
+    }
+
+    // Fallback to legacy imageUrl field if no featuredImage found
+    if (mainImageUrl.isEmpty && dto['imageUrl'] != null) {
       mainImageUrl = dto['imageUrl'];
       allImages = [mainImageUrl];
+      print('📷 Using fallback imageUrl: $mainImageUrl');
+    }
+
+    if (mainImageUrl.isEmpty) {
+      print('⚠️ No images found in DTO');
     }
 
     // Parse clinic type from enum int value
@@ -102,19 +126,38 @@ class Clinic {
     List<Map<String, dynamic>> clinicServices = [];
     Set<String> serviceCategories = {};
 
+    print('🛠️ Processing services for clinic: ${dto['name']}');
     if (dto['services'] != null && dto['services'] is List) {
-      for (var service in dto['services'] as List) {
+      final servicesList = dto['services'] as List;
+      print('📋 Found ${servicesList.length} services');
+
+      for (final service in servicesList) {
         if (service is Map<String, dynamic>) {
-          // Store the complete service object
-          clinicServices.add(service);
+          // Map service data from API format (capitalCase) to mobile format (camelCase)
+          final mappedService = {
+            'id': service['id'] ?? service['Id'],
+            'name': service['name'] ?? service['Name'] ?? 'Unknown Service',
+            'price': (service['price'] ?? service['Price'] ?? 0).toDouble(),
+            'category': service['category'] ?? service['Category'] ?? 'Geral',
+            'description': service['description'] ?? service['Description'],
+          };
+
+          print('🔧 Processing service: ${mappedService['name']} - category: ${mappedService['category']}');
+          clinicServices.add(mappedService);
 
           // Extract service category for quick filters
-          if (service['category'] != null) {
-            serviceCategories.add(service['category']);
+          final String category = mappedService['category'] as String;
+          if (category.isNotEmpty) {
+            serviceCategories.add(category);
+            print('🏷️ Added category: $category');
           }
         }
       }
+    } else {
+      print('⚠️ No services found in DTO');
     }
+
+    print('🎯 Final categories for ${dto['name']}: $serviceCategories');
 
     // Create contact info from backend fields
     ContactInfo contact = ContactInfo(
@@ -130,29 +173,25 @@ class Clinic {
       longitude: (dto['longitude'] ?? 0).toDouble(),
     );
 
-    // Add test data for demo purposes when production data is empty
-    bool isTestMode = allImages.isEmpty && clinicServices.isEmpty;
+    // Use real data from API, only add fallback if completely missing
+    bool needsFallback = allImages.isEmpty && clinicServices.isEmpty;
 
-    if (isTestMode) {
-      // Add test image URLs for demo
-      allImages = [
-        'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800',
-        'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800',
-        'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800'
-      ];
-      mainImageUrl = allImages.first;
+    print('🧪 Using real API data for ${dto['name']}. Needs fallback: $needsFallback');
 
-      // Add test services for demo
-      clinicServices = [
-        {'name': 'Botox', 'price': 120.0, 'category': 'Estética Facial'},
-        {'name': 'Preenchimento', 'price': 200.0, 'category': 'Estética Facial'},
-        {'name': 'Harmonização Facial', 'price': 300.0, 'category': 'Terapias Injetáveis'},
-        {'name': 'Limpeza de Pele', 'price': 80.0, 'category': 'Estética Facial'},
-        {'name': 'Consulta Dermatológica', 'price': 150.0, 'category': 'Dermatologia'}
-      ];
+    if (needsFallback) {
+      print('⚠️ No real data available, using fallback');
+      // Only use fallback data if API completely fails to provide data
+      if (allImages.isEmpty) {
+        allImages = ['https://images.unsplash.com/photo-1551076805-e1869033e561?w=800'];
+        mainImageUrl = allImages.first;
+      }
 
-      // Update categories based on services
-      serviceCategories = {'Estética Facial', 'Terapias Injetáveis', 'Dermatologia'};
+      if (clinicServices.isEmpty) {
+        clinicServices = [
+          {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
+        ];
+        serviceCategories.add('Geral');
+      }
     }
 
     return Clinic(
@@ -168,10 +207,7 @@ class Clinic {
       isAvailable: dto['isActive'] ?? false,
       nextAvailableSlot: DateTime.now().add(const Duration(hours: 2)), // Default next slot
       type: clinicType,
-      services: clinicServices.isNotEmpty ? clinicServices : [
-        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
-        {'name': 'Exames', 'price': 1.5, 'category': 'Geral'}
-      ], // Use real services from backend
+      services: clinicServices, // Use real services from backend
       contact: contact,
       coordinates: coordinates,
       isPartner: clinicType == ClinicType.partner,

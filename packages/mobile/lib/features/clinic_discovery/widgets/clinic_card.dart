@@ -43,21 +43,49 @@ class ClinicCard extends StatelessWidget {
   }
 
   Widget _buildImageSection() {
+    print('🖼️ Building image section for clinic: ${clinic.name}');
+    print('📷 Main image URL: ${clinic.imageUrl}');
+    print('🖼️ All images: ${clinic.images}');
+
     return Container(
       height: 120,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        image: DecorationImage(
-          image: NetworkImage(clinic.imageUrl),
-          fit: BoxFit.cover,
-          onError: (exception, stackTrace) {
-            // Use a default placeholder image
-          },
-        ),
+        color: Colors.grey[200],
       ),
       child: Stack(
         children: [
+          // Main image content
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: clinic.imageUrl.isNotEmpty
+                ? Image.network(
+                    clinic.imageUrl,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 120,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        print('✅ Image loaded successfully: ${clinic.imageUrl}');
+                        return child;
+                      }
+                      print('⏳ Loading image: ${clinic.imageUrl}');
+                      return Container(
+                        color: Colors.grey[100],
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      print('❌ Failed to load image: ${clinic.imageUrl}');
+                      print('🔍 Error: $error');
+                      return _buildPlaceholderImage();
+                    },
+                  )
+                : _buildPlaceholderImage(),
+          ),
           // Gradient overlay for better text readability
           Container(
             decoration: BoxDecoration(
@@ -354,6 +382,34 @@ class ClinicCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderImage() {
+    print('📷 Building placeholder image for clinic: ${clinic.name}');
+    return Container(
+      width: double.infinity,
+      height: 120,
+      color: Colors.grey[300],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.local_hospital,
+            size: 40,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Imagem indisponível',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart' hide Response;
 import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
 
 /// HTTP interceptor for automatic JWT token authentication
@@ -71,11 +73,19 @@ class AuthInterceptor extends Interceptor {
         if (retrySuccessful) {
           // If retry was successful, don't propagate the original error
           return;
+        } else {
+          // Token refresh failed - redirect to login
+          if (kDebugMode) {
+            print('🚨 Token refresh failed - redirecting to login');
+          }
+          await _handleAuthenticationFailure();
         }
       } catch (retryError) {
         if (kDebugMode) {
           print('❌ Token refresh failed: $retryError');
         }
+        // Token refresh failed - redirect to login
+        await _handleAuthenticationFailure();
       }
     }
 
@@ -238,5 +248,36 @@ class AuthInterceptor extends Interceptor {
     }
 
     return 'Request failed with status ${response?.statusCode ?? 'unknown'}';
+  }
+
+  /// Handle authentication failure by signing out and redirecting to login
+  Future<void> _handleAuthenticationFailure() async {
+    try {
+      if (kDebugMode) {
+        print('🚨 Handling authentication failure - signing out user');
+      }
+
+      // Sign out the Firebase user to clear invalid token
+      await _firebaseAuth.signOut();
+
+      // Use GetX to navigate to login screen
+      // Only navigate if we're not already on the login screen
+      if (Get.currentRoute != '/login' && Get.currentRoute != '/splash') {
+        await Get.offAllNamed('/login');
+
+        // Show user-friendly message
+        Get.snackbar(
+          'Sessão Expirada',
+          'Sua sessão expirou. Faça login novamente.',
+          backgroundColor: Get.theme.colorScheme.error.withValues(alpha: 0.1),
+          colorText: Get.theme.colorScheme.error,
+          icon: const Icon(Icons.info_outline),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ Error handling authentication failure: $e');
+      }
+    }
   }
 }

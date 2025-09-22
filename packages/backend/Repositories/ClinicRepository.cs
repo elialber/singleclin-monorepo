@@ -205,22 +205,40 @@ public class ClinicRepository : IClinicRepository
     {
         try
         {
-            // Try to load with services first
+            // Load clinics first without services to avoid JOIN issues
             var clinics = await _context.Clinics
                 .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
-                .Include(c => c.Services)
                 .Where(c => c.IsActive)
                 .OrderBy(c => c.Name)
                 .AsNoTracking()
                 .ToListAsync();
 
-            _logger.LogDebug("Retrieved {Count} active clinics with services", clinics.Count);
+            // Load services separately for each clinic to avoid complex JOINs
+            foreach (var clinic in clinics)
+            {
+                try
+                {
+                    var services = await _context.ClinicServices
+                        .Where(s => s.ClinicId == clinic.Id)
+                        .AsNoTracking()
+                        .ToListAsync();
+
+                    clinic.Services = services;
+                }
+                catch (Exception serviceEx)
+                {
+                    _logger.LogWarning(serviceEx, "Failed to load services for clinic {ClinicId}, setting empty list", clinic.Id);
+                    clinic.Services = new List<Service>();
+                }
+            }
+
+            _logger.LogDebug("Retrieved {Count} active clinics with services loaded separately", clinics.Count);
             return clinics;
         }
         catch (Exception ex)
         {
-            // If services include fails (likely due to missing credit_cost column), load without services
-            _logger.LogWarning(ex, "Failed to load clinics with services, loading basic clinic data only");
+            // If everything fails, load basic clinic data only
+            _logger.LogWarning(ex, "Failed to load clinics, loading basic clinic data only");
 
             var clinics = await _context.Clinics
                 .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
@@ -228,6 +246,12 @@ public class ClinicRepository : IClinicRepository
                 .OrderBy(c => c.Name)
                 .AsNoTracking()
                 .ToListAsync();
+
+            // Ensure each clinic has an empty services list
+            foreach (var clinic in clinics)
+            {
+                clinic.Services = new List<Service>();
+            }
 
             _logger.LogDebug("Retrieved {Count} active clinics without services", clinics.Count);
             return clinics;

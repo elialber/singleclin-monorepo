@@ -69,11 +69,25 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply snake_case naming convention
+        // Apply snake_case naming convention with specific overrides for existing tables
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
-            // Convert table names to snake_case
-            entity.SetTableName(ToSnakeCase(entity.GetTableName()));
+            var tableName = entity.GetTableName();
+
+            // Override for specific tables that use PascalCase in the database
+            if (tableName == "ClinicImage")
+            {
+                entity.SetTableName("ClinicImages");
+            }
+            else if (tableName == "ClinicService")
+            {
+                entity.SetTableName("ClinicServices");
+            }
+            else
+            {
+                // Convert other table names to snake_case
+                entity.SetTableName(ToSnakeCase(tableName));
+            }
 
             // Convert column names to snake_case
             foreach (var property in entity.GetProperties())

@@ -680,8 +680,8 @@ public class ClinicService : IClinicService
                 Latitude = clinic.Latitude,
                 Longitude = clinic.Longitude,
                 ImageUrl = clinic.ImageUrl ?? "",
-                Images = new List<ClinicImageDto>(), // Simplified - empty list for active clinics endpoint
-                Services = new List<ClinicServiceDto>(), // Simplified - empty list for active clinics endpoint
+                Images = clinic.Images?.Select(MapToImageDto).ToList() ?? new List<ClinicImageDto>(), // Include actual images for mobile app
+                Services = clinic.Services?.Select(MapToServiceDto).ToList() ?? new List<ClinicServiceDto>(), // Include actual services for mobile app
                 CreatedAt = clinic.CreatedAt,
                 UpdatedAt = clinic.UpdatedAt,
                 TransactionCount = 0 // Transaction count not included for performance in list views
