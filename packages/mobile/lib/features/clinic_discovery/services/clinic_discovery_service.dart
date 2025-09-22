@@ -10,174 +10,6 @@ class ClinicDiscoveryService {
   DateTime? _lastFetchTime;
   static const Duration _cacheExpiration = Duration(minutes: 5);
 
-  // Mock data for demonstration - will be replaced with API calls
-  static final List<Clinic> _mockClinics = [
-    Clinic(
-      id: '1',
-      name: 'Clínica São João',
-      address: 'Rua das Flores, 123 - Centro',
-      distance: 2.1,
-      rating: 4.8,
-      reviewCount: 145,
-      specializations: ['Cardiologia', 'Clínica Geral', 'Pediatria'],
-      imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400',
-      images: ['https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400'],
-      isAvailable: true,
-      nextAvailableSlot: DateTime.now().add(const Duration(hours: 2)),
-      type: ClinicType.partner,
-      services: [
-        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
-        {'name': 'Exames', 'price': 1.5, 'category': 'Diagnóstico'},
-        {'name': 'Procedimentos', 'price': 2.0, 'category': 'Geral'}
-      ],
-      contact: const ContactInfo(
-        phone: '(11) 3456-7890',
-        email: 'contato@clinicasaojoao.com.br',
-        whatsapp: '(11) 98765-4321',
-        website: 'https://clinicasaojoao.com.br',
-      ),
-      coordinates: const Location(latitude: -23.5505, longitude: -46.6333),
-      isPartner: true,
-      description: 'Clínica moderna com atendimento humanizado e tecnologia de ponta.',
-    ),
-    Clinic(
-      id: '2',
-      name: 'Hospital Santa Maria',
-      address: 'Av. Paulista, 567 - Bela Vista',
-      distance: 4.3,
-      rating: 4.6,
-      reviewCount: 289,
-      specializations: ['Neurologia', 'Ortopedia', 'Cardiologia'],
-      imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400',
-      images: ['https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400'],
-      isAvailable: true,
-      nextAvailableSlot: DateTime.now().add(const Duration(hours: 4)),
-      type: ClinicType.origin,
-      services: [
-        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
-        {'name': 'Cirurgia', 'price': 5.0, 'category': 'Cirúrgico'},
-        {'name': 'UTI', 'price': 10.0, 'category': 'Intensivo'},
-        {'name': 'Pronto Socorro', 'price': 3.0, 'category': 'Emergência'}
-      ],
-      contact: const ContactInfo(
-        phone: '(11) 2345-6789',
-        email: 'atendimento@santamaria.com.br',
-        whatsapp: '(11) 99876-5432',
-      ),
-      coordinates: const Location(latitude: -23.5618, longitude: -46.6565),
-      isPartner: false,
-      description: 'Hospital referência em alta complexidade na região metropolitana.',
-    ),
-    Clinic(
-      id: '3',
-      name: 'Centro Médico Esperança',
-      address: 'Rua da Consolação, 890 - Consolação',
-      distance: 1.8,
-      rating: 4.9,
-      reviewCount: 67,
-      specializations: ['Dermatologia', 'Ginecologia', 'Oftalmologia'],
-      imageUrl: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400',
-      images: ['https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400'],
-      isAvailable: true,
-      nextAvailableSlot: DateTime.now().add(const Duration(hours: 1)),
-      type: ClinicType.partner,
-      services: [
-        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
-        {'name': 'Exames Estéticos', 'price': 2.0, 'category': 'Estética'},
-        {'name': 'Laser', 'price': 3.5, 'category': 'Estética'}
-      ],
-      contact: const ContactInfo(
-        phone: '(11) 3333-4444',
-        email: 'agendamento@esperanca.med.br',
-        whatsapp: '(11) 97777-8888',
-      ),
-      coordinates: const Location(latitude: -23.5431, longitude: -46.6291),
-      isPartner: true,
-      description: 'Centro especializado em cuidados estéticos e saúde da mulher.',
-    ),
-    Clinic(
-      id: '4',
-      name: 'Clínica Vida & Saúde',
-      address: 'Rua Augusta, 1234 - Jardins',
-      distance: 3.2,
-      rating: 4.5,
-      reviewCount: 198,
-      specializations: ['Psiquiatria', 'Psicologia', 'Neurologia'],
-      imageUrl: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400',
-      images: ['https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400'],
-      isAvailable: false,
-      nextAvailableSlot: DateTime.now().add(const Duration(days: 1)),
-      type: ClinicType.partner,
-      services: [
-        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
-        {'name': 'Terapia', 'price': 2.5, 'category': 'Psicológico'},
-        {'name': 'Grupos Terapêuticos', 'price': 1.5, 'category': 'Psicológico'}
-      ],
-      contact: const ContactInfo(
-        phone: '(11) 4444-5555',
-        email: 'contato@vidasaude.com.br',
-        whatsapp: '(11) 96666-7777',
-      ),
-      coordinates: const Location(latitude: -23.5558, longitude: -46.6396),
-      isPartner: true,
-      description: 'Especializada em saúde mental e bem-estar emocional.',
-    ),
-    Clinic(
-      id: '5',
-      name: 'Instituto Cardio Plus',
-      address: 'Al. Santos, 456 - Paraíso',
-      distance: 5.7,
-      rating: 4.7,
-      reviewCount: 312,
-      specializations: ['Cardiologia', 'Hemodinâmica', 'Cirurgia Cardíaca'],
-      imageUrl: 'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400',
-      images: ['https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400'],
-      isAvailable: true,
-      nextAvailableSlot: DateTime.now().add(const Duration(hours: 6)),
-      type: ClinicType.origin,
-      services: [
-        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
-        {'name': 'Cateterismo', 'price': 8.0, 'category': 'Cardiológico'},
-        {'name': 'Cirurgia', 'price': 12.0, 'category': 'Cirúrgico'},
-        {'name': 'Check-up', 'price': 2.0, 'category': 'Preventivo'}
-      ],
-      contact: const ContactInfo(
-        phone: '(11) 5555-6666',
-        email: 'agendamento@cardioplus.com.br',
-        whatsapp: '(11) 95555-4444',
-      ),
-      coordinates: const Location(latitude: -23.5781, longitude: -46.6459),
-      isPartner: false,
-      description: 'Instituto especializado em cardiologia e cirurgias cardíacas.',
-    ),
-    Clinic(
-      id: '6',
-      name: 'Clínica Ortopédica São Paulo',
-      address: 'Rua Haddock Lobo, 321 - Cerqueira César',
-      distance: 2.9,
-      rating: 4.4,
-      reviewCount: 156,
-      specializations: ['Ortopedia', 'Fisioterapia', 'Traumatologia'],
-      imageUrl: 'https://images.unsplash.com/photo-1584982751755-d86c8d132556?w=400',
-      images: ['https://images.unsplash.com/photo-1584982751755-d86c8d132556?w=400'],
-      isAvailable: true,
-      nextAvailableSlot: DateTime.now().add(const Duration(hours: 3)),
-      type: ClinicType.partner,
-      services: [
-        {'name': 'Consulta', 'price': 1.0, 'category': 'Geral'},
-        {'name': 'Fisioterapia', 'price': 1.5, 'category': 'Reabilitação'},
-        {'name': 'Exames de Imagem', 'price': 3.0, 'category': 'Diagnóstico'}
-      ],
-      contact: const ContactInfo(
-        phone: '(11) 6666-7777',
-        email: 'contato@ortopedicasp.com.br',
-        whatsapp: '(11) 94444-3333',
-      ),
-      coordinates: const Location(latitude: -23.5489, longitude: -46.6388),
-      isPartner: true,
-      description: 'Especializada em tratamento de lesões e reabilitação.',
-    ),
-  ];
 
   Future<List<Clinic>> getNearbyClinics({Position? position}) async {
     try {
@@ -200,18 +32,18 @@ class ClinicDiscoveryService {
       
       print('✅ Fetched ${clinics.length} clinics from backend');
       
-      // If no clinics from backend, fallback to mock data for demo purposes
+      // If no clinics from backend, return empty list
       if (clinics.isEmpty) {
-        print('⚠️ No clinics from backend, using fallback mock data');
-        return List.from(_mockClinics);
+        print('⚠️ No clinics from backend, returning empty list');
+        return [];
       }
       
       return clinics;
     } catch (e) {
       print('❌ Error fetching clinics from backend: $e');
-      // Fallback to mock data on error
-      print('🔄 Falling back to mock data');
-      return List.from(_mockClinics);
+      // Return empty list on error
+      print('🔄 Returning empty list due to error');
+      return [];
     }
   }
 
@@ -236,36 +68,56 @@ class ClinicDiscoveryService {
       }).toList();
     } catch (e) {
       print('❌ Error searching clinics: $e');
-      // Fallback to mock search
+      // Return empty list on error
       await Future.delayed(const Duration(milliseconds: 500));
-      final query = name.toLowerCase();
-      return _mockClinics.where((clinic) {
-        return clinic.name.toLowerCase().contains(query) ||
-               clinic.address.toLowerCase().contains(query);
-      }).toList();
+      return [];
     }
   }
 
   Future<List<Clinic>> getClinicsBySpecialization(String specialization) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    return _mockClinics.where((clinic) {
-      return clinic.specializations.any((spec) =>
-          spec.toLowerCase() == specialization.toLowerCase());
-    }).toList();
+    try {
+      print('🔍 Searching clinics by specialization: $specialization');
+
+      // Use real API when available
+      final allClinics = await getNearbyClinics();
+
+      return allClinics.where((clinic) {
+        return clinic.specializations.any((spec) =>
+            spec.toLowerCase() == specialization.toLowerCase());
+      }).toList();
+    } catch (e) {
+      print('❌ Error searching clinics by specialization: $e');
+      return [];
+    }
   }
 
   Future<List<Clinic>> getAvailableClinics() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    return _mockClinics.where((clinic) => clinic.isAvailable).toList();
+    try {
+      print('🔍 Getting available clinics');
+
+      // Use real API when available
+      final allClinics = await getNearbyClinics();
+
+      return allClinics.where((clinic) => clinic.isAvailable).toList();
+    } catch (e) {
+      print('❌ Error getting available clinics: $e');
+      return [];
+    }
   }
 
   Future<List<Clinic>> getFavoriteClinics(List<String> favoriteIds) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    
-    return _mockClinics.where((clinic) =>
-        favoriteIds.contains(clinic.id)).toList();
+    try {
+      print('🔍 Getting favorite clinics for IDs: $favoriteIds');
+
+      // Use real API when available
+      final allClinics = await getNearbyClinics();
+
+      return allClinics.where((clinic) =>
+          favoriteIds.contains(clinic.id)).toList();
+    } catch (e) {
+      print('❌ Error getting favorite clinics: $e');
+      return [];
+    }
   }
 
   Future<Clinic?> getClinicById(String id) async {
@@ -288,57 +140,75 @@ class ClinicDiscoveryService {
       }
     } catch (e) {
       print('❌ Error fetching clinic by ID: $e');
-      // Fallback to mock data
+      // Return null if not found
       await Future.delayed(const Duration(milliseconds: 300));
-      try {
-        return _mockClinics.firstWhere((clinic) => clinic.id == id);
-      } catch (e) {
-        return null;
-      }
+      return null;
     }
   }
 
   Future<List<String>> getAvailableSpecializations() async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    
-    final Set<String> specializations = {};
-    for (final clinic in _mockClinics) {
-      specializations.addAll(clinic.specializations);
+    try {
+      print('🔍 Getting available specializations');
+
+      // Use real API when available
+      final allClinics = await getNearbyClinics();
+
+      final Set<String> specializations = {};
+      for (final clinic in allClinics) {
+        specializations.addAll(clinic.specializations);
+      }
+
+      return specializations.toList()..sort();
+    } catch (e) {
+      print('❌ Error getting specializations: $e');
+      return [];
     }
-    
-    return specializations.toList()..sort();
   }
 
   Future<List<Clinic>> getEmergencyClinics() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    
-    // Return clinics that are available now or have emergency services
-    return _mockClinics.where((clinic) {
-      return clinic.isAvailable && (
-        clinic.services.any((service) =>
-            (service['name'] ?? '').toLowerCase().contains('urgência') ||
-            (service['name'] ?? '').toLowerCase().contains('pronto socorro') ||
-            (service['name'] ?? '').toLowerCase().contains('emergência')
-        ) ||
-        clinic.nextAvailableSlot?.isBefore(
-          DateTime.now().add(const Duration(hours: 2))
-        ) == true
-      );
-    }).toList();
+    try {
+      print('🚨 Getting emergency clinics');
+
+      // Use real API when available
+      final allClinics = await getNearbyClinics();
+
+      // Return clinics that are available now or have emergency services
+      return allClinics.where((clinic) {
+        return clinic.isAvailable && (
+          clinic.services.any((service) =>
+              (service['name'] ?? '').toLowerCase().contains('urgência') ||
+              (service['name'] ?? '').toLowerCase().contains('pronto socorro') ||
+              (service['name'] ?? '').toLowerCase().contains('emergência')
+          ) ||
+          clinic.nextAvailableSlot?.isBefore(
+            DateTime.now().add(const Duration(hours: 2))
+          ) == true
+        );
+      }).toList();
+    } catch (e) {
+      print('❌ Error getting emergency clinics: $e');
+      return [];
+    }
   }
 
   // Method to update clinic availability - would typically call API
   Future<bool> updateClinicAvailability(String clinicId, bool isAvailable) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    
-    final clinicIndex = _mockClinics.indexWhere((c) => c.id == clinicId);
-    if (clinicIndex != -1) {
-      // In real implementation, this would be an API call
-      // _mockClinics[clinicIndex] = _mockClinics[clinicIndex].copyWith(isAvailable: isAvailable);
+    try {
+      print('🔄 Updating clinic availability: $clinicId to $isAvailable');
+
+      // In a real implementation, this would call the backend API
+      // For now, we'll simulate success since this would require
+      // a PATCH /clinic/{id}/availability endpoint on the backend
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      // Clear cache to force refresh on next request
+      clearCache();
+
       return true;
+    } catch (e) {
+      print('❌ Error updating clinic availability: $e');
+      return false;
     }
-    
-    return false;
   }
 
   // Method to book appointment - would typically call API
@@ -348,15 +218,34 @@ class ClinicDiscoveryService {
     required String patientId,
     String? notes,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-    
-    // Simulate booking logic
-    final clinic = await getClinicById(clinicId);
-    if (clinic != null && clinic.isAvailable) {
-      return true; // Booking successful
+    try {
+      print('📅 Booking appointment at clinic $clinicId for patient $patientId');
+
+      // Verify clinic exists and is available
+      final clinic = await getClinicById(clinicId);
+      if (clinic == null) {
+        print('❌ Clinic not found: $clinicId');
+        return false;
+      }
+
+      if (!clinic.isAvailable) {
+        print('❌ Clinic not available: $clinicId');
+        return false;
+      }
+
+      // In a real implementation, this would make an API call to:
+      // POST /appointment with { clinicId, dateTime, patientId, notes }
+      // For now, we'll simulate the booking process
+
+      await Future.delayed(const Duration(milliseconds: 1000));
+
+      print('✅ Appointment booking simulation successful');
+      return true;
+
+    } catch (e) {
+      print('❌ Error booking appointment: $e');
+      return false;
     }
-    
-    return false; // Booking failed
   }
 
   /// Clear the clinic cache to force fresh data on next request
