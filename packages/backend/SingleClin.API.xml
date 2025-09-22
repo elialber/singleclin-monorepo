@@ -5580,6 +5580,15 @@
         <member name="M:SingleClin.API.Migrations.ApplicationDb.CreateClinicServicesTableActual.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:SingleClin.API.Migrations.ApplicationDb.AddCreditCostToServices">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddCreditCostToServices.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.ApplicationDb.AddCreditCostToServices.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
         <member name="T:SingleClin.API.Repositories.ClinicRepository">
             <summary>
             Repository implementation for Clinic entity operations

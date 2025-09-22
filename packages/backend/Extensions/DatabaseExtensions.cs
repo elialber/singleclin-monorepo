@@ -115,6 +115,7 @@ public static class DatabaseExtensions
                         category character varying(50) NOT NULL,
                         is_available boolean NOT NULL DEFAULT true,
                         image_url character varying(500),
+                        credit_cost integer NOT NULL DEFAULT 1,
                         created_at timestamp with time zone NOT NULL DEFAULT NOW(),
                         updated_at timestamp with time zone NOT NULL DEFAULT NOW(),
                         CONSTRAINT pk_clinic_services PRIMARY KEY (id),
@@ -126,6 +127,11 @@ public static class DatabaseExtensions
                     CREATE INDEX ""IX_ClinicServices_ClinicId"" ON ""ClinicServices"" (clinic_id);
                     CREATE INDEX ""IX_ClinicServices_Category"" ON ""ClinicServices"" (category);
                     CREATE INDEX ""IX_ClinicServices_IsAvailable"" ON ""ClinicServices"" (is_available);
+                ELSE
+                    -- Table exists, check if credit_cost column exists and add it if missing
+                    IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'ClinicServices' AND column_name = 'credit_cost') THEN
+                        ALTER TABLE ""ClinicServices"" ADD COLUMN credit_cost integer NOT NULL DEFAULT 1;
+                    END IF;
                 END IF;
             END $$;
         ";
