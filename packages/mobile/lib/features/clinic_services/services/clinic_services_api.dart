@@ -26,35 +26,49 @@ class ClinicServicesApi {
     }
   }
 
-  static Future<bool> bookService({
+  static Future<Map<String, dynamic>> scheduleAppointment({
     required String clinicId,
     required String serviceId,
-    required String userId,
     required DateTime appointmentDate,
-    String? notes,
   }) async {
     try {
-      final response = await _apiService.post('/appointments', data: {
+      final response = await _apiService.post('/appointments/schedule', data: {
         'clinicId': clinicId,
         'serviceId': serviceId,
-        'userId': userId,
-        'appointmentDate': appointmentDate.toIso8601String(),
-        'notes': notes,
+        'scheduledDate': appointmentDate.toIso8601String(),
       });
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return true;
+        return response.data['data'] ?? response.data;
       } else {
-        throw Exception('Failed to book service: ${response.statusCode}');
+        throw Exception('Failed to schedule appointment: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Error booking service: $e');
+      throw Exception('Error scheduling appointment: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> confirmAppointment({
+    required String confirmationToken,
+  }) async {
+    try {
+      final response = await _apiService.post('/appointments/confirm', data: {
+        'confirmationToken': confirmationToken,
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data['data'] ?? response.data;
+      } else {
+        throw Exception('Failed to confirm appointment: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error confirming appointment: $e');
     }
   }
 
   static Future<Map<String, dynamic>> getUserCredits(String userId) async {
     try {
-      final response = await _apiService.get('/users/$userId/credits');
+      final response = await _apiService.get('/appointments/my-credits');
 
       if (response.statusCode == 200) {
         return response.data;
@@ -66,24 +80,4 @@ class ClinicServicesApi {
     }
   }
 
-  static Future<bool> consumeCredits({
-    required String userId,
-    required String serviceId,
-    required double amount,
-  }) async {
-    try {
-      final response = await _apiService.post('/users/$userId/credits/consume', data: {
-        'serviceId': serviceId,
-        'amount': amount,
-      });
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return true;
-      } else {
-        throw Exception('Failed to consume credits: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error consuming credits: $e');
-    }
-  }
 }
