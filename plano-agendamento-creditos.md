@@ -12,157 +12,157 @@ transação.
 
 ### 1.1 Modelos e Tipos Base
 
-#### Task 1.1.1: Criar modelo IService no shared types
+#### Task 1.1.1: Criar modelo IService no shared types ✅
 
 **Critério de Teste**: Modelo deve compilar e ter todas as propriedades definidas
 
-- [ ] Adicionar interface `IService` em `packages/shared/src/types/index.ts`
-- [ ] Propriedades: `id, name, description, creditCost, duration, isActive, clinicId, category`
-- [ ] Exportar tipo no index principal
-- [ ] **Teste**: Importar tipo em outro arquivo sem erros
+- [x] Adicionar interface `IService` em `packages/shared/src/types/index.ts`
+- [x] Propriedades: `id, name, description, creditCost, duration, isActive, clinicId, category`
+- [x] Exportar tipo no index principal
+- [x] **Teste**: Importar tipo em outro arquivo sem erros
 
-#### Task 1.1.2: Criar modelo IAppointment no shared types
+#### Task 1.1.2: Criar modelo IAppointment no shared types ✅
 
 **Critério de Teste**: Modelo deve compilar e integrar com tipos existentes
 
-- [ ] Adicionar interface `IAppointment` em `packages/shared/src/types/index.ts`
-- [ ] Propriedades:
+- [x] Adicionar interface `IAppointment` em `packages/shared/src/types/index.ts`
+- [x] Propriedades:
       `id, userId, serviceId, clinicId, scheduledDate, status, transactionId?, totalCredits, createdAt, updatedAt`
-- [ ] Referenciar tipos existentes (`IUser`, `IClinic`)
-- [ ] **Teste**: TypeScript não deve apresentar erros de tipo
+- [x] Referenciar tipos existentes (`IUser`, `IClinic`)
+- [x] **Teste**: TypeScript não deve apresentar erros de tipo
 
-#### Task 1.1.3: Criar enum AppointmentStatus
+#### Task 1.1.3: Criar enum AppointmentStatus ✅
 
 **Critério de Teste**: Enum deve ter todos os valores necessários
 
-- [ ] Adicionar `AppointmentStatus` com valores: `SCHEDULED, CONFIRMED, COMPLETED, CANCELLED`
-- [ ] Integrar ao modelo `IAppointment`
-- [ ] **Teste**: Usar enum em atribuições sem erros
+- [x] Adicionar `AppointmentStatus` com valores: `SCHEDULED, CONFIRMED, COMPLETED, CANCELLED`
+- [x] Integrar ao modelo `IAppointment`
+- [x] **Teste**: Usar enum em atribuições sem erros
 
 ### 1.2 Entidades do Backend (.NET)
 
-#### Task 1.2.1: Criar entidade Service no backend
+#### Task 1.2.1: Criar entidade Service no backend ✅
 
 **Critério de Teste**: Entity Framework deve conseguir criar tabela
 
-- [ ] Criar `Service.cs` em `packages/backend/Models/`
-- [ ] Implementar todas as propriedades do `IService`
-- [ ] Configurar relacionamento com `Clinic`
-- [ ] **Teste**: `dotnet ef migrations add AddServiceEntity` deve executar sem erros
+- [x] Criar `Service.cs` em `packages/backend/Models/`
+- [x] Implementar todas as propriedades do `IService`
+- [x] Configurar relacionamento com `Clinic`
+- [x] **Teste**: `dotnet ef migrations add AddServiceEntity` deve executar sem erros
 
-#### Task 1.2.2: Criar entidade Appointment no backend
+#### Task 1.2.2: Criar entidade Appointment no backend ✅
 
 **Critério de Teste**: Relacionamentos devem estar corretos
 
-- [ ] Criar `Appointment.cs` em `packages/backend/Models/`
-- [ ] Configurar relacionamentos: `User`, `Service`, `Clinic`, `Transaction`
-- [ ] Adicionar validações de data e créditos
-- [ ] **Teste**: Migration deve criar tabela com foreign keys corretas
+- [x] Criar `Appointment.cs` em `packages/backend/Models/`
+- [x] Configurar relacionamentos: `User`, `Service`, `Clinic`, `Transaction`
+- [x] Adicionar validações de data e créditos
+- [x] **Teste**: Migration deve criar tabela com foreign keys corretas
 
-#### Task 1.2.3: Atualizar DbContext
+#### Task 1.2.3: Atualizar DbContext ✅
 
 **Critério de Teste**: Context deve incluir novas entidades
 
-- [ ] Adicionar `DbSet<Service>` e `DbSet<Appointment>` ao `ApplicationDbContext`
-- [ ] Configurar relacionamentos no `OnModelCreating`
-- [ ] **Teste**: `dotnet build` deve compilar sem erros
+- [x] Adicionar `DbSet<Service>` e `DbSet<Appointment>` ao `ApplicationDbContext`
+- [x] Configurar relacionamentos no `OnModelCreating`
+- [x] **Teste**: `dotnet build` deve compilar sem erros
 
 ### 1.3 DTOs para API
 
-#### Task 1.3.1: Criar DTOs de requisição
+#### Task 1.3.1: Criar DTOs de requisição ✅
 
 **Critério de Teste**: DTOs devem validar dados de entrada
 
-- [ ] `AppointmentScheduleDto` com validações obrigatórias
-- [ ] `AppointmentConfirmationDto` com validação de IDs
-- [ ] Adicionar DataAnnotations para validação
-- [ ] **Teste**: Deserializar JSON inválido deve retornar erros de validação
+- [x] `AppointmentScheduleDto` com validações obrigatórias
+- [x] `AppointmentConfirmationDto` com validação de IDs
+- [x] Adicionar DataAnnotations para validação
+- [x] **Teste**: Deserializar JSON inválido deve retornar erros de validação
 
-#### Task 1.3.2: Criar DTOs de resposta
+#### Task 1.3.2: Criar DTOs de resposta ✅
 
 **Critério de Teste**: DTOs devem serializar dados corretamente
 
-- [ ] `AppointmentSummaryDto` com todos os dados para confirmação
-- [ ] `ServiceDto` para listagem de serviços
-- [ ] Incluir propriedades calculadas (saldo após transação)
-- [ ] **Teste**: Serialização JSON deve incluir todas as propriedades
+- [x] `AppointmentSummaryDto` com todos os dados para confirmação
+- [x] `ServiceDto` para listagem de serviços
+- [x] Incluir propriedades calculadas (saldo após transação)
+- [x] **Teste**: Serialização JSON deve incluir todas as propriedades
 
 ### 1.4 Services (Lógica de Negócio)
 
-#### Task 1.4.1: Implementar CreditValidationService
+#### Task 1.4.1: Implementar CreditValidationService ✅
 
 **Critério de Teste**: Validações devem retornar resultados corretos
 
-- [ ] Método `ValidateUserCredits(userId, requiredCredits)` → bool
-- [ ] Método `GetAvailableCredits(userId)` → int
-- [ ] Verificar planos ativos e não expirados
-- [ ] **Teste Unitário**: Usuário com créditos suficientes retorna `true`
-- [ ] **Teste Unitário**: Usuário sem créditos retorna `false`
+- [x] Método `ValidateUserCredits(userId, requiredCredits)` → bool
+- [x] Método `GetAvailableCredits(userId)` → int
+- [x] Verificar planos ativos e não expirados
+- [x] **Teste Unitário**: Usuário com créditos suficientes retorna `true`
+- [x] **Teste Unitário**: Usuário sem créditos retorna `false`
 
-#### Task 1.4.2: Implementar AppointmentService
+#### Task 1.4.2: Implementar AppointmentService ✅
 
 **Critério de Teste**: CRUD completo de agendamentos
 
-- [ ] `ScheduleAppointment()` - criar agendamento pendente
-- [ ] `ConfirmAppointment()` - confirmar e debitar créditos
-- [ ] `CancelAppointment()` - cancelar agendamento
-- [ ] `GetUserAppointments()` - listar agendamentos do usuário
-- [ ] **Teste Unitário**: Agendamento deve ser criado com status SCHEDULED
-- [ ] **Teste Unitário**: Confirmação deve alterar status para CONFIRMED
+- [x] `ScheduleAppointment()` - criar agendamento pendente
+- [x] `ConfirmAppointment()` - confirmar e debitar créditos
+- [x] `CancelAppointment()` - cancelar agendamento
+- [x] `GetUserAppointments()` - listar agendamentos do usuário
+- [x] **Teste Unitário**: Agendamento deve ser criado com status SCHEDULED
+- [x] **Teste Unitário**: Confirmação deve alterar status para CONFIRMED
 
-#### Task 1.4.3: Melhorar TransactionService existente
+#### Task 1.4.3: Melhorar TransactionService existente ✅
 
 **Critério de Teste**: Transações devem ser atômicas
 
-- [ ] `ProcessAppointmentTransaction()` - debitar créditos para agendamento
-- [ ] `RollbackTransaction()` - reverter em caso de erro
-- [ ] Implementar padrão Unit of Work
-- [ ] **Teste Unitário**: Falha deve reverter todas as alterações
-- [ ] **Teste Unitário**: Sucesso deve salvar appointment + transaction
+- [x] `ProcessAppointmentTransaction()` - debitar créditos para agendamento
+- [x] `RollbackTransaction()` - reverter em caso de erro
+- [x] Implementar padrão Unit of Work
+- [x] **Teste Unitário**: Falha deve reverter todas as alterações
+- [x] **Teste Unitário**: Sucesso deve salvar appointment + transaction
 
 ### 1.5 Controllers
 
-#### Task 1.5.1: Implementar ServicesController
+#### Task 1.5.1: Implementar ServicesController ✅
 
 **Critério de Teste**: Endpoints devem retornar dados corretos
 
-- [ ] `GET /api/services/clinic/{clinicId}` - listar serviços da clínica
-- [ ] `GET /api/services/{id}` - detalhes do serviço
-- [ ] Implementar paginação e filtros
-- [ ] **Teste de Integração**: GET deve retornar 200 com lista de serviços
-- [ ] **Teste de Integração**: ID inválido deve retornar 404
+- [x] `GET /api/services/clinic/{clinicId}` - listar serviços da clínica
+- [x] `GET /api/services/{id}` - detalhes do serviço
+- [x] Implementar paginação e filtros
+- [x] **Teste de Integração**: GET deve retornar 200 com lista de serviços
+- [x] **Teste de Integração**: ID inválido deve retornar 404
 
-#### Task 1.5.2: Implementar AppointmentsController
+#### Task 1.5.2: Implementar AppointmentsController ✅
 
 **Critério de Teste**: Fluxo completo deve funcionar
 
-- [ ] `POST /api/appointments/schedule` - criar agendamento
-- [ ] `POST /api/appointments/{id}/confirm` - confirmar agendamento
-- [ ] `GET /api/appointments/user/{userId}` - listar agendamentos
-- [ ] `GET /api/appointments/{id}` - detalhes do agendamento
-- [ ] **Teste de Integração**: Schedule → Confirm deve debitar créditos
-- [ ] **Teste de Integração**: Confirmar sem créditos deve retornar 400
+- [x] `POST /api/appointments/schedule` - criar agendamento
+- [x] `POST /api/appointments/{id}/confirm` - confirmar agendamento
+- [x] `GET /api/appointments/user/{userId}` - listar agendamentos
+- [x] `GET /api/appointments/{id}` - detalhes do agendamento
+- [x] **Teste de Integração**: Schedule → Confirm deve debitar créditos
+- [x] **Teste de Integração**: Confirmar sem créditos deve retornar 400
 
 ### 1.6 Validações e Regras de Negócio
 
-#### Task 1.6.1: Implementar validações de agendamento
+#### Task 1.6.1: Implementar validações de agendamento ✅
 
 **Critério de Teste**: Regras de negócio devem ser respeitadas
 
-- [ ] Validar disponibilidade de horário (não conflitar)
-- [ ] Validar se usuário tem plano ativo
-- [ ] Validar se serviço pertence à clínica informada
-- [ ] **Teste Unitário**: Agendamento em horário ocupado deve falhar
-- [ ] **Teste Unitário**: Agendamento com plano expirado deve falhar
+- [x] Validar disponibilidade de horário (não conflitar)
+- [x] Validar se usuário tem plano ativo
+- [x] Validar se serviço pertence à clínica informada
+- [x] **Teste Unitário**: Agendamento em horário ocupado deve falhar
+- [x] **Teste Unitário**: Agendamento com plano expirado deve falhar
 
-#### Task 1.6.2: Implementar transações atômicas
+#### Task 1.6.2: Implementar transações atômicas ✅
 
 **Critério de Teste**: Consistência de dados garantida
 
-- [ ] Usar Database Transactions para operações críticas
-- [ ] Implementar retry logic para falhas temporárias
-- [ ] Logs de auditoria para todas as operações
-- [ ] **Teste de Integração**: Falha na transação não deve deixar dados inconsistentes
+- [x] Usar Database Transactions para operações críticas
+- [x] Implementar retry logic para falhas temporárias
+- [x] Logs de auditoria para todas as operações
+- [x] **Teste de Integração**: Falha na transação não deve deixar dados inconsistentes
 
 ---
 

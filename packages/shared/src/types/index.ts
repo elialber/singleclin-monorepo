@@ -126,3 +126,68 @@ export interface TransactionRequest {
   creditsToUse: number;
   description?: string;
 }
+
+export interface IService {
+  id: string;
+  name: string;
+  description: string;
+  creditCost: number;
+  duration: number; // in minutes
+  isActive: boolean;
+  clinicId: string;
+  category: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IAppointment {
+  id: string;
+  userId: string;
+  serviceId: string;
+  clinicId: string;
+  scheduledDate: Date;
+  status: AppointmentStatus;
+  transactionId?: string;
+  totalCredits: number;
+  confirmationToken?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum AppointmentStatus {
+  SCHEDULED = 'scheduled',
+  CONFIRMED = 'confirmed',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled'
+}
+
+export interface AppointmentScheduleRequest {
+  serviceId: string;
+  clinicId: string;
+  scheduledDate: Date;
+}
+
+export interface AppointmentConfirmationRequest {
+  confirmationToken: string;
+}
+
+export interface AppointmentSummaryDto {
+  id: string;
+  service: IService;
+  clinic: IClinic;
+  scheduledDate: Date;
+  totalCredits: number;
+  confirmationToken: string;
+  userCurrentCredits: number;
+  userRemainingCredits: number;
+}
+
+export interface ServiceDto {
+  id: string;
+  name: string;
+  description: string;
+  creditCost: number;
+  duration: number;
+  category: string;
+  clinic: IClinic;
+}

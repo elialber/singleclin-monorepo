@@ -75,12 +75,19 @@ export const createApiResponse = <T>(
   message?: string,
   errors?: string[]
 ): ApiResponse<T> => {
-  return {
-    success,
-    data,
-    message,
-    errors
-  };
+  const response: ApiResponse<T> = { success };
+
+  if (data !== undefined) {
+    response.data = data;
+  }
+  if (message !== undefined) {
+    response.message = message;
+  }
+  if (errors !== undefined) {
+    response.errors = errors;
+  }
+
+  return response;
 };
 
 export const createSuccessResponse = <T>(
