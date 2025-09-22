@@ -31,42 +31,20 @@ public class CreditValidationService : ICreditValidationService
                 return (false, 0, new[] { "Credits required must be greater than zero" });
             }
 
-            // Find user in AppDbContext
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
-            if (user == null)
+            // Get total available credits from active user plans
+            var availableCredits = await _context.UserPlans
+                .Where(up => up.UserId == userId && up.IsActive && !up.IsExpired)
+                .SumAsync(up => up.CreditsRemaining);
+
+            _logger.LogInformation("User {UserId} has {AvailableCredits} credits available, requires {CreditsRequired}",
+                userId, availableCredits, creditsRequired);
+
+            if (availableCredits < creditsRequired)
             {
-                _logger.LogWarning("User {UserId} not found in AppDbContext", userId);
-                return (false, 0, new[] { "User not found" });
+                return (false, availableCredits, new[] { $"Insufficient credits. Available: {availableCredits}, Required: {creditsRequired}" });
             }
 
-            // Get user's active plans with remaining credits
-            var activePlans = await _context.UserPlans
-                .Where(up => up.UserId == user.Id &&
-                           up.IsActive &&
-                           up.CreditsRemaining > 0 &&
-                           up.ExpirationDate > DateTime.UtcNow)
-                .Include(up => up.Plan)
-                .OrderBy(up => up.ExpirationDate) // Use credits from plans expiring first
-                .ToListAsync();
-
-            if (!activePlans.Any())
-            {
-                _logger.LogInformation("User {UserId} has no active plans with credits", userId);
-                return (false, 0, new[] { "No active plans with credits available" });
-            }
-
-            // Calculate total available credits
-            var totalAvailableCredits = activePlans.Sum(up => up.CreditsRemaining);
-
-            _logger.LogInformation("User {UserId} has {AvailableCredits} total credits available, requires {CreditsRequired}",
-                userId, totalAvailableCredits, creditsRequired);
-
-            if (totalAvailableCredits < creditsRequired)
-            {
-                return (false, totalAvailableCredits, new[] { $"Insufficient credits. Available: {totalAvailableCredits}, Required: {creditsRequired}" });
-            }
-
-            return (true, totalAvailableCredits, Array.Empty<string>());
+            return (true, availableCredits, Array.Empty<string>());
         }
         catch (Exception ex)
         {
@@ -81,20 +59,9 @@ public class CreditValidationService : ICreditValidationService
         {
             _logger.LogInformation("Getting available credits for user {UserId}", userId);
 
-            // Find user in AppDbContext
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
-            if (user == null)
-            {
-                _logger.LogWarning("User {UserId} not found in AppDbContext", userId);
-                return 0;
-            }
-
-            // Get total credits from active plans
+            // Get total available credits from active user plans
             var totalCredits = await _context.UserPlans
-                .Where(up => up.UserId == user.Id &&
-                           up.IsActive &&
-                           up.CreditsRemaining > 0 &&
-                           up.ExpirationDate > DateTime.UtcNow)
+                .Where(up => up.UserId == userId && up.IsActive && !up.IsExpired)
                 .SumAsync(up => up.CreditsRemaining);
 
             _logger.LogInformation("User {UserId} has {TotalCredits} available credits", userId, totalCredits);
@@ -113,53 +80,36 @@ public class CreditValidationService : ICreditValidationService
         {
             _logger.LogInformation("Getting active plans for user {UserId}", userId);
 
-            // Find user in AppDbContext
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
-            if (user == null)
-            {
-                _logger.LogWarning("User {UserId} not found in AppDbContext", userId);
-                return Array.Empty<UserPlanResponseDto>();
-            }
-
-            var activePlans = await _context.UserPlans
-                .Where(up => up.UserId == user.Id &&
-                           up.IsActive &&
-                           up.ExpirationDate > DateTime.UtcNow)
+            // Get active user plans with plan details
+            var userPlans = await _context.UserPlans
                 .Include(up => up.Plan)
-                .OrderBy(up => up.ExpirationDate)
+                .Where(up => up.UserId == userId && up.IsActive && !up.IsExpired)
+                .Select(up => new UserPlanResponseDto
+                {
+                    Id = up.Id,
+                    UserId = up.UserId,
+                    PlanId = up.PlanId,
+                    Plan = new PlanResponseDto
+                    {
+                        Id = up.Plan.Id,
+                        Name = up.Plan.Name,
+                        Description = up.Plan.Description,
+                        Credits = up.Plan.Credits,
+                        Price = up.Plan.Price,
+                        IsActive = up.Plan.IsActive
+                    },
+                    Credits = up.Credits,
+                    CreditsRemaining = up.CreditsRemaining,
+                    AmountPaid = up.AmountPaid,
+                    ExpirationDate = up.ExpirationDate,
+                    IsActive = up.IsActive,
+                    CreatedAt = up.CreatedAt,
+                    UpdatedAt = up.UpdatedAt
+                })
                 .ToListAsync();
 
-            return activePlans.Select(up => new UserPlanResponseDto
-            {
-                Id = up.Id,
-                UserId = userId,
-                PlanId = up.PlanId,
-                Plan = new PlanResponseDto
-                {
-                    Id = up.Plan.Id,
-                    Name = up.Plan.Name,
-                    Description = up.Plan.Description,
-                    Credits = up.Plan.Credits,
-                    Price = up.Plan.Price,
-                    OriginalPrice = up.Plan.OriginalPrice,
-                    ValidityDays = up.Plan.ValidityDays,
-                    IsActive = up.Plan.IsActive,
-                    DisplayOrder = up.Plan.DisplayOrder,
-                    IsFeatured = up.Plan.IsFeatured,
-                    CreatedAt = up.Plan.CreatedAt,
-                    UpdatedAt = up.Plan.UpdatedAt
-                },
-                Credits = up.Credits,
-                CreditsRemaining = up.CreditsRemaining,
-                AmountPaid = up.AmountPaid,
-                ExpirationDate = up.ExpirationDate,
-                IsActive = up.IsActive,
-                PaymentMethod = up.PaymentMethod,
-                PaymentTransactionId = up.PaymentTransactionId,
-                Notes = up.Notes,
-                CreatedAt = up.CreatedAt,
-                UpdatedAt = up.UpdatedAt
-            });
+            _logger.LogInformation("User {UserId} has {PlanCount} active plans", userId, userPlans.Count);
+            return userPlans;
         }
         catch (Exception ex)
         {
@@ -174,18 +124,9 @@ public class CreditValidationService : ICreditValidationService
         {
             _logger.LogInformation("Checking if user {UserId} has active plans", userId);
 
-            // Find user in AppDbContext
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
-            if (user == null)
-            {
-                _logger.LogWarning("User {UserId} not found in AppDbContext", userId);
-                return false;
-            }
-
+            // Check if user has any active, non-expired plans
             var hasActivePlans = await _context.UserPlans
-                .AnyAsync(up => up.UserId == user.Id &&
-                              up.IsActive &&
-                              up.ExpirationDate > DateTime.UtcNow);
+                .AnyAsync(up => up.UserId == userId && up.IsActive && !up.IsExpired);
 
             _logger.LogInformation("User {UserId} has active plans: {HasActivePlans}", userId, hasActivePlans);
             return hasActivePlans;
