@@ -58,7 +58,7 @@ public class ClinicService : IClinicService
     public async Task<IEnumerable<ClinicResponseDto>> GetActiveAsync()
     {
         var clinics = await _clinicRepository.GetActiveAsync();
-        return clinics.Select(MapToResponseDto);
+        return clinics.Select(MapToActiveClinicsResponseDto);
     }
 
     public async Task<ClinicResponseDto> CreateAsync(ClinicRequestDto clinicRequest)
@@ -639,6 +639,56 @@ public class ClinicService : IClinicService
         _logger.LogInformation("Successfully reordered images for clinic {ClinicId}", clinicId);
 
         return clinic.Images?.Select(MapToImageDto).OrderBy(i => i.DisplayOrder).ToList() ?? new List<ClinicImageDto>();
+    }
+
+    private static ClinicResponseDto MapToActiveClinicsResponseDto(Clinic clinic)
+    {
+        try
+        {
+            return new ClinicResponseDto
+            {
+                Id = clinic.Id,
+                Name = clinic.Name ?? "Unknown Clinic",
+                Type = clinic.Type,
+                Address = clinic.Address ?? "",
+                PhoneNumber = clinic.PhoneNumber ?? "",
+                Email = clinic.Email ?? "",
+                Cnpj = clinic.Cnpj ?? "",
+                IsActive = clinic.IsActive,
+                Latitude = clinic.Latitude,
+                Longitude = clinic.Longitude,
+                ImageUrl = clinic.ImageUrl ?? "",
+                Images = new List<ClinicImageDto>(), // Simplified - empty list for active clinics endpoint
+                Services = new List<ClinicServiceDto>(), // Simplified - empty list for active clinics endpoint
+                CreatedAt = clinic.CreatedAt,
+                UpdatedAt = clinic.UpdatedAt,
+                TransactionCount = 0 // Transaction count not included for performance in list views
+            };
+        }
+        catch (Exception ex)
+        {
+            // Log the error and return a minimal clinic object
+            Console.WriteLine($"Error mapping clinic {clinic?.Id}: {ex.Message}");
+            return new ClinicResponseDto
+            {
+                Id = clinic?.Id ?? Guid.Empty,
+                Name = clinic?.Name ?? "Error Loading Clinic",
+                Type = clinic?.Type ?? 0,
+                Address = "",
+                PhoneNumber = "",
+                Email = "",
+                Cnpj = "",
+                IsActive = false,
+                Latitude = 0,
+                Longitude = 0,
+                ImageUrl = "",
+                Images = new List<ClinicImageDto>(),
+                Services = new List<ClinicServiceDto>(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                TransactionCount = 0
+            };
+        }
     }
 
     private static ClinicResponseDto MapToResponseDto(Clinic clinic)
