@@ -7,7 +7,7 @@ import '../../../shared/widgets/custom_app_bar.dart';
 import '../../../shared/widgets/custom_bottom_nav.dart';
 import '../controllers/discovery_controller.dart';
 import '../controllers/filters_controller.dart';
-import '../models/clinic.dart';
+import '../../clinic_discovery/models/clinic.dart';
 import '../widgets/clinic_card.dart';
 import 'map_view_screen.dart';
 import 'filters_screen.dart';
@@ -233,23 +233,74 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
   Widget _buildQuickFilterChip(String label, IconData icon) {
     return Container(
       margin: const EdgeInsets.only(right: 8),
-      child: FilterChip(
-        label: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16),
-            const SizedBox(width: 4),
-            Text(label),
-          ],
-        ),
-        onSelected: (selected) {
-          _applyQuickFilter(label);
-        },
-        backgroundColor: Colors.white,
-        selectedColor: AppColors.primary.withOpacity(0.1),
-        checkmarkColor: AppColors.primary,
-      ),
+      child: Obx(() {
+        final isSelected = _isQuickFilterSelected(label);
+        return FilterChip(
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16),
+              const SizedBox(width: 4),
+              Text(label),
+            ],
+          ),
+          selected: isSelected,
+          onSelected: (selected) {
+            if (selected) {
+              _applyQuickFilter(label);
+            } else {
+              _clearQuickFilter(label);
+            }
+          },
+          backgroundColor: Colors.white,
+          selectedColor: AppColors.primary.withOpacity(0.1),
+          checkmarkColor: AppColors.primary,
+        );
+      }),
     );
+  }
+
+  bool _isQuickFilterSelected(String filterName) {
+    final filters = controller.filterOptions;
+    switch (filterName) {
+      case 'Hoje':
+        return filters.availability.todayOnly == true;
+      case 'Até 100SG':
+        return filters.priceRange.maxPrice != null && filters.priceRange.maxPrice! <= 100;
+      case '4★+':
+        return filters.rating.minimumRating != null && filters.rating.minimumRating! >= 4.0;
+      case 'Estética':
+        return filters.categories.selectedCategories.contains('Estética Facial');
+      case 'Injetáveis':
+        return filters.categories.selectedCategories.contains('Terapias Injetáveis');
+      default:
+        return false;
+    }
+  }
+
+  void _clearQuickFilter(String filterName) {
+    switch (filterName) {
+      case 'Hoje':
+        filtersController.setAvailabilityToday(false);
+        _applyFiltersToDiscovery();
+        break;
+      case 'Até 100SG':
+        filtersController.updatePriceRange(const RangeValues(0, 500));
+        _applyFiltersToDiscovery();
+        break;
+      case '4★+':
+        filtersController.updateMinimumRating(0.0);
+        _applyFiltersToDiscovery();
+        break;
+      case 'Estética':
+        filtersController.toggleCategory('Estética Facial');
+        _applyFiltersToDiscovery();
+        break;
+      case 'Injetáveis':
+        filtersController.toggleCategory('Terapias Injetáveis');
+        _applyFiltersToDiscovery();
+        break;
+    }
   }
 
   Widget _buildViewModeToggle() {
@@ -454,25 +505,36 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
         break;
       case 'Hoje':
         filtersController.setAvailabilityToday(true);
-        filtersController.applyFilters();
+        _applyFiltersToDiscovery();
         break;
       case 'Até 100SG':
         filtersController.updatePriceRange(const RangeValues(0, 100));
-        filtersController.applyFilters();
+        _applyFiltersToDiscovery();
         break;
       case '4★+':
         filtersController.updateMinimumRating(4.0);
-        filtersController.applyFilters();
+        _applyFiltersToDiscovery();
         break;
       case 'Estética':
         filtersController.toggleCategory('Estética Facial');
-        filtersController.applyFilters();
+        _applyFiltersToDiscovery();
         break;
       case 'Injetáveis':
         filtersController.toggleCategory('Terapias Injetáveis');
-        filtersController.applyFilters();
+        _applyFiltersToDiscovery();
         break;
     }
+  }
+
+  void _applyFiltersToDiscovery() {
+    controller.updateFilters(filtersController.tempFilters);
+
+    Get.snackbar(
+      'Filtro Aplicado',
+      'Resultados atualizados',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
   }
 
   void _navigateToClinicDetails(Clinic clinic) {

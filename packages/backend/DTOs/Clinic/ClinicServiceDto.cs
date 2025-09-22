@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace SingleClin.API.DTOs.Clinic;
 
@@ -35,9 +36,17 @@ public class ClinicServiceDto
     /// <summary>
     /// Cost in credits for this service
     /// </summary>
-    [Required(ErrorMessage = "Credit cost is required")]
-    [Range(1, int.MaxValue, ErrorMessage = "Credit cost must be at least 1")]
     public int CreditCost { get; set; }
+
+    /// <summary>
+    /// Gets or sets CreditCost, automatically setting it based on Price if not provided
+    /// </summary>
+    [JsonIgnore]
+    public int EffectiveCreditCost
+    {
+        get => CreditCost > 0 ? CreditCost : Math.Max(1, (int)Math.Ceiling(Price));
+        set => CreditCost = value;
+    }
 
     /// <summary>
     /// Service duration in minutes

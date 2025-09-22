@@ -63,6 +63,16 @@ public class ClinicService : IClinicService
 
     public async Task<ClinicResponseDto> CreateAsync(ClinicRequestDto clinicRequest)
     {
+        // Preprocess services to ensure CreditCost is set
+        foreach (var service in clinicRequest.Services)
+        {
+            if (service.CreditCost <= 0)
+            {
+                // If CreditCost is not provided or invalid, calculate from Price
+                service.CreditCost = Math.Max(1, (int)Math.Ceiling(service.Price));
+            }
+        }
+
         // Validate clinic data
         var validationErrors = await ValidateAsync(clinicRequest);
         if (validationErrors.Any())
@@ -113,6 +123,16 @@ public class ClinicService : IClinicService
 
     public async Task<ClinicResponseDto> UpdateAsync(Guid id, ClinicRequestDto clinicRequest)
     {
+        // Preprocess services to ensure CreditCost is set
+        foreach (var service in clinicRequest.Services)
+        {
+            if (service.CreditCost <= 0)
+            {
+                // If CreditCost is not provided or invalid, calculate from Price
+                service.CreditCost = Math.Max(1, (int)Math.Ceiling(service.Price));
+            }
+        }
+
         // Validate clinic data first
         var validationErrors = await ValidateAsync(clinicRequest, id);
         if (validationErrors.Any())

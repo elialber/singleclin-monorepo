@@ -4,7 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/widgets/sg_credit_widget.dart';
-import '../models/clinic.dart';
+import '../../clinic_discovery/models/clinic.dart';
 
 /// Clinic card widget optimized for mobile with touch-friendly design
 class ClinicCard extends StatelessWidget {
@@ -98,13 +98,13 @@ class ClinicCard extends StatelessWidget {
   }
 
   Widget _buildClinicImage({double? height, double? size}) {
-    final imageUrl = clinic.images.isNotEmpty ? clinic.images.first : null;
-    
+    final imageUrl = clinic.imageUrl.isNotEmpty ? clinic.imageUrl : null;
+
     return Container(
       height: height ?? size,
       width: size,
       decoration: BoxDecoration(
-        borderRadius: height != null 
+        borderRadius: height != null
             ? const BorderRadius.vertical(top: Radius.circular(12))
             : BorderRadius.circular(8),
         color: AppColors.lightGrey.withOpacity(0.3),
@@ -175,7 +175,7 @@ class ClinicCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              if (clinic.isVerified)
+              if (clinic.isPartner)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
@@ -188,7 +188,7 @@ class ClinicCard extends StatelessWidget {
                       Icon(Icons.verified, color: Colors.white, size: 12),
                       SizedBox(width: 2),
                       Text(
-                        'Verificado',
+                        'Parceiro',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,
@@ -199,7 +199,7 @@ class ClinicCard extends StatelessWidget {
                   ),
                 ),
               const Spacer(),
-              if (clinic.isCurrentlyOpen)
+              if (clinic.isAvailable)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
@@ -207,7 +207,7 @@ class ClinicCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    'Aberto',
+                    'Disponível',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -230,7 +230,7 @@ class ClinicCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            clinic.location,
+            clinic.address,
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 14,
@@ -253,9 +253,9 @@ class ClinicCard extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: IconButton(
-          icon: Icon(
-            clinic.isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: clinic.isFavorite ? Colors.red : AppColors.mediumGrey,
+          icon: const Icon(
+            Icons.favorite_border,
+            color: AppColors.mediumGrey,
           ),
           onPressed: onFavoritePressed,
           constraints: const BoxConstraints(
@@ -286,7 +286,7 @@ class ClinicCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  clinic.location,
+                  clinic.address,
                   style: const TextStyle(
                     color: AppColors.mediumGrey,
                     fontSize: 14,
@@ -329,7 +329,7 @@ class ClinicCard extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Text(
-          clinic.formattedRating,
+          clinic.rating.toStringAsFixed(1),
           style: const TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 12,
@@ -343,7 +343,7 @@ class ClinicCard extends StatelessWidget {
             fontSize: 12,
           ),
         ),
-        if (showDistance && clinic.distanceKm != null) ...[
+        if (showDistance && clinic.distance > 0) ...[
           const SizedBox(width: 8),
           const Icon(
             Icons.location_on,
@@ -352,7 +352,7 @@ class ClinicCard extends StatelessWidget {
           ),
           const SizedBox(width: 2),
           Text(
-            clinic.formattedDistance,
+            '${clinic.distance.toStringAsFixed(1)}km',
             style: const TextStyle(
               color: AppColors.mediumGrey,
               fontSize: 12,
@@ -364,8 +364,19 @@ class ClinicCard extends StatelessWidget {
   }
 
   Widget _buildPriceRange() {
+    final minPrice = clinic.services.isNotEmpty
+        ? clinic.services.map((s) => s['price'] as double? ?? 1.0).reduce((a, b) => a < b ? a : b)
+        : 1.0;
+    final maxPrice = clinic.services.isNotEmpty
+        ? clinic.services.map((s) => s['price'] as double? ?? 1.0).reduce((a, b) => a > b ? a : b)
+        : 1.0;
+
+    final priceText = minPrice == maxPrice
+        ? '${minPrice.toStringAsFixed(0)}SG'
+        : '${minPrice.toStringAsFixed(0)}SG - ${maxPrice.toStringAsFixed(0)}SG';
+
     return Text(
-      clinic.priceRange,
+      priceText,
       style: const TextStyle(
         color: AppColors.primary,
         fontSize: 14,
@@ -390,7 +401,7 @@ class ClinicCard extends StatelessWidget {
             const SizedBox(width: 4),
             Expanded(
               child: Text(
-                mainServices.map((s) => s.name).join(', '),
+                mainServices.map((s) => s['name'] ?? 'Serviço').join(', '),
                 style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.mediumGrey,
@@ -433,7 +444,7 @@ class ClinicCard extends StatelessWidget {
               ),
             ),
             Text(
-              clinic.priceRange,
+              _getPriceRangeText(),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -446,26 +457,26 @@ class ClinicCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              clinic.isCurrentlyOpen ? 'Aberto agora' : clinic.nextOpeningTime,
+              clinic.isAvailable ? 'Disponível' : 'Indisponível',
               style: TextStyle(
                 fontSize: 12,
-                color: clinic.isCurrentlyOpen ? AppColors.success : AppColors.mediumGrey,
+                color: clinic.isAvailable ? AppColors.success : AppColors.mediumGrey,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            if (clinic.mainCategory.isNotEmpty)
+            if (clinic.specializations.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 4),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.getCategoryColor(clinic.mainCategory).withOpacity(0.1),
+                  color: AppColors.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  clinic.mainCategory,
-                  style: TextStyle(
+                  clinic.specializations.first,
+                  style: const TextStyle(
                     fontSize: 10,
-                    color: AppColors.getCategoryColor(clinic.mainCategory),
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -502,5 +513,18 @@ class ClinicCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _getPriceRangeText() {
+    final minPrice = clinic.services.isNotEmpty
+        ? clinic.services.map((s) => s['price'] as double? ?? 1.0).reduce((a, b) => a < b ? a : b)
+        : 1.0;
+    final maxPrice = clinic.services.isNotEmpty
+        ? clinic.services.map((s) => s['price'] as double? ?? 1.0).reduce((a, b) => a > b ? a : b)
+        : 1.0;
+
+    return minPrice == maxPrice
+        ? '${minPrice.toStringAsFixed(0)}SG'
+        : '${minPrice.toStringAsFixed(0)}SG - ${maxPrice.toStringAsFixed(0)}SG';
   }
 }
