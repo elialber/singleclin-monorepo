@@ -139,17 +139,27 @@ public class ClinicRepository : IClinicRepository
     {
         try
         {
+            // Load clinic without services first to avoid JOIN issue
             var clinic = await _context.Clinics
                 .Include(c => c.Transactions)
                 .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
-                .Include(c => c.Services)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (clinic == null)
             {
                 _logger.LogDebug("Clinic not found with ID: {ClinicId}", id);
+                return null;
             }
+
+            // Load services separately to avoid the JOIN alias issue
+            var services = await _context.ClinicServices
+                .Where(s => s.ClinicId == id)
+                .AsNoTracking()
+                .ToListAsync();
+
+            // Manually set the services
+            clinic.Services = services;
 
             return clinic;
         }
