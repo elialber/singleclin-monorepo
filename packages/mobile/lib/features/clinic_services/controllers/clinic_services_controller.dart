@@ -156,13 +156,14 @@ class ClinicServicesController extends GetxController {
             creditsData = creditsResponse['data'];
           }
 
-          // Extract total available credits
+          // Extract total available credits from the API response structure
           int totalCredits = 0;
           if (creditsData is Map) {
-            if (creditsData.containsKey('TotalAvailableCredits')) {
-              totalCredits = (creditsData['TotalAvailableCredits'] as num).toInt();
-            } else if (creditsData.containsKey('totalAvailableCredits')) {
+            // API response structure: {"data": {"totalAvailableCredits": 0}}
+            if (creditsData.containsKey('totalAvailableCredits')) {
               totalCredits = (creditsData['totalAvailableCredits'] as num).toInt();
+            } else if (creditsData.containsKey('TotalAvailableCredits')) {
+              totalCredits = (creditsData['TotalAvailableCredits'] as num).toInt();
             } else if (creditsData.containsKey('credits')) {
               totalCredits = (creditsData['credits'] as num).toInt();
             }

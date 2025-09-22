@@ -32,8 +32,9 @@ public class CreditValidationService : ICreditValidationService
             }
 
             // Get total available credits from active user plans
+            // TEMPORARY: Removed !up.IsExpired to debug credit issue
             var availableCredits = await _context.UserPlans
-                .Where(up => up.UserId == userId && up.IsActive && !up.IsExpired)
+                .Where(up => up.UserId == userId && up.IsActive)
                 .SumAsync(up => up.CreditsRemaining);
 
             _logger.LogInformation("User {UserId} has {AvailableCredits} credits available, requires {CreditsRequired}",
@@ -60,9 +61,12 @@ public class CreditValidationService : ICreditValidationService
             _logger.LogInformation("Getting available credits for user {UserId}", userId);
 
             // Get total available credits from active user plans
+            // TEMPORARY: Removed !up.IsExpired to debug credit issue
             var totalCredits = await _context.UserPlans
-                .Where(up => up.UserId == userId && up.IsActive && !up.IsExpired)
+                .Where(up => up.UserId == userId && up.IsActive)
                 .SumAsync(up => up.CreditsRemaining);
+
+            _logger.LogInformation("Debug: UserPlan query without expiration filter returned {TotalCredits} credits", totalCredits);
 
             _logger.LogInformation("User {UserId} has {TotalCredits} available credits", userId, totalCredits);
             return totalCredits;
@@ -81,9 +85,10 @@ public class CreditValidationService : ICreditValidationService
             _logger.LogInformation("Getting active plans for user {UserId}", userId);
 
             // Get active user plans with plan details
+            // TEMPORARY: Removed !up.IsExpired to debug credit issue
             var userPlans = await _context.UserPlans
                 .Include(up => up.Plan)
-                .Where(up => up.UserId == userId && up.IsActive && !up.IsExpired)
+                .Where(up => up.UserId == userId && up.IsActive)
                 .Select(up => new UserPlanResponseDto
                 {
                     Id = up.Id,
@@ -125,8 +130,9 @@ public class CreditValidationService : ICreditValidationService
             _logger.LogInformation("Checking if user {UserId} has active plans", userId);
 
             // Check if user has any active, non-expired plans
+            // TEMPORARY: Removed !up.IsExpired to debug credit issue
             var hasActivePlans = await _context.UserPlans
-                .AnyAsync(up => up.UserId == userId && up.IsActive && !up.IsExpired);
+                .AnyAsync(up => up.UserId == userId && up.IsActive);
 
             _logger.LogInformation("User {UserId} has active plans: {HasActivePlans}", userId, hasActivePlans);
             return hasActivePlans;

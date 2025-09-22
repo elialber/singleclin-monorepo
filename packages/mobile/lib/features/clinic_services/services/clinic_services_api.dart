@@ -32,7 +32,7 @@ class ClinicServicesApi {
     required DateTime appointmentDate,
   }) async {
     try {
-      final response = await _apiService.post('/appointments/schedule', data: {
+      final response = await _apiService.post('/Appointments/schedule', data: {
         'clinicId': clinicId,
         'serviceId': serviceId,
         'scheduledDate': appointmentDate.toIso8601String(),
@@ -52,7 +52,7 @@ class ClinicServicesApi {
     required String confirmationToken,
   }) async {
     try {
-      final response = await _apiService.post('/appointments/confirm', data: {
+      final response = await _apiService.post('/Appointments/confirm', data: {
         'confirmationToken': confirmationToken,
       });
 
@@ -68,7 +68,7 @@ class ClinicServicesApi {
 
   static Future<Map<String, dynamic>> getUserCredits(String userId) async {
     try {
-      final response = await _apiService.get('/appointments/my-credits');
+      final response = await _apiService.get('/Appointments/my-credits');
 
       if (response.statusCode == 200) {
         return response.data;

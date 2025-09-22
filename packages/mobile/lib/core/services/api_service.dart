@@ -50,9 +50,9 @@ class ApiService extends getx.GetxService {
         if (error.response?.statusCode == 401) {
           // Check if this is an endpoint where we want to handle 401 gracefully
           final requestPath = error.requestOptions.path;
-          final isCreditsEndpoint = requestPath.contains('/appointments/my-credits');
-          final isScheduleEndpoint = requestPath.contains('/appointments/schedule');
-          final isConfirmEndpoint = requestPath.contains('/appointments/confirm');
+          final isCreditsEndpoint = requestPath.contains('/Appointments/my-credits');
+          final isScheduleEndpoint = requestPath.contains('/Appointments/schedule');
+          final isConfirmEndpoint = requestPath.contains('/Appointments/confirm');
 
           if (!isCreditsEndpoint && !isScheduleEndpoint && !isConfirmEndpoint) {
             // Token expirado - fazer logout apenas se não for um endpoint de agendamento
