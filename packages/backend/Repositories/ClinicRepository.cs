@@ -30,71 +30,147 @@ public class ClinicRepository : IClinicRepository
         string sortBy = "Name",
         string sortDirection = "asc")
     {
-        var query = _context.Clinics.AsQueryable();
-
-        // Apply filters
-        if (isActive.HasValue)
+        try
         {
-            query = query.Where(c => c.IsActive == isActive.Value);
-        }
+            var query = _context.Clinics.AsQueryable();
 
-        if (type.HasValue)
+            // Apply filters
+            if (isActive.HasValue)
+            {
+                query = query.Where(c => c.IsActive == isActive.Value);
+            }
+
+            if (type.HasValue)
+            {
+                query = query.Where(c => c.Type == type.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(c => EF.Functions.ILike(c.Name, $"%{searchTerm}%") ||
+                                       EF.Functions.ILike(c.Address, $"%{searchTerm}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(city))
+            {
+                query = query.Where(c => EF.Functions.ILike(c.Address, $"%{city}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(state))
+            {
+                query = query.Where(c => EF.Functions.ILike(c.Address, $"%{state}%"));
+            }
+
+            // Get total count for pagination
+            int totalCount = await query.CountAsync();
+
+            // Apply dynamic sorting
+            query = ApplySorting(query, sortBy, sortDirection);
+
+            // Apply pagination and try to include services
+            var clinics = await query
+                .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+                .Include(c => c.Services)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToListAsync();
+
+            _logger.LogDebug("Retrieved {Count} clinics from database with filters: Active={IsActive}, Type={Type}, Search={SearchTerm}, City={City}, State={State}, SortBy={SortBy}, SortDirection={SortDirection}",
+                clinics.Count, isActive, type, searchTerm, city, state, sortBy, sortDirection);
+
+            return (clinics, totalCount);
+        }
+        catch (Exception ex)
         {
-            query = query.Where(c => c.Type == type.Value);
+            // If services include fails (likely due to missing credit_cost column), load without services
+            _logger.LogWarning(ex, "Failed to load clinics with services, loading basic clinic data only");
+
+            var query = _context.Clinics.AsQueryable();
+
+            // Apply filters
+            if (isActive.HasValue)
+            {
+                query = query.Where(c => c.IsActive == isActive.Value);
+            }
+
+            if (type.HasValue)
+            {
+                query = query.Where(c => c.Type == type.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(c => EF.Functions.ILike(c.Name, $"%{searchTerm}%") ||
+                                       EF.Functions.ILike(c.Address, $"%{searchTerm}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(city))
+            {
+                query = query.Where(c => EF.Functions.ILike(c.Address, $"%{city}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(state))
+            {
+                query = query.Where(c => EF.Functions.ILike(c.Address, $"%{state}%"));
+            }
+
+            // Get total count for pagination
+            int totalCount = await query.CountAsync();
+
+            // Apply dynamic sorting
+            query = ApplySorting(query, sortBy, sortDirection);
+
+            // Apply pagination without services
+            var clinics = await query
+                .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToListAsync();
+
+            _logger.LogDebug("Retrieved {Count} clinics from database without services", clinics.Count);
+
+            return (clinics, totalCount);
         }
-
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            query = query.Where(c => EF.Functions.ILike(c.Name, $"%{searchTerm}%") ||
-                                   EF.Functions.ILike(c.Address, $"%{searchTerm}%"));
-        }
-
-        if (!string.IsNullOrWhiteSpace(city))
-        {
-            query = query.Where(c => EF.Functions.ILike(c.Address, $"%{city}%"));
-        }
-
-        if (!string.IsNullOrWhiteSpace(state))
-        {
-            query = query.Where(c => EF.Functions.ILike(c.Address, $"%{state}%"));
-        }
-
-        // Get total count for pagination
-        int totalCount = await query.CountAsync();
-
-        // Apply dynamic sorting
-        query = ApplySorting(query, sortBy, sortDirection);
-
-        // Apply pagination
-        var clinics = await query
-            .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
-            .Include(c => c.Services)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .AsNoTracking()
-            .ToListAsync();
-
-        _logger.LogDebug("Retrieved {Count} clinics from database with filters: Active={IsActive}, Type={Type}, Search={SearchTerm}, City={City}, State={State}, SortBy={SortBy}, SortDirection={SortDirection}",
-            clinics.Count, isActive, type, searchTerm, city, state, sortBy, sortDirection);
-
-        return (clinics, totalCount);
     }
 
     public async Task<Clinic?> GetByIdAsync(Guid id)
     {
-        var clinic = await _context.Clinics
-            .Include(c => c.Transactions)
-            .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
-            .Include(c => c.Services)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == id);
-
-        if (clinic == null)
+        try
         {
-            _logger.LogDebug("Clinic not found with ID: {ClinicId}", id);
-        }
+            var clinic = await _context.Clinics
+                .Include(c => c.Transactions)
+                .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+                .Include(c => c.Services)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == id);
 
-        return clinic;
+            if (clinic == null)
+            {
+                _logger.LogDebug("Clinic not found with ID: {ClinicId}", id);
+            }
+
+            return clinic;
+        }
+        catch (Exception ex)
+        {
+            // If services include fails (likely due to missing credit_cost column), load without services
+            _logger.LogWarning(ex, "Failed to load clinic with services, loading basic clinic data only for ID: {ClinicId}", id);
+
+            var clinic = await _context.Clinics
+                .Include(c => c.Transactions)
+                .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (clinic == null)
+            {
+                _logger.LogDebug("Clinic not found with ID: {ClinicId}", id);
+            }
+
+            return clinic;
+        }
     }
 
     public async Task<Clinic?> GetByNameAsync(string name)

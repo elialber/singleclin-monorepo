@@ -1,0 +1,4 @@
+using SingleClin.API.Scripts;
+
+// Executar migration para produção - COMENTADO PARA DESENVOLVIMENTO
+// await ApplyProdMigration.Main(args);

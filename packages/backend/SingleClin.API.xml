@@ -5861,6 +5861,11 @@
             Repository for transaction data access operations
             </summary>
         </member>
+        <member name="T:SingleClin.API.Scripts.ApplyProdMigration">
+            <summary>
+            Script para aplicar a migration credit_cost em produção
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.AppointmentService">
             <summary>
             Service for managing appointments and credit debit operations

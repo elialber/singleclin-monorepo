@@ -13,7 +13,7 @@ namespace SingleClin.API.Scripts
         private const string ProductionConnectionString =
             "Host=singleclin-prod-postgres.postgres.database.azure.com;Database=singleclin;Username=singleclinadmin;Password=SingleClin123!;Port=5432;SSL Mode=Require;";
 
-        public static async Task Main(string[] args)
+        public static async Task RunMigration(string[] args)
         {
             Console.WriteLine("🚀 Aplicando migration credit_cost no banco de produção...");
 
