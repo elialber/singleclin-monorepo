@@ -96,6 +96,7 @@ public class ClinicService : IClinicService
                     Name = serviceDto.Name,
                     Description = serviceDto.Description,
                     Price = NormalizeServicePrice(serviceDto.Price),
+                    CreditCost = serviceDto.CreditCost, // Add the preprocessed CreditCost
                     Duration = serviceDto.Duration,
                     Category = serviceDto.Category,
                     IsActive = serviceDto.IsActive,
@@ -195,6 +196,7 @@ public class ClinicService : IClinicService
                         Name = serviceDto.Name,
                         Description = serviceDto.Description,
                         Price = NormalizeServicePrice(serviceDto.Price),
+                        CreditCost = serviceDto.CreditCost, // Add the preprocessed CreditCost
                         Duration = serviceDto.Duration,
                         Category = serviceDto.Category,
                         IsActive = serviceDto.IsActive,
