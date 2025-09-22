@@ -9,7 +9,7 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service>
     public void Configure(EntityTypeBuilder<Service> builder)
     {
         // Table name
-        builder.ToTable("ClinicServices");
+        builder.ToTable("services");
 
         // Primary key
         builder.HasKey(cs => cs.Id);
@@ -48,12 +48,12 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service>
 
         // Indexes
         builder.HasIndex(cs => cs.ClinicId)
-            .HasDatabaseName("IX_ClinicServices_ClinicId");
+            .HasDatabaseName("ix_services_clinic_id");
 
         builder.HasIndex(cs => cs.Category)
-            .HasDatabaseName("IX_ClinicServices_Category");
+            .HasDatabaseName("ix_services_category");
 
         builder.HasIndex(cs => cs.IsActive)
-            .HasDatabaseName("IX_ClinicServices_IsActive");
+            .HasDatabaseName("ix_services_is_active");
     }
 }

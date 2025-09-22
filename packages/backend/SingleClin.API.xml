@@ -3103,6 +3103,11 @@
             Cost in credits for this service
             </summary>
         </member>
+        <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.EffectiveCreditCost">
+            <summary>
+            Gets or sets CreditCost, automatically setting it based on Price if not provided
+            </summary>
+        </member>
         <member name="P:SingleClin.API.DTOs.Clinic.ClinicServiceDto.Duration">
             <summary>
             Service duration in minutes
@@ -5451,6 +5456,18 @@
         <member name="M:SingleClin.API.Migrations.AddClinicImages.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:SingleClin.API.Migrations.FixServiceIsActiveColumn">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.FixServiceIsActiveColumn.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.FixServiceIsActiveColumn.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:SingleClin.API.Migrations.FixServiceIsActiveColumn.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
         <member name="T:SingleClin.API.Migrations.ApplicationDb.AddIdentityAndRefreshTokens">
             <inheritdoc />
         </member>
@@ -7417,6 +7434,11 @@
             </summary>
             <param name="cnpj">CNPJ to validate</param>
             <returns>True if format is valid, false otherwise</returns>
+        </member>
+        <member name="T:SingleClin.API.Validators.ClinicServiceDtoValidator">
+            <summary>
+            Validator for ClinicServiceDto with automatic CreditCost calculation
+            </summary>
         </member>
         <member name="T:SingleClin.API.Validators.PlanRequestValidator">
             <summary>

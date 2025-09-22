@@ -168,125 +168,148 @@ transação.
 
 ## Fase 2: Frontend Mobile (Flutter) - Tasks Testáveis
 
-### 2.1 Modelos Dart
+### 2.1 Modelos Dart ✅
 
-#### Task 2.1.1: Criar modelos Dart para Service e Appointment
+#### Task 2.1.1: Criar modelos Dart para Service e Appointment ✅
 
 **Critério de Teste**: Modelos devem serializar/deserializar JSON
 
-- [ ] Criar `lib/models/service.dart` com fromJson/toJson
-- [ ] Criar `lib/models/appointment.dart` com fromJson/toJson
-- [ ] Criar `lib/models/appointment_status.dart` enum
-- [ ] **Teste Unitário**: fromJson deve criar objeto válido
-- [ ] **Teste Unitário**: toJson deve gerar JSON correto
+- [x] Criar `lib/domain/entities/service_entity.dart` com fromJson/toJson
+- [x] Criar `lib/domain/entities/appointment_entity.dart` com fromJson/toJson
+- [x] Criar `lib/domain/entities/appointment_status.dart` enum
+- [x] Criar `lib/domain/entities/appointment_dtos.dart` para requests/responses
+- [x] **Teste Unitário**: fromJson deve criar objeto válido
+- [x] **Teste Unitário**: toJson deve gerar JSON correto
 
-### 2.2 Estados de Gerenciamento
+### 2.2 Estados de Gerenciamento ✅
 
-#### Task 2.2.1: Implementar AppointmentState com Bloc/Cubit
+#### Task 2.2.1: Implementar AppointmentState com GetX ✅
 
 **Critério de Teste**: Estados devem refletir operações corretamente
 
-- [ ] Estados: `Initial, Loading, Scheduled, Confirming, Confirmed, Error`
-- [ ] Eventos: `ScheduleAppointment, ConfirmAppointment, LoadAppointments`
-- [ ] Gerenciar dados do agendamento atual
-- [ ] **Teste Unitário**: ScheduleAppointment deve emitir Loading → Scheduled
-- [ ] **Teste Unitário**: Erro deve emitir Error com mensagem
+- [x] Estados: `Initial, Loading, Scheduled, Confirming, Confirmed, Error`
+- [x] Métodos: `ScheduleAppointment, ConfirmAppointment, LoadAppointments`
+- [x] Gerenciar dados do agendamento atual com observables
+- [x] **Teste Unitário**: ScheduleAppointment deve emitir Loading → Scheduled
+- [x] **Teste Unitário**: Erro deve emitir Error com mensagem
 
-#### Task 2.2.2: Implementar ServiceState
+#### Task 2.2.2: Implementar ServiceState ✅
 
 **Critério de Teste**: Lista de serviços deve ser carregada
 
-- [ ] Estados para listagem e filtros de serviços
-- [ ] Cache local de serviços por clínica
-- [ ] **Teste Unitário**: LoadServices deve popular lista
+- [x] Estados para listagem e filtros de serviços com GetX
+- [x] Cache local de serviços por clínica
+- [x] Filtros por categoria e busca por texto
+- [x] **Teste Unitário**: LoadServices deve popular lista
 
-### 2.3 Serviços de API
+### 2.3 Serviços de API ✅
 
-#### Task 2.3.1: Implementar AppointmentApiService
+#### Task 2.3.1: Implementar AppointmentApiService ✅
 
 **Critério de Teste**: Calls da API devem retornar dados esperados
 
-- [ ] `scheduleAppointment()` - POST para criar agendamento
-- [ ] `confirmAppointment()` - POST para confirmar
-- [ ] `getUserAppointments()` - GET lista de agendamentos
-- [ ] Tratamento de erros HTTP
-- [ ] **Teste Unitário**: Mock deve retornar appointment válido
-- [ ] **Teste Unitário**: Erro 400 deve lançar exception específica
+- [x] `scheduleAppointment()` - POST para criar agendamento
+- [x] `confirmAppointment()` - POST para confirmar
+- [x] `getUserAppointments()` - GET lista de agendamentos
+- [x] `cancelAppointment()` - POST para cancelar
+- [x] `getAppointmentDetails()` - GET detalhes específicos
+- [x] `rescheduleAppointment()` - PUT para reagendar
+- [x] Tratamento de erros HTTP com DioException
+- [x] **Teste Unitário**: Mock deve retornar appointment válido
+- [x] **Teste Unitário**: Erro 400 deve lançar exception específica
 
-#### Task 2.3.2: Implementar ServiceApiService
+#### Task 2.3.2: Implementar ServiceApiService ✅
 
 **Critério de Teste**: Serviços devem ser carregados por clínica
 
-- [ ] `getServicesByClinic(clinicId)` - GET lista de serviços
-- [ ] `getServiceDetails(serviceId)` - GET detalhes do serviço
-- [ ] **Teste Unitário**: Lista não deve estar vazia para clínica válida
+- [x] `getServicesByClinic(clinicId)` - GET lista de serviços
+- [x] `getServiceDetails(serviceId)` - GET detalhes do serviço
+- [x] `getAllServices()` - GET todos os serviços com paginação
+- [x] `getServiceCategories()` - GET categorias disponíveis
+- [x] `searchServices()` - GET busca de serviços
+- [x] **Teste Unitário**: Lista não deve estar vazia para clínica válida
 
-### 2.4 Telas Principais
+### 2.4 Telas Principais ✅
 
-#### Task 2.4.1: Implementar ServiceSelectionScreen
+#### Task 2.4.1: Implementar ServiceSelectionScreen ✅
 
 **Critério de Teste**: Lista deve exibir serviços disponíveis
 
-- [ ] ListView com serviços da clínica
-- [ ] Filtros por categoria
-- [ ] Exibir custo em créditos de cada serviço
-- [ ] Navegação para agendamento ao selecionar serviço
-- [ ] **Teste de Widget**: Deve renderizar lista de serviços
-- [ ] **Teste de Widget**: Tap deve navegar para próxima tela
+- [x] ListView com serviços da clínica
+- [x] Filtros por categoria com chips
+- [x] Busca por texto nos serviços
+- [x] Exibir custo em créditos de cada serviço
+- [x] Navegação para agendamento ao selecionar serviço
+- [x] Estados de loading e erro
+- [x] **Teste de Widget**: Deve renderizar lista de serviços
+- [x] **Teste de Widget**: Tap deve navegar para próxima tela
 
-#### Task 2.4.2: Implementar ScheduleAppointmentScreen
+#### Task 2.4.2: Implementar ScheduleAppointmentScreen ✅
 
 **Critério de Teste**: Seleção de data/hora deve funcionar
 
-- [ ] DatePicker e TimePicker para agendamento
-- [ ] Validação de horários disponíveis
-- [ ] Resumo do serviço selecionado
-- [ ] Botão "Continuar para Confirmação"
-- [ ] **Teste de Widget**: DatePicker deve alterar data selecionada
-- [ ] **Teste de Widget**: Horário passado deve estar desabilitado
+- [x] TableCalendar para seleção de datas
+- [x] Grid de horários disponíveis
+- [x] Validação de horários passados
+- [x] Resumo do serviço selecionado
+- [x] Botão "Continuar para Confirmação"
+- [x] Desabilitar fins de semana
+- [x] **Teste de Widget**: DatePicker deve alterar data selecionada
+- [x] **Teste de Widget**: Horário passado deve estar desabilitado
 
-#### Task 2.4.3: Implementar AppointmentConfirmationScreen ⭐
+#### Task 2.4.3: Implementar AppointmentConfirmationScreen ⭐ ✅
 
 **Critério de Teste**: Tela deve exibir todos os dados e processar confirmação
 
-- [ ] **Resumo completo**: serviço, data, clínica, custo
-- [ ] **Saldo atual e saldo após transação**
-- [ ] **Validação de créditos suficientes**
-- [ ] **Botões**: Cancelar e Confirmar
-- [ ] **Loading state** durante processamento
-- [ ] **Feedback de sucesso/erro**
-- [ ] **Teste de Widget**: Deve exibir todos os dados do agendamento
-- [ ] **Teste de Widget**: Créditos insuficientes deve desabilitar botão
-- [ ] **Teste de Widget**: Sucesso deve navegar para tela de sucesso
-- [ ] **Teste de Integração**: Fluxo completo deve funcionar
+- [x] **Resumo completo**: serviço, data, clínica, custo
+- [x] **Saldo atual e saldo após transação**
+- [x] **Validação de créditos suficientes**
+- [x] **Botões**: Cancelar e Confirmar
+- [x] **Loading state** durante processamento
+- [x] **Feedback de sucesso/erro**
+- [x] **Alertas visuais** para créditos insuficientes
+- [x] **Teste de Widget**: Deve exibir todos os dados do agendamento
+- [x] **Teste de Widget**: Créditos insuficientes deve desabilitar botão
+- [x] **Teste de Widget**: Sucesso deve navegar para tela de sucesso
+- [x] **Teste de Integração**: Fluxo completo deve funcionar
 
-#### Task 2.4.4: Implementar AppointmentSuccessScreen
+#### Task 2.4.4: Implementar AppointmentSuccessScreen ✅
 
 **Critério de Teste**: Confirmação deve exibir dados da transação
 
-- [ ] Detalhes do agendamento confirmado
-- [ ] Dados da transação (ID, créditos debitados)
-- [ ] Botão para voltar à tela principal
-- [ ] **Teste de Widget**: Deve exibir dados recebidos via navegação
+- [x] Detalhes do agendamento confirmado
+- [x] Dados da transação (ID, créditos debitados)
+- [x] Botões para ver agendamentos e voltar ao início
+- [x] Design celebrativo com ícone de sucesso
+- [x] Informações adicionais sobre gerenciamento
+- [x] **Teste de Widget**: Deve exibir dados recebidos via navegação
 
-### 2.5 Componentes Reutilizáveis
+### 2.5 Componentes Reutilizáveis ✅
 
-#### Task 2.5.1: Criar CreditBalanceWidget
+#### Task 2.5.1: Criar CreditBalanceWidget ✅
 
 **Critério de Teste**: Widget deve exibir saldo atualizado
 
-- [ ] Exibir créditos disponíveis do usuário
-- [ ] Indicador visual (verde/vermelho) para suficiente/insuficiente
-- [ ] Atualização automática quando saldo muda
-- [ ] **Teste de Widget**: Cores devem mudar conforme saldo
+- [x] Exibir créditos disponíveis do usuário
+- [x] Indicador visual (verde/vermelho) para suficiente/insuficiente
+- [x] Diferentes tamanhos (small, normal, large)
+- [x] Mostrar créditos após transação
+- [x] Status icons e cores dinâmicas
+- [x] Helper methods para casos comuns
+- [x] **Teste de Widget**: Cores devem mudar conforme saldo
 
-#### Task 2.5.2: Criar AppointmentSummaryCard
+#### Task 2.5.2: Criar AppointmentSummaryCard ✅
 
 **Critério de Teste**: Card deve exibir informações completas
 
-- [ ] Card responsivo com dados do agendamento
-- [ ] Reutilizável em várias telas
-- [ ] **Teste de Widget**: Deve renderizar todos os campos
+- [x] Card responsivo com dados do agendamento
+- [x] Construtores para diferentes fontes de dados
+- [x] Suporte para AppointmentEntity, AppointmentSummaryDto e ServiceEntity
+- [x] Status badges para appointments
+- [x] Indicadores visuais para appointments passados
+- [x] Actions buttons opcionais
+- [x] Reutilizável em várias telas
+- [x] **Teste de Widget**: Deve renderizar todos os campos
 
 ### 2.6 Navegação e Fluxo
 
