@@ -64,9 +64,11 @@ export interface ClinicServiceDto {
   name: string
   description?: string
   price: number
+  creditCost?: number
   duration: number
   category: string
-  isAvailable: boolean
+  isActive: boolean
+  imageUrl?: string
 }
 
 export interface UpdateClinicRequest extends Partial<CreateClinicRequest> {

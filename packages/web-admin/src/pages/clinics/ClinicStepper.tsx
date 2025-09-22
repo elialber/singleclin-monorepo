@@ -293,7 +293,7 @@ export default function ClinicStepperPage() {
           price: service.credits, // Usar créditos diretamente como SG (SingleClin Gold)
           duration: 30, // Duração padrão de 30 minutos
           category: service.category,
-          isAvailable: true
+          isActive: true
         }))
       
       console.log('🔄 Serviços mapeados:', request.services)
