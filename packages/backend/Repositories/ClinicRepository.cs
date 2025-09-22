@@ -117,17 +117,35 @@ public class ClinicRepository : IClinicRepository
 
     public async Task<IEnumerable<Clinic>> GetActiveAsync()
     {
-        var clinics = await _context.Clinics
-            .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
-            .Include(c => c.Services)
-            .Where(c => c.IsActive)
-            .OrderBy(c => c.Name)
-            .AsNoTracking()
-            .ToListAsync();
+        try
+        {
+            // Try to load with services first
+            var clinics = await _context.Clinics
+                .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+                .Include(c => c.Services)
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.Name)
+                .AsNoTracking()
+                .ToListAsync();
 
-        _logger.LogDebug("Retrieved {Count} active clinics", clinics.Count);
+            _logger.LogDebug("Retrieved {Count} active clinics with services", clinics.Count);
+            return clinics;
+        }
+        catch (Exception ex)
+        {
+            // If services include fails (likely due to missing credit_cost column), load without services
+            _logger.LogWarning(ex, "Failed to load clinics with services, loading basic clinic data only");
 
-        return clinics;
+            var clinics = await _context.Clinics
+                .Include(c => c.Images.OrderBy(i => i.DisplayOrder))
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.Name)
+                .AsNoTracking()
+                .ToListAsync();
+
+            _logger.LogDebug("Retrieved {Count} active clinics without services", clinics.Count);
+            return clinics;
+        }
     }
 
     public async Task<Clinic> CreateAsync(Clinic clinic)
