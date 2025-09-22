@@ -32,7 +32,7 @@ public class CreditValidationService : ICreditValidationService
             }
 
             // Get total available credits from active user plans
-            // TEMPORARY: Removed !up.IsExpired to debug credit issue
+       
             var availableCredits = await _context.UserPlans
                 .Where(up => up.UserId == userId && up.IsActive)
                 .SumAsync(up => up.CreditsRemaining);
@@ -60,6 +60,25 @@ public class CreditValidationService : ICreditValidationService
         {
             _logger.LogInformation("Getting available credits for user {UserId}", userId);
 
+            // Debug: Check if user exists first
+            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+            _logger.LogInformation("Debug: User {UserId} exists in database: {UserExists}", userId, userExists);
+
+            // Debug: Get all UserPlans for this user (regardless of filters)
+            var allUserPlans = await _context.UserPlans
+                .Where(up => up.UserId == userId)
+                .Select(up => new {
+                    up.Credits,
+                    up.CreditsRemaining,
+                    up.IsActive,
+                    up.ExpirationDate,
+                    IsExpired = up.ExpirationDate < DateTime.UtcNow
+                })
+                .ToListAsync();
+
+            _logger.LogInformation("Debug: Found {UserPlanCount} UserPlans for user {UserId}: {@UserPlans}",
+                allUserPlans.Count, userId, allUserPlans);
+
             // Get total available credits from active user plans
             // TEMPORARY: Removed !up.IsExpired to debug credit issue
             var totalCredits = await _context.UserPlans
@@ -67,6 +86,13 @@ public class CreditValidationService : ICreditValidationService
                 .SumAsync(up => up.CreditsRemaining);
 
             _logger.LogInformation("Debug: UserPlan query without expiration filter returned {TotalCredits} credits", totalCredits);
+
+            // Debug: Also check what original query would return
+            var originalQueryCredits = await _context.UserPlans
+                .Where(up => up.UserId == userId && up.IsActive && up.ExpirationDate > DateTime.UtcNow)
+                .SumAsync(up => up.CreditsRemaining);
+
+            _logger.LogInformation("Debug: Original query (WITH expiration filter) would return {OriginalCredits} credits", originalQueryCredits);
 
             _logger.LogInformation("User {UserId} has {TotalCredits} available credits", userId, totalCredits);
             return totalCredits;
