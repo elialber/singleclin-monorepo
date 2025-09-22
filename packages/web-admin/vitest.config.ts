@@ -13,6 +13,16 @@ export default defineConfig({
     outputFile: {
       json: './test-results/unit-tests.json'
     },
+    exclude: [
+      'node_modules/',
+      'dist/',
+      'build/',
+      '**/*.spec.ts', // Exclude Playwright test files
+      '**/*e2e*/**', // Exclude e2e test directories
+      'tests/e2e/**', // Exclude e2e test directory
+      'playwright-report/**',
+      'test-results/**'
+    ],
     coverage: {
       reporter: ['text', 'json', 'html'],
       exclude: [
