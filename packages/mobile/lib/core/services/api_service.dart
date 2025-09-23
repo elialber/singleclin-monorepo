@@ -4,6 +4,7 @@ import 'package:get/get.dart' as getx;
 import 'package:flutter/foundation.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
+import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
 import 'dart:io';
 
 class ApiService extends getx.GetxService {
@@ -40,10 +41,40 @@ class ApiService extends getx.GetxService {
     // Interceptor para adicionar token de autenticação
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await _storageService.getString(AppConstants.tokenKey);
+        // Try to get token from AuthController first (Firebase tokens)
+        String? token;
+        try {
+          final authController = getx.Get.find<AuthController>();
+          token = await authController.getCurrentToken();
+
+          if (kDebugMode) {
+            print('🔑 DEBUG: Firebase token from AuthController: ${token != null ? "Found" : "Not found"}');
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('⚠️ DEBUG: AuthController not found, trying storage fallback: $e');
+          }
+        }
+
+        // Fallback to storage service for legacy tokens
+        if (token == null || token.isEmpty) {
+          token = await _storageService.getString(AppConstants.tokenKey);
+          if (kDebugMode) {
+            print('🔑 DEBUG: Storage token: ${token != null ? "Found" : "Not found"}');
+          }
+        }
+
         if (token != null && token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
+          if (kDebugMode) {
+            print('✅ DEBUG: Authorization header added to request');
+          }
+        } else {
+          if (kDebugMode) {
+            print('❌ DEBUG: No token available for request to: ${options.path}');
+          }
         }
+
         handler.next(options);
       },
       onError: (error, handler) async {

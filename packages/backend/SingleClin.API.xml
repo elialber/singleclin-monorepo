@@ -649,6 +649,22 @@
             <param name="id">Clinic ID</param>
             <returns>Created services</returns>
         </member>
+        <member name="T:SingleClin.API.Controllers.CreditSyncTestController">
+            <summary>
+            Test controller to validate credit synchronization after purchase-plan
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.CreditSyncTestController.ValidateCreditSync(System.String)">
+            <summary>
+            Test endpoint to validate credit synchronization
+            Compares both credit query endpoints after a purchase
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Controllers.CreditSyncTestController.TestPurchaseFlow(System.String,SingleClin.API.DTOs.Plan.PurchasePlanDto)">
+            <summary>
+            Test endpoint to simulate and validate complete purchase-to-query flow
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Controllers.HealthController">
             <summary>
             Health check endpoints documentation

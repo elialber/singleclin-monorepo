@@ -84,7 +84,11 @@ class AppConstants {
 
   /// Get base URL based on environment
   static String _getBaseUrl() {
-    // Always use production API for all environments
+    // Temporarily use production API for testing authentication fixes
+    // TODO: Switch back to localhost when .NET 9.0 is available
+    // if (kDebugMode) {
+    //   return 'http://localhost:5010/api';
+    // }
     return 'https://api.singleclin.com.br/api';
   }
 }

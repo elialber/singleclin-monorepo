@@ -141,6 +141,13 @@ class ClinicServicesController extends GetxController {
 
   Future<void> loadUserCredits() async {
     try {
+      // Check authentication first
+      if (!_authController.isAuthenticated) {
+        print('DEBUG: User not authenticated, setting mock credits');
+        userCredits.value = 0; // No credits for unauthenticated users
+        return;
+      }
+
       final userId = _authController.currentUser?.id;
       print('DEBUG: loadUserCredits - userId: $userId');
       print('DEBUG: loadUserCredits - currentUser: ${_authController.currentUser}');
@@ -243,6 +250,36 @@ class ClinicServicesController extends GetxController {
     try {
       Get.back(); // Close dialog
       isLoading.value = true;
+
+      // Check if user is authenticated
+      if (!_authController.isAuthenticated) {
+        Get.snackbar(
+          'Autenticação Necessária',
+          'Você precisa estar logado para agendar serviços.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+        Get.offAllNamed('/login');
+        return;
+      }
+
+      // Verify token is available
+      final token = await _authController.getCurrentToken();
+      if (token == null || token.isEmpty) {
+        print('DEBUG: No valid token available for appointment booking');
+        Get.snackbar(
+          'Erro de Autenticação',
+          'Token de autenticação não encontrado. Faça login novamente.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        Get.offAllNamed('/login');
+        return;
+      }
+
+      print('DEBUG: User authenticated with token available for booking');
 
       // Check if user has enough credits
       if (userCredits.value < service.price) {
