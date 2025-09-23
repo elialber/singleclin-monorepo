@@ -760,32 +760,7 @@ public class AuthService : IAuthService
 
                 await _context.SaveChangesAsync();
 
-                // Ensure corresponding User domain entity exists
-                var domainUser = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == existingUser.Id);
-                if (domainUser == null)
-                {
-                    domainUser = new User
-                    {
-                        ApplicationUserId = existingUser.Id,
-                        Email = existingUser.Email,
-                        FullName = existingUser.FullName,
-                        Role = existingUser.Role,
-                        ClinicId = existingUser.ClinicId,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    _context.Users.Add(domainUser);
-                    await _context.SaveChangesAsync();
-                    _logger.LogInformation("Created missing domain User entity for existing ApplicationUser: {UserId}", domainUser.Id);
-                }
-                else
-                {
-                    // Update domain user
-                    domainUser.Email = existingUser.Email;
-                    domainUser.FullName = existingUser.FullName;
-                    domainUser.UpdatedAt = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
-                }
+                // Note: Domain User entity creation is handled separately in AppDbContext
 
                 _logger.LogInformation("Updated existing user: {UserId}, Email: {Email}", existingUser.Id, existingUser.Email);
 
@@ -831,32 +806,7 @@ public class AuthService : IAuthService
 
                 await _context.SaveChangesAsync();
 
-                // Ensure corresponding User domain entity exists
-                var emailDomainUser = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == existingEmailUser.Id);
-                if (emailDomainUser == null)
-                {
-                    emailDomainUser = new User
-                    {
-                        ApplicationUserId = existingEmailUser.Id,
-                        Email = existingEmailUser.Email,
-                        FullName = existingEmailUser.FullName,
-                        Role = existingEmailUser.Role,
-                        ClinicId = existingEmailUser.ClinicId,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    _context.Users.Add(emailDomainUser);
-                    await _context.SaveChangesAsync();
-                    _logger.LogInformation("Created missing domain User entity for email user: {UserId}", emailDomainUser.Id);
-                }
-                else
-                {
-                    // Update domain user
-                    emailDomainUser.Email = existingEmailUser.Email;
-                    emailDomainUser.FullName = existingEmailUser.FullName;
-                    emailDomainUser.UpdatedAt = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
-                }
+                // Note: Domain User entity creation is handled separately in AppDbContext
 
                 _logger.LogInformation("Linked Firebase UID to existing user: {UserId}, Email: {Email}", existingEmailUser.Id, existingEmailUser.Email);
 
@@ -912,23 +862,8 @@ public class AuthService : IAuthService
 
             _logger.LogInformation("Created new Firebase user: {UserId}, Email: {Email}", newUser.Id, newUser.Email);
 
-            // Create corresponding User domain entity
-            var domainUser = new User
-            {
-                ApplicationUserId = newUser.Id,
-                Email = newUser.Email,
-                FullName = newUser.FullName,
-                Role = newUser.Role,
-                ClinicId = newUser.ClinicId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _context.Users.Add(domainUser);
-            await _context.SaveChangesAsync();
-
-            _logger.LogInformation("Created domain User entity: {UserId}, ApplicationUserId: {ApplicationUserId}",
-                domainUser.Id, domainUser.ApplicationUserId);
+            // Note: Domain User entity creation is handled separately in AppDbContext
+            _logger.LogInformation("Created new Firebase ApplicationUser: {UserId}, Email: {Email}", newUser.Id, newUser.Email);
 
             // Generate tokens
             var newAccessToken = _jwtService.GenerateAccessToken(newUser);
