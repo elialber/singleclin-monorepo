@@ -387,6 +387,9 @@ class AuthController extends GetxController {
       if (_isAuthenticated.value) {
         // First try to get JWT token from storage (from sync endpoint)
         final jwtToken = await _storageService.getString(AppConstants.tokenKey);
+        print('DEBUG: Checking for JWT token in storage with key: ${AppConstants.tokenKey}');
+        print('DEBUG: JWT token found: ${jwtToken != null ? "YES (length: ${jwtToken!.length})" : "NO"}');
+
         if (jwtToken != null && jwtToken.isNotEmpty) {
           print('DEBUG: Using JWT token from sync endpoint');
           return jwtToken;

@@ -249,6 +249,12 @@ class UserApiService {
         // Store the JWT token for future API calls
         await _storageService.setString(AppConstants.tokenKey, jwtToken);
         print('DEBUG: JWT accessToken from sync endpoint stored successfully');
+        print('DEBUG: Stored JWT token with key: ${AppConstants.tokenKey}');
+        print('DEBUG: Token length: ${jwtToken.length} characters');
+
+        // Verify storage immediately
+        final storedToken = await _storageService.getString(AppConstants.tokenKey);
+        print('DEBUG: Verification - token stored correctly: ${storedToken != null && storedToken == jwtToken}');
       } else {
         print('DEBUG: No accessToken found in sync response');
       }
