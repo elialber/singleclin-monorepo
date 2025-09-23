@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:get/get.dart' as getx;
 
 import 'package:singleclin_mobile/core/constants/api_constants.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/data/models/user_model.dart';
 import 'package:singleclin_mobile/data/services/api_client.dart';
 
@@ -11,6 +14,7 @@ import 'package:singleclin_mobile/data/services/api_client.dart';
 /// JWT authentication for user-related API operations.
 class UserApiService {
   final ApiClient _apiClient = ApiClient.instance;
+  final StorageService _storageService = getx.Get.find<StorageService>();
 
   /// Get current user profile
   Future<UserModel> getCurrentUserProfile() async {
@@ -211,7 +215,7 @@ class UserApiService {
 
   /// Sync user data with Firebase
   /// This method can be called after Firebase authentication
-  /// to sync the user data with your backend
+  /// to sync the user data with your backend and store the JWT token
   Future<UserModel> syncUserWithBackend({
     required String firebaseUid,
     required String email,
@@ -235,7 +239,37 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
+      final responseData = response.data as Map<String, dynamic>;
+
+      // Extract and store JWT token from sync response
+      if (responseData.containsKey('data') && responseData['data'] != null) {
+        final data = responseData['data'] as Map<String, dynamic>;
+
+        // Check for JWT token in the response
+        if (data.containsKey('token') && data['token'] != null) {
+          final jwtToken = data['token'] as String;
+
+          // Store the JWT token for future API calls
+          await _storageService.setString(AppConstants.tokenKey, jwtToken);
+
+          print('DEBUG: JWT token from sync endpoint stored successfully');
+        } else {
+          print('DEBUG: No JWT token found in sync response');
+        }
+
+        // Check for user data
+        if (data.containsKey('user') && data['user'] != null) {
+          return UserModel.fromJson(data['user'] as Map<String, dynamic>);
+        }
+      }
+
+      // Fallback to existing structure
+      if (responseData.containsKey(ApiConstants.dataKey)) {
+        return UserModel.fromJson(responseData[ApiConstants.dataKey] as Map<String, dynamic>);
+      }
+
+      throw const GenericApiException('Invalid response structure', 'invalid_response');
+
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;

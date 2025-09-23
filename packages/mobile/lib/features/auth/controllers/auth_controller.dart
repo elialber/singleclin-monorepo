@@ -40,9 +40,17 @@ class AuthController extends GetxController {
 
       if (currentUser != null) {
         try {
-          // Try to get user profile from backend
-          final userProfile = await _userApiService.getCurrentUserProfile();
+          // Get Firebase ID token
           final String idToken = await _authService.getIdToken();
+
+          // Sync Firebase user with backend database
+          final userProfile = await _userApiService.syncUserWithBackend(
+            firebaseUid: currentUser.id,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            photoUrl: currentUser.photoUrl,
+            isEmailVerified: currentUser.isEmailVerified,
+          );
 
           // Store data locally
           await _storageService.setString(AppConstants.tokenKey, idToken);
@@ -52,7 +60,7 @@ class AuthController extends GetxController {
           );
 
           // Update controller state
-          _user.value = UserModel.fromEntity(userProfile);
+          _user.value = userProfile;
           _isAuthenticated.value = true;
         } catch (backendError) {
           // If backend fails but Firebase is authenticated, logout completely
@@ -86,8 +94,14 @@ class AuthController extends GetxController {
       // Step 2: Get Firebase ID token
       final String idToken = await _authService.getIdToken(forceRefresh: true);
 
-      // Step 3: Get user profile from backend (this will sync with Firebase token via interceptor)
-      final userProfile = await _userApiService.getCurrentUserProfile();
+      // Step 3: Sync Firebase user with backend database
+      final userProfile = await _userApiService.syncUserWithBackend(
+        firebaseUid: firebaseUser.id,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        photoUrl: firebaseUser.photoUrl,
+        isEmailVerified: firebaseUser.isEmailVerified,
+      );
 
       // Step 4: Store user data locally
       await _storageService.setString(AppConstants.tokenKey, idToken);
@@ -129,8 +143,14 @@ class AuthController extends GetxController {
       // Step 2: Get Firebase ID token
       final String idToken = await _authService.getIdToken(forceRefresh: true);
 
-      // Step 3: Get user profile from backend
-      final userProfile = await _userApiService.getCurrentUserProfile();
+      // Step 3: Sync Firebase user with backend database
+      final userProfile = await _userApiService.syncUserWithBackend(
+        firebaseUid: firebaseUser.id,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        photoUrl: firebaseUser.photoUrl,
+        isEmailVerified: firebaseUser.isEmailVerified,
+      );
 
       // Step 4: Store user data locally
       await _storageService.setString(AppConstants.tokenKey, idToken);
@@ -309,12 +329,27 @@ class AuthController extends GetxController {
 
   /// Manipular autenticação bem-sucedida
   Future<void> _handleSuccessfulAuth(UserEntity userEntity) async {
-    // Convert to UserModel and save
-    final userModel = UserModel.fromEntity(userEntity);
-    await _storageService.setString(AppConstants.userKey, userModel.toJson().toString());
+    // Get Firebase ID token
+    final String idToken = await _authService.getIdToken(forceRefresh: true);
 
-    // Update state
-    _user.value = userModel;
+    // Sync Firebase user with backend database
+    final userProfile = await _userApiService.syncUserWithBackend(
+      firebaseUid: userEntity.id,
+      email: userEntity.email,
+      displayName: userEntity.displayName,
+      photoUrl: userEntity.photoUrl,
+      isEmailVerified: userEntity.isEmailVerified,
+    );
+
+    // Store user data locally
+    await _storageService.setString(AppConstants.tokenKey, idToken);
+    await _storageService.setString(
+      AppConstants.userKey,
+      userProfile.toJson().toString(),
+    );
+
+    // Update controller state
+    _user.value = userProfile;
     _isAuthenticated.value = true;
 
     // Navigate to dashboard or onboarding
@@ -344,5 +379,27 @@ class AuthController extends GetxController {
   /// Validar telefone
   bool isValidPhone(String phone) {
     return RegExp(r'^\(\d{2}\) \d{4,5}-\d{4}$').hasMatch(phone);
+  }
+
+  /// Get current token for API requests (prioritizes JWT from sync endpoint)
+  Future<String?> getCurrentToken() async {
+    try {
+      if (_isAuthenticated.value) {
+        // First try to get JWT token from storage (from sync endpoint)
+        final jwtToken = await _storageService.getString(AppConstants.tokenKey);
+        if (jwtToken != null && jwtToken.isNotEmpty) {
+          print('DEBUG: Using JWT token from sync endpoint');
+          return jwtToken;
+        }
+
+        // Fallback to Firebase token
+        print('DEBUG: No JWT token found, using Firebase token');
+        return await _authService.getIdToken(forceRefresh: false);
+      }
+      return null;
+    } catch (e) {
+      print('Error getting current token: $e');
+      return null;
+    }
   }
 }
