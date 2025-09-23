@@ -41,27 +41,32 @@ class ApiService extends getx.GetxService {
     // Interceptor para adicionar token de autenticação
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // Try to get token from AuthController first (Firebase tokens)
-        String? token;
-        try {
-          final authController = getx.Get.find<AuthController>();
-          token = await authController.getCurrentToken();
+        // First try to get JWT token directly from storage (fastest path)
+        String? token = await _storageService.getString(AppConstants.tokenKey);
 
-          if (kDebugMode) {
-            print('🔑 DEBUG: Firebase token from AuthController: ${token != null ? "Found" : "Not found"}');
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            print('⚠️ DEBUG: AuthController not found, trying storage fallback: $e');
+        if (kDebugMode) {
+          print('🔑 DEBUG: Direct JWT token check: ${token != null ? "Found (${token!.length} chars)" : "Not found"}');
+        }
+
+        // If no JWT token, try AuthController (Firebase tokens)
+        if (token == null || token.isEmpty) {
+          try {
+            final authController = getx.Get.find<AuthController>();
+            token = await authController.getCurrentToken();
+
+            if (kDebugMode) {
+              print('🔑 DEBUG: Firebase token from AuthController: ${token != null ? "Found" : "Not found"}');
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              print('⚠️ DEBUG: AuthController not found, trying storage fallback: $e');
+            }
           }
         }
 
-        // Fallback to storage service for legacy tokens
-        if (token == null || token.isEmpty) {
-          token = await _storageService.getString(AppConstants.tokenKey);
-          if (kDebugMode) {
-            print('🔑 DEBUG: Storage token: ${token != null ? "Found" : "Not found"}');
-          }
+        // Final fallback check
+        if (kDebugMode && (token == null || token.isEmpty)) {
+          print('❌ DEBUG: No token available for request to: ${options.path}');
         }
 
         if (token != null && token.isNotEmpty) {
