@@ -61,48 +61,45 @@ public class CreditValidationService : ICreditValidationService
         {
             _logger.LogInformation("Getting available credits for user {UserId}", userId);
 
-            // Debug: Check if user exists first by ApplicationUserId (JWT ID)
+            // Check if user exists first by ApplicationUserId (JWT ID)
             var userExists = await _context.Users.AnyAsync(u => u.ApplicationUserId == userId);
-            _logger.LogInformation("Debug: User with ApplicationUserId {UserId} exists in database: {UserExists}", userId, userExists);
+            if (!userExists)
+            {
+                _logger.LogWarning("User with ApplicationUserId {UserId} not found in database", userId);
+                return 0;
+            }
 
-            // Also check if user exists by Id directly (old method)
-            var userExistsById = await _context.Users.AnyAsync(u => u.Id == userId);
-            _logger.LogInformation("Debug: User with Id {UserId} exists in database: {UserExistsById}", userId, userExistsById);
-
-            // Debug: Get all UserPlans for this user by ApplicationUserId (CORRECT)
+            // Get all UserPlans for this user by ApplicationUserId and log details
             var allUserPlans = await _context.UserPlans
                 .Include(up => up.User)
+                .Include(up => up.Plan)
                 .Where(up => up.User.ApplicationUserId == userId)
                 .Select(up => new {
+                    UserPlanId = up.Id,
+                    PlanName = up.Plan.Name,
                     up.Credits,
                     up.CreditsRemaining,
                     up.IsActive,
                     up.ExpirationDate,
-                    IsExpired = up.ExpirationDate < DateTime.UtcNow
+                    IsExpired = up.ExpirationDate < DateTime.UtcNow,
+                    up.CreatedAt
                 })
                 .ToListAsync();
 
-            _logger.LogInformation("Debug: Found {UserPlanCount} UserPlans for user {UserId}: {@UserPlans}",
+            _logger.LogInformation("Found {UserPlanCount} UserPlans for user {UserId}: {@UserPlans}",
                 allUserPlans.Count, userId, allUserPlans);
 
-            // Get total available credits from active user plans
-            // FIXED: Use ApplicationUserId instead of UserId
+            // Get total available credits from active, non-expired user plans
             var totalCredits = await _context.UserPlans
                 .Include(up => up.User)
-                .Where(up => up.User.ApplicationUserId == userId && up.IsActive)
+                .Where(up => up.User.ApplicationUserId == userId &&
+                            up.IsActive &&
+                            up.ExpirationDate > DateTime.UtcNow)
                 .SumAsync(up => up.CreditsRemaining);
 
-            _logger.LogInformation("Debug: UserPlan query without expiration filter returned {TotalCredits} credits", totalCredits);
+            _logger.LogInformation("User {UserId} has {TotalCredits} available credits from active, non-expired plans",
+                userId, totalCredits);
 
-            // Debug: Also check what original query would return
-            var originalQueryCredits = await _context.UserPlans
-                .Include(up => up.User)
-                .Where(up => up.User.ApplicationUserId == userId && up.IsActive && up.ExpirationDate > DateTime.UtcNow)
-                .SumAsync(up => up.CreditsRemaining);
-
-            _logger.LogInformation("Debug: Original query (WITH expiration filter) would return {OriginalCredits} credits", originalQueryCredits);
-
-            _logger.LogInformation("User {UserId} has {TotalCredits} available credits", userId, totalCredits);
             return totalCredits;
         }
         catch (Exception ex)
@@ -118,12 +115,14 @@ public class CreditValidationService : ICreditValidationService
         {
             _logger.LogInformation("Getting active plans for user {UserId}", userId);
 
-            // Get active user plans with plan details
+            // Get active, non-expired user plans with plan details
             // FIXED: Use ApplicationUserId instead of UserId
             var userPlans = await _context.UserPlans
                 .Include(up => up.Plan)
                 .Include(up => up.User)
-                .Where(up => up.User.ApplicationUserId == userId && up.IsActive)
+                .Where(up => up.User.ApplicationUserId == userId &&
+                            up.IsActive &&
+                            up.ExpirationDate > DateTime.UtcNow)
                 .Select(up => new UserPlanResponseDto
                 {
                     Id = up.Id,

@@ -553,20 +553,32 @@ public class UserService : IUserService
     {
         try
         {
-            // Find user in AppDbContext
+            _logger.LogInformation("Getting user plans for ApplicationUserId {UserId}", userId);
+
+            // Find user in AppDbContext using ApplicationUserId
             var user = await _appDbContext.Users
                 .FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
 
             if (user == null)
             {
+                _logger.LogWarning("User with ApplicationUserId {UserId} not found in AppDbContext", userId);
                 return Array.Empty<UserPlanResponseDto>();
             }
 
+            _logger.LogInformation("Found User in AppDbContext: Id={UserId}, ApplicationUserId={ApplicationUserId}",
+                user.Id, user.ApplicationUserId);
+
+            // Get active, non-expired user plans
             var userPlans = await _appDbContext.UserPlans
-                .Where(up => up.UserId == user.Id && up.IsActive)
+                .Where(up => up.UserId == user.Id &&
+                            up.IsActive &&
+                            up.ExpirationDate > DateTime.UtcNow)
                 .Include(up => up.Plan)
                 .OrderBy(up => up.ExpirationDate)
                 .ToListAsync();
+
+            _logger.LogInformation("Found {PlanCount} active user plans for user {UserId}",
+                userPlans.Count, userId);
 
             return userPlans.Select(up => new UserPlanResponseDto
             {

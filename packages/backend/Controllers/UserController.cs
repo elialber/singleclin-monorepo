@@ -455,19 +455,19 @@ public class UserController : BaseController
         {
             _logger.LogInformation("Getting credits for user: {UserId}", id);
 
-            // For Firebase UIDs (like ATp3HykPuYMosiLapAKP6QEsB622), return mock credits for now
-            // In production, this would need to map Firebase UID to internal User ID
+            // Validate user ID format - must be a valid GUID (ApplicationUserId from JWT)
             if (!Guid.TryParse(id, out var userId))
             {
-                _logger.LogInformation("Non-GUID user ID detected (likely Firebase UID): {UserId}", id);
-                // Return mock credits for Firebase users
-                return Ok(new { credits = 100 });
+                _logger.LogWarning("Invalid user ID format: {UserId}. Expected GUID format.", id);
+                return BadRequest(new { message = "Invalid user ID format. Expected GUID." });
             }
 
+            // Get user plans using the ApplicationUserId (JWT user ID)
             var userPlans = await _userService.GetUserPlansAsync(userId);
             var totalCredits = userPlans.Sum(up => up.CreditsRemaining);
 
-            _logger.LogInformation("Found {TotalCredits} credits for user {UserId}", totalCredits, id);
+            _logger.LogInformation("Found {TotalCredits} credits for user {UserId} from {PlanCount} active plans",
+                totalCredits, id, userPlans.Count());
 
             return Ok(new { credits = totalCredits });
         }
