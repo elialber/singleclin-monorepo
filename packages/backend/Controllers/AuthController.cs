@@ -507,6 +507,51 @@ public class AuthController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Sync Firebase user with backend database
+    /// </summary>
+    /// <param name="syncUserDto">Firebase user sync data</param>
+    /// <returns>User authentication response</returns>
+    /// <response code="200">User sync successful</response>
+    /// <response code="400">Invalid sync data</response>
+    /// <response code="401">Firebase authentication failed</response>
+    [HttpPost("sync")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SyncUser([FromBody] SyncUserDto syncUserDto)
+    {
+        try
+        {
+            var ipAddress = GetIpAddress();
+            var result = await _authService.SyncUserWithBackendAsync(syncUserDto, ipAddress);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "User Sync Failed",
+                    Detail = result.Error,
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            _logger.LogInformation("User sync successful: {Email}", result.Response!.Email);
+            return Ok(result.Response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during user sync for {Email}", syncUserDto.Email);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "User Sync Error",
+                Detail = "An unexpected error occurred during user sync",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
     private string? GetIpAddress()
     {
         // Check for forwarded IP (when behind proxy/load balancer)

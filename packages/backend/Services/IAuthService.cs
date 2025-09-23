@@ -74,4 +74,12 @@ public interface IAuthService
     /// <param name="ipAddress">Client IP address</param>
     /// <returns>Authentication response with tokens</returns>
     Task<(bool Success, AuthResponseDto? Response, string? Error)> FirebaseLoginAsync(FirebaseLoginDto firebaseLoginDto, string? ipAddress = null);
+
+    /// <summary>
+    /// Sync Firebase user with backend database
+    /// </summary>
+    /// <param name="syncUserDto">Firebase user sync data</param>
+    /// <param name="ipAddress">Client IP address</param>
+    /// <returns>User response data</returns>
+    Task<(bool Success, AuthResponseDto? Response, string? Error)> SyncUserWithBackendAsync(SyncUserDto syncUserDto, string? ipAddress = null);
 }

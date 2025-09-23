@@ -236,6 +236,16 @@
             <response code="400">Invalid data or email already exists</response>
             <response code="503">Not available in production</response>
         </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.SyncUser(SingleClin.API.DTOs.Auth.SyncUserDto)">
+            <summary>
+            Sync Firebase user with backend database
+            </summary>
+            <param name="syncUserDto">Firebase user sync data</param>
+            <returns>User authentication response</returns>
+            <response code="200">User sync successful</response>
+            <response code="400">Invalid sync data</response>
+            <response code="401">Firebase authentication failed</response>
+        </member>
         <member name="M:SingleClin.API.Controllers.AuthTestController.GetPublic">
             <summary>
             Public endpoint - no authentication required
@@ -648,22 +658,6 @@
             </summary>
             <param name="id">Clinic ID</param>
             <returns>Created services</returns>
-        </member>
-        <member name="T:SingleClin.API.Controllers.CreditSyncTestController">
-            <summary>
-            Test controller to validate credit synchronization after purchase-plan
-            </summary>
-        </member>
-        <member name="M:SingleClin.API.Controllers.CreditSyncTestController.ValidateCreditSync(System.String)">
-            <summary>
-            Test endpoint to validate credit synchronization
-            Compares both credit query endpoints after a purchase
-            </summary>
-        </member>
-        <member name="M:SingleClin.API.Controllers.CreditSyncTestController.TestPurchaseFlow(System.String,SingleClin.API.DTOs.Plan.PurchasePlanDto)">
-            <summary>
-            Test endpoint to simulate and validate complete purchase-to-query flow
-            </summary>
         </member>
         <member name="T:SingleClin.API.Controllers.HealthController">
             <summary>
@@ -2727,6 +2721,36 @@
         <member name="P:SingleClin.API.DTOs.Auth.SocialLoginDto.FullName">
             <summary>
             User's full name (optional, used if not provided by social provider)
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.DTOs.Auth.SyncUserDto">
+            <summary>
+            Data transfer object for syncing Firebase user with backend
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SyncUserDto.FirebaseUid">
+            <summary>
+            Firebase UID
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SyncUserDto.Email">
+            <summary>
+            User's email
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SyncUserDto.DisplayName">
+            <summary>
+            User's display name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SyncUserDto.PhotoUrl">
+            <summary>
+            User's photo URL
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.Auth.SyncUserDto.IsEmailVerified">
+            <summary>
+            Whether the user's email is verified in Firebase
             </summary>
         </member>
         <member name="T:SingleClin.API.DTOs.Clinic.ClinicFilterDto">
@@ -6142,6 +6166,14 @@
             <param name="firebaseLoginDto">Firebase login data</param>
             <param name="ipAddress">Client IP address</param>
             <returns>Authentication response with tokens</returns>
+        </member>
+        <member name="M:SingleClin.API.Services.IAuthService.SyncUserWithBackendAsync(SingleClin.API.DTOs.Auth.SyncUserDto,System.String)">
+            <summary>
+            Sync Firebase user with backend database
+            </summary>
+            <param name="syncUserDto">Firebase user sync data</param>
+            <param name="ipAddress">Client IP address</param>
+            <returns>User response data</returns>
         </member>
         <member name="T:SingleClin.API.Services.IAzureCommunicationService">
             <summary>
