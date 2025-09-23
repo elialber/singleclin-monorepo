@@ -190,10 +190,10 @@ public class ClinicRateLimitingMiddleware
     /// </summary>
     private static void AddRateLimitHeaders(HttpContext context, RateLimitInfo rateLimitInfo)
     {
-        context.Response.Headers.Add("X-RateLimit-Limit", rateLimitInfo.Limit.ToString());
-        context.Response.Headers.Add("X-RateLimit-Remaining", rateLimitInfo.Remaining.ToString());
-        context.Response.Headers.Add("X-RateLimit-Reset", new DateTimeOffset(rateLimitInfo.ResetTime).ToUnixTimeSeconds().ToString());
-        context.Response.Headers.Add("X-RateLimit-Window", $"{rateLimitInfo.WindowMinutes}m");
+        context.Response.Headers["X-RateLimit-Limit"] = rateLimitInfo.Limit.ToString();
+        context.Response.Headers["X-RateLimit-Remaining"] = rateLimitInfo.Remaining.ToString();
+        context.Response.Headers["X-RateLimit-Reset"] = new DateTimeOffset(rateLimitInfo.ResetTime).ToUnixTimeSeconds().ToString();
+        context.Response.Headers["X-RateLimit-Window"] = $"{rateLimitInfo.WindowMinutes}m";
     }
 
     /// <summary>
