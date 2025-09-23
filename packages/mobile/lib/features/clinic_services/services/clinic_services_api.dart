@@ -8,7 +8,7 @@ class ClinicServicesApi {
   static Future<List<ClinicService>> getClinicServices(String clinicId) async {
     try {
       print('DEBUG: Making API call to get services for clinic: $clinicId');
-      final response = await _apiService.get('/clinics/$clinicId/services');
+      final response = await _apiService.get('/clinic/$clinicId/services');
       
       print('DEBUG: API response: $response');
       
@@ -33,9 +33,9 @@ class ClinicServicesApi {
   }) async {
     try {
       final response = await _apiService.post('/Appointments/schedule', data: {
-        'clinicId': clinicId,
-        'serviceId': serviceId,
-        'scheduledDate': appointmentDate.toIso8601String(),
+        'ClinicId': clinicId,
+        'ServiceId': serviceId,
+        'ScheduledDate': appointmentDate.toIso8601String(),
       });
 
       if (response.statusCode == 200 || response.statusCode == 201) {

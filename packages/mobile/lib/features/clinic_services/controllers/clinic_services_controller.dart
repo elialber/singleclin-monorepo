@@ -4,6 +4,7 @@ import '../models/clinic_service.dart';
 import '../services/clinic_services_api.dart';
 import '../../clinic_discovery/models/clinic.dart';
 import '../../../presentation/controllers/auth_controller.dart';
+import '../../../data/services/user_api_service.dart';
 
 class ClinicServicesController extends GetxController {
   final RxList<ClinicService> services = <ClinicService>[].obs;
@@ -14,6 +15,7 @@ class ClinicServicesController extends GetxController {
   
   Clinic? _clinic;
   final AuthController _authController = Get.find<AuthController>();
+  final UserApiService _userApiService = UserApiService();
   
   Clinic get clinic {
     if (_clinic == null) {
@@ -51,8 +53,8 @@ class ClinicServicesController extends GetxController {
       
       // Load credits first, then services to ensure proper validation
       loadUserCredits().then((_) {
-        // Use services that already come from clinic data instead of making separate API call
-        loadServicesFromClinic();
+        // Always use API to get real service IDs and data
+        loadServices();
       });
     } catch (e) {
       print('DEBUG: Exception in onInit: $e');
@@ -72,53 +74,10 @@ class ClinicServicesController extends GetxController {
     );
   }
 
-  /// Load services from clinic data (no API call needed)
-  void loadServicesFromClinic() {
-    print('DEBUG: loadServicesFromClinic() called');
-    try {
-      isLoading.value = true;
-      error.value = '';
-      print('DEBUG: Loading set to true');
-      
-      // Check if clinic has services data from backend
-      if (clinic.services.isNotEmpty) {
-        // Convert clinic.services (List<Map<String, dynamic>>) to List<ClinicService>
-        final List<ClinicService> realServices = clinic.services.asMap().entries.map((entry) {
-          final index = entry.key;
-          final serviceData = entry.value;
-          return ClinicService(
-            id: 'service_${index}_${clinic.id}',
-            name: serviceData['name'] ?? 'Serviço',
-            description: serviceData['description'] ?? 'Serviço de ${serviceData['name']} disponível na clínica',
-            price: (serviceData['price'] ?? 1.0).toDouble(), // Use real price from backend
-            duration: serviceData['duration'] ?? 30, // Use real duration or default
-            category: serviceData['category'] ?? 'Serviços Gerais',
-            isAvailable: serviceData['isAvailable'] ?? true,
-            imageUrl: serviceData['imageUrl'],
-          );
-        }).toList();
-        
-        services.value = realServices;
-        print('DEBUG: Services loaded from clinic data: ${realServices.length} services');
-      } else {
-        print('DEBUG: No services found in clinic data, trying API fallback');
-        loadServices();
-        return;
-      }
-    } catch (e) {
-      print('DEBUG: Error processing clinic services: $e');
-      error.value = 'Erro ao processar serviços da clínica: $e';
-      services.value = [];
-    } finally {
-      isLoading.value = false;
-      print('DEBUG: Loading set to false');
-      print('DEBUG: Final services count: ${services.length}');
-    }
-  }
 
-  /// Fallback method to load services from API (only used if clinic data doesn't have services)
+  /// Load services from API
   Future<void> loadServices() async {
-    print('DEBUG: loadServices() API fallback called');
+    print('DEBUG: loadServices() API called');
     try {
       isLoading.value = true;
       error.value = '';
@@ -151,6 +110,20 @@ class ClinicServicesController extends GetxController {
       final userId = _authController.currentUser?.id;
       print('DEBUG: loadUserCredits - userId: $userId');
       print('DEBUG: loadUserCredits - currentUser: ${_authController.currentUser}');
+
+      // Force sync user with backend to ensure user exists
+      try {
+        final syncResult = await _userApiService.syncUserWithBackend(
+          firebaseUid: _authController.currentUser!.id,
+          email: _authController.currentUser!.email,
+          displayName: _authController.currentUser!.displayName,
+          photoUrl: _authController.currentUser!.photoUrl,
+          isEmailVerified: _authController.currentUser!.isEmailVerified,
+        );
+        print('DEBUG: User synced successfully: ${syncResult.id}');
+      } catch (syncError) {
+        print('DEBUG: Sync error (user may already exist): $syncError');
+      }
 
       if (userId != null) {
         try {
@@ -197,7 +170,7 @@ class ClinicServicesController extends GetxController {
   }
 
   Future<void> refreshServices() async {
-    loadServicesFromClinic();
+    await loadServices();
     await loadUserCredits();
   }
 
