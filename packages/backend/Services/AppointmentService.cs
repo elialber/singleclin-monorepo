@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data;
 using SingleClin.API.Data.Models;
@@ -15,15 +16,18 @@ namespace SingleClin.API.Services;
 public class AppointmentService : IAppointmentService
 {
     private readonly AppDbContext _context;
+    private readonly ApplicationDbContext _applicationDbContext;
     private readonly ICreditValidationService _creditValidationService;
     private readonly ILogger<AppointmentService> _logger;
 
     public AppointmentService(
         AppDbContext context,
+        ApplicationDbContext applicationDbContext,
         ICreditValidationService creditValidationService,
         ILogger<AppointmentService> logger)
     {
         _context = context;
+        _applicationDbContext = applicationDbContext;
         _creditValidationService = creditValidationService;
         _logger = logger;
     }
@@ -35,8 +39,8 @@ public class AppointmentService : IAppointmentService
             _logger.LogInformation("Scheduling appointment for user {UserId} with service {ServiceId} at clinic {ClinicId}",
                 userId, scheduleDto.ServiceId, scheduleDto.ClinicId);
 
-            // Find user in AppDbContext
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+            // Find user in AppDbContext, create if doesn't exist
+            var user = await GetOrCreateDomainUserAsync(userId);
             if (user == null)
             {
                 return (false, null, new[] { "User not found" });
@@ -164,8 +168,8 @@ public class AppointmentService : IAppointmentService
             _logger.LogInformation("Confirming appointment for user {UserId} with token {Token}",
                 userId, confirmationDto.ConfirmationToken);
 
-            // Find user in AppDbContext
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+            // Find user in AppDbContext, create if doesn't exist
+            var user = await GetOrCreateDomainUserAsync(userId);
             if (user == null)
             {
                 return (false, null, new[] { "User not found" });
@@ -289,7 +293,7 @@ public class AppointmentService : IAppointmentService
         {
             _logger.LogInformation("Getting appointment {AppointmentId} for user {UserId}", appointmentId, userId);
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+            var user = await GetOrCreateDomainUserAsync(userId);
             if (user == null)
             {
                 return null;
@@ -316,7 +320,7 @@ public class AppointmentService : IAppointmentService
             _logger.LogInformation("Getting appointments for user {UserId}, includeCompleted: {IncludeCompleted}",
                 userId, includeCompleted);
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+            var user = await GetOrCreateDomainUserAsync(userId);
             if (user == null)
             {
                 return Array.Empty<AppointmentResponseDto>();
@@ -352,7 +356,7 @@ public class AppointmentService : IAppointmentService
         {
             _logger.LogInformation("Cancelling appointment {AppointmentId} for user {UserId}", appointmentId, userId);
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
+            var user = await GetOrCreateDomainUserAsync(userId);
             if (user == null)
             {
                 return (false, null, new[] { "User not found" });
@@ -560,5 +564,52 @@ public class AppointmentService : IAppointmentService
         rng.GetBytes(randomBytes);
         var randomNumber = BitConverter.ToUInt32(randomBytes, 0) % 10000;
         return $"APT{timestamp}{randomNumber:D4}";
+    }
+
+    /// <summary>
+    /// Get domain user from AppDbContext, create if doesn't exist
+    /// </summary>
+    private async Task<User?> GetOrCreateDomainUserAsync(Guid applicationUserId)
+    {
+        try
+        {
+            // First try to find existing domain user
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == applicationUserId);
+            if (existingUser != null)
+            {
+                return existingUser;
+            }
+
+            // If not found, get ApplicationUser and create domain user
+            var applicationUser = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Id == applicationUserId);
+            if (applicationUser == null)
+            {
+                _logger.LogWarning("ApplicationUser {UserId} not found", applicationUserId);
+                return null;
+            }
+
+            // Create new domain user
+            var domainUser = new User
+            {
+                ApplicationUserId = applicationUser.Id,
+                Email = applicationUser.Email ?? "",
+                FullName = applicationUser.FullName ?? "",
+                Role = (UserRole)applicationUser.Role,
+                IsActive = applicationUser.IsActive,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.Users.Add(domainUser);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Created domain User entity for ApplicationUser {UserId}", applicationUserId);
+            return domainUser;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting or creating domain user for ApplicationUser {UserId}", applicationUserId);
+            return null;
+        }
     }
 }

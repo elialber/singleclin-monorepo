@@ -5928,6 +5928,11 @@
             Service for managing appointments and credit debit operations
             </summary>
         </member>
+        <member name="M:SingleClin.API.Services.AppointmentService.GetOrCreateDomainUserAsync(System.Guid)">
+            <summary>
+            Get domain user from AppDbContext, create if doesn't exist
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Services.AuthService">
             <summary>
             Service for handling authentication operations
