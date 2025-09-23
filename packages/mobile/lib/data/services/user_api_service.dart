@@ -242,33 +242,30 @@ class UserApiService {
       final responseData = response.data as Map<String, dynamic>;
 
       // Extract and store JWT token from sync response
-      if (responseData.containsKey('data') && responseData['data'] != null) {
-        final data = responseData['data'] as Map<String, dynamic>;
+      // The response structure is: { "accessToken": "...", "userId": "...", "email": "...", ... }
+      if (responseData.containsKey('accessToken') && responseData['accessToken'] != null) {
+        final jwtToken = responseData['accessToken'] as String;
 
-        // Check for JWT token in the response
-        if (data.containsKey('token') && data['token'] != null) {
-          final jwtToken = data['token'] as String;
-
-          // Store the JWT token for future API calls
-          await _storageService.setString(AppConstants.tokenKey, jwtToken);
-
-          print('DEBUG: JWT token from sync endpoint stored successfully');
-        } else {
-          print('DEBUG: No JWT token found in sync response');
-        }
-
-        // Check for user data
-        if (data.containsKey('user') && data['user'] != null) {
-          return UserModel.fromJson(data['user'] as Map<String, dynamic>);
-        }
+        // Store the JWT token for future API calls
+        await _storageService.setString(AppConstants.tokenKey, jwtToken);
+        print('DEBUG: JWT accessToken from sync endpoint stored successfully');
+      } else {
+        print('DEBUG: No accessToken found in sync response');
       }
 
-      // Fallback to existing structure
-      if (responseData.containsKey(ApiConstants.dataKey)) {
-        return UserModel.fromJson(responseData[ApiConstants.dataKey] as Map<String, dynamic>);
-      }
-
-      throw const GenericApiException('Invalid response structure', 'invalid_response');
+      // Create UserModel from the response data
+      // The sync endpoint returns user data directly, not nested under 'data' or 'user'
+      return UserModel.fromJson({
+        'id': responseData['userId'],
+        'email': responseData['email'],
+        'displayName': responseData['fullName'],
+        'photoUrl': null, // Not included in sync response
+        'role': 'Patient', // Default role for synced users
+        'isActive': true,
+        'isEmailVerified': responseData['isEmailVerified'] ?? false,
+        'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
 
     } on DioException catch (e) {
       if (e.error is ApiException) {
