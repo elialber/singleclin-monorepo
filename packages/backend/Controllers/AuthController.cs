@@ -571,4 +571,5 @@ public class AuthController : ControllerBase
         // Fall back to remote IP address
         return HttpContext.Connection.RemoteIpAddress?.ToString();
     }
+
 }

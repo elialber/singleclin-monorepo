@@ -41,6 +41,17 @@ public class GlobalExceptionHandlerMiddleware
         var response = context.Response;
         response.ContentType = "application/json";
 
+        // Ensure CORS headers are present even for error responses
+        if (!response.Headers.ContainsKey("Access-Control-Allow-Origin"))
+        {
+            var origin = context.Request.Headers["Origin"].ToString();
+            if (!string.IsNullOrEmpty(origin))
+            {
+                response.Headers.Add("Access-Control-Allow-Origin", origin);
+                response.Headers.Add("Access-Control-Allow-Credentials", "true");
+            }
+        }
+
         var responseWrapper = GetErrorResponse(exception);
         response.StatusCode = responseWrapper.StatusCode;
 

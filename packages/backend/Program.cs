@@ -118,7 +118,8 @@ public class Program
                             "capacitor://localhost", // Capacitor mobile
                             "http://localhost",      // Mobile emulator
                             "https://singleclin.com.br", // Production frontend
-                            "https://api.singleclin.com.br" // Production API domain
+                            "https://api.singleclin.com.br", // Production API domain
+                            "https://singleclin-frontend.proudbay-ea4166c5.eastus.azurecontainerapps.io" // Azure Container Apps frontend
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
@@ -571,6 +572,9 @@ public class Program
 
         // Add global exception handler
         app.UseGlobalExceptionHandler();
+
+        // Add custom CORS handler (before built-in CORS)
+        app.UseCorsHandler();
 
         // Add CORS
         app.UseCors("AllowSpecificOrigins");

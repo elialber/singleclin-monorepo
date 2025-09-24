@@ -82,4 +82,5 @@ public interface IAuthService
     /// <param name="ipAddress">Client IP address</param>
     /// <returns>User response data</returns>
     Task<(bool Success, AuthResponseDto? Response, string? Error)> SyncUserWithBackendAsync(SyncUserDto syncUserDto, string? ipAddress = null);
+
 }

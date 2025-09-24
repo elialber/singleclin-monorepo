@@ -176,10 +176,27 @@ public class FirebaseAuthService : IFirebaseAuthService
             _logger.LogError(ex, "Firebase Authentication Error - Code: {ErrorCode}, Message: {Message}, Email: {Email}",
                 ex.ErrorCode, ex.Message, email);
 
-            // Log more details about the error
-            if (ex.Message.Contains("EMAIL_EXISTS") || ex.Message.Contains("already exists"))
+            // Handle specific error cases
+            if (ex.ErrorCode == AuthErrorCode.EmailAlreadyExists ||
+                ex.Message.Contains("EMAIL_EXISTS") ||
+                ex.Message.Contains("already exists"))
             {
-                _logger.LogWarning("User with email {Email} already exists in Firebase", email);
+                _logger.LogWarning("User with email {Email} already exists in Firebase - attempting to retrieve existing user", email);
+
+                // Try to get the existing user and return it
+                try
+                {
+                    var existingUser = await GetUserByEmailAsync(email);
+                    if (existingUser != null)
+                    {
+                        _logger.LogInformation("Retrieved existing Firebase user: {Email}, UID: {Uid}", email, existingUser.Uid);
+                        return existingUser;
+                    }
+                }
+                catch (Exception retrieveEx)
+                {
+                    _logger.LogError(retrieveEx, "Failed to retrieve existing Firebase user: {Email}", email);
+                }
             }
 
             return null;

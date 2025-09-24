@@ -131,16 +131,45 @@ public class AuthService : IAuthService
                     else
                     {
                         _logger.LogError("❌ FAILED: CreateUserAsync returned null for email: {Email}", registerDto.Email);
+
+                        // Rollback local user creation if Firebase fails
+                        await _userManager.DeleteAsync(user);
+                        if (user.ClinicId.HasValue)
+                        {
+                            var clinic = await _context.Clinics.FindAsync(user.ClinicId.Value);
+                            if (clinic != null)
+                            {
+                                _context.Clinics.Remove(clinic);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+
+                        return (false, null, "Failed to create user in Firebase. Registration cancelled.");
                     }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "❌ EXCEPTION: Error creating user in Firebase for email: {Email}", registerDto.Email);
+
+                    // Rollback local user creation if Firebase fails
+                    await _userManager.DeleteAsync(user);
+                    if (user.ClinicId.HasValue)
+                    {
+                        var clinic = await _context.Clinics.FindAsync(user.ClinicId.Value);
+                        if (clinic != null)
+                        {
+                            _context.Clinics.Remove(clinic);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+
+                    return (false, null, "Failed to create user in Firebase due to an error. Registration cancelled.");
                 }
             }
             else
             {
-                _logger.LogError("❌ Firebase NOT configured! Cannot create user in Firebase for: {Email}", registerDto.Email);
+                _logger.LogWarning("⚠️ Firebase NOT configured! User will be created locally without Firebase integration for: {Email}", registerDto.Email);
+                // Continue with local-only registration if Firebase is not configured
             }
             _logger.LogInformation("=== FIREBASE USER CREATION END ===");
 
@@ -898,4 +927,5 @@ public class AuthService : IAuthService
             return (false, null, "An error occurred while syncing user data");
         }
     }
+
 }
