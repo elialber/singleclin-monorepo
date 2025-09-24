@@ -177,7 +177,7 @@ public class FirebaseAuthService : IFirebaseAuthService
                 ex.ErrorCode, ex.Message, email);
 
             // Handle specific error cases
-            if (ex.ErrorCode == AuthErrorCode.EmailAlreadyExists ||
+            if (ex.ErrorCode == ErrorCode.AlreadyExists ||
                 ex.Message.Contains("EMAIL_EXISTS") ||
                 ex.Message.Contains("already exists"))
             {

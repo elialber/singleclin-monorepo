@@ -13,7 +13,6 @@ COPY . ./
 
 # Build the application
 RUN dotnet publish -c Release -o /app/publish \
-    --no-restore \
     --self-contained false
 
 # Stage 2: Runtime environment

@@ -29,12 +29,12 @@ public class CorsHandlerMiddleware
 
         if (!string.IsNullOrEmpty(origin) && _allowedOrigins.Contains(origin))
         {
-            context.Response.Headers.Add("Access-Control-Allow-Origin", origin);
-            context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
-            context.Response.Headers.Add("Access-Control-Allow-Headers",
-                "Content-Type, Authorization, X-Requested-With, Accept, Origin");
-            context.Response.Headers.Add("Access-Control-Allow-Methods",
-                "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+            context.Response.Headers["Access-Control-Allow-Origin"] = origin;
+            context.Response.Headers["Access-Control-Allow-Credentials"] = "true";
+            context.Response.Headers["Access-Control-Allow-Headers"] =
+                "Content-Type, Authorization, X-Requested-With, Accept, Origin";
+            context.Response.Headers["Access-Control-Allow-Methods"] =
+                "GET, POST, PUT, DELETE, OPTIONS, PATCH";
 
             _logger.LogDebug("CORS headers set for origin: {Origin}", origin);
         }

@@ -47,8 +47,8 @@ public class GlobalExceptionHandlerMiddleware
             var origin = context.Request.Headers["Origin"].ToString();
             if (!string.IsNullOrEmpty(origin))
             {
-                response.Headers.Add("Access-Control-Allow-Origin", origin);
-                response.Headers.Add("Access-Control-Allow-Credentials", "true");
+                response.Headers["Access-Control-Allow-Origin"] = origin;
+                response.Headers["Access-Control-Allow-Credentials"] = "true";
             }
         }
 
