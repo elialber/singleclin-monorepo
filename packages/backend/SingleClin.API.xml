@@ -208,6 +208,16 @@
             <response code="400">Invalid Firebase token</response>
             <response code="401">Firebase authentication failed</response>
         </member>
+        <member name="M:SingleClin.API.Controllers.AuthController.ExchangeFirebaseToken(SingleClin.API.DTOs.Auth.FirebaseLoginDto)">
+            <summary>
+            Exchange a Firebase ID token for a SingleClin JWT + refresh token pair
+            </summary>
+            <param name="firebaseLoginDto">Firebase login information</param>
+            <returns>Authentication response with tokens</returns>
+            <response code="200">Token exchange successful</response>
+            <response code="400">Invalid Firebase token</response>
+            <response code="401">Firebase authentication failed</response>
+        </member>
         <member name="M:SingleClin.API.Controllers.AuthController.SocialLogin(SingleClin.API.DTOs.Auth.SocialLoginDto)">
             <summary>
             Login with social provider (Google or Apple)
@@ -5419,6 +5429,17 @@
             Statistics for balance check job execution
             </summary>
         </member>
+        <member name="T:SingleClin.API.Jobs.FirebaseRefreshTokenCleanupJob">
+            <summary>
+            Job responsible for revoking duplicate refresh tokens generated for Firebase-authenticated users.
+            Keeps the most recent active token per user and revokes the remainder.
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Jobs.FirebaseRefreshTokenCleanupJob.ExecuteAsync">
+            <summary>
+            Executes the cleanup routine.
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Middleware.ClinicRateLimitingMiddleware">
             <summary>
             Rate limiting middleware for clinic QR Code validation endpoints
@@ -5471,7 +5492,7 @@
         </member>
         <member name="T:SingleClin.API.Middleware.FirebaseAuthenticationMiddleware">
             <summary>
-            Middleware to validate Firebase tokens and convert them to internal JWT tokens
+            Middleware to validate Firebase tokens and attach the corresponding SingleClin user to the current context.
             </summary>
         </member>
         <member name="T:SingleClin.API.Middleware.FirebaseAuthenticationMiddlewareExtensions">

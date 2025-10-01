@@ -232,6 +232,7 @@ public class Program
 
         // Register background jobs
         builder.Services.AddScoped<BalanceCheckJob>();
+        builder.Services.AddScoped<FirebaseRefreshTokenCleanupJob>();
 
         // Add Report Service
         builder.Services.AddScoped<IReportService, ReportService>();
@@ -579,11 +580,11 @@ public class Program
         // Add CORS
         app.UseCors("AllowSpecificOrigins");
 
+        // Add Firebase authentication middleware before JWT handling
+        app.UseFirebaseAuthentication();
+
         // Add custom JWT middleware
         app.UseMiddleware<JwtAuthenticationMiddleware>();
-
-        // Add Firebase authentication middleware
-        app.UseFirebaseAuthentication();
 
         // Add clinic rate limiting middleware
         app.UseMiddleware<ClinicRateLimitingMiddleware>();
@@ -655,6 +656,20 @@ public class Program
             job => job.ExecuteAsync(),
             "0 */4 * * *", // Every 4 hours at minute 0
             TimeZoneInfo.Local);
+
+        // Daily cleanup to revoke duplicate Firebase-issued refresh tokens
+        recurringJobManager.AddOrUpdate<FirebaseRefreshTokenCleanupJob>(
+            "firebase-refresh-token-cleanup",
+            job => job.ExecuteAsync(),
+            Cron.Daily(),
+            TimeZoneInfo.Utc);
+
+        // Perform an immediate cleanup on startup to remove legacy duplicate tokens
+        using (var cleanupScope = app.Services.CreateScope())
+        {
+            var cleanupJob = cleanupScope.ServiceProvider.GetRequiredService<FirebaseRefreshTokenCleanupJob>();
+            await cleanupJob.ExecuteAsync();
+        }
 
         await app.RunAsync();
     }

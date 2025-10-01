@@ -310,7 +310,23 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> FirebaseLogin([FromBody] FirebaseLoginDto firebaseLoginDto)
+    public Task<IActionResult> FirebaseLogin([FromBody] FirebaseLoginDto firebaseLoginDto)
+        => ExchangeFirebaseToken(firebaseLoginDto);
+
+    /// <summary>
+    /// Exchange a Firebase ID token for a SingleClin JWT + refresh token pair
+    /// </summary>
+    /// <param name="firebaseLoginDto">Firebase login information</param>
+    /// <returns>Authentication response with tokens</returns>
+    /// <response code="200">Token exchange successful</response>
+    /// <response code="400">Invalid Firebase token</response>
+    /// <response code="401">Firebase authentication failed</response>
+    [HttpPost("firebase/exchange")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ExchangeFirebaseToken([FromBody] FirebaseLoginDto firebaseLoginDto)
     {
         try
         {
@@ -334,16 +350,16 @@ public class AuthController : ControllerBase
                     });
             }
 
-            _logger.LogInformation("Firebase login successful: {Email}", result.Response!.Email);
+            _logger.LogInformation("Firebase token exchange successful: {Email}", result.Response!.Email);
             return Ok(result.Response);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during Firebase login");
+            _logger.LogError(ex, "Error during Firebase token exchange");
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
-                Title = "Firebase Login Error",
-                Detail = "An unexpected error occurred during Firebase login",
+                Title = "Firebase Token Exchange Error",
+                Detail = "An unexpected error occurred during Firebase token exchange",
                 Status = StatusCodes.Status500InternalServerError
             });
         }
