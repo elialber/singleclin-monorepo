@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Custom rating stars widget with SingleClin styling
 class RatingStars extends StatelessWidget {
-  final double rating;
-  final double size;
-  final bool allowHalfRating;
-  final bool isInteractive;
-  final Function(double)? onRatingChanged;
-  final Color? color;
-  final Color? unratedColor;
-  final int maxRating;
-
   const RatingStars({
     Key? key,
     required this.rating,
@@ -23,6 +14,14 @@ class RatingStars extends StatelessWidget {
     this.unratedColor,
     this.maxRating = 5,
   }) : super(key: key);
+  final double rating;
+  final double size;
+  final bool allowHalfRating;
+  final bool isInteractive;
+  final Function(double)? onRatingChanged;
+  final Color? color;
+  final Color? unratedColor;
+  final int maxRating;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +42,7 @@ class RatingStars extends StatelessWidget {
 
   IconData _getIconForIndex(int index) {
     final starValue = index + 1;
-    
+
     if (rating >= starValue) {
       return Icons.star;
     } else if (allowHalfRating && rating >= starValue - 0.5) {
@@ -55,9 +54,8 @@ class RatingStars extends StatelessWidget {
 
   Color _getColorForIndex(int index) {
     final starValue = index + 1;
-    
-    if (rating >= starValue || 
-        (allowHalfRating && rating >= starValue - 0.5)) {
+
+    if (rating >= starValue || (allowHalfRating && rating >= starValue - 0.5)) {
       return color ?? AppColors.sgPrimary;
     } else {
       return unratedColor ?? AppColors.lightGrey;
@@ -73,15 +71,6 @@ class RatingStars extends StatelessWidget {
 
 /// Interactive rating stars for user input
 class InteractiveRatingStars extends StatefulWidget {
-  final double initialRating;
-  final double size;
-  final Function(double) onRatingChanged;
-  final Color? color;
-  final Color? unratedColor;
-  final int maxRating;
-  final bool allowHalfRating;
-  final String? label;
-
   const InteractiveRatingStars({
     Key? key,
     this.initialRating = 0.0,
@@ -93,6 +82,14 @@ class InteractiveRatingStars extends StatefulWidget {
     this.allowHalfRating = true,
     this.label,
   }) : super(key: key);
+  final double initialRating;
+  final double size;
+  final Function(double) onRatingChanged;
+  final Color? color;
+  final Color? unratedColor;
+  final int maxRating;
+  final bool allowHalfRating;
+  final String? label;
 
   @override
   State<InteractiveRatingStars> createState() => _InteractiveRatingStarsState();
@@ -112,13 +109,9 @@ class _InteractiveRatingStarsState extends State<InteractiveRatingStars>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
   }
 
   @override
@@ -154,7 +147,9 @@ class _InteractiveRatingStarsState extends State<InteractiveRatingStars>
                   animation: _scaleAnimation,
                   builder: (context, child) {
                     return Transform.scale(
-                      scale: index < _currentRating.floor() ? _scaleAnimation.value : 1.0,
+                      scale: index < _currentRating.floor()
+                          ? _scaleAnimation.value
+                          : 1.0,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: Icon(
@@ -184,7 +179,7 @@ class _InteractiveRatingStarsState extends State<InteractiveRatingStars>
 
   IconData _getIconForIndex(int index) {
     final starValue = index + 1;
-    
+
     if (_currentRating >= starValue) {
       return Icons.star;
     } else if (widget.allowHalfRating && _currentRating >= starValue - 0.5) {
@@ -196,8 +191,8 @@ class _InteractiveRatingStarsState extends State<InteractiveRatingStars>
 
   Color _getColorForIndex(int index) {
     final starValue = index + 1;
-    
-    if (_currentRating >= starValue || 
+
+    if (_currentRating >= starValue ||
         (widget.allowHalfRating && _currentRating >= starValue - 0.5)) {
       return widget.color ?? AppColors.sgPrimary;
     } else {
@@ -210,7 +205,7 @@ class _InteractiveRatingStarsState extends State<InteractiveRatingStars>
       _currentRating = rating.toDouble();
     });
     widget.onRatingChanged(_currentRating);
-    
+
     // Trigger animation
     _animationController.forward().then((_) {
       _animationController.reverse();
@@ -220,12 +215,6 @@ class _InteractiveRatingStarsState extends State<InteractiveRatingStars>
 
 /// Rating display with number and text
 class RatingDisplay extends StatelessWidget {
-  final double rating;
-  final int totalReviews;
-  final double starSize;
-  final bool showReviewCount;
-  final TextStyle? textStyle;
-
   const RatingDisplay({
     Key? key,
     required this.rating,
@@ -234,32 +223,37 @@ class RatingDisplay extends StatelessWidget {
     this.showReviewCount = true,
     this.textStyle,
   }) : super(key: key);
+  final double rating;
+  final int totalReviews;
+  final double starSize;
+  final bool showReviewCount;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        RatingStars(
-          rating: rating,
-          size: starSize,
-          allowHalfRating: true,
-        ),
+        RatingStars(rating: rating, size: starSize),
         const SizedBox(width: 4),
         Text(
           rating.toStringAsFixed(1),
-          style: textStyle ?? Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.darkGrey,
-          ),
+          style:
+              textStyle ??
+              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.darkGrey,
+              ),
         ),
         if (showReviewCount && totalReviews > 0) ...[
           const SizedBox(width: 4),
           Text(
             '($totalReviews)',
-            style: textStyle ?? Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.mediumGrey,
-            ),
+            style:
+                textStyle ??
+                Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
           ),
         ],
       ],
@@ -269,13 +263,6 @@ class RatingDisplay extends StatelessWidget {
 
 /// Compact rating bar for lists
 class CompactRating extends StatelessWidget {
-  final double rating;
-  final int totalReviews;
-  final double width;
-  final double height;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-
   const CompactRating({
     Key? key,
     required this.rating,
@@ -285,6 +272,12 @@ class CompactRating extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
   }) : super(key: key);
+  final double rating;
+  final int totalReviews;
+  final double width;
+  final double height;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -327,9 +320,9 @@ class CompactRating extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '($totalReviews)',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.mediumGrey,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
           ),
         ],
       ],
@@ -339,14 +332,13 @@ class CompactRating extends StatelessWidget {
 
 /// Rating breakdown chart
 class RatingBreakdown extends StatelessWidget {
-  final Map<int, int> ratingCounts;
-  final int totalRatings;
-
   const RatingBreakdown({
     Key? key,
     required this.ratingCounts,
     required this.totalRatings,
   }) : super(key: key);
+  final Map<int, int> ratingCounts;
+  final int totalRatings;
 
   @override
   Widget build(BuildContext context) {
@@ -360,16 +352,9 @@ class RatingBreakdown extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 2.0),
           child: Row(
             children: [
-              Text(
-                '$rating',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              Text('$rating', style: Theme.of(context).textTheme.bodySmall),
               const SizedBox(width: 4),
-              Icon(
-                Icons.star,
-                size: 12,
-                color: AppColors.sgPrimary,
-              ),
+              const Icon(Icons.star, size: 12, color: AppColors.sgPrimary),
               const SizedBox(width: 8),
               Expanded(
                 child: LinearProgressIndicator(
@@ -398,20 +383,23 @@ class RatingBreakdown extends StatelessWidget {
 
 /// Rating category breakdown for detailed reviews
 class CategoryRatingBreakdown extends StatelessWidget {
-  final Map<String, double> categoryRatings;
-  final double iconSize;
-
   const CategoryRatingBreakdown({
     Key? key,
     required this.categoryRatings,
     this.iconSize = 16.0,
   }) : super(key: key);
+  final Map<String, double> categoryRatings;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
     final categories = [
       {'key': 'service', 'label': 'Serviço', 'icon': Icons.medical_services},
-      {'key': 'cleanliness', 'label': 'Limpeza', 'icon': Icons.cleaning_services},
+      {
+        'key': 'cleanliness',
+        'label': 'Limpeza',
+        'icon': Icons.cleaning_services,
+      },
       {'key': 'staff', 'label': 'Atendimento', 'icon': Icons.people},
       {'key': 'value', 'label': 'Custo-Benefício', 'icon': Icons.attach_money},
     ];
@@ -420,28 +408,24 @@ class CategoryRatingBreakdown extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: categories.map((category) {
         final rating = categoryRatings[category['key']] ?? 0.0;
-        
+
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: Row(
             children: [
               Icon(
-                category['icon'] as IconData,
+                category['icon']! as IconData,
                 size: iconSize,
                 color: AppColors.mediumGrey,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  category['label'] as String,
+                  category['label']! as String,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
-              RatingStars(
-                rating: rating,
-                size: iconSize,
-                allowHalfRating: true,
-              ),
+              RatingStars(rating: rating, size: iconSize),
               const SizedBox(width: 8),
               Text(
                 rating.toStringAsFixed(1),

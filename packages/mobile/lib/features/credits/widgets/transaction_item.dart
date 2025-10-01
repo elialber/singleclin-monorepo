@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/credit_transaction_model.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class TransactionItem extends StatelessWidget {
-  final CreditTransactionModel transaction;
-  final VoidCallback? onTap;
-  final bool showDate;
-  final bool compact;
-
   const TransactionItem({
     super.key,
     required this.transaction,
@@ -16,6 +11,10 @@ class TransactionItem extends StatelessWidget {
     this.showDate = true,
     this.compact = false,
   });
+  final CreditTransactionModel transaction;
+  final VoidCallback? onTap;
+  final bool showDate;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +30,9 @@ class TransactionItem extends StatelessWidget {
             children: [
               // Transaction type icon
               _buildTransactionIcon(),
-              
+
               SizedBox(width: compact ? 12 : 16),
-              
+
               // Transaction details
               Expanded(
                 child: Column(
@@ -50,9 +49,9 @@ class TransactionItem extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     SizedBox(height: compact ? 2 : 4),
-                    
+
                     // Source and date
                     Row(
                       children: [
@@ -64,7 +63,7 @@ class TransactionItem extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        
+
                         if (showDate) ...[
                           Text(
                             ' • ',
@@ -86,9 +85,9 @@ class TransactionItem extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               SizedBox(width: compact ? 8 : 12),
-              
+
               // Amount and status
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -102,17 +101,14 @@ class TransactionItem extends StatelessWidget {
                       color: _getAmountColor(),
                     ),
                   ),
-                  
+
                   SizedBox(height: compact ? 2 : 4),
-                  
+
                   // Status badge or balance after
                   if (!compact && transaction.balanceAfter > 0)
                     Text(
                       'Saldo: ${transaction.balanceAfter} SG',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                     ),
                 ],
               ),
@@ -184,16 +180,9 @@ class TransactionItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         shape: BoxShape.circle,
-        border: Border.all(
-          color: iconColor.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: iconColor.withOpacity(0.3)),
       ),
-      child: Icon(
-        iconData,
-        color: iconColor,
-        size: compact ? 20 : 24,
-      ),
+      child: Icon(iconData, color: iconColor, size: compact ? 20 : 24),
     );
   }
 
@@ -210,7 +199,7 @@ class TransactionItem extends StatelessWidget {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays == 0) {
       return 'Hoje ${DateFormat('HH:mm').format(date)}';
     } else if (difference.inDays == 1) {
@@ -224,12 +213,8 @@ class TransactionItem extends StatelessWidget {
 }
 
 class TransactionItemShimmer extends StatelessWidget {
+  const TransactionItemShimmer({super.key, this.compact = false});
   final bool compact;
-
-  const TransactionItemShimmer({
-    super.key,
-    this.compact = false,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -248,9 +233,9 @@ class TransactionItemShimmer extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-            
+
             SizedBox(width: compact ? 12 : 16),
-            
+
             // Content shimmer
             Expanded(
               child: Column(
@@ -264,9 +249,9 @@ class TransactionItemShimmer extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  
+
                   SizedBox(height: compact ? 4 : 8),
-                  
+
                   Container(
                     height: compact ? 10 : 12,
                     width: 120,
@@ -278,9 +263,9 @@ class TransactionItemShimmer extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             SizedBox(width: compact ? 8 : 12),
-            
+
             // Amount shimmer
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -293,9 +278,9 @@ class TransactionItemShimmer extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-                
+
                 SizedBox(height: compact ? 2 : 4),
-                
+
                 if (!compact)
                   Container(
                     height: 10,

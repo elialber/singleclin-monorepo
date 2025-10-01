@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/profile_controller.dart';
-import '../widgets/profile_header.dart';
-import '../widgets/lgpd_settings.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../shared/widgets/custom_bottom_nav.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/controllers/profile_controller.dart';
+import 'package:singleclin_mobile/features/profile/widgets/profile_header.dart';
+import 'package:singleclin_mobile/features/profile/widgets/lgpd_settings.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Profile Screen
 /// Main profile screen with user information and LGPD settings
 class ProfileScreen extends GetView<ProfileController> {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +18,16 @@ class ProfileScreen extends GetView<ProfileController> {
       appBar: CustomAppBar(
         title: 'Meu Perfil',
         actions: [
-          Obx(() => controller.isEditing 
-              ? IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: controller.cancelEditing,
-                )
-              : IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: controller.startEditing,
-                )
+          Obx(
+            () => controller.isEditing
+                ? IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: controller.cancelEditing,
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: controller.startEditing,
+                  ),
           ),
         ],
       ),
@@ -37,16 +38,16 @@ class ProfileScreen extends GetView<ProfileController> {
 
         final profile = controller.profile;
         if (profile == null) {
-          return const Center(
-            child: Text('Perfil não encontrado'),
-          );
+          return const Center(child: Text('Perfil não encontrado'));
         }
 
         return SingleChildScrollView(
           child: Column(
             children: [
               ProfileHeader(
-                profile: controller.isEditing ? controller.tempProfile ?? profile : profile,
+                profile: controller.isEditing
+                    ? controller.tempProfile ?? profile
+                    : profile,
                 isEditing: controller.isEditing,
                 isUpdatingPhoto: controller.isUpdatingPhoto,
                 onPhotoUpdate: controller.updateProfilePhoto,
@@ -63,7 +64,8 @@ class ProfileScreen extends GetView<ProfileController> {
           ? _buildBottomBar()
           : CustomBottomNav(
               currentIndex: 3, // Perfil é índice 3
-              onTap: (index) => Get.find<BottomNavController>().changePage(index),
+              onTap: (index) =>
+                  Get.find<BottomNavController>().changePage(index),
             ),
     );
   }
@@ -71,7 +73,9 @@ class ProfileScreen extends GetView<ProfileController> {
   /// Build profile sections
   Widget _buildProfileSections() {
     return Obx(() {
-      final profile = controller.isEditing ? controller.tempProfile : controller.profile;
+      final profile = controller.isEditing
+          ? controller.tempProfile
+          : controller.profile;
       if (profile == null) return const SizedBox.shrink();
 
       return Column(
@@ -112,29 +116,36 @@ class ProfileScreen extends GetView<ProfileController> {
             value: profile.personalInfo.fullName,
             isEditable: controller.isEditing,
             onChanged: (value) {
-              final newPersonalInfo = profile.personalInfo.copyWith(fullName: value);
+              final newPersonalInfo = profile.personalInfo.copyWith(
+                fullName: value,
+              );
               controller.updatePersonalInfo(newPersonalInfo);
             },
           ),
           _buildInfoField(
             label: 'Data de Nascimento',
-            value: profile.personalInfo.birthDate != null 
+            value: profile.personalInfo.birthDate != null
                 ? '${profile.personalInfo.birthDate!.day.toString().padLeft(2, '0')}/${profile.personalInfo.birthDate!.month.toString().padLeft(2, '0')}/${profile.personalInfo.birthDate!.year}'
                 : 'Não informado',
-            isEditable: false, // Date picker would be implemented separately
           ),
           _buildInfoField(
             label: 'Gênero',
-            value: profile.personalInfo.gender.isEmpty ? 'Não informado' : profile.personalInfo.gender,
+            value: profile.personalInfo.gender.isEmpty
+                ? 'Não informado'
+                : profile.personalInfo.gender,
             isEditable: controller.isEditing,
             onChanged: (value) {
-              final newPersonalInfo = profile.personalInfo.copyWith(gender: value);
+              final newPersonalInfo = profile.personalInfo.copyWith(
+                gender: value,
+              );
               controller.updatePersonalInfo(newPersonalInfo);
             },
           ),
           _buildInfoField(
             label: 'CPF',
-            value: profile.personalInfo.cpf.isEmpty ? 'Não informado' : profile.personalInfo.cpf,
+            value: profile.personalInfo.cpf.isEmpty
+                ? 'Não informado'
+                : profile.personalInfo.cpf,
             isEditable: controller.isEditing,
             onChanged: (value) {
               final newPersonalInfo = profile.personalInfo.copyWith(cpf: value);
@@ -146,7 +157,9 @@ class ProfileScreen extends GetView<ProfileController> {
             value: profile.personalInfo.occupation ?? 'Não informado',
             isEditable: controller.isEditing,
             onChanged: (value) {
-              final newPersonalInfo = profile.personalInfo.copyWith(occupation: value.isEmpty ? null : value);
+              final newPersonalInfo = profile.personalInfo.copyWith(
+                occupation: value.isEmpty ? null : value,
+              );
               controller.updatePersonalInfo(newPersonalInfo);
             },
           ),
@@ -185,10 +198,14 @@ class ProfileScreen extends GetView<ProfileController> {
               Expanded(
                 child: _buildInfoField(
                   label: 'Tipo Sanguíneo',
-                  value: profile.healthInfo.bloodType.isEmpty ? 'Não informado' : profile.healthInfo.bloodType,
+                  value: profile.healthInfo.bloodType.isEmpty
+                      ? 'Não informado'
+                      : profile.healthInfo.bloodType,
                   isEditable: controller.isEditing,
                   onChanged: (value) {
-                    final newHealthInfo = profile.healthInfo.copyWith(bloodType: value);
+                    final newHealthInfo = profile.healthInfo.copyWith(
+                      bloodType: value,
+                    );
                     controller.updateHealthInfo(newHealthInfo);
                   },
                 ),
@@ -197,12 +214,15 @@ class ProfileScreen extends GetView<ProfileController> {
               Expanded(
                 child: _buildInfoField(
                   label: 'Peso (kg)',
-                  value: profile.healthInfo.weight?.toString() ?? 'Não informado',
+                  value:
+                      profile.healthInfo.weight?.toString() ?? 'Não informado',
                   isEditable: controller.isEditing,
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     final weight = double.tryParse(value);
-                    final newHealthInfo = profile.healthInfo.copyWith(weight: weight);
+                    final newHealthInfo = profile.healthInfo.copyWith(
+                      weight: weight,
+                    );
                     controller.updateHealthInfo(newHealthInfo);
                   },
                 ),
@@ -215,12 +235,15 @@ class ProfileScreen extends GetView<ProfileController> {
               Expanded(
                 child: _buildInfoField(
                   label: 'Altura (cm)',
-                  value: profile.healthInfo.height?.toString() ?? 'Não informado',
+                  value:
+                      profile.healthInfo.height?.toString() ?? 'Não informado',
                   isEditable: controller.isEditing,
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     final height = double.tryParse(value);
-                    final newHealthInfo = profile.healthInfo.copyWith(height: height);
+                    final newHealthInfo = profile.healthInfo.copyWith(
+                      height: height,
+                    );
                     controller.updateHealthInfo(newHealthInfo);
                   },
                 ),
@@ -269,7 +292,7 @@ class ProfileScreen extends GetView<ProfileController> {
             isEditable: controller.isEditing,
             onChanged: (value) {
               final newHealthInfo = profile.healthInfo.copyWith(
-                insuranceProvider: value.isEmpty ? null : value
+                insuranceProvider: value.isEmpty ? null : value,
               );
               controller.updateHealthInfo(newHealthInfo);
             },
@@ -288,7 +311,9 @@ class ProfileScreen extends GetView<ProfileController> {
         children: [
           _buildInfoField(
             label: 'Telefone',
-            value: profile.contactInfo.phone.isEmpty ? 'Não informado' : profile.contactInfo.phone,
+            value: profile.contactInfo.phone.isEmpty
+                ? 'Não informado'
+                : profile.contactInfo.phone,
             isEditable: controller.isEditing,
             keyboardType: TextInputType.phone,
             onChanged: (value) {
@@ -303,7 +328,7 @@ class ProfileScreen extends GetView<ProfileController> {
             keyboardType: TextInputType.phone,
             onChanged: (value) {
               final newContactInfo = profile.contactInfo.copyWith(
-                whatsapp: value.isEmpty ? null : value
+                whatsapp: value.isEmpty ? null : value,
               );
               controller.updateContactInfo(newContactInfo);
             },
@@ -357,8 +382,12 @@ class ProfileScreen extends GetView<ProfileController> {
             label: 'Alergias',
             items: profile.allergies,
             emptyMessage: 'Nenhuma alergia informada',
-            onAdd: controller.isEditing ? (value) => controller.addAllergy(value) : null,
-            onRemove: controller.isEditing ? (value) => controller.removeAllergy(value) : null,
+            onAdd: controller.isEditing
+                ? (value) => controller.addAllergy(value)
+                : null,
+            onRemove: controller.isEditing
+                ? (value) => controller.removeAllergy(value)
+                : null,
             color: AppColors.error,
           ),
           const SizedBox(height: 16),
@@ -366,8 +395,12 @@ class ProfileScreen extends GetView<ProfileController> {
             label: 'Medicamentos',
             items: profile.medications,
             emptyMessage: 'Nenhum medicamento informado',
-            onAdd: controller.isEditing ? (value) => controller.addMedication(value) : null,
-            onRemove: controller.isEditing ? (value) => controller.removeMedication(value) : null,
+            onAdd: controller.isEditing
+                ? (value) => controller.addMedication(value)
+                : null,
+            onRemove: controller.isEditing
+                ? (value) => controller.removeMedication(value)
+                : null,
             color: AppColors.primary,
           ),
           const SizedBox(height: 16),
@@ -375,8 +408,12 @@ class ProfileScreen extends GetView<ProfileController> {
             label: 'Condições de Saúde',
             items: profile.healthConditions,
             emptyMessage: 'Nenhuma condição informada',
-            onAdd: controller.isEditing ? (value) => controller.addHealthCondition(value) : null,
-            onRemove: controller.isEditing ? (value) => controller.removeHealthCondition(value) : null,
+            onAdd: controller.isEditing
+                ? (value) => controller.addHealthCondition(value)
+                : null,
+            onRemove: controller.isEditing
+                ? (value) => controller.removeHealthCondition(value)
+                : null,
             color: AppColors.warning,
           ),
         ],
@@ -400,16 +437,20 @@ class ProfileScreen extends GetView<ProfileController> {
             onChanged: (value) {
               final newSettings = NotificationSettings(
                 pushNotifications: value,
-                emailNotifications: profile.notificationSettings.emailNotifications,
+                emailNotifications:
+                    profile.notificationSettings.emailNotifications,
                 smsNotifications: profile.notificationSettings.smsNotifications,
-                appointmentReminders: profile.notificationSettings.appointmentReminders,
-                promotionalNotifications: profile.notificationSettings.promotionalNotifications,
+                appointmentReminders:
+                    profile.notificationSettings.appointmentReminders,
+                promotionalNotifications:
+                    profile.notificationSettings.promotionalNotifications,
                 healthTips: profile.notificationSettings.healthTips,
-                reminderHoursBefore: profile.notificationSettings.reminderHoursBefore,
+                reminderHoursBefore:
+                    profile.notificationSettings.reminderHoursBefore,
               );
               controller.updateNotificationSettings(newSettings);
             },
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
             contentPadding: EdgeInsets.zero,
           ),
           SwitchListTile(
@@ -418,17 +459,21 @@ class ProfileScreen extends GetView<ProfileController> {
             value: profile.notificationSettings.emailNotifications,
             onChanged: (value) {
               final newSettings = NotificationSettings(
-                pushNotifications: profile.notificationSettings.pushNotifications,
+                pushNotifications:
+                    profile.notificationSettings.pushNotifications,
                 emailNotifications: value,
                 smsNotifications: profile.notificationSettings.smsNotifications,
-                appointmentReminders: profile.notificationSettings.appointmentReminders,
-                promotionalNotifications: profile.notificationSettings.promotionalNotifications,
+                appointmentReminders:
+                    profile.notificationSettings.appointmentReminders,
+                promotionalNotifications:
+                    profile.notificationSettings.promotionalNotifications,
                 healthTips: profile.notificationSettings.healthTips,
-                reminderHoursBefore: profile.notificationSettings.reminderHoursBefore,
+                reminderHoursBefore:
+                    profile.notificationSettings.reminderHoursBefore,
               );
               controller.updateNotificationSettings(newSettings);
             },
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
             contentPadding: EdgeInsets.zero,
           ),
           SwitchListTile(
@@ -437,17 +482,21 @@ class ProfileScreen extends GetView<ProfileController> {
             value: profile.notificationSettings.appointmentReminders,
             onChanged: (value) {
               final newSettings = NotificationSettings(
-                pushNotifications: profile.notificationSettings.pushNotifications,
-                emailNotifications: profile.notificationSettings.emailNotifications,
+                pushNotifications:
+                    profile.notificationSettings.pushNotifications,
+                emailNotifications:
+                    profile.notificationSettings.emailNotifications,
                 smsNotifications: profile.notificationSettings.smsNotifications,
                 appointmentReminders: value,
-                promotionalNotifications: profile.notificationSettings.promotionalNotifications,
+                promotionalNotifications:
+                    profile.notificationSettings.promotionalNotifications,
                 healthTips: profile.notificationSettings.healthTips,
-                reminderHoursBefore: profile.notificationSettings.reminderHoursBefore,
+                reminderHoursBefore:
+                    profile.notificationSettings.reminderHoursBefore,
               );
               controller.updateNotificationSettings(newSettings);
             },
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
             contentPadding: EdgeInsets.zero,
           ),
         ],
@@ -571,10 +620,7 @@ class ProfileScreen extends GetView<ProfileController> {
         ] else ...[
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textPrimary,
-            ),
+            style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 12),
         ],
@@ -587,9 +633,9 @@ class ProfileScreen extends GetView<ProfileController> {
     required String label,
     required List<String> items,
     required String emptyMessage,
+    required Color color,
     Function(String)? onAdd,
     Function(String)? onRemove,
-    required Color color,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -614,11 +660,7 @@ class ProfileScreen extends GetView<ProfileController> {
                     color: color.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.add,
-                    size: 16,
-                    color: color,
-                  ),
+                  child: Icon(Icons.add, size: 16, color: color),
                 ),
               ),
             ],
@@ -638,38 +680,41 @@ class ProfileScreen extends GetView<ProfileController> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: items.map((item) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: color.withOpacity(0.3)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    item,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: color,
+            children: items
+                .map(
+                  (item) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: color.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          item,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: color,
+                          ),
+                        ),
+                        if (onRemove != null) ...[
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: () => onRemove(item),
+                            child: Icon(Icons.close, size: 14, color: color),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  if (onRemove != null) ...[
-                    const SizedBox(width: 6),
-                    GestureDetector(
-                      onTap: () => onRemove(item),
-                      child: Icon(
-                        Icons.close,
-                        size: 14,
-                        color: color,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            )).toList(),
+                )
+                .toList(),
           ),
         ],
       ],
@@ -694,22 +739,13 @@ class ProfileScreen extends GetView<ProfileController> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(
-          fontSize: 12,
-          color: AppColors.textSecondary,
-        ),
+        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
       ),
-      trailing: const Icon(
-        Icons.chevron_right,
-        color: AppColors.mediumGrey,
-      ),
+      trailing: const Icon(Icons.chevron_right, color: AppColors.mediumGrey),
       onTap: onTap,
       contentPadding: EdgeInsets.zero,
     );
@@ -747,7 +783,9 @@ class ProfileScreen extends GetView<ProfileController> {
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: controller.isSaving ? null : controller.saveProfile,
+                  onPressed: controller.isSaving
+                      ? null
+                      : controller.saveProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -775,23 +813,20 @@ class ProfileScreen extends GetView<ProfileController> {
   /// Show add item dialog
   void _showAddItemDialog(String type, Function(String) onAdd) {
     final controller = TextEditingController();
-    
+
     Get.dialog(
       AlertDialog(
         title: Text('Adicionar $type'),
         content: TextField(
           controller: controller,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: 'Digite o nome...',
-            border: const OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
           autofocus: true,
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
               if (controller.text.isNotEmpty) {

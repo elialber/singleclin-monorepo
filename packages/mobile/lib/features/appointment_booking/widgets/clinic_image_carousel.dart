@@ -3,12 +3,8 @@ import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ClinicImageCarousel extends StatefulWidget {
+  const ClinicImageCarousel({Key? key, required this.clinic}) : super(key: key);
   final Clinic clinic;
-
-  const ClinicImageCarousel({
-    Key? key,
-    required this.clinic,
-  }) : super(key: key);
 
   @override
   State<ClinicImageCarousel> createState() => _ClinicImageCarouselState();
@@ -17,7 +13,7 @@ class ClinicImageCarousel extends StatefulWidget {
 class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
   late PageController _pageController;
   int _currentIndex = 0;
-  
+
   // Mock images - in real implementation, this would come from the clinic model
   late List<String> _images;
 
@@ -25,7 +21,7 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
   void initState() {
     super.initState();
     _pageController = PageController();
-    
+
     // Use images from backend or fallback to main image
     if (widget.clinic.images.isNotEmpty) {
       _images = widget.clinic.images;
@@ -33,7 +29,9 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
       _images = [widget.clinic.imageUrl];
     } else {
       // Only show placeholder if no images at all
-      _images = ['https://via.placeholder.com/400x200?text=Sem+Imagem+Disponível'];
+      _images = [
+        'https://via.placeholder.com/400x200?text=Sem+Imagem+Disponível',
+      ];
     }
   }
 
@@ -45,7 +43,7 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 250,
       child: Stack(
         children: [
@@ -88,7 +86,7 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
                             color: AppColors.primary,
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
+                                      loadingProgress.expectedTotalBytes!
                                 : null,
                           ),
                         ),
@@ -122,7 +120,7 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
               );
             },
           ),
-          
+
           // Page Indicators
           Positioned(
             bottom: 16,
@@ -145,8 +143,8 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
                     width: _currentIndex == index ? 24 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: _currentIndex == index 
-                          ? Colors.white 
+                      color: _currentIndex == index
+                          ? Colors.white
                           : Colors.white.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(4),
                       boxShadow: [
@@ -163,7 +161,7 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
               ),
             ),
           ),
-          
+
           // Navigation Arrows (Optional)
           if (_images.length > 1) ...[
             // Left Arrow
@@ -188,7 +186,7 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
                       color: Colors.black.withOpacity(0.5),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.chevron_left,
                       color: Colors.white,
                       size: 24,
@@ -197,7 +195,7 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
                 ),
               ),
             ),
-            
+
             // Right Arrow
             Positioned(
               right: 16,
@@ -220,7 +218,7 @@ class _ClinicImageCarouselState extends State<ClinicImageCarousel> {
                       color: Colors.black.withOpacity(0.5),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.chevron_right,
                       color: Colors.white,
                       size: 24,

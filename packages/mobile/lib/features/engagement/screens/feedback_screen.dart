@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/feedback_controller.dart';
-import '../widgets/feedback_form.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/feedback_controller.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/feedback_form.dart';
 
 class FeedbackScreen extends StatelessWidget {
   const FeedbackScreen({super.key});
@@ -69,8 +69,8 @@ class FeedbackScreen extends StatelessWidget {
                         backgroundColor: Colors.grey[200],
                         selectedColor: const Color(0xFF005156),
                         labelStyle: TextStyle(
-                          color: controller.selectedFilter == 'all' 
-                              ? Colors.white 
+                          color: controller.selectedFilter == 'all'
+                              ? Colors.white
                               : Colors.black,
                         ),
                       ),
@@ -78,12 +78,13 @@ class FeedbackScreen extends StatelessWidget {
                       FilterChip(
                         label: const Text('Populares'),
                         selected: controller.selectedFilter == 'popular',
-                        onSelected: (_) => controller.filterSuggestions('popular'),
+                        onSelected: (_) =>
+                            controller.filterSuggestions('popular'),
                         backgroundColor: Colors.grey[200],
                         selectedColor: const Color(0xFF005156),
                         labelStyle: TextStyle(
-                          color: controller.selectedFilter == 'popular' 
-                              ? Colors.white 
+                          color: controller.selectedFilter == 'popular'
+                              ? Colors.white
                               : Colors.black,
                         ),
                       ),
@@ -91,12 +92,13 @@ class FeedbackScreen extends StatelessWidget {
                       FilterChip(
                         label: const Text('Em Análise'),
                         selected: controller.selectedFilter == 'reviewing',
-                        onSelected: (_) => controller.filterSuggestions('reviewing'),
+                        onSelected: (_) =>
+                            controller.filterSuggestions('reviewing'),
                         backgroundColor: Colors.grey[200],
                         selectedColor: const Color(0xFF005156),
                         labelStyle: TextStyle(
-                          color: controller.selectedFilter == 'reviewing' 
-                              ? Colors.white 
+                          color: controller.selectedFilter == 'reviewing'
+                              ? Colors.white
                               : Colors.black,
                         ),
                       ),
@@ -104,12 +106,13 @@ class FeedbackScreen extends StatelessWidget {
                       FilterChip(
                         label: const Text('Implementadas'),
                         selected: controller.selectedFilter == 'implemented',
-                        onSelected: (_) => controller.filterSuggestions('implemented'),
+                        onSelected: (_) =>
+                            controller.filterSuggestions('implemented'),
                         backgroundColor: Colors.grey[200],
                         selectedColor: const Color(0xFF005156),
                         labelStyle: TextStyle(
-                          color: controller.selectedFilter == 'implemented' 
-                              ? Colors.white 
+                          color: controller.selectedFilter == 'implemented'
+                              ? Colors.white
                               : Colors.black,
                         ),
                       ),
@@ -119,7 +122,9 @@ class FeedbackScreen extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(
-                  controller.sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                  controller.sortAscending
+                      ? Icons.arrow_upward
+                      : Icons.arrow_downward,
                   color: const Color(0xFF005156),
                 ),
                 onPressed: controller.toggleSort,
@@ -133,184 +138,195 @@ class FeedbackScreen extends StatelessWidget {
           child: controller.isLoading
               ? const Center(child: CircularProgressIndicator())
               : controller.filteredSuggestions.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.lightbulb_outline, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text(
-                            'Nenhuma sugestão encontrada',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Compartilhe suas ideias para melhorar o app!',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.lightbulb_outline,
+                        size: 64,
+                        color: Colors.grey,
                       ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: controller.loadSuggestions,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: controller.filteredSuggestions.length,
-                        itemBuilder: (context, index) {
-                          final suggestion = controller.filteredSuggestions[index];
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                      SizedBox(height: 16),
+                      Text(
+                        'Nenhuma sugestão encontrada',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Compartilhe suas ideias para melhorar o app!',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: controller.loadSuggestions,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: controller.filteredSuggestions.length,
+                    itemBuilder: (context, index) {
+                      final suggestion = controller.filteredSuggestions[index];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          suggestion.title,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _getStatusColor(suggestion.status),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Text(
-                                          _getStatusText(suggestion.status),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    suggestion.description,
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    children: [
-                                      Chip(
-                                        label: Text(suggestion.category),
-                                        backgroundColor: const Color(0xFF005156).withOpacity(0.1),
-                                        labelStyle: const TextStyle(
-                                          color: Color(0xFF005156),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                            icon: Icon(
-                                              suggestion.userVote == 1 
-                                                  ? Icons.thumb_up 
-                                                  : Icons.thumb_up_outlined,
-                                              color: suggestion.userVote == 1 
-                                                  ? const Color(0xFF005156) 
-                                                  : Colors.grey,
-                                              size: 18,
-                                            ),
-                                            onPressed: () => controller.voteSuggestion(
-                                              suggestion.id, 
-                                              suggestion.userVote == 1 ? 0 : 1,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${suggestion.upvotes}',
-                                            style: const TextStyle(fontSize: 14),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          IconButton(
-                                            icon: Icon(
-                                              suggestion.userVote == -1 
-                                                  ? Icons.thumb_down 
-                                                  : Icons.thumb_down_outlined,
-                                              color: suggestion.userVote == -1 
-                                                  ? Colors.red 
-                                                  : Colors.grey,
-                                              size: 18,
-                                            ),
-                                            onPressed: () => controller.voteSuggestion(
-                                              suggestion.id, 
-                                              suggestion.userVote == -1 ? 0 : -1,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${suggestion.downvotes}',
-                                            style: const TextStyle(fontSize: 14),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  if (suggestion.adminResponse != null) ...[
-                                    const Divider(),
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Row(
-                                            children: [
-                                              Icon(Icons.admin_panel_settings, 
-                                                   size: 16, color: Colors.blue),
-                                              SizedBox(width: 4),
-                                              Text(
-                                                'Resposta da Equipe',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.blue,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            suggestion.adminResponse!,
-                                            style: const TextStyle(fontSize: 14),
-                                          ),
-                                        ],
+                                  Expanded(
+                                    child: Text(
+                                      suggestion.title,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ],
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Enviado em ${_formatDate(suggestion.createdAt)}',
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _getStatusColor(suggestion.status),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      _getStatusText(suggestion.status),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                              const SizedBox(height: 8),
+                              Text(
+                                suggestion.description,
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Chip(
+                                    label: Text(suggestion.category),
+                                    backgroundColor: const Color(
+                                      0xFF005156,
+                                    ).withOpacity(0.1),
+                                    labelStyle: const TextStyle(
+                                      color: Color(0xFF005156),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          suggestion.userVote == 1
+                                              ? Icons.thumb_up
+                                              : Icons.thumb_up_outlined,
+                                          color: suggestion.userVote == 1
+                                              ? const Color(0xFF005156)
+                                              : Colors.grey,
+                                          size: 18,
+                                        ),
+                                        onPressed: () =>
+                                            controller.voteSuggestion(
+                                              suggestion.id,
+                                              suggestion.userVote == 1 ? 0 : 1,
+                                            ),
+                                      ),
+                                      Text(
+                                        '${suggestion.upvotes}',
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      IconButton(
+                                        icon: Icon(
+                                          suggestion.userVote == -1
+                                              ? Icons.thumb_down
+                                              : Icons.thumb_down_outlined,
+                                          color: suggestion.userVote == -1
+                                              ? Colors.red
+                                              : Colors.grey,
+                                          size: 18,
+                                        ),
+                                        onPressed: () =>
+                                            controller.voteSuggestion(
+                                              suggestion.id,
+                                              suggestion.userVote == -1
+                                                  ? 0
+                                                  : -1,
+                                            ),
+                                      ),
+                                      Text(
+                                        '${suggestion.downvotes}',
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              if (suggestion.adminResponse != null) ...[
+                                const Divider(),
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Row(
+                                        children: [
+                                          Icon(
+                                            Icons.admin_panel_settings,
+                                            size: 16,
+                                            color: Colors.blue,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            'Resposta da Equipe',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        suggestion.adminResponse!,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 8),
+                              Text(
+                                'Enviado em ${_formatDate(suggestion.createdAt)}',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
         ),
       ],
     );
@@ -340,7 +356,10 @@ class FeedbackScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                 ),
               ),
             ],
@@ -358,10 +377,7 @@ class FeedbackScreen extends StatelessWidget {
                       SizedBox(height: 16),
                       Text(
                         'Nenhum problema reportado',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -381,7 +397,7 @@ class FeedbackScreen extends StatelessWidget {
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor: _getBugPriorityColor(bug.priority),
-                          child: Icon(
+                          child: const Icon(
                             Icons.bug_report,
                             color: Colors.white,
                             size: 20,
@@ -460,10 +476,7 @@ class FeedbackScreen extends StatelessWidget {
                   SizedBox(height: 16),
                   Text(
                     'Roadmap em breve',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -524,7 +537,11 @@ class FeedbackScreen extends StatelessWidget {
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              const Icon(Icons.schedule, size: 16, color: Colors.grey),
+                              const Icon(
+                                Icons.schedule,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 'Previsão: ${_formatDate(item.estimatedDate!)}',
@@ -542,7 +559,8 @@ class FeedbackScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     'Progresso',
@@ -574,7 +592,11 @@ class FeedbackScreen extends StatelessWidget {
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              const Icon(Icons.how_to_vote, size: 16, color: Colors.grey),
+                              const Icon(
+                                Icons.how_to_vote,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 '${item.votes} votos da comunidade',
@@ -645,12 +667,7 @@ class FeedbackScreen extends StatelessWidget {
             Text('Reportado em: ${_formatDate(bug.createdAt)}'),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
-        ],
+        actions: [TextButton(onPressed: Get.back, child: const Text('Fechar'))],
       ),
     );
   }

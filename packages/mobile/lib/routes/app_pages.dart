@@ -1,62 +1,62 @@
 import 'package:get/get.dart';
 
 // Onboarding and Auth screens
-import '../features/onboarding/screens/splash_screen.dart';
-import '../features/onboarding/screens/onboarding_screen.dart';
-import '../features/auth/screens/login_screen.dart';
-import '../features/auth/screens/register_screen.dart';
-import '../features/auth/screens/forgot_password_screen.dart';
+import 'package:singleclin_mobile/features/onboarding/screens/splash_screen.dart';
+import 'package:singleclin_mobile/features/onboarding/screens/onboarding_screen.dart';
+import 'package:singleclin_mobile/features/auth/screens/login_screen.dart';
+import 'package:singleclin_mobile/features/auth/screens/register_screen.dart';
+import 'package:singleclin_mobile/features/auth/screens/forgot_password_screen.dart';
 
-// Dashboard screens  
-import '../features/dashboard/screens/dashboard_screen.dart';
-import '../features/dashboard/screens/home_screen.dart';
+// Dashboard screens
+import 'package:singleclin_mobile/features/dashboard/screens/dashboard_screen.dart';
+import 'package:singleclin_mobile/features/dashboard/screens/home_screen.dart';
 
-import '../features/discovery/screens/discovery_screen.dart';
-import '../features/discovery/screens/clinic_details_screen.dart';
-import '../features/discovery/screens/map_view_screen.dart';
-import '../features/discovery/screens/filters_screen.dart';
-import '../features/discovery/screens/booking_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/discovery_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/clinic_details_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/map_view_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/filters_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/booking_screen.dart';
 
 // Module 3 - Appointments screens
-import '../features/appointments/screens/appointments_screen.dart';
-import '../features/appointments/screens/appointment_details_screen.dart';
-import '../features/appointments/screens/cancellation_policy_screen.dart';
+import 'package:singleclin_mobile/features/appointments/screens/appointments_screen.dart';
+import 'package:singleclin_mobile/features/appointments/screens/appointment_details_screen.dart';
+import 'package:singleclin_mobile/features/appointments/screens/cancellation_policy_screen.dart';
 
 // Module 3 - Profile screens
-import '../features/profile/screens/profile_screen.dart';
-import '../features/profile/screens/health_history_screen.dart';
-import '../features/profile/screens/documents_screen.dart';
+import 'package:singleclin_mobile/features/profile/screens/profile_screen.dart';
+import 'package:singleclin_mobile/features/profile/screens/health_history_screen.dart';
+import 'package:singleclin_mobile/features/profile/screens/documents_screen.dart';
 
 // Credits screens
-import '../features/credits/screens/credit_history_screen.dart';
-import '../features/credits/screens/subscription_plans_screen.dart';
-import '../features/credits/bindings/credits_binding.dart';
+import 'package:singleclin_mobile/features/credits/screens/credit_history_screen.dart';
+import 'package:singleclin_mobile/features/credits/screens/subscription_plans_screen.dart';
+import 'package:singleclin_mobile/features/credits/bindings/credits_binding.dart';
 
 // Bindings
-import '../features/onboarding/controllers/onboarding_binding.dart';
-import '../features/auth/controllers/auth_binding.dart';
-import '../features/dashboard/controllers/dashboard_binding.dart';
-import '../features/discovery/controllers/discovery_binding.dart';
+import 'package:singleclin_mobile/features/onboarding/controllers/onboarding_binding.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_binding.dart';
+import 'package:singleclin_mobile/features/dashboard/controllers/dashboard_binding.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_binding.dart';
 
 // Module 3 - Bindings
-import '../features/appointments/bindings/appointments_binding.dart';
-import '../features/profile/bindings/profile_binding.dart';
+import 'package:singleclin_mobile/features/appointments/bindings/appointments_binding.dart';
+import 'package:singleclin_mobile/features/profile/bindings/profile_binding.dart';
 
 // Module 5 - Engagement screens and bindings
-import '../features/engagement/screens/reviews_screen.dart';
-import '../features/engagement/screens/write_review_screen.dart';
-import '../features/engagement/screens/support_screen.dart';
-import '../features/engagement/screens/faq_screen.dart';
-import '../features/engagement/screens/community_screen.dart';
-import '../features/engagement/screens/feedback_screen.dart';
-import '../features/engagement/screens/trust_center_screen.dart';
-import '../features/engagement/bindings/engagement_binding.dart';
+import 'package:singleclin_mobile/features/engagement/screens/reviews_screen.dart';
+import 'package:singleclin_mobile/features/engagement/screens/write_review_screen.dart';
+import 'package:singleclin_mobile/features/engagement/screens/support_screen.dart';
+import 'package:singleclin_mobile/features/engagement/screens/faq_screen.dart';
+import 'package:singleclin_mobile/features/engagement/screens/community_screen.dart';
+import 'package:singleclin_mobile/features/engagement/screens/feedback_screen.dart';
+import 'package:singleclin_mobile/features/engagement/screens/trust_center_screen.dart';
+import 'package:singleclin_mobile/features/engagement/bindings/engagement_binding.dart';
 
 // Clinic services
-import '../features/clinic_services/screens/clinic_services_screen.dart';
-import '../features/appointment_booking/screens/appointment_booking_screen.dart';
+import 'package:singleclin_mobile/features/clinic_services/screens/clinic_services_screen.dart';
+import 'package:singleclin_mobile/features/appointment_booking/screens/appointment_booking_screen.dart';
 
-import 'app_routes.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class AppPages {
   static final routes = [
@@ -86,7 +86,7 @@ class AppPages {
       page: () => const ForgotPasswordScreen(),
       binding: AuthBinding(),
     ),
-    
+
     // Dashboard Routes
     GetPage(
       name: AppRoutes.dashboard,
@@ -98,7 +98,7 @@ class AppPages {
       page: () => const HomeScreen(),
       binding: DashboardBinding(),
     ),
-    
+
     // Discovery Routes
     GetPage(
       name: AppRoutes.discovery,
@@ -112,7 +112,10 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.mapView,
-      page: () => MapViewScreen(clinics: Get.arguments['clinics'], onClinicTap: Get.arguments['onClinicTap']),
+      page: () => MapViewScreen(
+        clinics: Get.arguments['clinics'],
+        onClinicTap: Get.arguments['onClinicTap'],
+      ),
       binding: DiscoveryBinding(),
     ),
     GetPage(
@@ -129,11 +132,8 @@ class AppPages {
       name: AppRoutes.appointmentBooking,
       page: () => AppointmentBookingScreen(clinic: Get.arguments),
     ),
-    GetPage(
-      name: AppRoutes.clinicServices,
-      page: () => ClinicServicesScreen(),
-    ),
-    
+    GetPage(name: AppRoutes.clinicServices, page: ClinicServicesScreen.new),
+
     // Module 3 - Appointment Routes
     GetPage(
       name: AppRoutes.appointments,
@@ -150,7 +150,7 @@ class AppPages {
       page: () => const CancellationPolicyScreen(),
       binding: AppointmentsBinding(),
     ),
-    
+
     // Module 3 - Profile Routes
     GetPage(
       name: AppRoutes.profile,
@@ -167,7 +167,7 @@ class AppPages {
       page: () => const DocumentsScreen(),
       binding: ProfileBinding(),
     ),
-    
+
     // Module 5 - Engagement Routes
     GetPage(
       name: AppRoutes.reviews,

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../models/wallet_balance.dart';
+import 'package:singleclin_mobile/features/credits/models/wallet_balance.dart';
 
 class WalletController extends GetxController {
   // Reactive variables
@@ -40,7 +40,7 @@ class WalletController extends GetxController {
   double get monthlySgSpending => walletSummary?.monthlySgSpending ?? 0;
   double get monthlyCashbackEarned => walletSummary?.monthlyCashbackEarned ?? 0;
   
-  String get totalWalletValueDisplay => walletSummary?.totalWalletValueDisplay ?? 'R\$ 0,00';
+  String get totalWalletValueDisplay => walletSummary?.totalWalletValueDisplay ?? r'R$ 0,00';
   bool get hasAnyBalance => walletSummary?.hasAnyBalance ?? false;
 
   List<WalletBalance> get availableBalances => walletSummary?.balances ?? [];
@@ -521,7 +521,7 @@ class WalletController extends GetxController {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Get.back(),
+                onPressed: Get.back,
                 child: const Text('Fechar'),
               ),
             ),
@@ -572,8 +572,4 @@ class WalletController extends GetxController {
 
   int get unreadNotificationsCount => unreadNotifications.length;
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 }

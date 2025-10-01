@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../models/support_ticket.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/support_ticket.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Chat bubble widget for support conversations
 class SupportChatBubble extends StatelessWidget {
-  final TicketMessage message;
-  final bool isUser;
-  final bool showTimestamp;
-  final bool showSenderName;
-
   const SupportChatBubble({
     Key? key,
     required this.message,
@@ -18,13 +13,19 @@ class SupportChatBubble extends StatelessWidget {
     this.showTimestamp = true,
     this.showSenderName = true,
   }) : super(key: key);
+  final TicketMessage message;
+  final bool isUser;
+  final bool showTimestamp;
+  final bool showSenderName;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Column(
-        crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isUser
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           if (showSenderName && !isUser)
             Padding(
@@ -56,7 +57,10 @@ class SupportChatBubble extends StatelessWidget {
                   if (message.senderRole == 'agent')
                     Container(
                       margin: const EdgeInsets.only(left: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 1,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(4),
@@ -73,7 +77,9 @@ class SupportChatBubble extends StatelessWidget {
               ),
             ),
           Row(
-            mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment: isUser
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               if (!isUser && showTimestamp)
@@ -81,9 +87,7 @@ class SupportChatBubble extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 8, bottom: 4),
                   child: _buildTimestamp(context),
                 ),
-              Flexible(
-                child: _buildBubbleContent(context),
-              ),
+              Flexible(child: _buildBubbleContent(context)),
               if (isUser && showTimestamp)
                 Padding(
                   padding: const EdgeInsets.only(left: 8, bottom: 4),
@@ -103,7 +107,9 @@ class SupportChatBubble extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isUser ? AppColors.primary : AppColors.lightGrey.withOpacity(0.3),
+        color: isUser
+            ? AppColors.primary
+            : AppColors.lightGrey.withOpacity(0.3),
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(18),
           topRight: const Radius.circular(18),
@@ -144,11 +150,7 @@ class SupportChatBubble extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.info_outline,
-                size: 16,
-                color: AppColors.info,
-              ),
+              const Icon(Icons.info_outline, size: 16, color: AppColors.info),
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
@@ -174,7 +176,7 @@ class SupportChatBubble extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.smart_toy,
                     size: 16,
                     color: AppColors.sgPrimary,
@@ -192,9 +194,9 @@ class SupportChatBubble extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 message.message,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.darkGrey,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.darkGrey),
               ),
             ],
           ),
@@ -236,9 +238,7 @@ class SupportChatBubble extends StatelessWidget {
             width: 200,
             height: 150,
             color: AppColors.lightGrey,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            child: const Center(child: CircularProgressIndicator()),
           ),
           errorWidget: (context, url, error) => Container(
             width: 200,
@@ -249,10 +249,7 @@ class SupportChatBubble extends StatelessWidget {
               children: [
                 Icon(Icons.error, color: AppColors.error),
                 SizedBox(height: 4),
-                Text(
-                  'Erro ao carregar imagem',
-                  style: TextStyle(fontSize: 12),
-                ),
+                Text('Erro ao carregar imagem', style: TextStyle(fontSize: 12)),
               ],
             ),
           ),
@@ -263,13 +260,13 @@ class SupportChatBubble extends StatelessWidget {
 
   Widget _buildFileAttachment(BuildContext context, String fileUrl) {
     final fileName = fileUrl.split('/').last;
-    
+
     return Container(
       margin: const EdgeInsets.only(top: 4),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: isUser 
-            ? Colors.white.withOpacity(0.2) 
+        color: isUser
+            ? Colors.white.withOpacity(0.2)
             : AppColors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -315,23 +312,24 @@ class SupportChatBubble extends StatelessWidget {
 
 /// Live chat bubble for real-time support
 class LiveChatBubble extends StatelessWidget {
-  final ChatMessage message;
-  final bool isUser;
-  final bool showAvatar;
-
   const LiveChatBubble({
     Key? key,
     required this.message,
     required this.isUser,
     this.showAvatar = true,
   }) : super(key: key);
+  final ChatMessage message;
+  final bool isUser;
+  final bool showAvatar;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isUser && showAvatar) ...[
@@ -399,10 +397,7 @@ class LiveChatBubble extends StatelessWidget {
 class TypingIndicator extends StatefulWidget {
   final String senderName;
 
-  const TypingIndicator({
-    Key? key,
-    this.senderName = 'Atendente',
-  }) : super(key: key);
+  const TypingIndicator({super.key, this.senderName = 'Atendente'});
 
   @override
   State<TypingIndicator> createState() => _TypingIndicatorState();
@@ -420,7 +415,10 @@ class _TypingIndicatorState extends State<TypingIndicator>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     )..repeat();
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_animationController);
   }
 
   @override
@@ -477,9 +475,12 @@ class _TypingIndicatorState extends State<TypingIndicator>
                     return Row(
                       children: List.generate(3, (index) {
                         final delay = index * 0.2;
-                        final animationValue = (_animation.value - delay).clamp(0.0, 1.0);
+                        final animationValue = (_animation.value - delay).clamp(
+                          0.0,
+                          1.0,
+                        );
                         final opacity = (animationValue * 2 - 1).abs();
-                        
+
                         return Container(
                           margin: const EdgeInsets.symmetric(horizontal: 1),
                           width: 4,
@@ -508,10 +509,10 @@ class ChatStatusIndicator extends StatelessWidget {
   final int queuePosition;
 
   const ChatStatusIndicator({
-    Key? key,
+    super.key,
     required this.status,
     this.queuePosition = 0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -519,12 +520,7 @@ class ChatStatusIndicator extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: _getStatusColor().withOpacity(0.1),
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.lightGrey,
-            width: 1,
-          ),
-        ),
+        border: const Border(bottom: BorderSide(color: AppColors.lightGrey)),
       ),
       child: Row(
         children: [
@@ -582,7 +578,7 @@ class ChatStatusIndicator extends StatelessWidget {
   String _getStatusText() {
     switch (status) {
       case ChatStatus.waiting:
-        return queuePosition > 0 
+        return queuePosition > 0
             ? 'Aguardando na fila - Posição $queuePosition'
             : 'Aguardando atendente disponível...';
       case ChatStatus.active:
@@ -597,14 +593,13 @@ class ChatStatusIndicator extends StatelessWidget {
 
 /// Quick reply buttons for support chat
 class QuickReplyButtons extends StatelessWidget {
-  final List<String> replies;
-  final Function(String) onReplySelected;
-
   const QuickReplyButtons({
     Key? key,
     required this.replies,
     required this.onReplySelected,
   }) : super(key: key);
+  final List<String> replies;
+  final Function(String) onReplySelected;
 
   @override
   Widget build(BuildContext context) {
@@ -630,17 +625,20 @@ class QuickReplyButtons extends StatelessWidget {
               return OutlinedButton(
                 onPressed: () => onReplySelected(reply),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  side: BorderSide(color: AppColors.primary),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
                 child: Text(
                   reply,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primary,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.primary),
                 ),
               );
             }).toList(),

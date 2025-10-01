@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
-import '../../../features/auth/controllers/auth_controller.dart';
-import '../../../features/clinic_discovery/models/clinic.dart';
-import '../../../features/appointment/models/appointment_model.dart';
-import '../../../core/constants/app_constants.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/appointment/models/appointment_model.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
 
 class DashboardController extends GetxController {
   final ClinicApiService _clinicApiService = ClinicApiService();
@@ -137,10 +137,10 @@ class DashboardController extends GetxController {
       final results = await _clinicApiService.searchClinics(query);
 
       // Navegar para tela de resultados com os dados reais
-      Get.toNamed('/search-results', arguments: {
-        'query': query,
-        'clinics': results,
-      });
+      Get.toNamed(
+        '/search-results',
+        arguments: {'query': query, 'clinics': results},
+      );
     } catch (e) {
       _error.value = 'Erro na busca: $e';
     }
@@ -152,10 +152,10 @@ class DashboardController extends GetxController {
       // Buscar clínicas da categoria usando serviço real
       final clinics = await _clinicApiService.getActiveClinics();
 
-      Get.toNamed('/discovery', arguments: {
-        'category': category,
-        'clinics': clinics,
-      });
+      Get.toNamed(
+        '/discovery',
+        arguments: {'category': category, 'clinics': clinics},
+      );
     } catch (e) {
       _error.value = 'Erro ao carregar categoria: $e';
     }
@@ -167,10 +167,10 @@ class DashboardController extends GetxController {
       // Buscar dados da clínica usando serviço real
       final clinic = await _clinicApiService.getClinicById(clinicId);
 
-      Get.toNamed('/clinic-details', arguments: {
-        'clinicId': clinicId,
-        'clinic': clinic,
-      });
+      Get.toNamed(
+        '/clinic-details',
+        arguments: {'clinicId': clinicId, 'clinic': clinic},
+      );
     } catch (e) {
       _error.value = 'Erro ao carregar detalhes da clínica: $e';
     }
@@ -178,19 +178,19 @@ class DashboardController extends GetxController {
 
   /// Navegar para detalhes do serviço
   void navigateToService(String serviceId) {
-    Get.toNamed('/service-details', arguments: {
-      'serviceId': serviceId,
-    });
+    Get.toNamed('/service-details', arguments: {'serviceId': serviceId});
   }
 
   /// Navegar para detalhes do agendamento
   void navigateToAppointment(String appointmentId) {
-    Get.toNamed('/appointment-details', arguments: {
-      'appointmentId': appointmentId,
-    });
+    Get.toNamed(
+      '/appointment-details',
+      arguments: {'appointmentId': appointmentId},
+    );
   }
 
   /// Refresh dos dados
+  @override
   Future<void> refresh() async {
     await loadDashboardData();
   }
@@ -213,10 +213,10 @@ class DashboardController extends GetxController {
   /// Obter dias até renovação dos créditos
   int get daysUntilCreditsRenew {
     if (creditsRenewDate == null) return 0;
-    
+
     final now = DateTime.now();
     final difference = creditsRenewDate!.difference(now);
-    
+
     return difference.inDays > 0 ? difference.inDays : 0;
   }
 
@@ -228,7 +228,7 @@ class DashboardController extends GetxController {
   /// Obter saudação baseada no horário
   String get greeting {
     final hour = DateTime.now().hour;
-    
+
     if (hour < 12) {
       return 'Bom dia';
     } else if (hour < 18) {

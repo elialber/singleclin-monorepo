@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import '../controllers/appointment_details_controller.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/appointments/controllers/appointment_details_controller.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Status Timeline Widget
 /// Displays appointment status timeline with visual indicators
 class StatusTimeline extends StatelessWidget {
+  const StatusTimeline({Key? key, required this.events}) : super(key: key);
   final List<TimelineEvent> events;
-
-  const StatusTimeline({
-    Key? key,
-    required this.events,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,16 +15,18 @@ class StatusTimeline extends StatelessWidget {
         final index = entry.key;
         final event = entry.value;
         final isLast = index == events.length - 1;
-        
+
         return _buildTimelineItem(event, isLast);
       }).toList(),
     );
   }
 
   Widget _buildTimelineItem(TimelineEvent event, bool isLast) {
-    final statusColor = Color(int.parse(event.status.color.substring(1), radix: 16) + 0xFF000000);
+    final statusColor = Color(
+      int.parse(event.status.color.substring(1), radix: 16) + 0xFF000000,
+    );
     final icon = _getIconData(event.icon);
-    
+
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,8 +38,8 @@ class StatusTimeline extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: event.status == TimelineEventStatus.current 
-                      ? statusColor 
+                  color: event.status == TimelineEventStatus.current
+                      ? statusColor
                       : statusColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -52,8 +50,8 @@ class StatusTimeline extends StatelessWidget {
                 child: Icon(
                   icon,
                   size: 20,
-                  color: event.status == TimelineEventStatus.current 
-                      ? Colors.white 
+                  color: event.status == TimelineEventStatus.current
+                      ? Colors.white
                       : statusColor,
                 ),
               ),

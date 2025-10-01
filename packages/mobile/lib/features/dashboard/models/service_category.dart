@@ -1,20 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Service category model for the SingleClin dashboard
 class ServiceCategory {
-  final String id;
-  final String name;
-  final String description;
-  final IconData icon;
-  final Color color;
-  final String imageAsset;
-  final int serviceCount;
-  final double averageRating;
-  final bool isPopular;
-  final bool isNew;
-  final List<String> popularServices;
-
   const ServiceCategory({
     required this.id,
     required this.name,
@@ -46,6 +34,17 @@ class ServiceCategory {
           : const [],
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final IconData icon;
+  final Color color;
+  final String imageAsset;
+  final int serviceCount;
+  final double averageRating;
+  final bool isPopular;
+  final bool isNew;
+  final List<String> popularServices;
 
   Map<String, dynamic> toJson() {
     return {

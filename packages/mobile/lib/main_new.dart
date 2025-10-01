@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'firebase_options.dart';
-import 'core/constants/app_constants.dart';
-import 'core/themes/app_theme.dart';
-import 'core/utils/app_bindings.dart';
-import 'routes/app_pages.dart';
-import 'routes/app_routes.dart';
+import 'package:singleclin_mobile/firebase_options.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
+import 'package:singleclin_mobile/core/themes/app_theme.dart';
+import 'package:singleclin_mobile/core/utils/app_bindings.dart';
+import 'package:singleclin_mobile/routes/app_pages.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,7 @@ void main() async {
 }
 
 class SingleClinApp extends StatelessWidget {
-  const SingleClinApp({Key? key}) : super(key: key);
+  const SingleClinApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +56,9 @@ class SingleClinApp extends StatelessWidget {
       // Error handling
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: const TextScaler.linear(1.0),
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: child!,
         );
       },

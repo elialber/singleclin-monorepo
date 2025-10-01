@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/appointment_details_controller.dart';
-import '../widgets/status_timeline.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/appointments/controllers/appointment_details_controller.dart';
+import 'package:singleclin_mobile/features/appointments/widgets/status_timeline.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Appointment Details Screen
 /// Shows detailed appointment information with timeline and actions
 class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
-  const AppointmentDetailsScreen({Key? key}) : super(key: key);
+  const AppointmentDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +64,7 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
 
         final appointment = controller.appointment;
         if (appointment == null) {
-          return const Center(
-            child: Text('Agendamento não encontrado'),
-          );
+          return const Center(child: Text('Agendamento não encontrado'));
         }
 
         return SingleChildScrollView(
@@ -127,9 +125,14 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
                     ),
                     const SizedBox(height: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.getCategoryColor(appointment.categoryName).withOpacity(0.1),
+                        color: AppColors.getCategoryColor(
+                          appointment.categoryName,
+                        ).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -137,7 +140,9 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.getCategoryColor(appointment.categoryName),
+                          color: AppColors.getCategoryColor(
+                            appointment.categoryName,
+                          ),
                         ),
                       ),
                     ),
@@ -151,7 +156,8 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
           _buildInfoRow(
             icon: Icons.calendar_today,
             title: 'Data e Horário',
-            value: '${appointment.formattedDate} às ${appointment.formattedTime}',
+            value:
+                '${appointment.formattedDate} às ${appointment.formattedTime}',
           ),
           const SizedBox(height: 12),
           _buildInfoRow(
@@ -171,7 +177,8 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
           _buildInfoRow(
             icon: Icons.schedule,
             title: 'Duração',
-            value: '${appointment.metadata?['procedureDuration'] ?? 60} minutos',
+            value:
+                '${appointment.metadata?['procedureDuration'] ?? 60} minutos',
           ),
         ],
       ),
@@ -185,11 +192,7 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: AppColors.primary,
-        ),
+        Icon(icon, size: 20, color: AppColors.primary),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -270,21 +273,14 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
         decoration: BoxDecoration(
           color: AppColors.info.withOpacity(0.05),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: AppColors.info.withOpacity(0.2),
-            width: 1,
-          ),
+          border: Border.all(color: AppColors.info.withOpacity(0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Row(
               children: [
-                Icon(
-                  Icons.info_outline,
-                  color: AppColors.info,
-                  size: 20,
-                ),
+                Icon(Icons.info_outline, color: AppColors.info, size: 20),
                 SizedBox(width: 8),
                 Text(
                   'Instruções Importantes',
@@ -297,17 +293,19 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
               ],
             ),
             const SizedBox(height: 12),
-            ...instructions.map((instruction) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                instruction,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textPrimary,
-                  height: 1.4,
+            ...instructions.map(
+              (instruction) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  instruction,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
+                    height: 1.4,
+                  ),
                 ),
               ),
-            )),
+            ),
           ],
         ),
       );
@@ -365,9 +363,12 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
           ],
           Row(
             children: [
-              if (parking == true) ...[
+              if (parking ?? false) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.success.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -394,9 +395,12 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
                 ),
                 const SizedBox(width: 8),
               ],
-              if (wheelchair == true) ...[
+              if (wheelchair ?? false) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.info.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -404,11 +408,7 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.accessible,
-                        size: 14,
-                        color: AppColors.info,
-                      ),
+                      Icon(Icons.accessible, size: 14, color: AppColors.info),
                       SizedBox(width: 4),
                       Text(
                         'Acessível',
@@ -457,7 +457,10 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildPriceRow('Valor do serviço', 'R\$ ${appointment.price.toStringAsFixed(2)}'),
+          _buildPriceRow(
+            'Valor do serviço',
+            'R\$ ${appointment.price.toStringAsFixed(2)}',
+          ),
           if (appointment.sgCreditsUsed > 0) ...[
             const SizedBox(height: 8),
             _buildPriceRow(
@@ -507,7 +510,12 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
     );
   }
 
-  Widget _buildPriceRow(String label, String value, {Color? color, bool isTotal = false}) {
+  Widget _buildPriceRow(
+    String label,
+    String value, {
+    Color? color,
+    bool isTotal = false,
+  }) {
     return Row(
       children: [
         Expanded(
@@ -544,23 +552,33 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
           children: [
             if (actions.length <= 2)
               Row(
-                children: actions.map((action) => Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      right: actions.indexOf(action) < actions.length - 1 ? 12 : 0,
-                    ),
-                    child: _buildActionButton(action),
-                  ),
-                )).toList(),
+                children: actions
+                    .map(
+                      (action) => Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            right: actions.indexOf(action) < actions.length - 1
+                                ? 12
+                                : 0,
+                          ),
+                          child: _buildActionButton(action),
+                        ),
+                      ),
+                    )
+                    .toList(),
               )
             else
               Wrap(
                 spacing: 12,
                 runSpacing: 12,
-                children: actions.map((action) => SizedBox(
-                  width: (Get.width - 44) / 2,
-                  child: _buildActionButton(action),
-                )).toList(),
+                children: actions
+                    .map(
+                      (action) => SizedBox(
+                        width: (Get.width - 44) / 2,
+                        child: _buildActionButton(action),
+                      ),
+                    )
+                    .toList(),
               ),
           ],
         ),
@@ -569,7 +587,9 @@ class AppointmentDetailsScreen extends GetView<AppointmentDetailsController> {
   }
 
   Widget _buildActionButton(action) {
-    final color = Color(int.parse(action.color.substring(1), radix: 16) + 0xFF000000);
+    final color = Color(
+      int.parse(action.color.substring(1), radix: 16) + 0xFF000000,
+    );
     final icon = _getIconData(action.icon);
 
     return OutlinedButton.icon(

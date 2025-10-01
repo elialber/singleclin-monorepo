@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/presentation/controllers/base_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:singleclin_mobile/presentation/controllers/base_controller.dart';
 
 /// Controller for managing app theme
 class ThemeController extends BaseController {

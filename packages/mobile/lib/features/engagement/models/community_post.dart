@@ -2,30 +2,6 @@ import 'package:equatable/equatable.dart';
 
 /// Community post model for user interactions
 class CommunityPost extends Equatable {
-  final String id;
-  final String userId;
-  final String userName;
-  final String userAvatar;
-  final String title;
-  final String content;
-  final PostType type;
-  final CommunityGroup group;
-  final List<String> images;
-  final List<String> tags;
-  final int likesCount;
-  final int commentsCount;
-  final int sharesCount;
-  final bool isLikedByMe;
-  final bool isBookmarked;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  final PostStatus status;
-  final List<PostComment> comments;
-  final bool isAnonymous;
-  final PostVisibility visibility;
-  final String? clinicId;
-  final String? clinicName;
-
   const CommunityPost({
     required this.id,
     required this.userId,
@@ -83,9 +59,11 @@ class CommunityPost extends Equatable {
         (s) => s.name == json['status'],
         orElse: () => PostStatus.published,
       ),
-      comments: (json['comments'] as List<dynamic>?)
-          ?.map((c) => PostComment.fromJson(c as Map<String, dynamic>))
-          .toList() ?? [],
+      comments:
+          (json['comments'] as List<dynamic>?)
+              ?.map((c) => PostComment.fromJson(c as Map<String, dynamic>))
+              .toList() ??
+          [],
       isAnonymous: json['isAnonymous'] as bool,
       visibility: PostVisibility.values.firstWhere(
         (v) => v.name == json['visibility'],
@@ -95,6 +73,29 @@ class CommunityPost extends Equatable {
       clinicName: json['clinicName'] as String?,
     );
   }
+  final String id;
+  final String userId;
+  final String userName;
+  final String userAvatar;
+  final String title;
+  final String content;
+  final PostType type;
+  final CommunityGroup group;
+  final List<String> images;
+  final List<String> tags;
+  final int likesCount;
+  final int commentsCount;
+  final int sharesCount;
+  final bool isLikedByMe;
+  final bool isBookmarked;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final PostStatus status;
+  final List<PostComment> comments;
+  final bool isAnonymous;
+  final PostVisibility visibility;
+  final String? clinicId;
+  final String? clinicName;
 
   Map<String, dynamic> toJson() {
     return {
@@ -178,49 +179,34 @@ class CommunityPost extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        userName,
-        userAvatar,
-        title,
-        content,
-        type,
-        group,
-        images,
-        tags,
-        likesCount,
-        commentsCount,
-        sharesCount,
-        isLikedByMe,
-        isBookmarked,
-        createdAt,
-        updatedAt,
-        status,
-        comments,
-        isAnonymous,
-        visibility,
-        clinicId,
-        clinicName,
-      ];
+    id,
+    userId,
+    userName,
+    userAvatar,
+    title,
+    content,
+    type,
+    group,
+    images,
+    tags,
+    likesCount,
+    commentsCount,
+    sharesCount,
+    isLikedByMe,
+    isBookmarked,
+    createdAt,
+    updatedAt,
+    status,
+    comments,
+    isAnonymous,
+    visibility,
+    clinicId,
+    clinicName,
+  ];
 }
 
 /// Post comment model
 class PostComment extends Equatable {
-  final String id;
-  final String postId;
-  final String userId;
-  final String userName;
-  final String userAvatar;
-  final String content;
-  final List<String> images;
-  final int likesCount;
-  final bool isLikedByMe;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  final bool isAnonymous;
-  final String? parentCommentId;
-  final List<PostComment> replies;
-
   const PostComment({
     required this.id,
     required this.postId,
@@ -255,11 +241,27 @@ class PostComment extends Equatable {
           : null,
       isAnonymous: json['isAnonymous'] as bool,
       parentCommentId: json['parentCommentId'] as String?,
-      replies: (json['replies'] as List<dynamic>?)
-          ?.map((r) => PostComment.fromJson(r as Map<String, dynamic>))
-          .toList() ?? [],
+      replies:
+          (json['replies'] as List<dynamic>?)
+              ?.map((r) => PostComment.fromJson(r as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
+  final String id;
+  final String postId;
+  final String userId;
+  final String userName;
+  final String userAvatar;
+  final String content;
+  final List<String> images;
+  final int likesCount;
+  final bool isLikedByMe;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final bool isAnonymous;
+  final String? parentCommentId;
+  final List<PostComment> replies;
 
   Map<String, dynamic> toJson() {
     return {
@@ -282,43 +284,25 @@ class PostComment extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        postId,
-        userId,
-        userName,
-        userAvatar,
-        content,
-        images,
-        likesCount,
-        isLikedByMe,
-        createdAt,
-        updatedAt,
-        isAnonymous,
-        parentCommentId,
-        replies,
-      ];
+    id,
+    postId,
+    userId,
+    userName,
+    userAvatar,
+    content,
+    images,
+    likesCount,
+    isLikedByMe,
+    createdAt,
+    updatedAt,
+    isAnonymous,
+    parentCommentId,
+    replies,
+  ];
 }
 
 /// Community event model
 class CommunityEvent extends Equatable {
-  final String id;
-  final String title;
-  final String description;
-  final EventType type;
-  final DateTime startTime;
-  final DateTime endTime;
-  final String? location;
-  final String? meetingLink;
-  final List<String> speakers;
-  final List<String> tags;
-  final int attendeesCount;
-  final int maxAttendees;
-  final bool isAttending;
-  final bool isReminder;
-  final EventStatus status;
-  final String? recordingUrl;
-  final List<String> materials;
-
   const CommunityEvent({
     required this.id,
     required this.title,
@@ -366,6 +350,23 @@ class CommunityEvent extends Equatable {
       materials: List<String>.from(json['materials'] as List),
     );
   }
+  final String id;
+  final String title;
+  final String description;
+  final EventType type;
+  final DateTime startTime;
+  final DateTime endTime;
+  final String? location;
+  final String? meetingLink;
+  final List<String> speakers;
+  final List<String> tags;
+  final int attendeesCount;
+  final int maxAttendees;
+  final bool isAttending;
+  final bool isReminder;
+  final EventStatus status;
+  final String? recordingUrl;
+  final List<String> materials;
 
   Map<String, dynamic> toJson() {
     return {
@@ -391,24 +392,24 @@ class CommunityEvent extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        type,
-        startTime,
-        endTime,
-        location,
-        meetingLink,
-        speakers,
-        tags,
-        attendeesCount,
-        maxAttendees,
-        isAttending,
-        isReminder,
-        status,
-        recordingUrl,
-        materials,
-      ];
+    id,
+    title,
+    description,
+    type,
+    startTime,
+    endTime,
+    location,
+    meetingLink,
+    speakers,
+    tags,
+    attendeesCount,
+    maxAttendees,
+    isAttending,
+    isReminder,
+    status,
+    recordingUrl,
+    materials,
+  ];
 }
 
 /// Enums for community functionality
@@ -419,7 +420,7 @@ enum PostType {
   beforeAfter,
   recommendation,
   story,
-  review
+  review,
 }
 
 enum CommunityGroup {
@@ -431,51 +432,19 @@ enum CommunityGroup {
   weightLoss,
   skincare,
   antiAging,
-  wellness
+  wellness,
 }
 
-enum PostStatus {
-  draft,
-  published,
-  archived,
-  flagged,
-  removed
-}
+enum PostStatus { draft, published, archived, flagged, removed }
 
-enum PostVisibility {
-  public,
-  groupOnly,
-  followers,
-  private
-}
+enum PostVisibility { public, groupOnly, followers, private }
 
-enum EventType {
-  webinar,
-  live,
-  workshop,
-  meetup,
-  consultation,
-  qa
-}
+enum EventType { webinar, live, workshop, meetup, consultation, qa }
 
-enum EventStatus {
-  upcoming,
-  live,
-  ended,
-  cancelled
-}
+enum EventStatus { upcoming, live, ended, cancelled }
 
 /// Community statistics
 class CommunityStats extends Equatable {
-  final int totalMembers;
-  final int postsThisWeek;
-  final int myPostsCount;
-  final int myCommentsCount;
-  final int myLikesReceived;
-  final Map<CommunityGroup, int> groupActivity;
-  final List<String> topContributors;
-  final int engagementScore;
-
   const CommunityStats({
     required this.totalMembers,
     required this.postsThisWeek,
@@ -506,16 +475,24 @@ class CommunityStats extends Equatable {
       engagementScore: json['engagementScore'] as int,
     );
   }
+  final int totalMembers;
+  final int postsThisWeek;
+  final int myPostsCount;
+  final int myCommentsCount;
+  final int myLikesReceived;
+  final Map<CommunityGroup, int> groupActivity;
+  final List<String> topContributors;
+  final int engagementScore;
 
   @override
   List<Object> get props => [
-        totalMembers,
-        postsThisWeek,
-        myPostsCount,
-        myCommentsCount,
-        myLikesReceived,
-        groupActivity,
-        topContributors,
-        engagementScore,
-      ];
+    totalMembers,
+    postsThisWeek,
+    myPostsCount,
+    myCommentsCount,
+    myLikesReceived,
+    groupActivity,
+    topContributors,
+    engagementScore,
+  ];
 }

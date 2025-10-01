@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
 
-import '../../../core/services/location_service.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../features/clinic_discovery/models/clinic.dart';
-import '../models/service.dart';
-import '../models/filter_options.dart';
+import 'package:singleclin_mobile/core/services/location_service.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
+import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
 
 /// Main discovery controller managing clinic search, filtering, and display modes
 class DiscoveryController extends GetxController {
@@ -60,7 +60,7 @@ class DiscoveryController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeDiscovery();
-    
+
     // Set up reactive filtering
     debounce(_searchQuery, _performSearch, time: _debounceDelay);
     ever(_filterOptions, (_) => _applyFilters());
@@ -76,7 +76,7 @@ class DiscoveryController extends GetxController {
   Future<void> _initializeDiscovery() async {
     try {
       _isLoading.value = true;
-      
+
       // Load initial data concurrently
       await Future.wait([
         _loadUserLocation(),
@@ -84,7 +84,6 @@ class DiscoveryController extends GetxController {
         _loadPopularServices(),
         _loadInitialClinics(),
       ]);
-      
     } catch (e) {
       _handleError('Erro ao inicializar descoberta', e);
     } finally {
@@ -97,7 +96,7 @@ class DiscoveryController extends GetxController {
     try {
       final position = await _locationService.getCurrentPosition();
       _userLocation.value = position;
-      
+
       // Update filters with user location if not set
       if (_filterOptions.value.location == null) {
         final locationFilter = LocationFilter(
@@ -144,7 +143,6 @@ class DiscoveryController extends GetxController {
       _searchResultsCount.value = clinics.length;
       _hasMoreData.value = false;
       _currentPage.value = 1;
-
     } catch (e) {
       debugPrint('Erro ao carregar clínicas iniciais: $e');
     }
@@ -168,7 +166,7 @@ class DiscoveryController extends GetxController {
   }
 
   /// Perform search with debouncing
-  void _performSearch(String query) async {
+  Future<void> _performSearch(String query) async {
     try {
       _lastSearchTimestamp.value = DateTime.now();
 
@@ -190,7 +188,6 @@ class DiscoveryController extends GetxController {
       _cacheTimestamps[cacheKey] = DateTime.now();
 
       _updateSearchResults(clinics, clinics.length, false);
-
     } catch (e) {
       _handleError('Erro na pesquisa', e);
     } finally {
@@ -220,7 +217,6 @@ class DiscoveryController extends GetxController {
       // TODO: Implementar paginação quando API suportar
       // Por enquanto, não há mais dados para carregar
       _hasMoreData.value = false;
-
     } catch (e) {
       _handleError('Erro ao carregar mais clínicas', e);
     } finally {
@@ -260,7 +256,9 @@ class DiscoveryController extends GetxController {
   /// Filter by category
   void filterByCategory(String category) {
     final categories = CategoryFilter(selectedCategories: [category]);
-    _filterOptions.value = _filterOptions.value.copyWith(categories: categories);
+    _filterOptions.value = _filterOptions.value.copyWith(
+      categories: categories,
+    );
   }
 
   /// Get clinic by ID with details
@@ -293,7 +291,10 @@ class DiscoveryController extends GetxController {
   Future<void> toggleClinicFavorite(String clinicId) async {
     try {
       // TODO: Implementar funcionalidade de favoritos quando API estiver disponível
-      _handleError('Funcionalidade de favoritos em desenvolvimento', 'coming_soon');
+      _handleError(
+        'Funcionalidade de favoritos em desenvolvimento',
+        'coming_soon',
+      );
     } catch (e) {
       _handleError('Erro ao atualizar favorito', e);
     }
@@ -301,7 +302,11 @@ class DiscoveryController extends GetxController {
 
   /// Private helper methods
 
-  void _updateSearchResults(List<Clinic> clinics, int totalCount, bool hasMore) {
+  void _updateSearchResults(
+    List<Clinic> clinics,
+    int totalCount,
+    bool hasMore,
+  ) {
     _clinics.value = clinics;
     _filteredClinics.value = clinics;
     _searchResultsCount.value = totalCount;
@@ -314,10 +319,10 @@ class DiscoveryController extends GetxController {
 
   bool _isCacheValid(String cacheKey) {
     if (!_searchCache.containsKey(cacheKey)) return false;
-    
+
     final timestamp = _cacheTimestamps[cacheKey];
     if (timestamp == null) return false;
-    
+
     return DateTime.now().difference(timestamp) < _cacheValidityDuration;
   }
 
@@ -328,11 +333,7 @@ class DiscoveryController extends GetxController {
 
   void _handleError(String message, dynamic error) {
     debugPrint('$message: $error');
-    Get.snackbar(
-      'Erro',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    Get.snackbar('Erro', message, snackPosition: SnackPosition.BOTTOM);
   }
 }
 
@@ -347,13 +348,12 @@ enum ViewMode {
 
 /// Search response model
 class SearchResponse {
-  final List<Clinic> clinics;
-  final int totalCount;
-  final bool hasMore;
-
   const SearchResponse({
     required this.clinics,
     required this.totalCount,
     required this.hasMore,
   });
+  final List<Clinic> clinics;
+  final int totalCount;
+  final bool hasMore;
 }

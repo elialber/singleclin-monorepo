@@ -13,7 +13,7 @@ class StorageService extends GetxService {
 
   /// Salvar string
   Future<bool> setString(String key, String value) async {
-    return await _prefs.setString(key, value);
+    return _prefs.setString(key, value);
   }
 
   /// Obter string
@@ -23,7 +23,7 @@ class StorageService extends GetxService {
 
   /// Salvar int
   Future<bool> setInt(String key, int value) async {
-    return await _prefs.setInt(key, value);
+    return _prefs.setInt(key, value);
   }
 
   /// Obter int
@@ -33,7 +33,7 @@ class StorageService extends GetxService {
 
   /// Salvar bool
   Future<bool> setBool(String key, bool value) async {
-    return await _prefs.setBool(key, value);
+    return _prefs.setBool(key, value);
   }
 
   /// Obter bool
@@ -43,7 +43,7 @@ class StorageService extends GetxService {
 
   /// Salvar double
   Future<bool> setDouble(String key, double value) async {
-    return await _prefs.setDouble(key, value);
+    return _prefs.setDouble(key, value);
   }
 
   /// Obter double
@@ -53,7 +53,7 @@ class StorageService extends GetxService {
 
   /// Salvar lista de strings
   Future<bool> setStringList(String key, List<String> value) async {
-    return await _prefs.setStringList(key, value);
+    return _prefs.setStringList(key, value);
   }
 
   /// Obter lista de strings
@@ -63,14 +63,14 @@ class StorageService extends GetxService {
 
   /// Salvar objeto JSON
   Future<bool> setJson(String key, Map<String, dynamic> value) async {
-    return await setString(key, json.encode(value));
+    return setString(key, json.encode(value));
   }
 
   /// Obter objeto JSON
   Future<Map<String, dynamic>?> getJson(String key) async {
     final stringValue = await getString(key);
     if (stringValue == null) return null;
-    
+
     try {
       return json.decode(stringValue) as Map<String, dynamic>;
     } catch (e) {
@@ -80,14 +80,14 @@ class StorageService extends GetxService {
 
   /// Salvar lista de objetos JSON
   Future<bool> setJsonList(String key, List<Map<String, dynamic>> value) async {
-    return await setString(key, json.encode(value));
+    return setString(key, json.encode(value));
   }
 
   /// Obter lista de objetos JSON
   Future<List<Map<String, dynamic>>?> getJsonList(String key) async {
     final stringValue = await getString(key);
     if (stringValue == null) return null;
-    
+
     try {
       final List<dynamic> decodedList = json.decode(stringValue);
       return decodedList.cast<Map<String, dynamic>>();
@@ -103,12 +103,12 @@ class StorageService extends GetxService {
 
   /// Remover valor
   Future<bool> remove(String key) async {
-    return await _prefs.remove(key);
+    return _prefs.remove(key);
   }
 
   /// Limpar todos os valores
   Future<bool> clear() async {
-    return await _prefs.clear();
+    return _prefs.clear();
   }
 
   /// Obter todas as chaves

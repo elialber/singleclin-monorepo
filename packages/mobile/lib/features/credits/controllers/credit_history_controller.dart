@@ -1,25 +1,10 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import '../models/credit_transaction_model.dart';
+import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
 
-enum HistoryPeriodFilter {
-  all,
-  today,
-  week,
-  month,
-  quarter,
-  year,
-  custom
-}
+enum HistoryPeriodFilter { all, today, week, month, quarter, year, custom }
 
-enum HistoryTypeFilter {
-  all,
-  earned,
-  spent,
-  refunded,
-  bonus,
-  subscription
-}
+enum HistoryTypeFilter { all, earned, spent, refunded, bonus, subscription }
 
 enum HistorySourceFilter {
   all,
@@ -28,15 +13,10 @@ enum HistorySourceFilter {
   purchase,
   booking,
   cancel,
-  bonus
+  bonus,
 }
 
-enum HistorySortOrder {
-  newest,
-  oldest,
-  highestAmount,
-  lowestAmount
-}
+enum HistorySortOrder { newest, oldest, highestAmount, lowestAmount }
 
 class CreditHistoryController extends GetxController {
   // Reactive variables
@@ -46,7 +26,7 @@ class CreditHistoryController extends GetxController {
   final _filteredTransactions = <CreditTransactionModel>[].obs;
   final _hasMoreData = true.obs;
   final _currentPage = 1.obs;
-  
+
   // Filter states
   final _periodFilter = HistoryPeriodFilter.all.obs;
   final _typeFilter = HistoryTypeFilter.all.obs;
@@ -54,7 +34,7 @@ class CreditHistoryController extends GetxController {
   final _sortOrder = HistorySortOrder.newest.obs;
   final _searchQuery = ''.obs;
   final _customDateRange = Rx<DateTimeRange?>(null);
-  
+
   // Statistics
   final _totalEarned = 0.obs;
   final _totalSpent = 0.obs;
@@ -66,7 +46,7 @@ class CreditHistoryController extends GetxController {
   List<CreditTransactionModel> get transactions => _filteredTransactions;
   bool get hasMoreData => _hasMoreData.value;
   int get currentPage => _currentPage.value;
-  
+
   // Filter getters
   HistoryPeriodFilter get periodFilter => _periodFilter.value;
   HistoryTypeFilter get typeFilter => _typeFilter.value;
@@ -74,7 +54,7 @@ class CreditHistoryController extends GetxController {
   HistorySortOrder get sortOrder => _sortOrder.value;
   String get searchQuery => _searchQuery.value;
   DateTimeRange? get customDateRange => _customDateRange.value;
-  
+
   // Stats getters
   int get totalEarned => _totalEarned.value;
   int get totalSpent => _totalSpent.value;
@@ -82,15 +62,15 @@ class CreditHistoryController extends GetxController {
   Map<String, Map<String, int>> get monthlyStats => _monthlyStats;
 
   String get netBalanceDisplay {
-    String prefix = netBalance >= 0 ? '+' : '';
+    final String prefix = netBalance >= 0 ? '+' : '';
     return '$prefix$netBalance SG';
   }
 
   bool get hasActiveFilters {
     return periodFilter != HistoryPeriodFilter.all ||
-           typeFilter != HistoryTypeFilter.all ||
-           sourceFilter != HistorySourceFilter.all ||
-           searchQuery.isNotEmpty;
+        typeFilter != HistoryTypeFilter.all ||
+        sourceFilter != HistorySourceFilter.all ||
+        searchQuery.isNotEmpty;
   }
 
   int get activeFiltersCount {
@@ -126,23 +106,22 @@ class CreditHistoryController extends GetxController {
         _hasMoreData.value = true;
         _transactions.clear();
       }
-      
+
       _isLoading.value = true;
-      
+
       // Mock API call - replace with actual service
       await Future.delayed(const Duration(seconds: 1));
-      
+
       final mockTransactions = _generateMockTransactions();
-      
+
       if (isRefresh) {
         _transactions.assignAll(mockTransactions);
       } else {
         _transactions.addAll(mockTransactions);
       }
-      
+
       _calculateStatistics();
       _applyFilters();
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -156,25 +135,26 @@ class CreditHistoryController extends GetxController {
 
   Future<void> loadMoreTransactions() async {
     if (!_hasMoreData.value || _isLoadingMore.value) return;
-    
+
     try {
       _isLoadingMore.value = true;
       _currentPage.value++;
-      
+
       // Mock API call for pagination
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Simulate no more data after page 3
       if (_currentPage.value > 3) {
         _hasMoreData.value = false;
         return;
       }
-      
-      final moreTransactions = _generateMockTransactions(page: _currentPage.value);
+
+      final moreTransactions = _generateMockTransactions(
+        page: _currentPage.value,
+      );
       _transactions.addAll(moreTransactions);
-      
+
       _applyFilters();
-      
     } catch (e) {
       _currentPage.value--;
       Get.snackbar(
@@ -189,38 +169,40 @@ class CreditHistoryController extends GetxController {
 
   void _applyFilters() {
     var filtered = List<CreditTransactionModel>.from(_transactions);
-    
+
     // Apply period filter
     if (_periodFilter.value != HistoryPeriodFilter.all) {
       filtered = _filterByPeriod(filtered);
     }
-    
+
     // Apply type filter
     if (_typeFilter.value != HistoryTypeFilter.all) {
       filtered = _filterByType(filtered);
     }
-    
+
     // Apply source filter
     if (_sourceFilter.value != HistorySourceFilter.all) {
       filtered = _filterBySource(filtered);
     }
-    
+
     // Apply search query
     if (_searchQuery.value.isNotEmpty) {
       filtered = _filterBySearchQuery(filtered);
     }
-    
+
     // Apply sorting
     filtered = _sortTransactions(filtered);
-    
+
     _filteredTransactions.assignAll(filtered);
     _updateFilteredStatistics(filtered);
   }
 
-  List<CreditTransactionModel> _filterByPeriod(List<CreditTransactionModel> transactions) {
+  List<CreditTransactionModel> _filterByPeriod(
+    List<CreditTransactionModel> transactions,
+  ) {
     final now = DateTime.now();
     late DateTime startDate;
-    
+
     switch (_periodFilter.value) {
       case HistoryPeriodFilter.today:
         startDate = DateTime(now.year, now.month, now.day);
@@ -239,66 +221,104 @@ class CreditHistoryController extends GetxController {
         break;
       case HistoryPeriodFilter.custom:
         if (_customDateRange.value == null) return transactions;
-        return transactions.where((t) =>
-            t.createdAt.isAfter(_customDateRange.value!.start) &&
-            t.createdAt.isBefore(_customDateRange.value!.end.add(const Duration(days: 1)))
-        ).toList();
+        return transactions
+            .where(
+              (t) =>
+                  t.createdAt.isAfter(_customDateRange.value!.start) &&
+                  t.createdAt.isBefore(
+                    _customDateRange.value!.end.add(const Duration(days: 1)),
+                  ),
+            )
+            .toList();
       case HistoryPeriodFilter.all:
       default:
         return transactions;
     }
-    
+
     return transactions.where((t) => t.createdAt.isAfter(startDate)).toList();
   }
 
-  List<CreditTransactionModel> _filterByType(List<CreditTransactionModel> transactions) {
+  List<CreditTransactionModel> _filterByType(
+    List<CreditTransactionModel> transactions,
+  ) {
     switch (_typeFilter.value) {
       case HistoryTypeFilter.earned:
-        return transactions.where((t) => t.type == TransactionType.earned).toList();
+        return transactions
+            .where((t) => t.type == TransactionType.earned)
+            .toList();
       case HistoryTypeFilter.spent:
-        return transactions.where((t) => t.type == TransactionType.spent).toList();
+        return transactions
+            .where((t) => t.type == TransactionType.spent)
+            .toList();
       case HistoryTypeFilter.refunded:
-        return transactions.where((t) => t.type == TransactionType.refunded).toList();
+        return transactions
+            .where((t) => t.type == TransactionType.refunded)
+            .toList();
       case HistoryTypeFilter.bonus:
-        return transactions.where((t) => t.type == TransactionType.bonus).toList();
+        return transactions
+            .where((t) => t.type == TransactionType.bonus)
+            .toList();
       case HistoryTypeFilter.subscription:
-        return transactions.where((t) => t.type == TransactionType.subscription).toList();
+        return transactions
+            .where((t) => t.type == TransactionType.subscription)
+            .toList();
       case HistoryTypeFilter.all:
       default:
         return transactions;
     }
   }
 
-  List<CreditTransactionModel> _filterBySource(List<CreditTransactionModel> transactions) {
+  List<CreditTransactionModel> _filterBySource(
+    List<CreditTransactionModel> transactions,
+  ) {
     switch (_sourceFilter.value) {
       case HistorySourceFilter.subscription:
-        return transactions.where((t) => t.source == TransactionSource.monthlySubscription).toList();
+        return transactions
+            .where((t) => t.source == TransactionSource.monthlySubscription)
+            .toList();
       case HistorySourceFilter.referral:
-        return transactions.where((t) => t.source == TransactionSource.referral).toList();
+        return transactions
+            .where((t) => t.source == TransactionSource.referral)
+            .toList();
       case HistorySourceFilter.purchase:
-        return transactions.where((t) => t.source == TransactionSource.purchase).toList();
+        return transactions
+            .where((t) => t.source == TransactionSource.purchase)
+            .toList();
       case HistorySourceFilter.booking:
-        return transactions.where((t) => t.source == TransactionSource.appointmentBooking).toList();
+        return transactions
+            .where((t) => t.source == TransactionSource.appointmentBooking)
+            .toList();
       case HistorySourceFilter.cancel:
-        return transactions.where((t) => t.source == TransactionSource.appointmentCancel).toList();
+        return transactions
+            .where((t) => t.source == TransactionSource.appointmentCancel)
+            .toList();
       case HistorySourceFilter.bonus:
-        return transactions.where((t) => t.source == TransactionSource.bonus).toList();
+        return transactions
+            .where((t) => t.source == TransactionSource.bonus)
+            .toList();
       case HistorySourceFilter.all:
       default:
         return transactions;
     }
   }
 
-  List<CreditTransactionModel> _filterBySearchQuery(List<CreditTransactionModel> transactions) {
+  List<CreditTransactionModel> _filterBySearchQuery(
+    List<CreditTransactionModel> transactions,
+  ) {
     final query = _searchQuery.value.toLowerCase();
-    return transactions.where((t) =>
-        t.description.toLowerCase().contains(query) ||
-        t.typeDisplayName.toLowerCase().contains(query) ||
-        t.sourceDisplayName.toLowerCase().contains(query)
-    ).toList();
+    return transactions
+        .where(
+          (t) =>
+              t.description.toLowerCase().contains(query) ||
+              t.typeDisplayName.toLowerCase().contains(query) ||
+              t.sourceDisplayName.toLowerCase().contains(query),
+        )
+        .toList();
   }
 
-  List<CreditTransactionModel> _sortTransactions(List<CreditTransactionModel> transactions) {
+  List<CreditTransactionModel> _sortTransactions(
+    List<CreditTransactionModel> transactions,
+  ) {
     switch (_sortOrder.value) {
       case HistorySortOrder.newest:
         transactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -356,31 +376,36 @@ class CreditHistoryController extends GetxController {
     int earned = 0;
     int spent = 0;
     final stats = <String, Map<String, int>>{};
-    
+
     for (final transaction in _transactions) {
       if (transaction.isPositive) {
         earned += transaction.amount;
       } else {
         spent += transaction.amount.abs();
       }
-      
+
       // Monthly statistics
-      final monthKey = '${transaction.createdAt.year}-${transaction.createdAt.month.toString().padLeft(2, '0')}';
+      final monthKey =
+          '${transaction.createdAt.year}-${transaction.createdAt.month.toString().padLeft(2, '0')}';
       stats[monthKey] ??= {'earned': 0, 'spent': 0};
-      
+
       if (transaction.isPositive) {
-        stats[monthKey]!['earned'] = stats[monthKey]!['earned']! + transaction.amount;
+        stats[monthKey]!['earned'] =
+            stats[monthKey]!['earned']! + transaction.amount;
       } else {
-        stats[monthKey]!['spent'] = stats[monthKey]!['spent']! + transaction.amount.abs();
+        stats[monthKey]!['spent'] =
+            stats[monthKey]!['spent']! + transaction.amount.abs();
       }
     }
-    
+
     _totalEarned.value = earned;
     _totalSpent.value = spent;
     _monthlyStats.assignAll(stats);
   }
 
-  void _updateFilteredStatistics(List<CreditTransactionModel> filteredTransactions) {
+  void _updateFilteredStatistics(
+    List<CreditTransactionModel> filteredTransactions,
+  ) {
     // Update statistics based on filtered results if needed
     // This could be used to show filtered stats in UI
   }
@@ -388,10 +413,10 @@ class CreditHistoryController extends GetxController {
   Future<void> exportHistory({String format = 'csv'}) async {
     try {
       _isLoading.value = true;
-      
+
       // Mock export functionality
       await Future.delayed(const Duration(seconds: 2));
-      
+
       Get.snackbar(
         'Sucesso',
         'Extrato exportado com sucesso!',
@@ -399,7 +424,6 @@ class CreditHistoryController extends GetxController {
         backgroundColor: Get.theme.primaryColor,
         colorText: Get.theme.colorScheme.onPrimary,
       );
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -415,28 +439,30 @@ class CreditHistoryController extends GetxController {
   List<CreditTransactionModel> _generateMockTransactions({int page = 1}) {
     final transactions = <CreditTransactionModel>[];
     final now = DateTime.now();
-    
+
     // Generate mock transactions based on page
     final baseIndex = (page - 1) * 20;
-    
+
     for (int i = 0; i < 20; i++) {
       final index = baseIndex + i;
       final daysBack = index * 2;
-      
-      transactions.add(CreditTransactionModel(
-        id: 'tx_${index + 1}',
-        userId: 'user123',
-        amount: _getMockAmount(index),
-        balanceAfter: 245 - (index * 5),
-        type: _getMockTransactionType(index),
-        source: _getMockTransactionSource(index),
-        description: _getMockDescription(index),
-        relatedEntityId: 'entity_${index + 1}',
-        relatedEntityType: _getMockEntityType(index),
-        createdAt: now.subtract(Duration(days: daysBack, hours: index % 24)),
-      ));
+
+      transactions.add(
+        CreditTransactionModel(
+          id: 'tx_${index + 1}',
+          userId: 'user123',
+          amount: _getMockAmount(index),
+          balanceAfter: 245 - (index * 5),
+          type: _getMockTransactionType(index),
+          source: _getMockTransactionSource(index),
+          description: _getMockDescription(index),
+          relatedEntityId: 'entity_${index + 1}',
+          relatedEntityType: _getMockEntityType(index),
+          createdAt: now.subtract(Duration(days: daysBack, hours: index % 24)),
+        ),
+      );
     }
-    
+
     return transactions;
   }
 
@@ -484,12 +510,13 @@ class CreditHistoryController extends GetxController {
   }
 
   String _getMockEntityType(int index) {
-    final types = ['subscription', 'appointment', 'referral', 'appointment', 'appointment'];
+    final types = [
+      'subscription',
+      'appointment',
+      'referral',
+      'appointment',
+      'appointment',
+    ];
     return types[index % types.length];
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }

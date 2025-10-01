@@ -1,52 +1,9 @@
 import 'package:equatable/equatable.dart';
-import 'appointment_status.dart';
+import 'package:singleclin_mobile/features/appointments/models/appointment_status.dart';
 
 /// Appointment Model
 /// Represents a medical appointment in the SingleClin system
 class Appointment extends Equatable {
-  final String id;
-  final String userId;
-  final String clinicId;
-  final String clinicName;
-  final String serviceId;
-  final String serviceName;
-  final String categoryId;
-  final String categoryName;
-  final DateTime scheduledDate;
-  final String scheduledTime;
-  final AppointmentStatus status;
-  final String? professionalId;
-  final String? professionalName;
-  final double price;
-  final double sgCreditsUsed;
-  final double sgCreditsEarned;
-  final String? notes;
-  final String? patientNotes;
-  final String? preInstructions;
-  final String? postInstructions;
-  final List<String> attachments;
-  final List<String> beforePhotos;
-  final List<String> afterPhotos;
-  final Map<String, dynamic>? metadata;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String? cancellationReason;
-  final DateTime? cancelledAt;
-  final double? refundAmount;
-  final String? reviewId;
-  final int? rating;
-  final String? reviewText;
-  final bool canCancel;
-  final bool canReschedule;
-  final bool canRate;
-  final bool requiresConsent;
-  final List<String> requiredDocuments;
-  final List<String> providedDocuments;
-  final String? qrCode;
-  final bool isConfirmed;
-  final bool reminderSent;
-  final DateTime? reminderDate;
-
   const Appointment({
     required this.id,
     required this.userId,
@@ -122,8 +79,8 @@ class Appointment extends Equatable {
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       cancellationReason: json['cancellationReason'] as String?,
-      cancelledAt: json['cancelledAt'] != null 
-          ? DateTime.parse(json['cancelledAt'] as String) 
+      cancelledAt: json['cancelledAt'] != null
+          ? DateTime.parse(json['cancelledAt'] as String)
           : null,
       refundAmount: (json['refundAmount'] as num?)?.toDouble(),
       reviewId: json['reviewId'] as String?,
@@ -133,16 +90,62 @@ class Appointment extends Equatable {
       canReschedule: json['canReschedule'] as bool? ?? true,
       canRate: json['canRate'] as bool? ?? false,
       requiresConsent: json['requiresConsent'] as bool? ?? false,
-      requiredDocuments: List<String>.from(json['requiredDocuments'] as List? ?? []),
-      providedDocuments: List<String>.from(json['providedDocuments'] as List? ?? []),
+      requiredDocuments: List<String>.from(
+        json['requiredDocuments'] as List? ?? [],
+      ),
+      providedDocuments: List<String>.from(
+        json['providedDocuments'] as List? ?? [],
+      ),
       qrCode: json['qrCode'] as String?,
       isConfirmed: json['isConfirmed'] as bool? ?? false,
       reminderSent: json['reminderSent'] as bool? ?? false,
-      reminderDate: json['reminderDate'] != null 
-          ? DateTime.parse(json['reminderDate'] as String) 
+      reminderDate: json['reminderDate'] != null
+          ? DateTime.parse(json['reminderDate'] as String)
           : null,
     );
   }
+  final String id;
+  final String userId;
+  final String clinicId;
+  final String clinicName;
+  final String serviceId;
+  final String serviceName;
+  final String categoryId;
+  final String categoryName;
+  final DateTime scheduledDate;
+  final String scheduledTime;
+  final AppointmentStatus status;
+  final String? professionalId;
+  final String? professionalName;
+  final double price;
+  final double sgCreditsUsed;
+  final double sgCreditsEarned;
+  final String? notes;
+  final String? patientNotes;
+  final String? preInstructions;
+  final String? postInstructions;
+  final List<String> attachments;
+  final List<String> beforePhotos;
+  final List<String> afterPhotos;
+  final Map<String, dynamic>? metadata;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String? cancellationReason;
+  final DateTime? cancelledAt;
+  final double? refundAmount;
+  final String? reviewId;
+  final int? rating;
+  final String? reviewText;
+  final bool canCancel;
+  final bool canReschedule;
+  final bool canRate;
+  final bool requiresConsent;
+  final List<String> requiredDocuments;
+  final List<String> providedDocuments;
+  final String? qrCode;
+  final bool isConfirmed;
+  final bool reminderSent;
+  final DateTime? reminderDate;
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
@@ -317,8 +320,19 @@ class Appointment extends Equatable {
   /// Get formatted date string
   String get formattedDate {
     final months = [
-      '', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+      '',
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez',
     ];
     return '${scheduledDate.day} ${months[scheduledDate.month]}';
   }
@@ -340,22 +354,22 @@ class Appointment extends Equatable {
 
   /// Check if all required documents are provided
   bool get hasAllRequiredDocuments {
-    return requiredDocuments.every((doc) => providedDocuments.contains(doc));
+    return requiredDocuments.every(providedDocuments.contains);
   }
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        clinicId,
-        serviceId,
-        scheduledDate,
-        scheduledTime,
-        status,
-        price,
-        sgCreditsUsed,
-        updatedAt,
-      ];
+    id,
+    userId,
+    clinicId,
+    serviceId,
+    scheduledDate,
+    scheduledTime,
+    status,
+    price,
+    sgCreditsUsed,
+    updatedAt,
+  ];
 
   @override
   String toString() {

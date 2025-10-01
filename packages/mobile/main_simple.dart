@@ -14,7 +14,7 @@ import 'lib/features/auth/controllers/auth_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -24,83 +24,71 @@ void main() async {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  
+
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  
+
   // Initialize services
   await _initServices();
-  
+
   runApp(const SingleClinApp());
 }
 
 Future<void> _initServices() async {
   // Initialize storage service first
   await Get.putAsync(() => StorageService().init());
-  
+
   // Initialize other services
   Get.put(ApiService(), permanent: true);
   Get.put(AuthService(), permanent: true);
-  
+
   // Initialize auth controller
   Get.put(AuthController(), permanent: true);
 }
 
 class SingleClinApp extends StatelessWidget {
-  const SingleClinApp({Key? key}) : super(key: key);
+  const SingleClinApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
-      
+
       // Theme configuration
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
-      
+
       // Localization
       locale: const Locale('pt', 'BR'),
       fallbackLocale: const Locale('pt', 'BR'),
-      
+
       // Routes
       initialRoute: '/splash',
       getPages: [
-        GetPage(
-          name: '/splash',
-          page: () => const EnhancedSplashScreen(),
-        ),
-        GetPage(
-          name: '/login',
-          page: () => const LoginScreen(),
-        ),
-        GetPage(
-          name: '/home',
-          page: () => const HomeScreen(),
-        ),
+        GetPage(name: '/splash', page: () => const EnhancedSplashScreen()),
+        GetPage(name: '/login', page: () => const LoginScreen()),
+        GetPage(name: '/home', page: () => const HomeScreen()),
       ],
-      
+
       // Global configuration
       defaultTransition: Transition.cupertino,
       transitionDuration: const Duration(milliseconds: 300),
-      
+
       // Error handling
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: const TextScaler.linear(1.0),
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: child!,
         );
       },
-      
-      // Smart management
-      smartManagement: SmartManagement.full,
-      
+
       // Enable log in debug mode
       enableLog: false,
     );

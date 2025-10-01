@@ -5,39 +5,12 @@ enum AppointmentStatus {
   completed,
   canceled,
   noShow,
-  rescheduled
+  rescheduled,
 }
 
-enum AppointmentType {
-  consultation,
-  procedure,
-  followUp,
-  emergency
-}
+enum AppointmentType { consultation, procedure, followUp, emergency }
 
 class AppointmentModel {
-  final String id;
-  final String userId;
-  final String clinicId;
-  final String serviceId;
-  final DateTime appointmentDate;
-  final int durationMinutes;
-  final int sgCost;
-  final AppointmentStatus status;
-  final AppointmentType type;
-  final String? notes;
-  final String? cancelReason;
-  final DateTime? canceledAt;
-  final String? rescheduledFromId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  
-  // Relacionamentos
-  final ClinicModel? clinic;
-  final ServiceModel? service;
-  final List<AppointmentDocument>? documents;
-  final AppointmentReview? review;
-
   AppointmentModel({
     required this.id,
     required this.userId,
@@ -79,23 +52,49 @@ class AppointmentModel {
       ),
       notes: json['notes'],
       cancelReason: json['cancelReason'],
-      canceledAt: json['canceledAt'] != null 
-          ? DateTime.parse(json['canceledAt']) : null,
+      canceledAt: json['canceledAt'] != null
+          ? DateTime.parse(json['canceledAt'])
+          : null,
       rescheduledFromId: json['rescheduledFromId'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      clinic: json['clinic'] != null 
-          ? ClinicModel.fromJson(json['clinic']) : null,
-      service: json['service'] != null 
-          ? ServiceModel.fromJson(json['service']) : null,
+      clinic: json['clinic'] != null
+          ? ClinicModel.fromJson(json['clinic'])
+          : null,
+      service: json['service'] != null
+          ? ServiceModel.fromJson(json['service'])
+          : null,
       documents: json['documents'] != null
           ? List<AppointmentDocument>.from(
-              json['documents'].map((x) => AppointmentDocument.fromJson(x)))
+              json['documents'].map((x) => AppointmentDocument.fromJson(x)),
+            )
           : null,
-      review: json['review'] != null 
-          ? AppointmentReview.fromJson(json['review']) : null,
+      review: json['review'] != null
+          ? AppointmentReview.fromJson(json['review'])
+          : null,
     );
   }
+  final String id;
+  final String userId;
+  final String clinicId;
+  final String serviceId;
+  final DateTime appointmentDate;
+  final int durationMinutes;
+  final int sgCost;
+  final AppointmentStatus status;
+  final AppointmentType type;
+  final String? notes;
+  final String? cancelReason;
+  final DateTime? canceledAt;
+  final String? rescheduledFromId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  // Relacionamentos
+  final ClinicModel? clinic;
+  final ServiceModel? service;
+  final List<AppointmentDocument>? documents;
+  final AppointmentReview? review;
 
   Map<String, dynamic> toJson() {
     return {
@@ -166,7 +165,7 @@ class AppointmentModel {
   }
 
   bool get canCancel {
-    if (status == AppointmentStatus.canceled || 
+    if (status == AppointmentStatus.canceled ||
         status == AppointmentStatus.completed ||
         status == AppointmentStatus.noShow) {
       return false;
@@ -174,12 +173,12 @@ class AppointmentModel {
 
     final now = DateTime.now();
     final hoursUntilAppointment = appointmentDate.difference(now).inHours;
-    
+
     return hoursUntilAppointment >= 24; // Pode cancelar com 24h de antecedência
   }
 
   bool get canReschedule {
-    if (status == AppointmentStatus.canceled || 
+    if (status == AppointmentStatus.canceled ||
         status == AppointmentStatus.completed ||
         status == AppointmentStatus.noShow) {
       return false;
@@ -187,7 +186,7 @@ class AppointmentModel {
 
     final now = DateTime.now();
     final hoursUntilAppointment = appointmentDate.difference(now).inHours;
-    
+
     return hoursUntilAppointment >= 2; // Pode reagendar com 2h de antecedência
   }
 
@@ -220,14 +219,6 @@ class AppointmentModel {
 }
 
 class AppointmentDocument {
-  final String id;
-  final String appointmentId;
-  final String name;
-  final String url;
-  final String type;
-  final int size;
-  final DateTime uploadedAt;
-
   AppointmentDocument({
     required this.id,
     required this.appointmentId,
@@ -249,6 +240,13 @@ class AppointmentDocument {
       uploadedAt: DateTime.parse(json['uploadedAt']),
     );
   }
+  final String id;
+  final String appointmentId;
+  final String name;
+  final String url;
+  final String type;
+  final int size;
+  final DateTime uploadedAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -264,13 +262,6 @@ class AppointmentDocument {
 }
 
 class AppointmentReview {
-  final String id;
-  final String appointmentId;
-  final String userId;
-  final int rating;
-  final String comment;
-  final DateTime createdAt;
-
   AppointmentReview({
     required this.id,
     required this.appointmentId,
@@ -290,6 +281,12 @@ class AppointmentReview {
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
+  final String id;
+  final String appointmentId;
+  final String userId;
+  final int rating;
+  final String comment;
+  final DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../models/subscription_plan.dart';
+import 'package:singleclin_mobile/features/credits/models/subscription_plan.dart';
 
 class SubscriptionController extends GetxController {
   // Reactive variables
@@ -17,12 +17,13 @@ class SubscriptionController extends GetxController {
   List<SubscriptionPlan> get plans => _plans;
   UserSubscription? get currentSubscription => _currentSubscription.value;
   SubscriptionPlan? get selectedPlan => _selectedPlan.value;
-  SubscriptionBillingCycle get selectedBillingCycle => _selectedBillingCycle.value;
+  SubscriptionBillingCycle get selectedBillingCycle =>
+      _selectedBillingCycle.value;
   bool get comparisonMode => _comparisonMode.value;
 
   bool get hasActiveSubscription => currentSubscription?.isActive ?? false;
   bool get canChangePlan => hasActiveSubscription;
-  
+
   SubscriptionPlan? get currentPlan => currentSubscription?.plan;
 
   List<SubscriptionPlan> get sortedPlans {
@@ -62,10 +63,10 @@ class SubscriptionController extends GetxController {
   Future<void> loadSubscriptionPlans() async {
     try {
       _isLoading.value = true;
-      
+
       // Mock API call
       await Future.delayed(const Duration(seconds: 1));
-      
+
       _plans.assignAll([
         SubscriptionPlan(
           id: 'basic',
@@ -81,10 +82,7 @@ class SubscriptionController extends GetxController {
             '1 clínica favorita',
             'Notificações por email',
           ],
-          restrictions: [
-            'Reagendamento limitado',
-            'Sem suporte telefônico',
-          ],
+          restrictions: ['Reagendamento limitado', 'Sem suporte telefônico'],
           isPopular: false,
           isActive: true,
           hasFreeTrial: true,
@@ -145,14 +143,11 @@ class SubscriptionController extends GetxController {
           isActive: true,
           hasFreeTrial: true,
           freeTrialDays: 30,
-          maxClinics: 999,
-          maxAppointmentsPerDay: 999,
           discountPercentage: 16.7,
           sortOrder: 3,
           category: 'vip',
         ),
       ]);
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -168,13 +163,13 @@ class SubscriptionController extends GetxController {
     try {
       // Mock API call
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Mock current subscription (Premium)
       final premiumPlan = _plans.firstWhere(
         (plan) => plan.id == 'premium',
         orElse: () => _plans.first,
       );
-      
+
       _currentSubscription.value = UserSubscription(
         id: 'sub_123',
         userId: 'user_123',
@@ -191,7 +186,6 @@ class SubscriptionController extends GetxController {
         createdAt: DateTime.now().subtract(const Duration(days: 15)),
         updatedAt: DateTime.now(),
       );
-      
     } catch (e) {
       print('Error loading current subscription: $e');
     }
@@ -212,18 +206,21 @@ class SubscriptionController extends GetxController {
     update(['comparison_mode']);
   }
 
-  Future<void> subscribeToPlan(SubscriptionPlan plan, {SubscriptionBillingCycle? cycle}) async {
+  Future<void> subscribeToPlan(
+    SubscriptionPlan plan, {
+    SubscriptionBillingCycle? cycle,
+  }) async {
     if (isProcessing) return;
-    
+
     try {
       _isProcessing.value = true;
-      
+
       final billingCycle = cycle ?? _selectedBillingCycle.value;
-      
+
       // Show confirmation dialog
       final confirmed = await _showSubscriptionConfirmation(plan, billingCycle);
       if (!confirmed) return;
-      
+
       // Show processing dialog
       Get.dialog(
         AlertDialog(
@@ -239,13 +236,13 @@ class SubscriptionController extends GetxController {
         ),
         barrierDismissible: false,
       );
-      
+
       // Mock subscription process
       await Future.delayed(const Duration(seconds: 3));
-      
+
       // Close processing dialog
       Get.back();
-      
+
       // Show success
       Get.dialog(
         AlertDialog(
@@ -256,7 +253,9 @@ class SubscriptionController extends GetxController {
             children: [
               Text('Bem-vindo ao plano ${plan.name}!'),
               const SizedBox(height: 8),
-              Text('${plan.monthlyCredits} créditos SG foram adicionados à sua conta.'),
+              Text(
+                '${plan.monthlyCredits} créditos SG foram adicionados à sua conta.',
+              ),
               if (plan.hasFreeTrial)
                 Text('\n🎁 Aproveite seus ${plan.freeTrialDays} dias grátis!'),
             ],
@@ -272,10 +271,9 @@ class SubscriptionController extends GetxController {
           ],
         ),
       );
-      
+
       // Refresh subscription data
       await loadCurrentSubscription();
-      
     } catch (e) {
       Get.back(); // Close any open dialog
       Get.snackbar(
@@ -289,17 +287,17 @@ class SubscriptionController extends GetxController {
   }
 
   Future<bool> _showSubscriptionConfirmation(
-    SubscriptionPlan plan, 
-    SubscriptionBillingCycle cycle
+    SubscriptionPlan plan,
+    SubscriptionBillingCycle cycle,
   ) async {
-    final price = cycle == SubscriptionBillingCycle.monthly 
-        ? plan.monthlyPrice 
+    final price = cycle == SubscriptionBillingCycle.monthly
+        ? plan.monthlyPrice
         : plan.annualPrice;
-    
-    final priceDisplay = cycle == SubscriptionBillingCycle.monthly 
-        ? plan.monthlyPriceDisplay 
+
+    final priceDisplay = cycle == SubscriptionBillingCycle.monthly
+        ? plan.monthlyPriceDisplay
         : plan.annualPriceDisplay;
-    
+
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: Text('Confirmar Assinatura ${plan.name}'),
@@ -308,7 +306,9 @@ class SubscriptionController extends GetxController {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Plano: ${plan.name}'),
-            Text('Cobrança: ${cycle == SubscriptionBillingCycle.monthly ? 'Mensal' : 'Anual'}'),
+            Text(
+              'Cobrança: ${cycle == SubscriptionBillingCycle.monthly ? 'Mensal' : 'Anual'}',
+            ),
             Text('Valor: $priceDisplay'),
             Text('Créditos: ${plan.monthlyCredits} SG/mês'),
             if (plan.hasFreeTrial)
@@ -329,22 +329,25 @@ class SubscriptionController extends GetxController {
         ],
       ),
     );
-    
+
     return confirmed ?? false;
   }
 
   Future<void> changePlan(SubscriptionPlan newPlan) async {
     if (!canChangePlan || currentPlan == null) return;
-    
+
     try {
       _isProcessing.value = true;
-      
+
       final isUpgrade = newPlan.monthlyPrice > currentPlan!.monthlyPrice;
       final isDowngrade = newPlan.monthlyPrice < currentPlan!.monthlyPrice;
-      
-      String dialogTitle = isUpgrade ? 'Fazer Upgrade' : 
-                          isDowngrade ? 'Fazer Downgrade' : 'Alterar Plano';
-      
+
+      final String dialogTitle = isUpgrade
+          ? 'Fazer Upgrade'
+          : isDowngrade
+          ? 'Fazer Downgrade'
+          : 'Alterar Plano';
+
       final confirmed = await Get.dialog<bool>(
         AlertDialog(
           title: Text(dialogTitle),
@@ -376,25 +379,24 @@ class SubscriptionController extends GetxController {
           ],
         ),
       );
-      
+
       if (confirmed != true) return;
-      
+
       // Mock plan change process
       await Future.delayed(const Duration(seconds: 2));
-      
+
       Get.snackbar(
         'Plano Alterado!',
-        isUpgrade 
-          ? 'Upgrade realizado com sucesso!'
-          : 'Seu plano será alterado no próximo ciclo',
+        isUpgrade
+            ? 'Upgrade realizado com sucesso!'
+            : 'Seu plano será alterado no próximo ciclo',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Get.theme.primaryColor,
         colorText: Get.theme.colorScheme.onPrimary,
       );
-      
+
       // Refresh subscription data
       await loadCurrentSubscription();
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -408,7 +410,7 @@ class SubscriptionController extends GetxController {
 
   Future<void> cancelSubscription() async {
     if (!hasActiveSubscription) return;
-    
+
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: const Text('Cancelar Assinatura'),
@@ -436,24 +438,23 @@ class SubscriptionController extends GetxController {
         ],
       ),
     );
-    
+
     if (confirmed != true) return;
-    
+
     try {
       _isProcessing.value = true;
-      
+
       // Mock cancellation process
       await Future.delayed(const Duration(seconds: 1));
-      
+
       Get.snackbar(
         'Assinatura Cancelada',
         'Sua assinatura foi cancelada e será válida até ${currentSubscription?.nextBillingDate.day}/${currentSubscription?.nextBillingDate.month}',
         snackPosition: SnackPosition.BOTTOM,
       );
-      
+
       // Refresh subscription data
       await loadCurrentSubscription();
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -467,7 +468,7 @@ class SubscriptionController extends GetxController {
 
   Future<void> pauseSubscription() async {
     if (!hasActiveSubscription) return;
-    
+
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: const Text('Pausar Assinatura'),
@@ -494,23 +495,22 @@ class SubscriptionController extends GetxController {
         ],
       ),
     );
-    
+
     if (confirmed != true) return;
-    
+
     try {
       _isProcessing.value = true;
-      
+
       // Mock pause process
       await Future.delayed(const Duration(seconds: 1));
-      
+
       Get.snackbar(
         'Assinatura Pausada',
         'Sua assinatura foi pausada com sucesso',
         snackPosition: SnackPosition.BOTTOM,
       );
-      
+
       await loadCurrentSubscription();
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -545,7 +545,10 @@ class SubscriptionController extends GetxController {
                 if (plan.isPopular) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Get.theme.primaryColor,
                       borderRadius: BorderRadius.circular(10),
@@ -565,7 +568,7 @@ class SubscriptionController extends GetxController {
             const SizedBox(height: 8),
             Text(plan.description),
             const SizedBox(height: 16),
-            
+
             // Price and credits
             Row(
               children: [
@@ -579,21 +582,22 @@ class SubscriptionController extends GetxController {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.shade100,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     '${plan.monthlyCredits} SG/mês',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
-            
+
             if (plan.hasFreeTrial) ...[
               const SizedBox(height: 8),
               Container(
@@ -617,7 +621,7 @@ class SubscriptionController extends GetxController {
                 ),
               ),
             ],
-            
+
             const SizedBox(height: 16),
             Text(
               'Recursos Inclusos:',
@@ -626,17 +630,19 @@ class SubscriptionController extends GetxController {
               ),
             ),
             const SizedBox(height: 8),
-            ...plan.features.map((feature) => Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                children: [
-                  Icon(Icons.check, color: Colors.green.shade600, size: 16),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(feature)),
-                ],
+            ...plan.features.map(
+              (feature) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  children: [
+                    Icon(Icons.check, color: Colors.green.shade600, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(feature)),
+                  ],
+                ),
               ),
-            )),
-            
+            ),
+
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -650,9 +656,11 @@ class SubscriptionController extends GetxController {
                   }
                 },
                 child: Text(
-                  hasActiveSubscription 
-                    ? (currentPlan?.id == plan.id ? 'Plano Atual' : 'Alterar para Este Plano')
-                    : 'Assinar Agora',
+                  hasActiveSubscription
+                      ? (currentPlan?.id == plan.id
+                            ? 'Plano Atual'
+                            : 'Alterar para Este Plano')
+                      : 'Assinar Agora',
                 ),
               ),
             ),
@@ -672,10 +680,5 @@ class SubscriptionController extends GetxController {
   String calculateSavingsDisplay(SubscriptionPlan plan) {
     final savings = calculateSavings(plan);
     return 'Economize R\$ ${savings.toStringAsFixed(2)}/mês';
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }

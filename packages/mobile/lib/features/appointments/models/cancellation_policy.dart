@@ -3,20 +3,6 @@ import 'package:equatable/equatable.dart';
 /// Cancellation Policy Model
 /// Defines cancellation rules and refund calculations for appointments
 class CancellationPolicy extends Equatable {
-  final String id;
-  final String serviceId;
-  final String serviceName;
-  final String categoryId;
-  final List<CancellationRule> rules;
-  final String description;
-  final bool allowsEmergencyException;
-  final List<String> emergencyExceptions;
-  final bool allowsRescheduling;
-  final int maxReschedulingCount;
-  final bool requiresJustification;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   const CancellationPolicy({
     required this.id,
     required this.serviceId,
@@ -41,11 +27,16 @@ class CancellationPolicy extends Equatable {
       serviceName: json['serviceName'] as String,
       categoryId: json['categoryId'] as String,
       rules: (json['rules'] as List)
-          .map((rule) => CancellationRule.fromJson(rule as Map<String, dynamic>))
+          .map(
+            (rule) => CancellationRule.fromJson(rule as Map<String, dynamic>),
+          )
           .toList(),
       description: json['description'] as String,
-      allowsEmergencyException: json['allowsEmergencyException'] as bool? ?? true,
-      emergencyExceptions: List<String>.from(json['emergencyExceptions'] as List? ?? []),
+      allowsEmergencyException:
+          json['allowsEmergencyException'] as bool? ?? true,
+      emergencyExceptions: List<String>.from(
+        json['emergencyExceptions'] as List? ?? [],
+      ),
       allowsRescheduling: json['allowsRescheduling'] as bool? ?? true,
       maxReschedulingCount: json['maxReschedulingCount'] as int? ?? 3,
       requiresJustification: json['requiresJustification'] as bool? ?? false,
@@ -53,6 +44,19 @@ class CancellationPolicy extends Equatable {
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
   }
+  final String id;
+  final String serviceId;
+  final String serviceName;
+  final String categoryId;
+  final List<CancellationRule> rules;
+  final String description;
+  final bool allowsEmergencyException;
+  final List<String> emergencyExceptions;
+  final bool allowsRescheduling;
+  final int maxReschedulingCount;
+  final bool requiresJustification;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
@@ -81,8 +85,10 @@ class CancellationPolicy extends Equatable {
     required double sgCreditsUsed,
     bool isEmergency = false,
   }) {
-    final hoursUntilAppointment = appointmentDate.difference(cancellationDate).inHours;
-    
+    final hoursUntilAppointment = appointmentDate
+        .difference(cancellationDate)
+        .inHours;
+
     // Emergency exception - full refund
     if (isEmergency && allowsEmergencyException) {
       return CancellationCalculation(
@@ -115,7 +121,8 @@ class CancellationPolicy extends Equatable {
       );
     }
 
-    final refundAmount = sgCreditsUsed * (applicableRule.refundPercentage / 100);
+    final refundAmount =
+        sgCreditsUsed * (applicableRule.refundPercentage / 100);
     final penalty = sgCreditsUsed - refundAmount;
 
     return CancellationCalculation(
@@ -135,7 +142,7 @@ class CancellationPolicy extends Equatable {
       serviceId: 'all',
       serviceName: 'Todos os serviços',
       categoryId: 'all',
-      rules: [
+      rules: const [
         CancellationRule(
           minHoursBeforeAppointment: 48,
           refundPercentage: 100,
@@ -144,12 +151,14 @@ class CancellationPolicy extends Equatable {
         CancellationRule(
           minHoursBeforeAppointment: 24,
           refundPercentage: 80,
-          description: 'Cancelamento com 24h de antecedência - 80% de reembolso',
+          description:
+              'Cancelamento com 24h de antecedência - 80% de reembolso',
         ),
         CancellationRule(
           minHoursBeforeAppointment: 12,
           refundPercentage: 50,
-          description: 'Cancelamento com 12h de antecedência - 50% de reembolso',
+          description:
+              'Cancelamento com 12h de antecedência - 50% de reembolso',
         ),
         CancellationRule(
           minHoursBeforeAppointment: 0,
@@ -157,7 +166,8 @@ class CancellationPolicy extends Equatable {
           description: 'Cancelamento com menos de 12h - Sem reembolso',
         ),
       ],
-      description: 'Política padrão de cancelamento para procedimentos estéticos',
+      description:
+          'Política padrão de cancelamento para procedimentos estéticos',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -165,22 +175,18 @@ class CancellationPolicy extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        serviceId,
-        categoryId,
-        rules,
-        allowsEmergencyException,
-        allowsRescheduling,
-      ];
+    id,
+    serviceId,
+    categoryId,
+    rules,
+    allowsEmergencyException,
+    allowsRescheduling,
+  ];
 }
 
 /// Cancellation Rule
 /// Individual rule within a cancellation policy
 class CancellationRule extends Equatable {
-  final int minHoursBeforeAppointment;
-  final int refundPercentage;
-  final String description;
-
   const CancellationRule({
     required this.minHoursBeforeAppointment,
     required this.refundPercentage,
@@ -194,6 +200,9 @@ class CancellationRule extends Equatable {
       description: json['description'] as String,
     );
   }
+  final int minHoursBeforeAppointment;
+  final int refundPercentage;
+  final String description;
 
   Map<String, dynamic> toJson() {
     return {
@@ -210,13 +219,6 @@ class CancellationRule extends Equatable {
 /// Cancellation Calculation Result
 /// Result of refund calculation for appointment cancellation
 class CancellationCalculation extends Equatable {
-  final int refundPercentage;
-  final double refundAmount;
-  final double penalty;
-  final String reason;
-  final int hoursUntilAppointment;
-  final bool canCancel;
-
   const CancellationCalculation({
     required this.refundPercentage,
     required this.refundAmount,
@@ -225,6 +227,12 @@ class CancellationCalculation extends Equatable {
     required this.hoursUntilAppointment,
     required this.canCancel,
   });
+  final int refundPercentage;
+  final double refundAmount;
+  final double penalty;
+  final String reason;
+  final int hoursUntilAppointment;
+  final bool canCancel;
 
   /// Get user-friendly time description
   String get timeDescription {
@@ -255,26 +263,26 @@ class CancellationCalculation extends Equatable {
     if (!canCancel) {
       return 'Cancelamento não permitido. $reason.';
     }
-    
+
     if (refundPercentage == 100) {
       return 'Reembolso total de ${refundAmount.toStringAsFixed(0)} SG créditos.';
     }
-    
+
     if (refundPercentage > 0) {
       return 'Reembolso de $refundPercentage% (${refundAmount.toStringAsFixed(0)} SG créditos). Taxa de cancelamento: ${penalty.toStringAsFixed(0)} SG créditos.';
     }
-    
+
     return 'Sem reembolso. Taxa de cancelamento: ${penalty.toStringAsFixed(0)} SG créditos.';
   }
 
   @override
   List<Object?> get props => [
-        refundPercentage,
-        refundAmount,
-        penalty,
-        hoursUntilAppointment,
-        canCancel,
-      ];
+    refundPercentage,
+    refundAmount,
+    penalty,
+    hoursUntilAppointment,
+    canCancel,
+  ];
 }
 
 /// Emergency Exception Types

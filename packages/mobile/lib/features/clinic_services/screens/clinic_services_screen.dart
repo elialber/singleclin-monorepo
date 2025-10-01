@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/clinic_services_controller.dart';
-import '../widgets/service_list_item.dart';
+import 'package:singleclin_mobile/features/clinic_services/controllers/clinic_services_controller.dart';
+import 'package:singleclin_mobile/features/clinic_services/widgets/service_list_item.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ClinicServicesScreen extends StatelessWidget {
-  const ClinicServicesScreen({Key? key}) : super(key: key);
+  const ClinicServicesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +27,7 @@ class ClinicServicesScreen extends StatelessWidget {
             } catch (e) {
               return const Text(
                 'Serviços',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
               );
             }
           },
@@ -40,38 +37,43 @@ class ClinicServicesScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, size: 20),
-          onPressed: () => Get.back(),
+          onPressed: Get.back,
         ),
         actions: [
           // Credits display
           Container(
             margin: const EdgeInsets.only(right: 16),
-            child: Obx(() => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.onPrimary.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.account_balance_wallet,
-                    color: AppColors.onPrimary,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${controller.userCredits.value}',
-                    style: const TextStyle(
+            child: Obx(
+              () => Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.onPrimary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.account_balance_wallet,
                       color: AppColors.onPrimary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                      size: 16,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4),
+                    Text(
+                      '${controller.userCredits.value}',
+                      style: const TextStyle(
+                        color: AppColors.onPrimary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )),
+            ),
           ),
         ],
       ),
@@ -103,8 +105,8 @@ class ClinicServicesScreen extends StatelessWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              clinic.imageUrl.isNotEmpty 
-                                  ? clinic.imageUrl 
+                              clinic.imageUrl.isNotEmpty
+                                  ? clinic.imageUrl
                                   : 'https://via.placeholder.com/60x60?text=Clinic',
                               width: 60,
                               height: 60,
@@ -144,7 +146,7 @@ class ClinicServicesScreen extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.star,
                                       color: AppColors.warning,
                                       size: 16,
@@ -159,7 +161,7 @@ class ClinicServicesScreen extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(width: 8),
-                                    Icon(
+                                    const Icon(
                                       Icons.location_on,
                                       color: AppColors.primary,
                                       size: 16,
@@ -189,15 +191,15 @@ class ClinicServicesScreen extends StatelessWidget {
                             color: AppColors.info.withOpacity(0.3),
                           ),
                         ),
-                        child: Row(
+                        child: const Row(
                           children: [
                             Icon(
                               Icons.info_outline,
                               color: AppColors.info,
                               size: 20,
                             ),
-                            const SizedBox(width: 8),
-                            const Expanded(
+                            SizedBox(width: 8),
+                            Expanded(
                               child: Text(
                                 'Selecione um serviço para agendar. O valor será descontado dos seus créditos.',
                                 style: TextStyle(
@@ -214,14 +216,14 @@ class ClinicServicesScreen extends StatelessWidget {
                 } catch (e) {
                   return Container(
                     padding: const EdgeInsets.all(16),
-                    child: Column(
+                    child: const Column(
                       children: [
                         Icon(
                           Icons.error_outline,
                           size: 48,
                           color: AppColors.error,
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Text(
                           'Erro ao carregar informações da clínica',
                           style: TextStyle(
@@ -236,18 +238,18 @@ class ClinicServicesScreen extends StatelessWidget {
               },
             ),
           ),
-          
+
           // Services list
           Expanded(
             child: Obx(() {
-              print('DEBUG: Rebuilding services list - Loading: ${controller.isLoading.value}, Error: ${controller.error.value}, Services: ${controller.services.length}');
-              
+              print(
+                'DEBUG: Rebuilding services list - Loading: ${controller.isLoading.value}, Error: ${controller.error.value}, Services: ${controller.services.length}',
+              );
+
               if (controller.isLoading.value) {
                 print('DEBUG: Showing loading indicator');
                 return const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
-                  ),
+                  child: CircularProgressIndicator(color: AppColors.primary),
                 );
               }
 
@@ -257,13 +259,13 @@ class ClinicServicesScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.error_outline,
                         size: 64,
                         color: AppColors.error,
                       ),
                       const SizedBox(height: 16),
-                      Text(
+                      const Text(
                         'Erro ao carregar serviços',
                         style: TextStyle(
                           fontSize: 18,
@@ -272,11 +274,9 @@ class ClinicServicesScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      const Text(
                         'Tente novamente mais tarde',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                        ),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
@@ -295,7 +295,7 @@ class ClinicServicesScreen extends StatelessWidget {
 
               if (controller.services.isEmpty) {
                 print('DEBUG: Showing empty state - no services available');
-                return Center(
+                return const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -304,7 +304,7 @@ class ClinicServicesScreen extends StatelessWidget {
                         size: 64,
                         color: AppColors.mediumGrey,
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
                       Text(
                         'Nenhum serviço disponível',
                         style: TextStyle(
@@ -313,20 +313,20 @@ class ClinicServicesScreen extends StatelessWidget {
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Text(
                         'Esta clínica ainda não possui serviços cadastrados',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                        ),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ],
                   ),
                 );
               }
 
-              print('DEBUG: Showing services list - ${controller.services.length} items');
+              print(
+                'DEBUG: Showing services list - ${controller.services.length} items',
+              );
               return RefreshIndicator(
                 onRefresh: controller.refreshServices,
                 child: ListView.builder(
@@ -334,12 +334,15 @@ class ClinicServicesScreen extends StatelessWidget {
                   itemCount: controller.services.length,
                   itemBuilder: (context, index) {
                     final service = controller.services[index];
-                    print('DEBUG: Building service item $index: ${service.name}');
+                    print(
+                      'DEBUG: Building service item $index: ${service.name}',
+                    );
                     return ServiceListItem(
                       service: service,
                       userCredits: controller.userCredits.value,
                       creditsLoaded: controller.creditsLoaded.value,
-                      onBookPressed: () => controller.showBookingConfirmation(service),
+                      onBookPressed: () =>
+                          controller.showBookingConfirmation(service),
                     );
                   },
                 ),

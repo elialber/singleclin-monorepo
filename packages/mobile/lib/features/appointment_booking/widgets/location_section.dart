@@ -3,12 +3,8 @@ import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class LocationSection extends StatefulWidget {
+  const LocationSection({Key? key, required this.clinic}) : super(key: key);
   final Clinic clinic;
-
-  const LocationSection({
-    Key? key,
-    required this.clinic,
-  }) : super(key: key);
 
   @override
   State<LocationSection> createState() => _LocationSectionState();
@@ -40,10 +36,7 @@ class _LocationSectionState extends State<LocationSection> {
                 const SizedBox(height: 4),
                 Text(
                   'Como chegar à clínica',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -57,7 +50,7 @@ class _LocationSectionState extends State<LocationSection> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.location_on,
                     size: 14,
                     color: AppColors.primary,
@@ -65,7 +58,7 @@ class _LocationSectionState extends State<LocationSection> {
                   const SizedBox(width: 4),
                   Text(
                     '${widget.clinic.distance.toStringAsFixed(1)} km',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primary,
@@ -76,9 +69,9 @@ class _LocationSectionState extends State<LocationSection> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Address Card
         Container(
           padding: const EdgeInsets.all(16),
@@ -99,15 +92,15 @@ class _LocationSectionState extends State<LocationSection> {
                       color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.location_on,
                       color: AppColors.primary,
                       size: 20,
                     ),
                   ),
-                  
+
                   const SizedBox(width: 12),
-                  
+
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,10 +125,10 @@ class _LocationSectionState extends State<LocationSection> {
                       ],
                     ),
                   ),
-                  
+
                   // Copy Address Button
                   InkWell(
-                    onTap: () => _copyAddress(),
+                    onTap: _copyAddress,
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -152,9 +145,9 @@ class _LocationSectionState extends State<LocationSection> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Action Buttons
               Row(
                 children: [
@@ -163,18 +156,18 @@ class _LocationSectionState extends State<LocationSection> {
                       icon: Icons.directions,
                       label: 'Como chegar',
                       color: AppColors.primary,
-                      onTap: () => _openDirections(),
+                      onTap: _openDirections,
                     ),
                   ),
-                  
+
                   const SizedBox(width: 12),
-                  
+
                   Expanded(
                     child: _buildActionButton(
                       icon: Icons.map,
                       label: 'Ver no mapa',
                       color: Colors.green,
-                      onTap: () => _toggleMapView(),
+                      onTap: _toggleMapView,
                     ),
                   ),
                 ],
@@ -182,9 +175,9 @@ class _LocationSectionState extends State<LocationSection> {
             ],
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Map Preview
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -255,7 +248,7 @@ class _LocationSectionState extends State<LocationSection> {
                           );
                         },
                       ),
-                      
+
                       // Map marker
                       Positioned(
                         top: _isMapExpanded ? 100 : 60,
@@ -285,7 +278,7 @@ class _LocationSectionState extends State<LocationSection> {
                     ],
                   ),
                 ),
-                
+
                 // Map controls overlay
                 Positioned(
                   top: 12,
@@ -293,24 +286,29 @@ class _LocationSectionState extends State<LocationSection> {
                   child: Column(
                     children: [
                       _buildMapControl(
-                        icon: _isMapExpanded ? Icons.fullscreen_exit : Icons.fullscreen,
-                        onTap: () => _toggleMapView(),
+                        icon: _isMapExpanded
+                            ? Icons.fullscreen_exit
+                            : Icons.fullscreen,
+                        onTap: _toggleMapView,
                       ),
                       const SizedBox(height: 8),
                       _buildMapControl(
                         icon: Icons.my_location,
-                        onTap: () => _centerOnUserLocation(),
+                        onTap: _centerOnUserLocation,
                       ),
                     ],
                   ),
                 ),
-                
+
                 // Distance and time info
                 Positioned(
                   bottom: 12,
                   left: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(20),
@@ -340,9 +338,9 @@ class _LocationSectionState extends State<LocationSection> {
             ),
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Transportation Options
         _buildTransportationOptions(),
       ],
@@ -405,11 +403,7 @@ class _LocationSectionState extends State<LocationSection> {
             ),
           ],
         ),
-        child: Icon(
-          icon,
-          color: Colors.grey[700],
-          size: 18,
-        ),
+        child: Icon(icon, color: Colors.grey[700], size: 18),
       ),
     );
   }
@@ -426,9 +420,9 @@ class _LocationSectionState extends State<LocationSection> {
             color: Colors.grey[700],
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         Row(
           children: [
             Expanded(
@@ -453,7 +447,7 @@ class _LocationSectionState extends State<LocationSection> {
               child: _buildTransportOption(
                 icon: Icons.directions_walk,
                 label: 'A pé',
-                time: '${(_getEstimatedTime() * 4)} min',
+                time: '${_getEstimatedTime() * 4} min',
                 color: Colors.orange,
               ),
             ),
@@ -490,10 +484,7 @@ class _LocationSectionState extends State<LocationSection> {
           ),
           Text(
             time,
-            style: TextStyle(
-              fontSize: 10,
-              color: color.withOpacity(0.8),
-            ),
+            style: TextStyle(fontSize: 10, color: color.withOpacity(0.8)),
           ),
         ],
       ),

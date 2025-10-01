@@ -3,29 +3,6 @@ import 'package:equatable/equatable.dart';
 /// Health Record Model
 /// Represents medical history and health records for the user
 class HealthRecord extends Equatable {
-  final String id;
-  final String userId;
-  final String type;
-  final String title;
-  final String description;
-  final DateTime date;
-  final String? clinicId;
-  final String? clinicName;
-  final String? professionalId;
-  final String? professionalName;
-  final String? appointmentId;
-  final List<String> attachments;
-  final List<String> photos;
-  final Map<String, dynamic>? results;
-  final List<String> recommendations;
-  final String? followUpDate;
-  final bool isImportant;
-  final List<String> tags;
-  final HealthRecordStatus status;
-  final Map<String, dynamic>? metadata;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   const HealthRecord({
     required this.id,
     required this.userId,
@@ -68,16 +45,42 @@ class HealthRecord extends Equatable {
       attachments: List<String>.from(json['attachments'] as List? ?? []),
       photos: List<String>.from(json['photos'] as List? ?? []),
       results: json['results'] as Map<String, dynamic>?,
-      recommendations: List<String>.from(json['recommendations'] as List? ?? []),
+      recommendations: List<String>.from(
+        json['recommendations'] as List? ?? [],
+      ),
       followUpDate: json['followUpDate'] as String?,
       isImportant: json['isImportant'] as bool? ?? false,
       tags: List<String>.from(json['tags'] as List? ?? []),
-      status: HealthRecordStatus.fromString(json['status'] as String? ?? 'active'),
+      status: HealthRecordStatus.fromString(
+        json['status'] as String? ?? 'active',
+      ),
       metadata: json['metadata'] as Map<String, dynamic>?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
   }
+  final String id;
+  final String userId;
+  final String type;
+  final String title;
+  final String description;
+  final DateTime date;
+  final String? clinicId;
+  final String? clinicName;
+  final String? professionalId;
+  final String? professionalName;
+  final String? appointmentId;
+  final List<String> attachments;
+  final List<String> photos;
+  final Map<String, dynamic>? results;
+  final List<String> recommendations;
+  final String? followUpDate;
+  final bool isImportant;
+  final List<String> tags;
+  final HealthRecordStatus status;
+  final Map<String, dynamic>? metadata;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
@@ -161,8 +164,19 @@ class HealthRecord extends Equatable {
   /// Get formatted date string
   String get formattedDate {
     final months = [
-      '', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+      '',
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez',
     ];
     return '${date.day} ${months[date.month]} ${date.year}';
   }
@@ -171,7 +185,7 @@ class HealthRecord extends Equatable {
   String get timeAgo {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 365) {
       final years = (difference.inDays / 365).floor();
       return '$years ano${years > 1 ? 's' : ''} atrás';
@@ -221,14 +235,7 @@ class HealthRecord extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-        id,
-        userId,
-        type,
-        title,
-        date,
-        updatedAt,
-      ];
+  List<Object?> get props => [id, userId, type, title, date, updatedAt];
 
   @override
   String toString() {
@@ -268,7 +275,12 @@ enum HealthRecordType {
   nutrition('nutrition', 'Nutrição', '#8BC34A', 'restaurant'),
   fitness('fitness', 'Exercício', '#FF5722', 'fitness_center'),
   mental_health('mental_health', 'Saúde Mental', '#673AB7', 'mood'),
-  chronic_condition('chronic_condition', 'Condição Crônica', '#FFC107', 'monitor_heart'),
+  chronic_condition(
+    'chronic_condition',
+    'Condição Crônica',
+    '#FFC107',
+    'monitor_heart',
+  ),
   emergency('emergency', 'Emergência', '#D32F2F', 'emergency'),
   followup('followup', 'Retorno', '#00BCD4', 'event_repeat'),
   other('other', 'Outro', '#9E9E9E', 'description');
@@ -289,44 +301,34 @@ enum HealthRecordType {
 
   /// Get all procedure types
   static List<HealthRecordType> get procedureTypes => [
-        consultation,
-        exam,
-        procedure,
-        surgery,
-        therapy,
-      ];
+    consultation,
+    exam,
+    procedure,
+    surgery,
+    therapy,
+  ];
 
   /// Get all medical types
   static List<HealthRecordType> get medicalTypes => [
-        consultation,
-        exam,
-        procedure,
-        vaccination,
-        prescription,
-        surgery,
-      ];
+    consultation,
+    exam,
+    procedure,
+    vaccination,
+    prescription,
+    surgery,
+  ];
 
   /// Get all lifestyle types
   static List<HealthRecordType> get lifestyleTypes => [
-        nutrition,
-        fitness,
-        mental_health,
-      ];
+    nutrition,
+    fitness,
+    mental_health,
+  ];
 }
 
 /// Health Metric Model
 /// For tracking specific health metrics over time
 class HealthMetric extends Equatable {
-  final String id;
-  final String userId;
-  final String type;
-  final double value;
-  final String unit;
-  final DateTime recordedDate;
-  final String? source;
-  final String? notes;
-  final Map<String, dynamic>? metadata;
-
   const HealthMetric({
     required this.id,
     required this.userId,
@@ -352,6 +354,15 @@ class HealthMetric extends Equatable {
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
+  final String id;
+  final String userId;
+  final String type;
+  final double value;
+  final String unit;
+  final DateTime recordedDate;
+  final String? source;
+  final String? notes;
+  final Map<String, dynamic>? metadata;
 
   Map<String, dynamic> toJson() {
     return {
@@ -415,29 +426,23 @@ enum HealthMetricType {
 
   /// Get vital signs metrics
   static List<HealthMetricType> get vitalSigns => [
-        bloodPressure,
-        heartRate,
-        temperature,
-        oxygenSaturation,
-      ];
+    bloodPressure,
+    heartRate,
+    temperature,
+    oxygenSaturation,
+  ];
 
   /// Get body metrics
-  static List<HealthMetricType> get bodyMetrics => [
-        weight,
-        height,
-      ];
+  static List<HealthMetricType> get bodyMetrics => [weight, height];
 
   /// Get lab metrics
-  static List<HealthMetricType> get labMetrics => [
-        bloodSugar,
-        cholesterol,
-      ];
+  static List<HealthMetricType> get labMetrics => [bloodSugar, cholesterol];
 
   /// Get lifestyle metrics
   static List<HealthMetricType> get lifestyleMetrics => [
-        steps,
-        sleep,
-        water,
-        calories,
-      ];
+    steps,
+    sleep,
+    water,
+    calories,
+  ];
 }

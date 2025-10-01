@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/support_controller.dart';
-import '../widgets/support_chat_bubble.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/support_controller.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/support_chat_bubble.dart';
 
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});
@@ -38,7 +38,10 @@ class SupportScreen extends StatelessWidget {
                     indicatorColor: Color(0xFF005156),
                     tabs: [
                       Tab(icon: Icon(Icons.chat), text: 'Chat'),
-                      Tab(icon: Icon(Icons.confirmation_number), text: 'Tickets'),
+                      Tab(
+                        icon: Icon(Icons.confirmation_number),
+                        text: 'Tickets',
+                      ),
                     ],
                   ),
                 ),
@@ -91,9 +94,9 @@ class SupportScreen extends StatelessWidget {
             ],
           ),
         ),
-        
+
         const Divider(height: 1),
-        
+
         // Chat messages
         Expanded(
           child: controller.chatMessages.isEmpty
@@ -134,7 +137,7 @@ class SupportScreen extends StatelessWidget {
                   },
                 ),
         ),
-        
+
         // Typing indicator
         if (controller.isAgentTyping)
           Container(
@@ -142,7 +145,10 @@ class SupportScreen extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(18),
@@ -163,7 +169,7 @@ class SupportScreen extends StatelessWidget {
               ],
             ),
           ),
-        
+
         // Message input
         Container(
           padding: const EdgeInsets.all(16),
@@ -203,8 +209,8 @@ class SupportScreen extends StatelessWidget {
               const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.send),
-                onPressed: controller.canSendMessage 
-                    ? controller.sendMessage 
+                onPressed: controller.canSendMessage
+                    ? controller.sendMessage
                     : null,
                 color: const Color(0xFF005156),
               ),
@@ -235,7 +241,7 @@ class SupportScreen extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // Tickets list
         Expanded(
           child: controller.tickets.isEmpty
@@ -243,14 +249,15 @@ class SupportScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.confirmation_number, size: 64, color: Colors.grey),
+                      Icon(
+                        Icons.confirmation_number,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
                       SizedBox(height: 16),
                       Text(
                         'Nenhum ticket encontrado',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -316,11 +323,15 @@ class SupportScreen extends StatelessWidget {
                                 ),
                               ),
                               if (ticket.priority == 'high')
-                                const Icon(Icons.priority_high, 
-                                    color: Colors.red, size: 16),
+                                const Icon(
+                                  Icons.priority_high,
+                                  color: Colors.red,
+                                  size: 16,
+                                ),
                             ],
                           ),
-                          onTap: () => Get.toNamed('/support/ticket/${ticket.id}'),
+                          onTap: () =>
+                              Get.toNamed('/support/ticket/${ticket.id}'),
                         ),
                       );
                     },
@@ -331,7 +342,10 @@ class SupportScreen extends StatelessWidget {
     );
   }
 
-  void _showTicketsBottomSheet(BuildContext context, SupportController controller) {
+  void _showTicketsBottomSheet(
+    BuildContext context,
+    SupportController controller,
+  ) {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(16),
@@ -345,10 +359,7 @@ class SupportScreen extends StatelessWidget {
           children: [
             const Text(
               'Tickets Ativos',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ...controller.activeTickets.map((ticket) {
@@ -392,16 +403,13 @@ class SupportScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: controller.selectedCategory,
+              initialValue: controller.selectedCategory,
               decoration: const InputDecoration(
                 labelText: 'Categoria',
                 border: OutlineInputBorder(),
               ),
               items: controller.ticketCategories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
+                return DropdownMenuItem(value: category, child: Text(category));
               }).toList(),
               onChanged: controller.setSelectedCategory,
             ),
@@ -417,10 +425,7 @@ class SupportScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
               controller.createTicket();

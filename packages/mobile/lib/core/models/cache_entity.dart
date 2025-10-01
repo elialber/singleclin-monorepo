@@ -58,15 +58,6 @@ abstract class CacheableEntity {
 
 /// Metadata for cached items
 class CacheMetadata {
-  final String key;
-  final DateTime cachedAt;
-  final DateTime lastAccessed;
-  final DateTime? expiresAt;
-  final int accessCount;
-  final String entityType;
-  final int size; // Approximate size in bytes
-  final Map<String, dynamic>? customData;
-
   CacheMetadata({
     required this.key,
     required this.cachedAt,
@@ -92,6 +83,14 @@ class CacheMetadata {
       customData: json['customData'] as Map<String, dynamic>?,
     );
   }
+  final String key;
+  final DateTime cachedAt;
+  final DateTime lastAccessed;
+  final DateTime? expiresAt;
+  final int accessCount;
+  final String entityType;
+  final int size; // Approximate size in bytes
+  final Map<String, dynamic>? customData;
 
   Map<String, dynamic> toJson() {
     return {
@@ -128,51 +127,39 @@ class CacheMetadata {
 
   /// Check if cache entry is stale (not accessed recently)
   bool get isStale {
-    final stalePeriod = Duration(days: 7); // Consider stale after 7 days
+    const stalePeriod = Duration(days: 7); // Consider stale after 7 days
     return DateTime.now().difference(lastAccessed) > stalePeriod;
   }
 
   /// Calculate cache score for eviction decisions (higher = keep)
   double get cacheScore {
-    final ageWeight = 0.3;
-    final accessWeight = 0.4;
-    final sizeWeight = 0.3;
+    const ageWeight = 0.3;
+    const accessWeight = 0.4;
+    const sizeWeight = 0.3;
 
     // Normalize values (0-1)
     final ageDays = DateTime.now().difference(cachedAt).inDays;
     final ageScore = 1.0 - (ageDays / 30.0).clamp(0.0, 1.0); // Newer = better
 
-    final accessScore = (accessCount / 100.0).clamp(0.0, 1.0); // More access = better
+    final accessScore = (accessCount / 100.0).clamp(
+      0.0,
+      1.0,
+    ); // More access = better
 
-    final sizeScore = 1.0 - (size / 100000.0).clamp(0.0, 1.0); // Smaller = better
+    final sizeScore =
+        1.0 - (size / 100000.0).clamp(0.0, 1.0); // Smaller = better
 
     return (ageScore * ageWeight) +
-           (accessScore * accessWeight) +
-           (sizeScore * sizeWeight);
+        (accessScore * accessWeight) +
+        (sizeScore * sizeWeight);
   }
 }
 
 /// Cache operation types for queue
-enum CacheOperation {
-  create,
-  update,
-  delete,
-  sync,
-}
+enum CacheOperation { create, update, delete, sync }
 
 /// Pending operation for offline queue
 class PendingOperation {
-  final String id;
-  final CacheOperation operation;
-  final BoxType boxType;
-  final String entityKey;
-  final Map<String, dynamic>? data;
-  final DateTime createdAt;
-  final int retryCount;
-  final DateTime? lastRetryAt;
-  final String? errorMessage;
-  final Map<String, dynamic>? metadata;
-
   PendingOperation({
     required this.id,
     required this.operation,
@@ -206,6 +193,16 @@ class PendingOperation {
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
+  final String id;
+  final CacheOperation operation;
+  final BoxType boxType;
+  final String entityKey;
+  final Map<String, dynamic>? data;
+  final DateTime createdAt;
+  final int retryCount;
+  final DateTime? lastRetryAt;
+  final String? errorMessage;
+  final Map<String, dynamic>? metadata;
 
   Map<String, dynamic> toJson() {
     return {
@@ -264,13 +261,6 @@ class PendingOperation {
 
 /// Search cache entry
 class SearchCacheEntry {
-  final String query;
-  final Map<String, dynamic> filters;
-  final List<Map<String, dynamic>> results;
-  final DateTime cachedAt;
-  final int totalResults;
-  final Duration queryDuration;
-
   SearchCacheEntry({
     required this.query,
     required this.filters,
@@ -290,6 +280,12 @@ class SearchCacheEntry {
       queryDuration: Duration(milliseconds: json['queryDurationMs'] as int),
     );
   }
+  final String query;
+  final Map<String, dynamic> filters;
+  final List<Map<String, dynamic>> results;
+  final DateTime cachedAt;
+  final int totalResults;
+  final Duration queryDuration;
 
   Map<String, dynamic> toJson() {
     return {

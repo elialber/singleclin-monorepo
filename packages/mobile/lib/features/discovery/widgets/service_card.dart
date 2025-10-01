@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/sg_credit_widget.dart';
-import '../models/service.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
 
 /// Service card widget optimized for mobile touch interactions
 class ServiceCard extends StatelessWidget {
-  final Service service;
-  final VoidCallback? onTap;
-  final VoidCallback? onBookPressed;
-  final bool compact;
-  final bool showDescription;
-  final int? userSGCredits;
-
   const ServiceCard({
     Key? key,
     required this.service,
@@ -23,15 +16,19 @@ class ServiceCard extends StatelessWidget {
     this.showDescription = true,
     this.userSGCredits,
   }) : super(key: key);
+  final Service service;
+  final VoidCallback? onTap;
+  final VoidCallback? onBookPressed;
+  final bool compact;
+  final bool showDescription;
+  final int? userSGCredits;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -116,7 +113,8 @@ class ServiceCard extends StatelessWidget {
               height: size,
               fit: BoxFit.cover,
               placeholder: (context, url) => _buildImagePlaceholder(size),
-              errorWidget: (context, url, error) => _buildImagePlaceholder(size),
+              errorWidget: (context, url, error) =>
+                  _buildImagePlaceholder(size),
             )
           : _buildImagePlaceholder(size),
     );
@@ -141,10 +139,7 @@ class ServiceCard extends StatelessWidget {
   Widget _buildServiceName({int maxLines = 2}) {
     return Text(
       service.name,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-      ),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       maxLines: maxLines,
       overflow: TextOverflow.ellipsis,
     );
@@ -169,30 +164,20 @@ class ServiceCard extends StatelessWidget {
   }
 
   Widget _buildDurationAndPrice() {
-    final isAffordable = userSGCredits != null ? 
-        userSGCredits! >= service.priceInSG : true;
+    final isAffordable = userSGCredits != null
+        ? userSGCredits! >= service.priceInSG
+        : true;
 
     return Row(
       children: [
-        Icon(
-          Icons.schedule,
-          size: 14,
-          color: AppColors.mediumGrey,
-        ),
+        const Icon(Icons.schedule, size: 14, color: AppColors.mediumGrey),
         const SizedBox(width: 4),
         Text(
           service.formattedDuration,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.mediumGrey,
-          ),
+          style: const TextStyle(fontSize: 12, color: AppColors.mediumGrey),
         ),
         const SizedBox(width: 12),
-        SgCostChip(
-          cost: service.priceInSG,
-          isAffordable: isAffordable,
-          fontSize: 12,
-        ),
+        SgCostChip(cost: service.priceInSG, isAffordable: isAffordable),
       ],
     );
   }
@@ -214,44 +199,41 @@ class ServiceCard extends StatelessWidget {
     final features = <Widget>[];
 
     if (service.requiresConsultation) {
-      features.add(_buildFeatureChip(
-        'Consulta necessária',
-        Icons.medical_services,
-        AppColors.warning,
-      ));
+      features.add(
+        _buildFeatureChip(
+          'Consulta necessária',
+          Icons.medical_services,
+          AppColors.warning,
+        ),
+      );
     }
 
-    if (service.recommendedSessions != null && service.recommendedSessions! > 1) {
-      features.add(_buildFeatureChip(
-        service.recommendedSessionsText,
-        Icons.repeat,
-        AppColors.info,
-      ));
+    if (service.recommendedSessions != null &&
+        service.recommendedSessions! > 1) {
+      features.add(
+        _buildFeatureChip(
+          service.recommendedSessionsText,
+          Icons.repeat,
+          AppColors.info,
+        ),
+      );
     }
 
     if (service.isFeatured) {
-      features.add(_buildFeatureChip(
-        'Destaque',
-        Icons.star,
-        AppColors.sgPrimary,
-      ));
+      features.add(
+        _buildFeatureChip('Destaque', Icons.star, AppColors.sgPrimary),
+      );
     }
 
     if (service.isPopular) {
-      features.add(_buildFeatureChip(
-        'Popular',
-        Icons.trending_up,
-        AppColors.success,
-      ));
+      features.add(
+        _buildFeatureChip('Popular', Icons.trending_up, AppColors.success),
+      );
     }
 
     if (features.isEmpty) return const SizedBox.shrink();
 
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: features,
-    );
+    return Wrap(spacing: 6, runSpacing: 6, children: features);
   }
 
   Widget _buildFeatureChip(String label, IconData icon, Color color) {
@@ -315,9 +297,7 @@ class ServiceCard extends StatelessWidget {
         const SizedBox(height: 6),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Row(
-            children: deals.map((deal) => _buildPackageDealCard(deal)).toList(),
-          ),
+          child: Row(children: deals.map(_buildPackageDealCard).toList()),
         ),
       ],
     );
@@ -337,10 +317,7 @@ class ServiceCard extends StatelessWidget {
         children: [
           Text(
             '${deal.sessions} sessões',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 2),
           Text(
@@ -379,24 +356,19 @@ class ServiceCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Expanded(
-          flex: 2,
-          child: _buildBookButton(),
-        ),
+        Expanded(flex: 2, child: _buildBookButton()),
       ],
     );
   }
 
   Widget _buildBookButton({bool compact = false}) {
-    final isAffordable = userSGCredits != null ? 
-        userSGCredits! >= service.priceInSG : true;
+    final isAffordable = userSGCredits != null
+        ? userSGCredits! >= service.priceInSG
+        : true;
 
     return ElevatedButton.icon(
       onPressed: isAffordable ? onBookPressed : null,
-      icon: Icon(
-        Icons.calendar_today,
-        size: compact ? 14 : 16,
-      ),
+      icon: Icon(Icons.calendar_today, size: compact ? 14 : 16),
       label: Text(
         compact ? 'Agendar' : 'Agendar Agora',
         style: TextStyle(fontSize: compact ? 12 : 14),

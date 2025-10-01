@@ -1,35 +1,9 @@
-enum SubscriptionStatus {
-  active,
-  expiring,
-  expired,
-  paused,
-  cancelled
-}
+enum SubscriptionStatus { active, expiring, expired, paused, cancelled }
 
-enum SubscriptionBillingCycle {
-  monthly,
-  quarterly,
-  annual
-}
+enum SubscriptionBillingCycle { monthly, quarterly, annual }
 
 class SubscriptionPlan {
-  final String id;
-  final String name;
-  final String description;
-  final int monthlyCredits;
-  final double monthlyPrice;
-  final double annualPrice;
-  final List<String> features;
-  final List<String> restrictions;
-  final bool isPopular;
-  final bool isActive;
-  final bool hasFreeTrial;
-  final int freeTrialDays;
-  final int maxClinics;
-  final int maxAppointmentsPerDay;
-  final double discountPercentage;
-  final int sortOrder;
-  final String category; // 'basic', 'premium', 'vip'
+  // 'basic', 'premium', 'vip'
 
   SubscriptionPlan({
     required this.id,
@@ -60,9 +34,11 @@ class SubscriptionPlan {
       monthlyPrice: (json['monthlyPrice'] ?? 0.0).toDouble(),
       annualPrice: (json['annualPrice'] ?? 0.0).toDouble(),
       features: json['features'] != null
-          ? List<String>.from(json['features']) : [],
+          ? List<String>.from(json['features'])
+          : [],
       restrictions: json['restrictions'] != null
-          ? List<String>.from(json['restrictions']) : [],
+          ? List<String>.from(json['restrictions'])
+          : [],
       isPopular: json['isPopular'] ?? false,
       isActive: json['isActive'] ?? true,
       hasFreeTrial: json['hasFreeTrial'] ?? false,
@@ -74,6 +50,23 @@ class SubscriptionPlan {
       category: json['category'] ?? 'basic',
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final int monthlyCredits;
+  final double monthlyPrice;
+  final double annualPrice;
+  final List<String> features;
+  final List<String> restrictions;
+  final bool isPopular;
+  final bool isActive;
+  final bool hasFreeTrial;
+  final int freeTrialDays;
+  final int maxClinics;
+  final int maxAppointmentsPerDay;
+  final double discountPercentage;
+  final int sortOrder;
+  final String category;
 
   Map<String, dynamic> toJson() {
     return {
@@ -140,26 +133,6 @@ class SubscriptionPlan {
 }
 
 class UserSubscription {
-  final String id;
-  final String userId;
-  final String planId;
-  final SubscriptionPlan? plan;
-  final SubscriptionStatus status;
-  final SubscriptionBillingCycle billingCycle;
-  final DateTime startDate;
-  final DateTime? endDate;
-  final DateTime nextBillingDate;
-  final DateTime? cancelDate;
-  final DateTime? pauseDate;
-  final int creditsBalance;
-  final int creditsUsedThisMonth;
-  final int creditsTotal;
-  final double amountPaid;
-  final String? paymentMethodId;
-  final Map<String, dynamic>? metadata;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   UserSubscription({
     required this.id,
     required this.userId,
@@ -187,7 +160,9 @@ class UserSubscription {
       id: json['id'] ?? '',
       userId: json['userId'] ?? '',
       planId: json['planId'] ?? '',
-      plan: json['plan'] != null ? SubscriptionPlan.fromJson(json['plan']) : null,
+      plan: json['plan'] != null
+          ? SubscriptionPlan.fromJson(json['plan'])
+          : null,
       status: SubscriptionStatus.values.firstWhere(
         (e) => e.toString().split('.').last == json['status'],
         orElse: () => SubscriptionStatus.active,
@@ -199,8 +174,12 @@ class UserSubscription {
       startDate: DateTime.parse(json['startDate']),
       endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
       nextBillingDate: DateTime.parse(json['nextBillingDate']),
-      cancelDate: json['cancelDate'] != null ? DateTime.parse(json['cancelDate']) : null,
-      pauseDate: json['pauseDate'] != null ? DateTime.parse(json['pauseDate']) : null,
+      cancelDate: json['cancelDate'] != null
+          ? DateTime.parse(json['cancelDate'])
+          : null,
+      pauseDate: json['pauseDate'] != null
+          ? DateTime.parse(json['pauseDate'])
+          : null,
       creditsBalance: json['creditsBalance'] ?? 0,
       creditsUsedThisMonth: json['creditsUsedThisMonth'] ?? 0,
       creditsTotal: json['creditsTotal'] ?? 0,
@@ -211,6 +190,25 @@ class UserSubscription {
       updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
+  final String id;
+  final String userId;
+  final String planId;
+  final SubscriptionPlan? plan;
+  final SubscriptionStatus status;
+  final SubscriptionBillingCycle billingCycle;
+  final DateTime startDate;
+  final DateTime? endDate;
+  final DateTime nextBillingDate;
+  final DateTime? cancelDate;
+  final DateTime? pauseDate;
+  final int creditsBalance;
+  final int creditsUsedThisMonth;
+  final int creditsTotal;
+  final double amountPaid;
+  final String? paymentMethodId;
+  final Map<String, dynamic>? metadata;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Map<String, dynamic> toJson() {
     return {

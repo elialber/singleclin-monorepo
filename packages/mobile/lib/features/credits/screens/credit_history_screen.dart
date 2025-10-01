@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/credit_history_controller.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../shared/widgets/custom_bottom_nav.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
+import 'package:singleclin_mobile/features/credits/controllers/credit_history_controller.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_strings.dart';
 
 class CreditHistoryScreen extends GetView<CreditHistoryController> {
-  const CreditHistoryScreen({Key? key}) : super(key: key);
+  const CreditHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         title: 'Histórico de Transações',
         showBackButton: false,
       ),
-      body: Obx(() => _buildBody()),
+      body: Obx(_buildBody),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: 2,
         onTap: (index) => Get.find<BottomNavController>().changePage(index),
@@ -60,11 +60,7 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: AppColors.error,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               'Erro ao carregar transações',
@@ -133,9 +129,7 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -201,7 +195,10 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: _getStatusColor(transaction.status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),

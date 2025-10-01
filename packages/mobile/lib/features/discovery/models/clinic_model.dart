@@ -1,24 +1,4 @@
 class ClinicModel {
-  final String id;
-  final String name;
-  final String description;
-  final String address;
-  final double latitude;
-  final double longitude;
-  final String phone;
-  final String? email;
-  final String? website;
-  final List<String> imageUrls;
-  final double rating;
-  final int reviewCount;
-  final List<ServiceModel> services;
-  final List<String> specialties;
-  final ClinicSchedule schedule;
-  final bool isVerified;
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   ClinicModel({
     required this.id,
     required this.name,
@@ -52,15 +32,19 @@ class ClinicModel {
       phone: json['phone'] ?? '',
       email: json['email'],
       website: json['website'],
-      imageUrls: json['imageUrls'] != null 
-          ? List<String>.from(json['imageUrls']) : [],
+      imageUrls: json['imageUrls'] != null
+          ? List<String>.from(json['imageUrls'])
+          : [],
       rating: (json['rating'] ?? 0.0).toDouble(),
       reviewCount: json['reviewCount'] ?? 0,
-      services: json['services'] != null 
+      services: json['services'] != null
           ? List<ServiceModel>.from(
-              json['services'].map((x) => ServiceModel.fromJson(x))) : [],
-      specialties: json['specialties'] != null 
-          ? List<String>.from(json['specialties']) : [],
+              json['services'].map((x) => ServiceModel.fromJson(x)),
+            )
+          : [],
+      specialties: json['specialties'] != null
+          ? List<String>.from(json['specialties'])
+          : [],
       schedule: ClinicSchedule.fromJson(json['schedule'] ?? {}),
       isVerified: json['isVerified'] ?? false,
       isActive: json['isActive'] ?? true,
@@ -68,6 +52,25 @@ class ClinicModel {
       updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final String address;
+  final double latitude;
+  final double longitude;
+  final String phone;
+  final String? email;
+  final String? website;
+  final List<String> imageUrls;
+  final double rating;
+  final int reviewCount;
+  final List<ServiceModel> services;
+  final List<String> specialties;
+  final ClinicSchedule schedule;
+  final bool isVerified;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -96,17 +99,16 @@ class ClinicModel {
   double distanceFrom(double userLat, double userLng) {
     // Implementar cálculo de distância usando fórmula de Haversine
     const double earthRadius = 6371; // km
-    
-    double dLat = _toRadians(latitude - userLat);
-    double dLng = _toRadians(longitude - userLng);
-    
-    double a = 
+
+    final double dLat = _toRadians(latitude - userLat);
+    final double dLng = _toRadians(longitude - userLng);
+
+    final double a =
         (dLat / 2) * (dLat / 2) +
-        (dLng / 2) * (dLng / 2) * 
-        (latitude.toDouble() * userLat.toDouble());
-    
-    double c = 2 * (a.squareRoot().asin());
-    
+        (dLng / 2) * (dLng / 2) * (latitude.toDouble() * userLat.toDouble());
+
+    final double c = 2 * (a.squareRoot().asin());
+
     return earthRadius * c;
   }
 
@@ -116,15 +118,6 @@ class ClinicModel {
 }
 
 class ServiceModel {
-  final String id;
-  final String name;
-  final String description;
-  final int sgCost;
-  final int durationMinutes;
-  final String category;
-  final List<String> imageUrls;
-  final bool isActive;
-
   ServiceModel({
     required this.id,
     required this.name,
@@ -144,11 +137,20 @@ class ServiceModel {
       sgCost: json['sgCost'] ?? 0,
       durationMinutes: json['durationMinutes'] ?? 60,
       category: json['category'] ?? '',
-      imageUrls: json['imageUrls'] != null 
-          ? List<String>.from(json['imageUrls']) : [],
+      imageUrls: json['imageUrls'] != null
+          ? List<String>.from(json['imageUrls'])
+          : [],
       isActive: json['isActive'] ?? true,
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final int sgCost;
+  final int durationMinutes;
+  final String category;
+  final List<String> imageUrls;
+  final bool isActive;
 
   Map<String, dynamic> toJson() {
     return {
@@ -165,8 +167,6 @@ class ServiceModel {
 }
 
 class ClinicSchedule {
-  final Map<String, DaySchedule> weekdays;
-
   ClinicSchedule({required this.weekdays});
 
   factory ClinicSchedule.fromJson(Map<String, dynamic> json) {
@@ -178,9 +178,10 @@ class ClinicSchedule {
     });
     return ClinicSchedule(weekdays: schedules);
   }
+  final Map<String, DaySchedule> weekdays;
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
+    final Map<String, dynamic> json = {};
     weekdays.forEach((key, value) {
       json[key] = value.toJson();
     });
@@ -188,39 +189,42 @@ class ClinicSchedule {
   }
 
   bool isOpenAt(DateTime dateTime) {
-    String weekday = _getWeekdayString(dateTime.weekday);
-    DaySchedule? daySchedule = weekdays[weekday];
-    
+    final String weekday = _getWeekdayString(dateTime.weekday);
+    final DaySchedule? daySchedule = weekdays[weekday];
+
     if (daySchedule == null || !daySchedule.isOpen) {
       return false;
     }
 
-    String currentTime = '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-    return currentTime.compareTo(daySchedule.openTime) >= 0 && 
-           currentTime.compareTo(daySchedule.closeTime) < 0;
+    final String currentTime =
+        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    return currentTime.compareTo(daySchedule.openTime) >= 0 &&
+        currentTime.compareTo(daySchedule.closeTime) < 0;
   }
 
   String _getWeekdayString(int weekday) {
     switch (weekday) {
-      case 1: return 'monday';
-      case 2: return 'tuesday';
-      case 3: return 'wednesday';
-      case 4: return 'thursday';
-      case 5: return 'friday';
-      case 6: return 'saturday';
-      case 7: return 'sunday';
-      default: return 'monday';
+      case 1:
+        return 'monday';
+      case 2:
+        return 'tuesday';
+      case 3:
+        return 'wednesday';
+      case 4:
+        return 'thursday';
+      case 5:
+        return 'friday';
+      case 6:
+        return 'saturday';
+      case 7:
+        return 'sunday';
+      default:
+        return 'monday';
     }
   }
 }
 
 class DaySchedule {
-  final bool isOpen;
-  final String openTime;
-  final String closeTime;
-  final String? breakStart;
-  final String? breakEnd;
-
   DaySchedule({
     required this.isOpen,
     required this.openTime,
@@ -238,6 +242,11 @@ class DaySchedule {
       breakEnd: json['breakEnd'],
     );
   }
+  final bool isOpen;
+  final String openTime;
+  final String closeTime;
+  final String? breakStart;
+  final String? breakEnd;
 
   Map<String, dynamic> toJson() {
     return {

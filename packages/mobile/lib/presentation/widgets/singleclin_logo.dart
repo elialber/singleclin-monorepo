@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
 class SingleClinLogo extends StatelessWidget {
-  final double size;
-  final Color? color;
-  final bool showBackground;
-
   const SingleClinLogo({
     super.key,
     this.size = 48,
     this.color,
     this.showBackground = true,
   });
+  final double size;
+  final Color? color;
+  final bool showBackground;
 
   @override
   Widget build(BuildContext context) {
     final logoColor = color ?? Theme.of(context).primaryColor;
-    
+
     return Container(
       width: size,
       height: size,
@@ -36,13 +35,9 @@ class SingleClinLogo extends StatelessWidget {
 }
 
 class _SingleClinLogoPainter extends CustomPainter {
+  _SingleClinLogoPainter({required this.color, required this.showBackground});
   final Color color;
   final bool showBackground;
-
-  _SingleClinLogoPainter({
-    required this.color,
-    required this.showBackground,
-  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -59,7 +54,7 @@ class _SingleClinLogoPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
     final cornerRadius = w * 0.1;
-    
+
     // Vertical part of cross
     path.moveTo(w * 0.4, h * 0.3);
     path.quadraticBezierTo(w * 0.4, h * 0.2, w * 0.5, h * 0.2);
@@ -92,21 +87,12 @@ class _SingleClinLogoPainter extends CustomPainter {
 
 // Icon variant for smaller uses
 class SingleClinIcon extends StatelessWidget {
+  const SingleClinIcon({super.key, this.size = 24, this.color});
   final double size;
   final Color? color;
 
-  const SingleClinIcon({
-    super.key,
-    this.size = 24,
-    this.color,
-  });
-
   @override
   Widget build(BuildContext context) {
-    return SingleClinLogo(
-      size: size,
-      color: color,
-      showBackground: false,
-    );
+    return SingleClinLogo(size: size, color: color, showBackground: false);
   }
 }

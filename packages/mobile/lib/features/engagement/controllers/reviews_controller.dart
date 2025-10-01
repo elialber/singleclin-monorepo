@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import '../models/review.dart';
-import '../../../core/services/api_service.dart';
+import 'package:singleclin_mobile/features/engagement/models/review.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
 
 /// Controller for managing user reviews and ratings
 class ReviewsController extends GetxController {
@@ -13,12 +13,12 @@ class ReviewsController extends GetxController {
   final RxList<Review> reviews = <Review>[].obs;
   final RxList<Review> pendingReviews = <Review>[].obs;
   final Rx<ReviewStats?> stats = Rx<ReviewStats?>(null);
-  
+
   // Filter and sort options
   final RxString selectedFilter = 'all'.obs;
   final RxString selectedSort = 'newest'.obs;
   final RxString searchQuery = ''.obs;
-  
+
   // Pagination
   int _currentPage = 1;
   bool _hasMoreData = true;
@@ -79,7 +79,7 @@ class ReviewsController extends GetxController {
   Future<void> loadPendingReviews() async {
     try {
       final response = await _apiService.get('/user/reviews/pending');
-      
+
       final List<Review> pending = (response.data['reviews'] as List)
           .map((json) => Review.fromJson(json))
           .toList();
@@ -103,33 +103,34 @@ class ReviewsController extends GetxController {
   /// Vote on review helpfulness
   Future<void> voteOnReview(String reviewId, bool isHelpful) async {
     try {
-      await _apiService.post('/reviews/$reviewId/vote', data: {
-        'isHelpful': isHelpful,
-      });
+      await _apiService.post(
+        '/reviews/$reviewId/vote',
+        data: {'isHelpful': isHelpful},
+      );
 
       // Update local review
       final reviewIndex = reviews.indexWhere((r) => r.id == reviewId);
       if (reviewIndex != -1) {
         final review = reviews[reviewIndex];
         final updatedReview = review.copyWith(
-          helpfulCount: isHelpful 
-              ? review.helpfulCount + 1 
+          helpfulCount: isHelpful
+              ? review.helpfulCount + 1
               : review.helpfulCount,
-          notHelpfulCount: !isHelpful 
-              ? review.notHelpfulCount + 1 
+          notHelpfulCount: !isHelpful
+              ? review.notHelpfulCount + 1
               : review.notHelpfulCount,
         );
         reviews[reviewIndex] = updatedReview;
       }
 
       Get.snackbar(
-        'Obrigado!', 
+        'Obrigado!',
         'Sua avaliação foi registrada',
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
       Get.snackbar(
-        'Erro', 
+        'Erro',
         'Não foi possível registrar sua avaliação',
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -139,18 +140,19 @@ class ReviewsController extends GetxController {
   /// Report inappropriate review
   Future<void> reportReview(String reviewId, String reason) async {
     try {
-      await _apiService.post('/reviews/$reviewId/report', data: {
-        'reason': reason,
-      });
+      await _apiService.post(
+        '/reviews/$reviewId/report',
+        data: {'reason': reason},
+      );
 
       Get.snackbar(
-        'Denúncia enviada', 
+        'Denúncia enviada',
         'Obrigado por nos ajudar a manter a comunidade segura',
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
       Get.snackbar(
-        'Erro', 
+        'Erro',
         'Não foi possível enviar a denúncia',
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -161,20 +163,20 @@ class ReviewsController extends GetxController {
   Future<void> deleteReview(String reviewId) async {
     try {
       await _apiService.delete('/user/reviews/$reviewId');
-      
+
       reviews.removeWhere((r) => r.id == reviewId);
-      
+
       Get.snackbar(
-        'Avaliação removida', 
+        'Avaliação removida',
         'Sua avaliação foi excluída com sucesso',
         snackPosition: SnackPosition.BOTTOM,
       );
-      
+
       // Reload stats
       loadReviewStats();
     } catch (e) {
       Get.snackbar(
-        'Erro', 
+        'Erro',
         'Não foi possível remover a avaliação',
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -207,6 +209,7 @@ class ReviewsController extends GetxController {
   }
 
   /// Refresh all data
+  @override
   Future<void> refresh() async {
     await Future.wait([
       loadReviews(refresh: true),
@@ -221,13 +224,19 @@ class ReviewsController extends GetxController {
       case '5stars':
         return reviews.where((r) => r.overallRating >= 4.5).toList();
       case '4stars':
-        return reviews.where((r) => r.overallRating >= 3.5 && r.overallRating < 4.5).toList();
+        return reviews
+            .where((r) => r.overallRating >= 3.5 && r.overallRating < 4.5)
+            .toList();
       case '3stars':
-        return reviews.where((r) => r.overallRating >= 2.5 && r.overallRating < 3.5).toList();
+        return reviews
+            .where((r) => r.overallRating >= 2.5 && r.overallRating < 3.5)
+            .toList();
       case 'low':
         return reviews.where((r) => r.overallRating < 2.5).toList();
       case 'photos':
-        return reviews.where((r) => r.beforePhotos.isNotEmpty || r.afterPhotos.isNotEmpty).toList();
+        return reviews
+            .where((r) => r.beforePhotos.isNotEmpty || r.afterPhotos.isNotEmpty)
+            .toList();
       case 'recommended':
         return reviews.where((r) => r.isRecommended).toList();
       default:
@@ -238,7 +247,7 @@ class ReviewsController extends GetxController {
   /// Get badge info for user
   String getBadgeText() {
     final totalReviews = stats.value?.totalReviews ?? 0;
-    
+
     if (totalReviews >= 100) {
       return 'Especialista em Avaliações';
     } else if (totalReviews >= 50) {
@@ -281,17 +290,25 @@ class ReviewsController extends GetxController {
   double getClinicAverageRating(String clinicId) {
     final clinicReviews = reviews.where((r) => r.clinicId == clinicId).toList();
     if (clinicReviews.isEmpty) return 0.0;
-    
-    final total = clinicReviews.fold(0.0, (sum, review) => sum + review.overallRating);
+
+    final total = clinicReviews.fold(
+      0.0,
+      (sum, review) => sum + review.overallRating,
+    );
     return total / clinicReviews.length;
   }
 
   /// Get service average rating from user reviews
   double getServiceAverageRating(String serviceId) {
-    final serviceReviews = reviews.where((r) => r.serviceId == serviceId).toList();
+    final serviceReviews = reviews
+        .where((r) => r.serviceId == serviceId)
+        .toList();
     if (serviceReviews.isEmpty) return 0.0;
-    
-    final total = serviceReviews.fold(0.0, (sum, review) => sum + review.overallRating);
+
+    final total = serviceReviews.fold(
+      0.0,
+      (sum, review) => sum + review.overallRating,
+    );
     return total / serviceReviews.length;
   }
 }

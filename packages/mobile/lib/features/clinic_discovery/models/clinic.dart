@@ -1,22 +1,4 @@
 class Clinic {
-  final String id;
-  final String name;
-  final String address;
-  final double distance; // in kilometers
-  final double rating;
-  final int reviewCount;
-  final List<String> specializations;
-  final String imageUrl;
-  final List<String> images; // All images from backend
-  final bool isAvailable;
-  final DateTime? nextAvailableSlot;
-  final ClinicType type;
-  final List<Map<String, dynamic>> services;
-  final ContactInfo contact;
-  final Location coordinates;
-  final bool isPartner;
-  final String? description;
-
   const Clinic({
     required this.id,
     required this.name,
@@ -49,14 +31,16 @@ class Clinic {
       imageUrl: json['imageUrl'] ?? '',
       images: List<String>.from(json['images'] ?? []),
       isAvailable: json['isAvailable'] ?? false,
-      nextAvailableSlot: json['nextAvailableSlot'] != null 
+      nextAvailableSlot: json['nextAvailableSlot'] != null
           ? DateTime.parse(json['nextAvailableSlot'])
           : null,
       type: ClinicType.fromString(json['type'] ?? 'partner'),
       services: List<Map<String, dynamic>>.from(
-        (json['services'] ?? []).map((service) =>
-          service is Map<String, dynamic> ? service : {'name': service.toString(), 'price': 1.0}
-        )
+        (json['services'] ?? []).map(
+          (service) => service is Map<String, dynamic>
+              ? service
+              : {'name': service.toString(), 'price': 1.0},
+        ),
       ),
       contact: ContactInfo.fromJson(json['contact'] ?? {}),
       coordinates: Location.fromJson(json['coordinates'] ?? {}),
@@ -77,9 +61,11 @@ class Clinic {
     print('🔍 Checking for images in DTO...');
 
     // First check for featuredImage from real API response
-    if (dto['featuredImage'] != null && dto['featuredImage'] is Map<String, dynamic>) {
+    if (dto['featuredImage'] != null &&
+        dto['featuredImage'] is Map<String, dynamic>) {
       var featuredImage = dto['featuredImage'] as Map<String, dynamic>;
-      if (featuredImage['imageUrl'] != null && featuredImage['imageUrl'].toString().isNotEmpty) {
+      if (featuredImage['imageUrl'] != null &&
+          featuredImage['imageUrl'].toString().isNotEmpty) {
         mainImageUrl = featuredImage['imageUrl'];
         allImages.add(mainImageUrl);
         print('✅ Found featuredImage URL: $mainImageUrl');
@@ -87,13 +73,16 @@ class Clinic {
     }
 
     // Also check for additional images array
-    if (dto['images'] != null && dto['images'] is List && (dto['images'] as List).isNotEmpty) {
+    if (dto['images'] != null &&
+        dto['images'] is List &&
+        (dto['images'] as List).isNotEmpty) {
       var imagesList = dto['images'] as List;
       print('📸 Found additional images list with ${imagesList.length} items');
 
       // Extract all image URLs from ClinicImageDto objects
       for (var imageItem in imagesList) {
-        if (imageItem is Map<String, dynamic> && imageItem['imageUrl'] != null) {
+        if (imageItem is Map<String, dynamic> &&
+            imageItem['imageUrl'] != null) {
           String imageUrl = imageItem['imageUrl'];
           if (!allImages.contains(imageUrl)) {
             print('🖼️ Adding additional image URL: $imageUrl');
@@ -142,7 +131,9 @@ class Clinic {
             'description': service['description'] ?? service['Description'],
           };
 
-          print('🔧 Processing service: ${mappedService['name']} - category: ${mappedService['category']}');
+          print(
+            '🔧 Processing service: ${mappedService['name']} - category: ${mappedService['category']}',
+          );
           clinicServices.add(mappedService);
 
           // Extract service category for quick filters
@@ -176,13 +167,17 @@ class Clinic {
     // Use real data from API, only add fallback if completely missing
     bool needsFallback = allImages.isEmpty && clinicServices.isEmpty;
 
-    print('🧪 Using real API data for ${dto['name']}. Needs fallback: $needsFallback');
+    print(
+      '🧪 Using real API data for ${dto['name']}. Needs fallback: $needsFallback',
+    );
 
     if (needsFallback) {
       print('⚠️ No real data available, using fallback');
       // Only use fallback data if API completely fails to provide data
       if (allImages.isEmpty) {
-        allImages = ['https://images.unsplash.com/photo-1551076805-e1869033e561?w=800'];
+        allImages = [
+          'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800',
+        ];
         mainImageUrl = allImages.first;
       }
 
@@ -201,11 +196,14 @@ class Clinic {
       distance: 0.0, // Will be calculated later based on user location
       rating: 4.5, // Default rating - TODO: implement real ratings
       reviewCount: 23, // Default review count - TODO: implement real reviews
-      specializations: serviceCategories.toList(), // Use service categories as specializations
+      specializations: serviceCategories
+          .toList(), // Use service categories as specializations
       imageUrl: mainImageUrl,
       images: allImages,
       isAvailable: dto['isActive'] ?? false,
-      nextAvailableSlot: DateTime.now().add(const Duration(hours: 2)), // Default next slot
+      nextAvailableSlot: DateTime.now().add(
+        const Duration(hours: 2),
+      ), // Default next slot
       type: clinicType,
       services: clinicServices, // Use real services from backend
       contact: contact,
@@ -214,6 +212,23 @@ class Clinic {
       description: null, // TODO: add description field to backend
     );
   }
+  final String id;
+  final String name;
+  final String address;
+  final double distance; // in kilometers
+  final double rating;
+  final int reviewCount;
+  final List<String> specializations;
+  final String imageUrl;
+  final List<String> images; // All images from backend
+  final bool isAvailable;
+  final DateTime? nextAvailableSlot;
+  final ClinicType type;
+  final List<Map<String, dynamic>> services;
+  final ContactInfo contact;
+  final Location coordinates;
+  final bool isPartner;
+  final String? description;
 
   Map<String, dynamic> toJson() {
     return {
@@ -290,11 +305,6 @@ enum ClinicType {
 }
 
 class ContactInfo {
-  final String phone;
-  final String email;
-  final String? whatsapp;
-  final String? website;
-
   const ContactInfo({
     required this.phone,
     required this.email,
@@ -310,6 +320,10 @@ class ContactInfo {
       website: json['website'],
     );
   }
+  final String phone;
+  final String email;
+  final String? whatsapp;
+  final String? website;
 
   Map<String, dynamic> toJson() {
     return {
@@ -322,13 +336,7 @@ class ContactInfo {
 }
 
 class Location {
-  final double latitude;
-  final double longitude;
-
-  const Location({
-    required this.latitude,
-    required this.longitude,
-  });
+  const Location({required this.latitude, required this.longitude});
 
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
@@ -336,25 +344,15 @@ class Location {
       longitude: (json['longitude'] ?? 0).toDouble(),
     );
   }
+  final double latitude;
+  final double longitude;
 
   Map<String, dynamic> toJson() {
-    return {
-      'latitude': latitude,
-      'longitude': longitude,
-    };
+    return {'latitude': latitude, 'longitude': longitude};
   }
 }
 
 class AppointmentSlot {
-  final String id;
-  final DateTime dateTime;
-  final String doctorName;
-  final String specialization;
-  final Duration duration;
-  final bool isAvailable;
-  final double price;
-  final String? notes;
-
   const AppointmentSlot({
     required this.id,
     required this.dateTime,
@@ -378,6 +376,14 @@ class AppointmentSlot {
       notes: json['notes'],
     );
   }
+  final String id;
+  final DateTime dateTime;
+  final String doctorName;
+  final String specialization;
+  final Duration duration;
+  final bool isAvailable;
+  final double price;
+  final String? notes;
 
   Map<String, dynamic> toJson() {
     return {

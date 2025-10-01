@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/auth_controller.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -31,10 +31,7 @@ class RegisterScreen extends StatelessWidget {
               SizedBox(height: 16),
               Text(
                 'Em desenvolvimento...',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),

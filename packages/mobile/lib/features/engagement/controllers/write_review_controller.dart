@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import '../models/review.dart';
-import '../../../core/services/api_service.dart';
-import '../../credits/controllers/credits_controller.dart';
+import 'package:singleclin_mobile/features/engagement/models/review.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/credits/controllers/credits_controller.dart';
 
 /// Controller for writing and submitting reviews
 class WriteReviewController extends GetxController {
@@ -20,19 +20,19 @@ class WriteReviewController extends GetxController {
   final RxBool isSubmitting = false.obs;
   final RxInt currentStep = 0.obs;
   final RxString error = ''.obs;
-  
+
   // Rating values
   final RxDouble overallRating = 5.0.obs;
   final RxDouble serviceRating = 5.0.obs;
   final RxDouble cleanlinessRating = 5.0.obs;
   final RxDouble staffRating = 5.0.obs;
   final RxDouble valueRating = 5.0.obs;
-  
+
   // Review options
   final RxBool isRecommended = true.obs;
   final RxBool wouldReturn = true.obs;
   final RxList<String> selectedTags = <String>[].obs;
-  
+
   // Photo management
   final RxList<File> beforePhotos = <File>[].obs;
   final RxList<File> afterPhotos = <File>[].obs;
@@ -199,14 +199,15 @@ class WriteReviewController extends GetxController {
   Future<File?> compressImage(File file) async {
     try {
       final String targetPath = file.path.replaceAll('.jpg', '_compressed.jpg');
-      
-      final XFile? compressedFile = await FlutterImageCompress.compressAndGetFile(
-        file.absolute.path,
-        targetPath,
-        quality: 70,
-        minWidth: 800,
-        minHeight: 600,
-      );
+
+      final XFile? compressedFile =
+          await FlutterImageCompress.compressAndGetFile(
+            file.absolute.path,
+            targetPath,
+            quality: 70,
+            minWidth: 800,
+            minHeight: 600,
+          );
 
       return compressedFile != null ? File(compressedFile.path) : null;
     } catch (e) {
@@ -237,8 +238,14 @@ class WriteReviewController extends GetxController {
       error.value = '';
 
       // Upload photos first
-      final List<String> beforePhotoUrls = await uploadPhotos(beforePhotos.toList(), 'before');
-      final List<String> afterPhotoUrls = await uploadPhotos(afterPhotos.toList(), 'after');
+      final List<String> beforePhotoUrls = await uploadPhotos(
+        beforePhotos.toList(),
+        'before',
+      );
+      final List<String> afterPhotoUrls = await uploadPhotos(
+        afterPhotos.toList(),
+        'after',
+      );
 
       // Prepare review data
       final reviewData = {
@@ -260,7 +267,10 @@ class WriteReviewController extends GetxController {
       };
 
       // Submit review
-      final response = await _apiService.post('/user/reviews', data: reviewData);
+      final response = await _apiService.post(
+        '/user/reviews',
+        data: reviewData,
+      );
 
       // Award SG credits for review
       await _creditsController.awardCreditsForReview(
@@ -274,7 +284,6 @@ class WriteReviewController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        duration: const Duration(seconds: 3),
       );
 
       // Navigate back or to success screen
@@ -308,7 +317,7 @@ class WriteReviewController extends GetxController {
           fileField: 'photo',
           data: {'type': type, 'appointmentId': appointmentId},
         );
-        
+
         uploadedUrls.add(response.data['url']);
       }
 
@@ -358,9 +367,9 @@ class WriteReviewController extends GetxController {
 
   /// Get review templates for suggestions
   List<String> get reviewTemplates => [
-    'Excelente experiência na ${clinicName}! O atendimento foi impecável e o resultado superou minhas expectativas.',
+    'Excelente experiência na $clinicName! O atendimento foi impecável e o resultado superou minhas expectativas.',
     'Profissional muito qualificado e atencioso. O ambiente é limpo e moderno. Recomendo!',
-    'Fiquei muito satisfeito(a) com o serviço de ${serviceName}. Equipe competente e resultado excelente.',
+    'Fiquei muito satisfeito(a) com o serviço de $serviceName. Equipe competente e resultado excelente.',
     'Atendimento de qualidade, preço justo e resultado fantástico. Voltaria com certeza!',
   ];
 
@@ -398,15 +407,15 @@ class WriteReviewController extends GetxController {
       case 0:
         return overallRating.value > 0;
       case 1:
-        return serviceRating.value > 0 && 
-               cleanlinessRating.value > 0 && 
-               staffRating.value > 0 && 
-               valueRating.value > 0;
+        return serviceRating.value > 0 &&
+            cleanlinessRating.value > 0 &&
+            staffRating.value > 0 &&
+            valueRating.value > 0;
       case 2:
         return true; // Photos are optional
       case 3:
-        return titleController.text.trim().isNotEmpty && 
-               commentController.text.trim().length >= 20;
+        return titleController.text.trim().isNotEmpty &&
+            commentController.text.trim().length >= 20;
       case 4:
         return true; // Final review
       default:

@@ -2,22 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../controllers/map_controller.dart';
-import '../controllers/discovery_controller.dart';
-import '../models/clinic.dart';
-import '../widgets/clinic_card.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/map_controller.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
+import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/discovery/widgets/clinic_card.dart';
 
 /// Map view screen with Google Maps integration and interactive markers
 class MapViewScreen extends StatefulWidget {
+  const MapViewScreen({Key? key, required this.clinics, this.onClinicTap})
+    : super(key: key);
   final List<Clinic> clinics;
   final Function(Clinic)? onClinicTap;
-
-  const MapViewScreen({
-    Key? key,
-    required this.clinics,
-    this.onClinicTap,
-  }) : super(key: key);
 
   @override
   State<MapViewScreen> createState() => _MapViewScreenState();
@@ -26,27 +22,28 @@ class MapViewScreen extends StatefulWidget {
 class _MapViewScreenState extends State<MapViewScreen>
     with TickerProviderStateMixin {
   final MapController mapController = Get.put(MapController());
-  final DiscoveryController discoveryController = Get.find<DiscoveryController>();
-  
+  final DiscoveryController discoveryController =
+      Get.find<DiscoveryController>();
+
   late AnimationController _bottomSheetController;
   late Animation<Offset> _bottomSheetAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _bottomSheetController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _bottomSheetAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _bottomSheetController,
-      curve: Curves.easeOut,
-    ));
-    
+    _bottomSheetAnimation =
+        Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _bottomSheetController,
+            curve: Curves.easeOut,
+          ),
+        );
+
     // Listen for selected clinic changes
     ever(mapController.selectedClinic, (Clinic? clinic) {
       if (clinic != null) {
@@ -93,11 +90,6 @@ class _MapViewScreenState extends State<MapViewScreen>
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
         mapToolbarEnabled: false,
-        compassEnabled: true,
-        rotateGesturesEnabled: true,
-        scrollGesturesEnabled: true,
-        tiltGesturesEnabled: true,
-        zoomGesturesEnabled: true,
         minMaxZoomPreference: const MinMaxZoomPreference(10.0, 18.0),
         style: '''
           [
@@ -127,25 +119,31 @@ class _MapViewScreenState extends State<MapViewScreen>
             tooltip: 'Tipo do mapa',
           ),
           const SizedBox(height: 8),
-          Obx(() => _buildControlButton(
-            icon: mapController.showClustering ? Icons.scatter_plot : Icons.place,
-            onPressed: mapController.toggleClustering,
-            tooltip: mapController.showClustering ? 'Desagrupar' : 'Agrupar',
-          )),
+          Obx(
+            () => _buildControlButton(
+              icon: mapController.showClustering
+                  ? Icons.scatter_plot
+                  : Icons.place,
+              onPressed: mapController.toggleClustering,
+              tooltip: mapController.showClustering ? 'Desagrupar' : 'Agrupar',
+            ),
+          ),
           const SizedBox(height: 8),
-          Obx(() => _buildControlButton(
-            icon: mapController.showUserLocation 
-                ? Icons.my_location 
-                : Icons.location_disabled,
-            onPressed: mapController.toggleUserLocation,
-            tooltip: 'Minha localização',
-            backgroundColor: mapController.showUserLocation 
-                ? AppColors.primary 
-                : Colors.white,
-            iconColor: mapController.showUserLocation 
-                ? Colors.white 
-                : AppColors.mediumGrey,
-          )),
+          Obx(
+            () => _buildControlButton(
+              icon: mapController.showUserLocation
+                  ? Icons.my_location
+                  : Icons.location_disabled,
+              onPressed: mapController.toggleUserLocation,
+              tooltip: 'Minha localização',
+              backgroundColor: mapController.showUserLocation
+                  ? AppColors.primary
+                  : Colors.white,
+              iconColor: mapController.showUserLocation
+                  ? Colors.white
+                  : AppColors.mediumGrey,
+            ),
+          ),
         ],
       ),
     );
@@ -207,18 +205,11 @@ class _MapViewScreenState extends State<MapViewScreen>
         ],
       ),
       child: IconButton(
-        icon: Icon(
-          icon,
-          color: iconColor ?? AppColors.mediumGrey,
-          size: 20,
-        ),
+        icon: Icon(icon, color: iconColor ?? AppColors.mediumGrey, size: 20),
         onPressed: onPressed,
         tooltip: tooltip,
         padding: const EdgeInsets.all(12),
-        constraints: const BoxConstraints(
-          minWidth: 44,
-          minHeight: 44,
-        ),
+        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       ),
     );
   }
@@ -268,10 +259,10 @@ class _MapViewScreenState extends State<MapViewScreen>
                       widget.onClinicTap?.call(selectedClinic);
                     },
                     onFavoritePressed: () {
-                      discoveryController.toggleClinicFavorite(selectedClinic.id);
+                      discoveryController.toggleClinicFavorite(
+                        selectedClinic.id,
+                      );
                     },
-                    showDistance: true,
-                    compact: false,
                   ),
                 ),
                 // Action buttons

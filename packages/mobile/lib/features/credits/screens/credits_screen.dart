@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/credits_controller.dart';
-import '../widgets/credit_balance_card.dart';
-import '../widgets/transaction_item.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/credits/controllers/credits_controller.dart';
+import 'package:singleclin_mobile/features/credits/widgets/credit_balance_card.dart';
+import 'package:singleclin_mobile/features/credits/widgets/transaction_item.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});
@@ -28,9 +28,7 @@ class CreditsScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
         return RefreshIndicator(
@@ -80,7 +78,7 @@ class CreditsScreen extends StatelessWidget {
 
   Widget _buildSubscriptionCard(CreditsController controller) {
     final subscription = controller.subscription;
-    
+
     return Card(
       child: Container(
         decoration: BoxDecoration(
@@ -88,10 +86,7 @@ class CreditsScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary,
-              AppColors.primary.withOpacity(0.8),
-            ],
+            colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
           ),
         ),
         child: Padding(
@@ -131,7 +126,10 @@ class CreditsScreen extends StatelessWidget {
                   ),
                   if (controller.hasActiveSubscription)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.green.shade400,
                         borderRadius: BorderRadius.circular(12),
@@ -167,7 +165,11 @@ class CreditsScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.access_time, color: Colors.orange.shade200, size: 16),
+                        Icon(
+                          Icons.access_time,
+                          color: Colors.orange.shade200,
+                          size: 16,
+                        ),
                         const SizedBox(width: 8),
                         const Text(
                           'Renovação em breve',
@@ -210,7 +212,7 @@ class CreditsScreen extends StatelessWidget {
 
   Widget _buildUsageProgressCard(CreditsController controller) {
     final percentage = controller.creditUsagePercentage;
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -219,7 +221,7 @@ class CreditsScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.trending_up,
                   color: AppColors.sgPrimary,
                   size: 24,
@@ -228,10 +230,7 @@ class CreditsScreen extends StatelessWidget {
                 const Expanded(
                   child: Text(
                     'Uso Mensal',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
                 Text(
@@ -245,7 +244,7 @@ class CreditsScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Progress bar
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -258,16 +257,13 @@ class CreditsScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 8),
             Text(
               controller.usageDisplay,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
-            
+
             if (percentage > 80) ...[
               const SizedBox(height: 8),
               Container(
@@ -279,7 +275,11 @@ class CreditsScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.warning, color: Colors.orange.shade700, size: 16),
+                    Icon(
+                      Icons.warning,
+                      color: Colors.orange.shade700,
+                      size: 16,
+                    ),
                     const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
@@ -303,10 +303,7 @@ class CreditsScreen extends StatelessWidget {
       children: [
         const Text(
           'Ações Rápidas',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         Row(
@@ -370,11 +367,7 @@ class CreditsScreen extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: color,
-              size: 28,
-            ),
+            Icon(icon, color: color, size: 28),
             const SizedBox(height: 8),
             Text(
               label,
@@ -400,10 +393,7 @@ class CreditsScreen extends StatelessWidget {
             const Expanded(
               child: Text(
                 'Transações Recentes',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
             TextButton(
@@ -413,7 +403,7 @@ class CreditsScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
+
         if (controller.recentTransactions.isEmpty)
           Card(
             child: Container(
@@ -429,26 +419,20 @@ class CreditsScreen extends StatelessWidget {
                   SizedBox(height: 12),
                   Text(
                     'Nenhuma transação ainda',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   SizedBox(height: 4),
                   Text(
                     'Suas transações aparecerão aqui',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
               ),
             ),
           )
         else
-          ...controller.recentTransactions.map((transaction) => 
-            TransactionItem(
+          ...controller.recentTransactions.map(
+            (transaction) => TransactionItem(
               transaction: transaction,
               onTap: () => _showTransactionDetails(transaction),
             ),
@@ -474,7 +458,7 @@ class CreditsScreen extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: AppColors.sgGradient,
                     shape: BoxShape.circle,
                   ),
@@ -488,34 +472,37 @@ class CreditsScreen extends StatelessWidget {
                 const Expanded(
                   child: Text(
                     'Detalhes do Saldo',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            
+
             _buildDetailRow('Saldo Total', controller.totalBalanceDisplay),
             _buildDetailRow('Saldo Disponível', controller.balanceDisplay),
             if (controller.lockedBalance > 0)
-              _buildDetailRow('Saldo Bloqueado', controller.lockedBalanceDisplay),
-            
+              _buildDetailRow(
+                'Saldo Bloqueado',
+                controller.lockedBalanceDisplay,
+              ),
+
             const SizedBox(height: 16),
             const Text(
               'Informações:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text('• Créditos SG não expiram enquanto a assinatura estiver ativa'),
-            const Text('• Saldo bloqueado são créditos reservados para agendamentos pendentes'),
-            const Text('• Você recebe 2% de cashback em compras de créditos extras'),
-            
+            const Text(
+              '• Créditos SG não expiram enquanto a assinatura estiver ativa',
+            ),
+            const Text(
+              '• Saldo bloqueado são créditos reservados para agendamentos pendentes',
+            ),
+            const Text(
+              '• Você recebe 2% de cashback em compras de créditos extras',
+            ),
+
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -575,20 +562,22 @@ class CreditsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             Text('Tipo: ${transaction.typeDisplayName}'),
             const SizedBox(height: 4),
             Text('Valor: ${transaction.amountDisplay}'),
             const SizedBox(height: 4),
             Text('Descrição: ${transaction.description}'),
             const SizedBox(height: 4),
-            Text('Data: ${transaction.createdAt.day}/${transaction.createdAt.month}/${transaction.createdAt.year}'),
-            
+            Text(
+              'Data: ${transaction.createdAt.day}/${transaction.createdAt.month}/${transaction.createdAt.year}',
+            ),
+
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Get.back(),
+                onPressed: Get.back,
                 child: const Text('Fechar'),
               ),
             ),
@@ -656,27 +645,32 @@ class CreditsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('🎯 O que são Créditos SG?'),
-              Text('Créditos SG são a moeda virtual do SingleClin. Use-os para agendar consultas e procedimentos.'),
+              Text(
+                'Créditos SG são a moeda virtual do SingleClin. Use-os para agendar consultas e procedimentos.',
+              ),
               SizedBox(height: 12),
-              
+
               Text('💰 Como Obter Créditos?'),
-              Text('• Assinatura mensal/anual\n• Compra de pacotes extras\n• Indicação de amigos (+10 SG)\n• Cashback (2% em compras)'),
+              Text(
+                '• Assinatura mensal/anual\n• Compra de pacotes extras\n• Indicação de amigos (+10 SG)\n• Cashback (2% em compras)',
+              ),
               SizedBox(height: 12),
-              
+
               Text('⏰ Validade dos Créditos'),
-              Text('Créditos SG não expiram enquanto sua assinatura estiver ativa.'),
+              Text(
+                'Créditos SG não expiram enquanto sua assinatura estiver ativa.',
+              ),
               SizedBox(height: 12),
-              
+
               Text('📊 Uso dos Créditos'),
-              Text('O valor varia por procedimento:\n• Consulta básica: 15-30 SG\n• Exames: 20-50 SG\n• Procedimentos: 30-100 SG'),
+              Text(
+                'O valor varia por procedimento:\n• Consulta básica: 15-30 SG\n• Exames: 20-50 SG\n• Procedimentos: 30-100 SG',
+              ),
             ],
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Entendi'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Entendi')),
         ],
       ),
     );

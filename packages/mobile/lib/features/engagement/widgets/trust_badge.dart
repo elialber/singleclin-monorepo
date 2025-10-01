@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../models/trust_certification.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/trust_certification.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Trust badge widget for displaying certifications
 class TrustBadge extends StatelessWidget {
@@ -11,12 +11,12 @@ class TrustBadge extends StatelessWidget {
   final bool showTooltip;
 
   const TrustBadge({
-    Key? key,
+    super.key,
     required this.certification,
     this.onTap,
     this.size = 48.0,
     this.showTooltip = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +28,7 @@ class TrustBadge extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-            color: _getStatusColor(),
-            width: 2,
-          ),
+          border: Border.all(color: _getStatusColor(), width: 2),
           color: Colors.white,
           boxShadow: [
             BoxShadow(
@@ -52,7 +49,7 @@ class TrustBadge extends StatelessWidget {
                   fit: BoxFit.cover,
                   placeholder: (context, url) => Container(
                     color: AppColors.lightGrey,
-                    child: Center(
+                    child: const Center(
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: AppColors.primary,
@@ -72,8 +69,8 @@ class TrustBadge extends StatelessWidget {
                     height: 8,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: certification.isExpired 
-                          ? AppColors.error 
+                      color: certification.isExpired
+                          ? AppColors.error
                           : AppColors.warning,
                     ),
                   ),
@@ -135,11 +132,7 @@ class TrustBadge extends StatelessWidget {
 
     return Container(
       color: color.withOpacity(0.1),
-      child: Icon(
-        icon,
-        color: color,
-        size: size * 0.5,
-      ),
+      child: Icon(icon, color: color, size: size * 0.5),
     );
   }
 
@@ -176,16 +169,15 @@ class TrustBadge extends StatelessWidget {
 
 /// Trust score widget with circular progress
 class TrustScoreWidget extends StatelessWidget {
-  final int score;
-  final double size;
-  final bool showLabel;
-
   const TrustScoreWidget({
     Key? key,
     required this.score,
     this.size = 80.0,
     this.showLabel = true,
   }) : super(key: key);
+  final int score;
+  final double size;
+  final bool showLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -240,9 +232,9 @@ class TrustScoreWidget extends StatelessWidget {
           ),
           Text(
             _getScoreDescription(score),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.mediumGrey,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
             textAlign: TextAlign.center,
           ),
         ],
@@ -269,12 +261,9 @@ class TrustScoreWidget extends StatelessWidget {
 
 /// Trust metrics summary widget
 class TrustMetricsSummary extends StatelessWidget {
+  const TrustMetricsSummary({Key? key, required this.metrics})
+    : super(key: key);
   final TrustMetrics metrics;
-
-  const TrustMetricsSummary({
-    Key? key,
-    required this.metrics,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -290,9 +279,9 @@ class TrustMetricsSummary extends StatelessWidget {
               children: [
                 Text(
                   'Métricas de Confiança',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 TrustScoreWidget(
@@ -351,17 +340,17 @@ class TrustMetricsSummary extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Certificações Ativas',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             if (metrics.certifications.isEmpty)
               Text(
                 'Nenhuma certificação disponível',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.mediumGrey,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.mediumGrey),
               )
             else
               Wrap(
@@ -370,18 +359,15 @@ class TrustMetricsSummary extends StatelessWidget {
                 children: metrics.certifications
                     .where((cert) => cert.status == CertificationStatus.active)
                     .take(6)
-                    .map((cert) => TrustBadge(
-                          certification: cert,
-                          size: 40,
-                        ))
+                    .map((cert) => TrustBadge(certification: cert, size: 40))
                     .toList(),
               ),
             const SizedBox(height: 8),
             Text(
               'Última atualização: ${_formatDate(metrics.lastUpdated)}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.mediumGrey,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
             ),
           ],
         ),
@@ -404,11 +390,7 @@ class TrustMetricsSummary extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
+          Icon(icon, color: color, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
@@ -420,9 +402,9 @@ class TrustMetricsSummary extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.mediumGrey,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
             textAlign: TextAlign.center,
           ),
         ],
@@ -446,14 +428,10 @@ class TrustMetricsSummary extends StatelessWidget {
 
 /// Security score badge
 class SecurityScoreBadge extends StatelessWidget {
+  const SecurityScoreBadge({Key? key, required this.score, this.onTap})
+    : super(key: key);
   final String score;
   final VoidCallback? onTap;
-
-  const SecurityScoreBadge({
-    Key? key,
-    required this.score,
-    this.onTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -470,11 +448,7 @@ class SecurityScoreBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.security,
-              size: 16,
-              color: _getScoreColor(),
-            ),
+            Icon(Icons.security, size: 16, color: _getScoreColor()),
             const SizedBox(width: 4),
             Text(
               'Segurança: $score',
@@ -511,31 +485,30 @@ class SecurityScoreBadge extends StatelessWidget {
 
 /// LGPD compliance indicator
 class LgpdComplianceIndicator extends StatelessWidget {
-  final LgpdCompliance compliance;
-  final VoidCallback? onTap;
-
   const LgpdComplianceIndicator({
     Key? key,
     required this.compliance,
     this.onTap,
   }) : super(key: key);
+  final LgpdCompliance compliance;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final compliancePercentage = _getCompliancePercentage();
-    
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: compliance.isCompliant 
+          color: compliance.isCompliant
               ? AppColors.success.withOpacity(0.1)
               : AppColors.warning.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: compliance.isCompliant 
+            color: compliance.isCompliant
                 ? AppColors.success.withOpacity(0.3)
                 : AppColors.warning.withOpacity(0.3),
           ),
@@ -544,7 +517,9 @@ class LgpdComplianceIndicator extends StatelessWidget {
           children: [
             Icon(
               compliance.isCompliant ? Icons.verified_user : Icons.warning,
-              color: compliance.isCompliant ? AppColors.success : AppColors.warning,
+              color: compliance.isCompliant
+                  ? AppColors.success
+                  : AppColors.warning,
               size: 24,
             ),
             const SizedBox(width: 12),
@@ -556,8 +531,8 @@ class LgpdComplianceIndicator extends StatelessWidget {
                     'LGPD Compliance',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: compliance.isCompliant 
-                          ? AppColors.success 
+                      color: compliance.isCompliant
+                          ? AppColors.success
                           : AppColors.warning,
                     ),
                   ),
@@ -572,8 +547,8 @@ class LgpdComplianceIndicator extends StatelessWidget {
                   LinearProgressIndicator(
                     value: compliancePercentage,
                     backgroundColor: AppColors.lightGrey,
-                    color: compliance.isCompliant 
-                        ? AppColors.success 
+                    color: compliance.isCompliant
+                        ? AppColors.success
                         : AppColors.warning,
                     minHeight: 4,
                   ),
@@ -589,8 +564,10 @@ class LgpdComplianceIndicator extends StatelessWidget {
   double _getCompliancePercentage() {
     final total = compliance.requirements.length;
     if (total == 0) return 0.0;
-    
-    final compliant = compliance.requirements.where((r) => r.isCompliant).length;
+
+    final compliant = compliance.requirements
+        .where((r) => r.isCompliant)
+        .length;
     return compliant / total;
   }
 }
@@ -603,12 +580,12 @@ class EmergencyContactCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const EmergencyContactCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.contact,
     required this.icon,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -634,11 +611,7 @@ class EmergencyContactCard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                color: AppColors.error,
-                size: 28,
-              ),
+              Icon(icon, color: AppColors.error, size: 28),
               const SizedBox(height: 8),
               Text(
                 title,
@@ -651,9 +624,9 @@ class EmergencyContactCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 contact,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.mediumGrey,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -666,29 +639,24 @@ class EmergencyContactCard extends StatelessWidget {
 
 /// Trust level indicator
 class TrustLevelIndicator extends StatelessWidget {
-  final int trustScore;
-  final bool isCompact;
-
   const TrustLevelIndicator({
     Key? key,
     required this.trustScore,
     this.isCompact = false,
   }) : super(key: key);
+  final int trustScore;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
     final level = _getTrustLevel(trustScore);
     final color = _getLevelColor(level);
-    
+
     if (isCompact) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            _getLevelIcon(level),
-            size: 16,
-            color: color,
-          ),
+          Icon(_getLevelIcon(level), size: 16, color: color),
           const SizedBox(width: 4),
           Text(
             level,
@@ -711,11 +679,7 @@ class TrustLevelIndicator extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            _getLevelIcon(level),
-            size: 20,
-            color: color,
-          ),
+          Icon(_getLevelIcon(level), size: 20, color: color),
           const SizedBox(width: 8),
           Text(
             '$level ($trustScore/100)',

@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Application constants
 class AppConstants {
   AppConstants._();

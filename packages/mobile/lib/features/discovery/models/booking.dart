@@ -1,34 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
-import 'service.dart';
-import 'clinic.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
+import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
 
 /// Represents a booking/appointment in the SingleClin system
 class Booking extends Equatable {
-  final String id;
-  final String userId;
-  final String clinicId;
-  final String serviceId;
-  final Clinic? clinic; // Populated when fetched with details
-  final Service? service; // Populated when fetched with details
-  final DateTime scheduledDate;
-  final TimeOfDay scheduledTime;
-  final BookingStatus status;
-  final int totalCostSG;
-  final PaymentStatus paymentStatus;
-  final String? notes;
-  final String? cancellationReason;
-  final DateTime? cancellationDate;
-  final String? professionalId;
-  final String? professionalName;
-  final BookingReminders reminders;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final bool requiresPreparation;
-  final String? preparationNotes;
-  final bool hasFollowUp;
-  final DateTime? followUpDate;
-
   const Booking({
     required this.id,
     required this.userId,
@@ -55,6 +31,71 @@ class Booking extends Equatable {
     this.followUpDate,
   });
 
+  /// Create from JSON
+  factory Booking.fromJson(Map<String, dynamic> json) {
+    return Booking(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      clinicId: json['clinicId'] as String,
+      serviceId: json['serviceId'] as String,
+      clinic: json['clinic'] != null
+          ? Clinic.fromJson(json['clinic'] as Map<String, dynamic>)
+          : null,
+      service: json['service'] != null
+          ? Service.fromJson(json['service'] as Map<String, dynamic>)
+          : null,
+      scheduledDate: DateTime.parse(json['scheduledDate'] as String),
+      scheduledTime: TimeOfDay(
+        hour: json['scheduledHour'] as int,
+        minute: json['scheduledMinute'] as int,
+      ),
+      status: BookingStatus.fromString(json['status'] as String),
+      totalCostSG: json['totalCostSG'] as int,
+      paymentStatus: PaymentStatus.fromString(json['paymentStatus'] as String),
+      notes: json['notes'] as String?,
+      cancellationReason: json['cancellationReason'] as String?,
+      cancellationDate: json['cancellationDate'] != null
+          ? DateTime.parse(json['cancellationDate'] as String)
+          : null,
+      professionalId: json['professionalId'] as String?,
+      professionalName: json['professionalName'] as String?,
+      reminders: BookingReminders.fromJson(
+        json['reminders'] as Map<String, dynamic>? ?? {},
+      ),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      requiresPreparation: json['requiresPreparation'] as bool? ?? false,
+      preparationNotes: json['preparationNotes'] as String?,
+      hasFollowUp: json['hasFollowUp'] as bool? ?? false,
+      followUpDate: json['followUpDate'] != null
+          ? DateTime.parse(json['followUpDate'] as String)
+          : null,
+    );
+  }
+  final String id;
+  final String userId;
+  final String clinicId;
+  final String serviceId;
+  final Clinic? clinic; // Populated when fetched with details
+  final Service? service; // Populated when fetched with details
+  final DateTime scheduledDate;
+  final TimeOfDay scheduledTime;
+  final BookingStatus status;
+  final int totalCostSG;
+  final PaymentStatus paymentStatus;
+  final String? notes;
+  final String? cancellationReason;
+  final DateTime? cancellationDate;
+  final String? professionalId;
+  final String? professionalName;
+  final BookingReminders reminders;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool requiresPreparation;
+  final String? preparationNotes;
+  final bool hasFollowUp;
+  final DateTime? followUpDate;
+
   /// Combined date and time for scheduling
   DateTime get scheduledDateTime {
     return DateTime(
@@ -70,16 +111,16 @@ class Booking extends Equatable {
   bool get isToday {
     final now = DateTime.now();
     return scheduledDate.year == now.year &&
-           scheduledDate.month == now.month &&
-           scheduledDate.day == now.day;
+        scheduledDate.month == now.month &&
+        scheduledDate.day == now.day;
   }
 
   /// Check if appointment is tomorrow
   bool get isTomorrow {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
     return scheduledDate.year == tomorrow.year &&
-           scheduledDate.month == tomorrow.month &&
-           scheduledDate.day == tomorrow.day;
+        scheduledDate.month == tomorrow.month &&
+        scheduledDate.day == tomorrow.day;
   }
 
   /// Check if appointment is in the past
@@ -91,13 +132,18 @@ class Booking extends Equatable {
   /// Check if appointment can be cancelled
   bool get canBeCancelled {
     return status == BookingStatus.confirmed &&
-           scheduledDateTime.isAfter(DateTime.now().add(const Duration(hours: 24)));
+        scheduledDateTime.isAfter(
+          DateTime.now().add(const Duration(hours: 24)),
+        );
   }
 
   /// Check if appointment can be rescheduled
   bool get canBeRescheduled {
-    return (status == BookingStatus.confirmed || status == BookingStatus.pending) &&
-           scheduledDateTime.isAfter(DateTime.now().add(const Duration(hours: 24)));
+    return (status == BookingStatus.confirmed ||
+            status == BookingStatus.pending) &&
+        scheduledDateTime.isAfter(
+          DateTime.now().add(const Duration(hours: 24)),
+        );
   }
 
   /// Time until appointment in hours
@@ -111,15 +157,33 @@ class Booking extends Equatable {
   String get formattedDate {
     if (isToday) return 'Hoje';
     if (isTomorrow) return 'Amanhã';
-    
+
     final weekdays = [
-      '', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'
+      '',
+      'Segunda',
+      'Terça',
+      'Quarta',
+      'Quinta',
+      'Sexta',
+      'Sábado',
+      'Domingo',
     ];
     final months = [
-      '', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+      '',
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez',
     ];
-    
+
     return '${weekdays[scheduledDate.weekday]}, ${scheduledDate.day} ${months[scheduledDate.month]}';
   }
 
@@ -167,7 +231,7 @@ class Booking extends Equatable {
   List<DateTime> get reminderTimes {
     final reminderTimes = <DateTime>[];
     final appointmentTime = scheduledDateTime;
-    
+
     if (reminders.oneDayBefore) {
       reminderTimes.add(appointmentTime.subtract(const Duration(days: 1)));
     }
@@ -177,7 +241,7 @@ class Booking extends Equatable {
     if (reminders.thirtyMinutesBefore) {
       reminderTimes.add(appointmentTime.subtract(const Duration(minutes: 30)));
     }
-    
+
     return reminderTimes;
   }
 
@@ -234,47 +298,6 @@ class Booking extends Equatable {
     );
   }
 
-  /// Create from JSON
-  factory Booking.fromJson(Map<String, dynamic> json) {
-    return Booking(
-      id: json['id'] as String,
-      userId: json['userId'] as String,
-      clinicId: json['clinicId'] as String,
-      serviceId: json['serviceId'] as String,
-      clinic: json['clinic'] != null 
-          ? Clinic.fromJson(json['clinic'] as Map<String, dynamic>)
-          : null,
-      service: json['service'] != null 
-          ? Service.fromJson(json['service'] as Map<String, dynamic>)
-          : null,
-      scheduledDate: DateTime.parse(json['scheduledDate'] as String),
-      scheduledTime: TimeOfDay(
-        hour: json['scheduledHour'] as int,
-        minute: json['scheduledMinute'] as int,
-      ),
-      status: BookingStatus.fromString(json['status'] as String),
-      totalCostSG: json['totalCostSG'] as int,
-      paymentStatus: PaymentStatus.fromString(json['paymentStatus'] as String),
-      notes: json['notes'] as String?,
-      cancellationReason: json['cancellationReason'] as String?,
-      cancellationDate: json['cancellationDate'] != null
-          ? DateTime.parse(json['cancellationDate'] as String)
-          : null,
-      professionalId: json['professionalId'] as String?,
-      professionalName: json['professionalName'] as String?,
-      reminders: BookingReminders.fromJson(
-          json['reminders'] as Map<String, dynamic>? ?? {}),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      requiresPreparation: json['requiresPreparation'] as bool? ?? false,
-      preparationNotes: json['preparationNotes'] as String?,
-      hasFollowUp: json['hasFollowUp'] as bool? ?? false,
-      followUpDate: json['followUpDate'] != null
-          ? DateTime.parse(json['followUpDate'] as String)
-          : null,
-    );
-  }
-
   /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -307,30 +330,30 @@ class Booking extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        clinicId,
-        serviceId,
-        clinic,
-        service,
-        scheduledDate,
-        scheduledTime,
-        status,
-        totalCostSG,
-        paymentStatus,
-        notes,
-        cancellationReason,
-        cancellationDate,
-        professionalId,
-        professionalName,
-        reminders,
-        createdAt,
-        updatedAt,
-        requiresPreparation,
-        preparationNotes,
-        hasFollowUp,
-        followUpDate,
-      ];
+    id,
+    userId,
+    clinicId,
+    serviceId,
+    clinic,
+    service,
+    scheduledDate,
+    scheduledTime,
+    status,
+    totalCostSG,
+    paymentStatus,
+    notes,
+    cancellationReason,
+    cancellationDate,
+    professionalId,
+    professionalName,
+    reminders,
+    createdAt,
+    updatedAt,
+    requiresPreparation,
+    preparationNotes,
+    hasFollowUp,
+    followUpDate,
+  ];
 }
 
 /// Booking status enumeration
@@ -388,10 +411,6 @@ enum PaymentStatus {
 
 /// Booking reminder settings
 class BookingReminders extends Equatable {
-  final bool oneDayBefore;
-  final bool oneHourBefore;
-  final bool thirtyMinutesBefore;
-
   const BookingReminders({
     this.oneDayBefore = true,
     this.oneHourBefore = true,
@@ -405,6 +424,9 @@ class BookingReminders extends Equatable {
       thirtyMinutesBefore: json['thirtyMinutesBefore'] as bool? ?? false,
     );
   }
+  final bool oneDayBefore;
+  final bool oneHourBefore;
+  final bool thirtyMinutesBefore;
 
   Map<String, dynamic> toJson() {
     return {
@@ -420,15 +442,6 @@ class BookingReminders extends Equatable {
 
 /// Booking creation request model
 class BookingRequest extends Equatable {
-  final String clinicId;
-  final String serviceId;
-  final DateTime scheduledDate;
-  final TimeOfDay scheduledTime;
-  final String? notes;
-  final String? professionalId;
-  final BookingReminders reminders;
-  final bool agreedToTerms;
-
   const BookingRequest({
     required this.clinicId,
     required this.serviceId,
@@ -439,6 +452,14 @@ class BookingRequest extends Equatable {
     this.reminders = const BookingReminders(),
     this.agreedToTerms = true,
   });
+  final String clinicId;
+  final String serviceId;
+  final DateTime scheduledDate;
+  final TimeOfDay scheduledTime;
+  final String? notes;
+  final String? professionalId;
+  final BookingReminders reminders;
+  final bool agreedToTerms;
 
   Map<String, dynamic> toJson() {
     return {
@@ -456,28 +477,27 @@ class BookingRequest extends Equatable {
 
   @override
   List<Object?> get props => [
-        clinicId,
-        serviceId,
-        scheduledDate,
-        scheduledTime,
-        notes,
-        professionalId,
-        reminders,
-        agreedToTerms,
-      ];
+    clinicId,
+    serviceId,
+    scheduledDate,
+    scheduledTime,
+    notes,
+    professionalId,
+    reminders,
+    agreedToTerms,
+  ];
 }
 
 /// Booking cancellation request model
 class BookingCancellationRequest extends Equatable {
-  final String bookingId;
-  final String reason;
-  final bool requestRefund;
-
   const BookingCancellationRequest({
     required this.bookingId,
     required this.reason,
     this.requestRefund = true,
   });
+  final String bookingId;
+  final String reason;
+  final bool requestRefund;
 
   Map<String, dynamic> toJson() {
     return {
@@ -493,17 +513,16 @@ class BookingCancellationRequest extends Equatable {
 
 /// Booking reschedule request model
 class BookingRescheduleRequest extends Equatable {
-  final String bookingId;
-  final DateTime newDate;
-  final TimeOfDay newTime;
-  final String? reason;
-
   const BookingRescheduleRequest({
     required this.bookingId,
     required this.newDate,
     required this.newTime,
     this.reason,
   });
+  final String bookingId;
+  final DateTime newDate;
+  final TimeOfDay newTime;
+  final String? reason;
 
   Map<String, dynamic> toJson() {
     return {
@@ -521,12 +540,6 @@ class BookingRescheduleRequest extends Equatable {
 
 /// Available time slot for booking
 class TimeSlot extends Equatable {
-  final TimeOfDay time;
-  final bool isAvailable;
-  final String? unavailabilityReason;
-  final String? professionalId;
-  final String? professionalName;
-
   const TimeSlot({
     required this.time,
     required this.isAvailable,
@@ -535,21 +548,23 @@ class TimeSlot extends Equatable {
     this.professionalName,
   });
 
-  String get formattedTime {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
-
   factory TimeSlot.fromJson(Map<String, dynamic> json) {
     return TimeSlot(
-      time: TimeOfDay(
-        hour: json['hour'] as int,
-        minute: json['minute'] as int,
-      ),
+      time: TimeOfDay(hour: json['hour'] as int, minute: json['minute'] as int),
       isAvailable: json['isAvailable'] as bool,
       unavailabilityReason: json['unavailabilityReason'] as String?,
       professionalId: json['professionalId'] as String?,
       professionalName: json['professionalName'] as String?,
     );
+  }
+  final TimeOfDay time;
+  final bool isAvailable;
+  final String? unavailabilityReason;
+  final String? professionalId;
+  final String? professionalName;
+
+  String get formattedTime {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
   Map<String, dynamic> toJson() {
@@ -565,10 +580,10 @@ class TimeSlot extends Equatable {
 
   @override
   List<Object?> get props => [
-        time,
-        isAvailable,
-        unavailabilityReason,
-        professionalId,
-        professionalName,
-      ];
+    time,
+    isAvailable,
+    unavailabilityReason,
+    professionalId,
+    professionalName,
+  ];
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/health_history_controller.dart';
-import '../widgets/health_timeline.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/controllers/health_history_controller.dart';
+import 'package:singleclin_mobile/features/profile/widgets/health_timeline.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Health History Screen
 /// Shows medical history timeline with records and metrics
 class HealthHistoryScreen extends GetView<HealthHistoryController> {
-  const HealthHistoryScreen({Key? key}) : super(key: key);
+  const HealthHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +56,7 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
           children: [
             _buildStatsHeader(),
             _buildFilterChips(),
-            Expanded(
-              child: _buildHistoryTimeline(),
-            ),
+            Expanded(child: _buildHistoryTimeline()),
           ],
         );
       }),
@@ -74,17 +72,12 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
   Widget _buildStatsHeader() {
     return Obx(() {
       final stats = controller.statistics;
-      
+
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.primary.withOpacity(0.05),
-          border: Border(
-            bottom: BorderSide(
-              color: AppColors.divider,
-              width: 1,
-            ),
-          ),
+          border: const Border(bottom: BorderSide(color: AppColors.divider)),
         ),
         child: Row(
           children: [
@@ -112,7 +105,12 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
     });
   }
 
-  Widget _buildStatItem(String label, String value, Color color, IconData icon) {
+  Widget _buildStatItem(
+    String label,
+    String value,
+    Color color,
+    IconData icon,
+  ) {
     return Expanded(
       child: Column(
         children: [
@@ -134,7 +132,7 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11,
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
@@ -151,25 +149,29 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Obx(() => Row(
-          children: [
-            _buildFilterChip('Todos', HealthRecordType.other),
-            const SizedBox(width: 8),
-            ...HealthRecordType.values.where((type) => type != HealthRecordType.other).map(
-              (type) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _buildFilterChip(type.label, type),
-              ),
-            ),
-          ],
-        )),
+        child: Obx(
+          () => Row(
+            children: [
+              _buildFilterChip('Todos', HealthRecordType.other),
+              const SizedBox(width: 8),
+              ...HealthRecordType.values
+                  .where((type) => type != HealthRecordType.other)
+                  .map(
+                    (type) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _buildFilterChip(type.label, type),
+                    ),
+                  ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildFilterChip(String label, HealthRecordType type) {
     final isSelected = controller.selectedFilter == type;
-    
+
     return FilterChip(
       label: Text(label),
       selected: isSelected,
@@ -190,7 +192,7 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
   Widget _buildHistoryTimeline() {
     return Obx(() {
       final records = controller.filteredRecords;
-      
+
       if (records.isEmpty) {
         return _buildEmptyState();
       }
@@ -207,8 +209,10 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
                 record: records[index],
                 onTap: () => _viewRecordDetails(records[index]),
                 onEdit: () => _editRecord(records[index]),
-                onArchive: () => controller.archiveHealthRecord(records[index].id),
-                onDelete: () => controller.deleteHealthRecord(records[index].id),
+                onArchive: () =>
+                    controller.archiveHealthRecord(records[index].id),
+                onDelete: () =>
+                    controller.deleteHealthRecord(records[index].id),
               ),
             );
           },
@@ -227,11 +231,11 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.lightGrey,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.history,
                 size: 48,
                 color: AppColors.mediumGrey,
@@ -250,10 +254,7 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
             const SizedBox(height: 8),
             const Text(
               'Seu histórico médico aparecerá aqui conforme você realiza procedimentos',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -286,8 +287,10 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
 
   /// Show search dialog
   void _showSearchDialog() {
-    final searchController = TextEditingController(text: controller.searchQuery);
-    
+    final searchController = TextEditingController(
+      text: controller.searchQuery,
+    );
+
     Get.dialog(
       AlertDialog(
         title: const Text('Pesquisar Histórico'),
@@ -308,10 +311,7 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
             },
             child: const Text('Limpar'),
           ),
-          ElevatedButton(
-            onPressed: () => Get.back(),
-            child: const Text('OK'),
-          ),
+          ElevatedButton(onPressed: Get.back, child: const Text('OK')),
         ],
       ),
     );
@@ -335,46 +335,43 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
                 const Expanded(
                   child: Text(
                     'Filtros',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(Icons.close),
-                ),
+                IconButton(onPressed: Get.back, icon: const Icon(Icons.close)),
               ],
             ),
             const SizedBox(height: 16),
             const Text(
               'Período',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
-            Obx(() => Column(
-              children: DateRange.values.map((range) => RadioListTile<DateRange>(
-                title: Text(range.label),
-                value: range,
-                groupValue: controller.selectedDateRange,
-                onChanged: (value) {
-                  if (value != null) {
-                    controller.updateDateRange(value);
-                  }
-                },
-                activeColor: AppColors.primary,
-                contentPadding: EdgeInsets.zero,
-              )).toList(),
-            )),
+            Obx(
+              () => Column(
+                children: DateRange.values
+                    .map(
+                      (range) => RadioListTile<DateRange>(
+                        title: Text(range.label),
+                        value: range,
+                        groupValue: controller.selectedDateRange,
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.updateDateRange(value);
+                          }
+                        },
+                        activeColor: AppColors.primary,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Get.back(),
+                onPressed: Get.back,
                 child: const Text('Aplicar Filtros'),
               ),
             ),
@@ -403,9 +400,9 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 'Descrição:',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(record.description),
               const SizedBox(height: 12),
@@ -432,12 +429,7 @@ class HealthHistoryScreen extends GetView<HealthHistoryController> {
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
-        ],
+        actions: [TextButton(onPressed: Get.back, child: const Text('Fechar'))],
       ),
     );
   }

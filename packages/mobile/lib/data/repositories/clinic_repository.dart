@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import '../../core/repositories/base_repository.dart';
-import '../../core/services/cache_service.dart';
-import '../../core/services/network_service.dart';
-import '../../features/discovery/models/clinic_model.dart';
+import 'package:singleclin_mobile/core/repositories/base_repository.dart';
+import 'package:singleclin_mobile/core/services/cache_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+import 'package:singleclin_mobile/features/discovery/models/clinic_model.dart';
 import 'dart:convert';
 
 /// Repository for clinic data with offline-first capabilities
@@ -11,14 +11,10 @@ import 'dart:convert';
 /// geographic filtering and offline support.
 class ClinicRepository extends BaseRepository<ClinicModel> {
   ClinicRepository({
-    required CacheService cacheService,
-    required NetworkService networkService,
-    required Dio dio,
-  }) : super(
-          cacheService: cacheService,
-          networkService: networkService,
-          dio: dio,
-        );
+    required super.cacheService,
+    required super.networkService,
+    required super.dio,
+  });
 
   @override
   String get boxName => 'clinics';
@@ -63,7 +59,10 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
         if (offset != null) 'offset': offset,
       };
 
-      final response = await _dio.get('/api/clinics', queryParameters: queryParams);
+      final response = await _dio.get(
+        '/api/clinics',
+        queryParameters: queryParams,
+      );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List<dynamic> clinics = response.data['data']['clinics'] ?? [];
@@ -161,14 +160,16 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
 
     if (offlineOnly || !await _networkService.isConnected) {
       // Perform offline text search
-      return await _performOfflineTextSearch(query, latitude, longitude, radiusKm, limit);
+      return _performOfflineTextSearch(
+        query,
+        latitude,
+        longitude,
+        radiusKm,
+        limit,
+      );
     }
 
-    return await getMany(
-      filters: filters,
-      limit: limit,
-      offlineOnly: offlineOnly,
-    );
+    return getMany(filters: filters, limit: limit, offlineOnly: offlineOnly);
   }
 
   /// Get clinics by specialty
@@ -196,9 +197,13 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
 
     // Filter by specialty offline if needed
     if (offlineOnly || !await _networkService.isConnected) {
-      return clinics.where((clinic) =>
-          clinic.specialties.any((s) => s.toLowerCase().contains(specialty.toLowerCase()))
-      ).toList();
+      return clinics
+          .where(
+            (clinic) => clinic.specialties.any(
+              (s) => s.toLowerCase().contains(specialty.toLowerCase()),
+            ),
+          )
+          .toList();
     }
 
     return clinics;
@@ -218,11 +223,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
       if (longitude != null) 'lng': longitude,
     };
 
-    return await getMany(
-      filters: filters,
-      limit: limit,
-      offlineOnly: offlineOnly,
-    );
+    return getMany(filters: filters, limit: limit, offlineOnly: offlineOnly);
   }
 
   /// Get recently viewed clinics (local only)
@@ -257,9 +258,15 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
       // Keep only last 20 items
       final limitedIds = recentIds.take(20).toList();
 
-      await _cacheService.putList(boxName, 'recently_viewed',
-        limitedIds.map((id) => {'id': id, 'viewedAt': DateTime.now().toIso8601String()}).toList());
-
+      await _cacheService.putList(
+        boxName,
+        'recently_viewed',
+        limitedIds
+            .map(
+              (id) => {'id': id, 'viewedAt': DateTime.now().toIso8601String()},
+            )
+            .toList(),
+      );
     } catch (e) {
       print('❌ Failed to mark clinic as viewed: $e');
     }
@@ -337,7 +344,9 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
     try {
       if (!await _networkService.isConnected) return;
 
-      print('📥 Preloading clinics for area (lat: $latitude, lng: $longitude, radius: ${radiusKm}km)');
+      print(
+        '📥 Preloading clinics for area (lat: $latitude, lng: $longitude, radius: ${radiusKm}km)',
+      );
 
       // Fetch clinics in the area
       final clinics = await searchByLocation(
@@ -345,11 +354,9 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
         longitude: longitude,
         radiusKm: radiusKm,
         limit: 100,
-        offlineOnly: false,
       );
 
       print('✅ Preloaded ${clinics.length} clinics for offline usage');
-
     } catch (e) {
       print('❌ Failed to preload clinics: $e');
     }
@@ -366,8 +373,11 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
     return clinics.where((clinic) {
       final distance = clinic.distanceFrom(userLat, userLng);
       return distance <= radiusKm;
-    }).toList()
-      ..sort((a, b) => a.distanceFrom(userLat, userLng).compareTo(b.distanceFrom(userLat, userLng)));
+    }).toList()..sort(
+      (a, b) => a
+          .distanceFrom(userLat, userLng)
+          .compareTo(b.distanceFrom(userLat, userLng)),
+    );
   }
 
   Future<List<ClinicModel>> _performOfflineTextSearch(
@@ -385,18 +395,22 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
       final lowerQuery = query.toLowerCase();
       var filteredClinics = allClinics.where((clinic) {
         return clinic.name.toLowerCase().contains(lowerQuery) ||
-               clinic.description.toLowerCase().contains(lowerQuery) ||
-               clinic.address.toLowerCase().contains(lowerQuery) ||
-               clinic.specialties.any((s) => s.toLowerCase().contains(lowerQuery));
+            clinic.description.toLowerCase().contains(lowerQuery) ||
+            clinic.address.toLowerCase().contains(lowerQuery) ||
+            clinic.specialties.any((s) => s.toLowerCase().contains(lowerQuery));
       }).toList();
 
       // Filter by location if provided
       if (latitude != null && longitude != null) {
-        filteredClinics = _filterByDistance(filteredClinics, latitude, longitude, radiusKm);
+        filteredClinics = _filterByDistance(
+          filteredClinics,
+          latitude,
+          longitude,
+          radiusKm,
+        );
       }
 
       return filteredClinics.take(limit).toList();
-
     } catch (e) {
       print('❌ Offline text search failed: $e');
       return [];
@@ -414,15 +428,19 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
   }
 
   Future<void> _saveFavoriteIds(List<String> favoriteIds) async {
-    await _cacheService.putList(boxName, 'favorites',
-      favoriteIds.map((id) => id).toList());
+    await _cacheService.putList(
+      boxName,
+      'favorites',
+      favoriteIds.map((id) => id).toList(),
+    );
   }
 
   Future<void> _syncFavoritesToServer(List<String> favoriteIds) async {
     try {
-      await _dio.put('/api/user/favorites/clinics', data: {
-        'clinicIds': favoriteIds,
-      });
+      await _dio.put(
+        '/api/user/favorites/clinics',
+        data: {'clinicIds': favoriteIds},
+      );
     } catch (e) {
       print('⚠️ Failed to sync favorites to server: $e');
       // Not critical, will retry next time

@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
-import '../models/cache_entity.dart';
-import 'cache_service.dart';
-import 'network_service.dart';
-import 'hive_box_manager.dart';
+import 'package:singleclin_mobile/core/models/cache_entity.dart';
+import 'package:singleclin_mobile/core/services/cache_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+import 'package:singleclin_mobile/core/services/hive_box_manager.dart';
 import 'dart:async';
 
 /// Service for managing offline operations queue
@@ -11,6 +11,13 @@ import 'dart:async';
 /// Handles queuing, prioritization, and automatic processing of operations
 /// that were performed while offline and need to be synced with the server.
 class OfflineOperationQueue extends GetxService {
+  OfflineOperationQueue({
+    required CacheService cacheService,
+    required NetworkService networkService,
+    required HiveBoxManager boxManager,
+  }) : _cacheService = cacheService,
+       _networkService = networkService,
+       _boxManager = boxManager;
   final CacheService _cacheService;
   final NetworkService _networkService;
   final HiveBoxManager _boxManager;
@@ -28,14 +35,6 @@ class OfflineOperationQueue extends GetxService {
   static const Duration _processingInterval = Duration(minutes: 2);
   static const int _maxRetryAttempts = 5;
   static const int _batchSize = 5;
-
-  OfflineOperationQueue({
-    required CacheService cacheService,
-    required NetworkService networkService,
-    required HiveBoxManager boxManager,
-  })  : _cacheService = cacheService,
-        _networkService = networkService,
-        _boxManager = boxManager;
 
   // Getters
   int get queueSize => _queueSize.value;
@@ -92,10 +91,7 @@ class OfflineOperationQueue extends GetxService {
       entityKey: entityKey,
       data: data,
       createdAt: DateTime.now(),
-      metadata: {
-        'priority': priority.name,
-        ...?metadata,
-      },
+      metadata: {'priority': priority.name, ...?metadata},
     );
 
     try {
@@ -104,7 +100,9 @@ class OfflineOperationQueue extends GetxService {
 
       await _updateQueueSize();
 
-      print('➕ Added operation to queue: ${operation.name} for $entityKey (ID: $operationId)');
+      print(
+        '➕ Added operation to queue: ${operation.name} for $entityKey (ID: $operationId)',
+      );
 
       // Try immediate processing if online
       if (_networkService.isConnected && !isProcessing) {
@@ -112,7 +110,6 @@ class OfflineOperationQueue extends GetxService {
       }
 
       return operationId;
-
     } catch (e) {
       print('❌ Failed to add operation to queue: $e');
       rethrow;
@@ -161,7 +158,6 @@ class OfflineOperationQueue extends GetxService {
       });
 
       return operations;
-
     } catch (e) {
       print('❌ Failed to get operations: $e');
       return [];
@@ -169,7 +165,9 @@ class OfflineOperationQueue extends GetxService {
   }
 
   /// Get operations by type
-  Future<List<PendingOperation>> getOperationsByType(CacheOperation operationType) async {
+  Future<List<PendingOperation>> getOperationsByType(
+    CacheOperation operationType,
+  ) async {
     final allOperations = await getAllOperations();
     return allOperations.where((op) => op.operation == operationType).toList();
   }
@@ -190,7 +188,7 @@ class OfflineOperationQueue extends GetxService {
       return OperationQueueResult.noConnection();
     }
 
-    return await _processOperations();
+    return _processOperations();
   }
 
   /// Clear all operations (with confirmation)
@@ -224,36 +222,37 @@ class OfflineOperationQueue extends GetxService {
         'operationsByType': <String, int>{},
         'operationsByBoxType': <String, int>{},
         'operationsByPriority': <String, int>{},
-        'oldestOperation': operations.isNotEmpty ? operations.first.createdAt : null,
-        'newestOperation': operations.isNotEmpty ? operations.last.createdAt : null,
+        'oldestOperation': operations.isNotEmpty
+            ? operations.first.createdAt
+            : null,
+        'newestOperation': operations.isNotEmpty
+            ? operations.last.createdAt
+            : null,
         'failedOperations': operations.where((op) => op.retryCount > 0).length,
-        'highPriorityOperations': operations.where((op) =>
-          _getPriorityValue(op.metadata?['priority']) == 3).length,
+        'highPriorityOperations': operations
+            .where((op) => _getPriorityValue(op.metadata?['priority']) == 3)
+            .length,
       };
 
       // Count by type
       for (final op in operations) {
         final typeName = op.operation.name;
         stats['operationsByType'][typeName] =
-          (stats['operationsByType'][typeName] ?? 0) + 1;
+            (stats['operationsByType'][typeName] ?? 0) + 1;
 
         final boxTypeName = op.boxType.name;
         stats['operationsByBoxType'][boxTypeName] =
-          (stats['operationsByBoxType'][boxTypeName] ?? 0) + 1;
+            (stats['operationsByBoxType'][boxTypeName] ?? 0) + 1;
 
         final priority = op.metadata?['priority'] ?? 'normal';
         stats['operationsByPriority'][priority] =
-          (stats['operationsByPriority'][priority] ?? 0) + 1;
+            (stats['operationsByPriority'][priority] ?? 0) + 1;
       }
 
       return stats;
-
     } catch (e) {
       print('❌ Failed to get queue statistics: $e');
-      return {
-        'totalOperations': 0,
-        'error': e.toString(),
-      };
+      return {'totalOperations': 0, 'error': e.toString()};
     }
   }
 
@@ -271,7 +270,9 @@ class OfflineOperationQueue extends GetxService {
       print('🔄 Processing operation queue...');
 
       final operations = await getAllOperations();
-      final operationsToProcess = operations.where((op) => op.shouldRetry).toList();
+      final operationsToProcess = operations
+          .where((op) => op.shouldRetry)
+          .toList();
 
       if (operationsToProcess.isEmpty) {
         return OperationQueueResult.success();
@@ -286,21 +287,24 @@ class OfflineOperationQueue extends GetxService {
             await _processOperation(operation);
             await removeOperation(operation.id);
             processed++;
-
           } catch (e) {
             print('❌ Failed to process operation ${operation.id}: $e');
             _processingErrors.add('${operation.operation.name}: $e');
 
             // Update operation with retry info
             final updatedOperation = operation.withRetry(e.toString());
-            final queueBox = await _boxManager.ensureBox(BoxType.operationQueue);
+            final queueBox = await _boxManager.ensureBox(
+              BoxType.operationQueue,
+            );
 
             if (updatedOperation.shouldRetry) {
               await queueBox.put(operation.id, updatedOperation.toJson());
             } else {
               // Max retries reached, remove from queue
               await queueBox.delete(operation.id);
-              print('⚠️ Operation ${operation.id} exceeded max retries, removed from queue');
+              print(
+                '⚠️ Operation ${operation.id} exceeded max retries, removed from queue',
+              );
             }
 
             failed++;
@@ -317,19 +321,19 @@ class OfflineOperationQueue extends GetxService {
       _lastProcessTime.value = DateTime.now();
 
       stopwatch.stop();
-      print('✅ Queue processing completed: $processed processed, $failed failed (${stopwatch.elapsed.inSeconds}s)');
+      print(
+        '✅ Queue processing completed: $processed processed, $failed failed (${stopwatch.elapsed.inSeconds}s)',
+      );
 
       return OperationQueueResult.success(
         processedCount: processed,
         failedCount: failed,
         duration: stopwatch.elapsed,
       );
-
     } catch (e) {
       print('❌ Queue processing failed: $e');
       _processingErrors.add('General processing error: $e');
       return OperationQueueResult.error(e.toString());
-
     } finally {
       _isProcessing.value = false;
     }
@@ -413,21 +417,10 @@ class OfflineOperationQueue extends GetxService {
 }
 
 /// Priority levels for operations
-enum OperationPriority {
-  low,
-  normal,
-  high,
-  critical,
-}
+enum OperationPriority { low, normal, high, critical }
 
 /// Result of queue processing operation
 class OperationQueueResult {
-  final bool success;
-  final int processedCount;
-  final int failedCount;
-  final String? errorMessage;
-  final Duration? duration;
-
   OperationQueueResult({
     required this.success,
     this.processedCount = 0,
@@ -470,6 +463,11 @@ class OperationQueueResult {
       errorMessage: 'Queue processing already in progress',
     );
   }
+  final bool success;
+  final int processedCount;
+  final int failedCount;
+  final String? errorMessage;
+  final Duration? duration;
 
   @override
   String toString() {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'shared/widgets/custom_bottom_nav.dart';
-import 'shared/controllers/bottom_nav_controller.dart';
-import 'features/clinic_discovery/screens/clinic_discovery_screen.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
+import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_discovery_screen.dart';
 
 class TempDashboardScreen extends StatelessWidget {
-  const TempDashboardScreen({Key? key}) : super(key: key);
+  const TempDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +41,8 @@ class TempDashboardScreen extends StatelessWidget {
   }
 }
 
-
 class TempTransactionsScreen extends StatelessWidget {
-  const TempTransactionsScreen({Key? key}) : super(key: key);
+  const TempTransactionsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +112,7 @@ class TempTransactionsScreen extends StatelessWidget {
               itemCount: transactions.length,
               itemBuilder: (context, index) {
                 final transaction = transactions[index];
-                final amount = transaction['amount'] as int;
+                final amount = transaction['amount']! as int;
                 final isCredit = amount > 0;
 
                 return Card(
@@ -127,20 +126,26 @@ class TempTransactionsScreen extends StatelessWidget {
                       ),
                     ),
                     title: Text(
-                      transaction['type'] as String,
+                      transaction['type']! as String,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(transaction['clinic'] as String),
+                        Text(transaction['clinic']! as String),
                         Text(
                           'ID: ${transaction['id']}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                         Text(
-                          _formatDate(transaction['date'] as DateTime),
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          _formatDate(transaction['date']! as DateTime),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -157,13 +162,16 @@ class TempTransactionsScreen extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.green.shade100,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            transaction['status'] as String,
+                            transaction['status']! as String,
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.green.shade700,
@@ -201,7 +209,7 @@ class TempTransactionsScreen extends StatelessWidget {
 }
 
 class TempPlansScreen extends StatelessWidget {
-  const TempPlansScreen({Key? key}) : super(key: key);
+  const TempPlansScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -237,9 +245,8 @@ class TempPlansScreen extends StatelessWidget {
   }
 }
 
-
 class ClinicDiscoveryWithNavScreen extends StatelessWidget {
-  const ClinicDiscoveryWithNavScreen({Key? key}) : super(key: key);
+  const ClinicDiscoveryWithNavScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +261,7 @@ class ClinicDiscoveryWithNavScreen extends StatelessWidget {
 }
 
 class TempProfileScreen extends StatelessWidget {
-  const TempProfileScreen({Key? key}) : super(key: key);
+  const TempProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -289,4 +296,3 @@ class TempProfileScreen extends StatelessWidget {
     );
   }
 }
-

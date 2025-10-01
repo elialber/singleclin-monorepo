@@ -3,18 +3,6 @@ import 'package:flutter/material.dart';
 
 /// Comprehensive filter options for discovery search
 class FilterOptions extends Equatable {
-  final LocationFilter? location;
-  final PriceRangeFilter priceRange;
-  final RatingFilter rating;
-  final CategoryFilter categories;
-  final AvailabilityFilter availability;
-  final DistanceFilter? distance;
-  final SortOption sortBy;
-  final bool onlyVerifiedClinics;
-  final bool onlyAcceptingSG;
-  final bool onlyWithPromotion;
-  final List<String> amenities;
-
   const FilterOptions({
     this.location,
     this.priceRange = const PriceRangeFilter(),
@@ -29,18 +17,62 @@ class FilterOptions extends Equatable {
     this.amenities = const [],
   });
 
+  /// Create from query parameters
+  factory FilterOptions.fromQueryParams(Map<String, dynamic> params) {
+    return FilterOptions(
+      location:
+          params.containsKey('latitude') && params.containsKey('longitude')
+          ? LocationFilter.fromQueryParams(params)
+          : null,
+      priceRange:
+          params.containsKey('minPrice') || params.containsKey('maxPrice')
+          ? PriceRangeFilter.fromQueryParams(params)
+          : const PriceRangeFilter(),
+      rating: params.containsKey('minRating')
+          ? RatingFilter.fromQueryParams(params)
+          : const RatingFilter(),
+      categories: params.containsKey('categories')
+          ? CategoryFilter.fromQueryParams(params)
+          : const CategoryFilter(),
+      availability: AvailabilityFilter.fromQueryParams(params),
+      distance: params.containsKey('maxDistance')
+          ? DistanceFilter.fromQueryParams(params)
+          : null,
+      sortBy: params.containsKey('sortBy')
+          ? SortOption.fromString(params['sortBy'] as String)
+          : SortOption.relevance,
+      onlyVerifiedClinics: params['verifiedOnly'] as bool? ?? false,
+      onlyAcceptingSG: params['acceptsSG'] as bool? ?? true,
+      onlyWithPromotion: params['promotionOnly'] as bool? ?? false,
+      amenities: params.containsKey('amenities')
+          ? (params['amenities'] as String).split(',')
+          : const [],
+    );
+  }
+  final LocationFilter? location;
+  final PriceRangeFilter priceRange;
+  final RatingFilter rating;
+  final CategoryFilter categories;
+  final AvailabilityFilter availability;
+  final DistanceFilter? distance;
+  final SortOption sortBy;
+  final bool onlyVerifiedClinics;
+  final bool onlyAcceptingSG;
+  final bool onlyWithPromotion;
+  final List<String> amenities;
+
   /// Check if any filters are active (not default)
   bool get hasActiveFilters {
     return location != null ||
-           priceRange.hasRange ||
-           rating.hasMinimum ||
-           categories.hasSelection ||
-           availability.hasRestriction ||
-           distance != null ||
-           onlyVerifiedClinics ||
-           !onlyAcceptingSG ||
-           onlyWithPromotion ||
-           amenities.isNotEmpty;
+        priceRange.hasRange ||
+        rating.hasMinimum ||
+        categories.hasSelection ||
+        availability.hasRestriction ||
+        distance != null ||
+        onlyVerifiedClinics ||
+        !onlyAcceptingSG ||
+        onlyWithPromotion ||
+        amenities.isNotEmpty;
   }
 
   /// Get count of active filter categories
@@ -104,30 +136,31 @@ class FilterOptions extends Equatable {
   /// Convert to query parameters for API calls
   Map<String, dynamic> toQueryParams() {
     final params = <String, dynamic>{};
-    
+
     if (location != null) {
       params.addAll(location!.toQueryParams());
     }
-    
+
     if (priceRange.hasRange) {
       params['minPrice'] = priceRange.minPrice;
       params['maxPrice'] = priceRange.maxPrice;
     }
-    
+
     if (rating.hasMinimum) {
       params['minRating'] = rating.minimumRating;
     }
-    
+
     if (categories.hasSelection) {
       params['categories'] = categories.selectedCategories.join(',');
     }
-    
+
     if (availability.hasRestriction) {
       if (availability.specificDate != null) {
         params['availableDate'] = availability.specificDate!.toIso8601String();
       }
       if (availability.specificTime != null) {
-        params['availableTime'] = '${availability.specificTime!.hour}:${availability.specificTime!.minute}';
+        params['availableTime'] =
+            '${availability.specificTime!.hour}:${availability.specificTime!.minute}';
       }
       if (availability.todayOnly) {
         params['availableToday'] = true;
@@ -136,87 +169,50 @@ class FilterOptions extends Equatable {
         params['availableThisWeek'] = true;
       }
     }
-    
+
     if (distance != null) {
       params.addAll(distance!.toQueryParams());
     }
-    
+
     params['sortBy'] = sortBy.name;
-    
+
     if (onlyVerifiedClinics) {
       params['verifiedOnly'] = true;
     }
-    
+
     if (!onlyAcceptingSG) {
       params['acceptsSG'] = false;
     }
-    
+
     if (onlyWithPromotion) {
       params['promotionOnly'] = true;
     }
-    
+
     if (amenities.isNotEmpty) {
       params['amenities'] = amenities.join(',');
     }
-    
-    return params;
-  }
 
-  /// Create from query parameters
-  factory FilterOptions.fromQueryParams(Map<String, dynamic> params) {
-    return FilterOptions(
-      location: params.containsKey('latitude') && params.containsKey('longitude')
-          ? LocationFilter.fromQueryParams(params)
-          : null,
-      priceRange: params.containsKey('minPrice') || params.containsKey('maxPrice')
-          ? PriceRangeFilter.fromQueryParams(params)
-          : const PriceRangeFilter(),
-      rating: params.containsKey('minRating')
-          ? RatingFilter.fromQueryParams(params)
-          : const RatingFilter(),
-      categories: params.containsKey('categories')
-          ? CategoryFilter.fromQueryParams(params)
-          : const CategoryFilter(),
-      availability: AvailabilityFilter.fromQueryParams(params),
-      distance: params.containsKey('maxDistance')
-          ? DistanceFilter.fromQueryParams(params)
-          : null,
-      sortBy: params.containsKey('sortBy')
-          ? SortOption.fromString(params['sortBy'] as String)
-          : SortOption.relevance,
-      onlyVerifiedClinics: params['verifiedOnly'] as bool? ?? false,
-      onlyAcceptingSG: params['acceptsSG'] as bool? ?? true,
-      onlyWithPromotion: params['promotionOnly'] as bool? ?? false,
-      amenities: params.containsKey('amenities')
-          ? (params['amenities'] as String).split(',')
-          : const [],
-    );
+    return params;
   }
 
   @override
   List<Object?> get props => [
-        location,
-        priceRange,
-        rating,
-        categories,
-        availability,
-        distance,
-        sortBy,
-        onlyVerifiedClinics,
-        onlyAcceptingSG,
-        onlyWithPromotion,
-        amenities,
-      ];
+    location,
+    priceRange,
+    rating,
+    categories,
+    availability,
+    distance,
+    sortBy,
+    onlyVerifiedClinics,
+    onlyAcceptingSG,
+    onlyWithPromotion,
+    amenities,
+  ];
 }
 
 /// Location-based filtering
 class LocationFilter extends Equatable {
-  final double latitude;
-  final double longitude;
-  final String? address;
-  final String? city;
-  final String? state;
-
   const LocationFilter({
     required this.latitude,
     required this.longitude,
@@ -224,6 +220,21 @@ class LocationFilter extends Equatable {
     this.city,
     this.state,
   });
+
+  factory LocationFilter.fromQueryParams(Map<String, dynamic> params) {
+    return LocationFilter(
+      latitude: params['latitude'] as double,
+      longitude: params['longitude'] as double,
+      address: params['address'] as String?,
+      city: params['city'] as String?,
+      state: params['state'] as String?,
+    );
+  }
+  final double latitude;
+  final double longitude;
+  final String? address;
+  final String? city;
+  final String? state;
 
   String get displayText {
     if (address != null) return address!;
@@ -242,29 +253,22 @@ class LocationFilter extends Equatable {
     };
   }
 
-  factory LocationFilter.fromQueryParams(Map<String, dynamic> params) {
-    return LocationFilter(
-      latitude: params['latitude'] as double,
-      longitude: params['longitude'] as double,
-      address: params['address'] as String?,
-      city: params['city'] as String?,
-      state: params['state'] as String?,
-    );
-  }
-
   @override
   List<Object?> get props => [latitude, longitude, address, city, state];
 }
 
 /// Price range filtering in SG credits
 class PriceRangeFilter extends Equatable {
+  const PriceRangeFilter({this.minPrice, this.maxPrice});
+
+  factory PriceRangeFilter.fromQueryParams(Map<String, dynamic> params) {
+    return PriceRangeFilter(
+      minPrice: params['minPrice'] as int?,
+      maxPrice: params['maxPrice'] as int?,
+    );
+  }
   final int? minPrice;
   final int? maxPrice;
-
-  const PriceRangeFilter({
-    this.minPrice,
-    this.maxPrice,
-  });
 
   bool get hasRange => minPrice != null || maxPrice != null;
 
@@ -289,22 +293,18 @@ class PriceRangeFilter extends Equatable {
     PriceRangeFilter(minPrice: 500),
   ];
 
-  factory PriceRangeFilter.fromQueryParams(Map<String, dynamic> params) {
-    return PriceRangeFilter(
-      minPrice: params['minPrice'] as int?,
-      maxPrice: params['maxPrice'] as int?,
-    );
-  }
-
   @override
   List<Object?> get props => [minPrice, maxPrice];
 }
 
 /// Rating-based filtering
 class RatingFilter extends Equatable {
-  final double? minimumRating;
-
   const RatingFilter({this.minimumRating});
+
+  factory RatingFilter.fromQueryParams(Map<String, dynamic> params) {
+    return RatingFilter(minimumRating: params['minRating'] as double?);
+  }
+  final double? minimumRating;
 
   bool get hasMinimum => minimumRating != null;
 
@@ -323,21 +323,20 @@ class RatingFilter extends Equatable {
     RatingFilter(minimumRating: 4.5),
   ];
 
-  factory RatingFilter.fromQueryParams(Map<String, dynamic> params) {
-    return RatingFilter(
-      minimumRating: params['minRating'] as double?,
-    );
-  }
-
   @override
   List<Object?> get props => [minimumRating];
 }
 
 /// Category-based filtering
 class CategoryFilter extends Equatable {
-  final List<String> selectedCategories;
-
   const CategoryFilter({this.selectedCategories = const []});
+
+  factory CategoryFilter.fromQueryParams(Map<String, dynamic> params) {
+    return CategoryFilter(
+      selectedCategories: (params['categories'] as String).split(','),
+    );
+  }
+  final List<String> selectedCategories;
 
   bool get hasSelection => selectedCategories.isNotEmpty;
 
@@ -373,49 +372,18 @@ class CategoryFilter extends Equatable {
     return const CategoryFilter();
   }
 
-  factory CategoryFilter.fromQueryParams(Map<String, dynamic> params) {
-    return CategoryFilter(
-      selectedCategories: (params['categories'] as String).split(','),
-    );
-  }
-
   @override
   List<Object?> get props => [selectedCategories];
 }
 
 /// Availability-based filtering
 class AvailabilityFilter extends Equatable {
-  final DateTime? specificDate;
-  final TimeOfDay? specificTime;
-  final bool todayOnly;
-  final bool thisWeekOnly;
-
   const AvailabilityFilter({
     this.specificDate,
     this.specificTime,
     this.todayOnly = false,
     this.thisWeekOnly = false,
   });
-
-  bool get hasRestriction => 
-      specificDate != null || 
-      specificTime != null || 
-      todayOnly || 
-      thisWeekOnly;
-
-  String get displayText {
-    if (todayOnly) return 'Disponível hoje';
-    if (thisWeekOnly) return 'Disponível esta semana';
-    if (specificDate != null && specificTime != null) {
-      final dateStr = '${specificDate!.day}/${specificDate!.month}';
-      final timeStr = '${specificTime!.hour.toString().padLeft(2, '0')}:${specificTime!.minute.toString().padLeft(2, '0')}';
-      return '$dateStr às $timeStr';
-    }
-    if (specificDate != null) {
-      return '${specificDate!.day}/${specificDate!.month}';
-    }
-    return 'Qualquer horário';
-  }
 
   factory AvailabilityFilter.fromQueryParams(Map<String, dynamic> params) {
     return AvailabilityFilter(
@@ -429,30 +397,61 @@ class AvailabilityFilter extends Equatable {
       thisWeekOnly: params['availableThisWeek'] as bool? ?? false,
     );
   }
+  final DateTime? specificDate;
+  final TimeOfDay? specificTime;
+  final bool todayOnly;
+  final bool thisWeekOnly;
+
+  bool get hasRestriction =>
+      specificDate != null || specificTime != null || todayOnly || thisWeekOnly;
+
+  String get displayText {
+    if (todayOnly) return 'Disponível hoje';
+    if (thisWeekOnly) return 'Disponível esta semana';
+    if (specificDate != null && specificTime != null) {
+      final dateStr = '${specificDate!.day}/${specificDate!.month}';
+      final timeStr =
+          '${specificTime!.hour.toString().padLeft(2, '0')}:${specificTime!.minute.toString().padLeft(2, '0')}';
+      return '$dateStr às $timeStr';
+    }
+    if (specificDate != null) {
+      return '${specificDate!.day}/${specificDate!.month}';
+    }
+    return 'Qualquer horário';
+  }
 
   static TimeOfDay _parseTimeFromString(String timeStr) {
     final parts = timeStr.split(':');
-    return TimeOfDay(
-      hour: int.parse(parts[0]),
-      minute: int.parse(parts[1]),
-    );
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
   @override
-  List<Object?> get props => [specificDate, specificTime, todayOnly, thisWeekOnly];
+  List<Object?> get props => [
+    specificDate,
+    specificTime,
+    todayOnly,
+    thisWeekOnly,
+  ];
 }
 
 /// Distance-based filtering
 class DistanceFilter extends Equatable {
-  final double maxDistanceKm;
-  final double? centerLatitude;
-  final double? centerLongitude;
-
   const DistanceFilter({
     required this.maxDistanceKm,
     this.centerLatitude,
     this.centerLongitude,
   });
+
+  factory DistanceFilter.fromQueryParams(Map<String, dynamic> params) {
+    return DistanceFilter(
+      maxDistanceKm: params['maxDistance'] as double,
+      centerLatitude: params['centerLat'] as double?,
+      centerLongitude: params['centerLng'] as double?,
+    );
+  }
+  final double maxDistanceKm;
+  final double? centerLatitude;
+  final double? centerLongitude;
 
   String get displayText {
     if (maxDistanceKm < 1) {
@@ -463,28 +462,24 @@ class DistanceFilter extends Equatable {
 
   /// Common distance options
   static const List<double> commonDistances = [
-    0.5, 1.0, 2.0, 5.0, 10.0, 25.0, 50.0
+    0.5,
+    1.0,
+    2.0,
+    5.0,
+    10.0,
+    25.0,
+    50.0,
   ];
 
   Map<String, dynamic> toQueryParams() {
-    final params = <String, dynamic>{
-      'maxDistance': maxDistanceKm,
-    };
-    
+    final params = <String, dynamic>{'maxDistance': maxDistanceKm};
+
     if (centerLatitude != null && centerLongitude != null) {
       params['centerLat'] = centerLatitude;
       params['centerLng'] = centerLongitude;
     }
-    
-    return params;
-  }
 
-  factory DistanceFilter.fromQueryParams(Map<String, dynamic> params) {
-    return DistanceFilter(
-      maxDistanceKm: params['maxDistance'] as double,
-      centerLatitude: params['centerLat'] as double?,
-      centerLongitude: params['centerLng'] as double?,
-    );
+    return params;
   }
 
   @override
@@ -514,17 +509,16 @@ enum SortOption {
 
 /// Search query model
 class SearchQuery extends Equatable {
-  final String query;
-  final FilterOptions filters;
-  final int page;
-  final int limit;
-
   const SearchQuery({
     this.query = '',
     this.filters = const FilterOptions(),
     this.page = 1,
     this.limit = 20,
   });
+  final String query;
+  final FilterOptions filters;
+  final int page;
+  final int limit;
 
   bool get hasQuery => query.trim().isNotEmpty;
 
@@ -550,14 +544,14 @@ class SearchQuery extends Equatable {
 
   Map<String, dynamic> toQueryParams() {
     final params = filters.toQueryParams();
-    
+
     if (hasQuery) {
       params['q'] = query;
     }
-    
+
     params['page'] = page;
     params['limit'] = limit;
-    
+
     return params;
   }
 
@@ -574,7 +568,6 @@ class QuickFilters {
 
   static const FilterOptions affordable = FilterOptions(
     priceRange: PriceRangeFilter(maxPrice: 100),
-    onlyAcceptingSG: true,
   );
 
   static const FilterOptions premium = FilterOptions(
@@ -599,11 +592,11 @@ class QuickFilters {
   );
 
   static List<MapEntry<String, FilterOptions>> get presets => [
-        const MapEntry('Próximo e disponível hoje', nearbyToday),
-        const MapEntry('Até 100 SG', affordable),
-        const MapEntry('Premium (4.5★+)', premium),
-        const MapEntry('Estética Facial', facialAesthetics),
-        const MapEntry('Terapias Injetáveis', injectableTherapies),
-        const MapEntry('Bem-estar', wellness),
-      ];
+    const MapEntry('Próximo e disponível hoje', nearbyToday),
+    const MapEntry('Até 100 SG', affordable),
+    const MapEntry('Premium (4.5★+)', premium),
+    const MapEntry('Estética Facial', facialAesthetics),
+    const MapEntry('Terapias Injetáveis', injectableTherapies),
+    const MapEntry('Bem-estar', wellness),
+  ];
 }

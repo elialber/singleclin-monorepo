@@ -3,31 +3,6 @@ import 'package:equatable/equatable.dart';
 /// Medical Document Model
 /// Represents medical documents, files, and images
 class MedicalDocument extends Equatable {
-  final String id;
-  final String userId;
-  final String name;
-  final String originalName;
-  final DocumentType type;
-  final String mimeType;
-  final int fileSize;
-  final String? fileUrl;
-  final String? thumbnailUrl;
-  final String? localPath;
-  final String? description;
-  final String? associatedAppointmentId;
-  final String? associatedRecordId;
-  final List<String> tags;
-  final bool isEncrypted;
-  final Map<String, dynamic>? metadata;
-  final DocumentStatus status;
-  final DateTime uploadedAt;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final DateTime? expiresAt;
-  final bool isShared;
-  final List<String> sharedWith;
-  final String? encryptionKey;
-
   const MedicalDocument({
     required this.id,
     required this.userId,
@@ -78,14 +53,38 @@ class MedicalDocument extends Equatable {
       uploadedAt: DateTime.parse(json['uploadedAt'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      expiresAt: json['expiresAt'] != null 
-          ? DateTime.parse(json['expiresAt'] as String) 
+      expiresAt: json['expiresAt'] != null
+          ? DateTime.parse(json['expiresAt'] as String)
           : null,
       isShared: json['isShared'] as bool? ?? false,
       sharedWith: List<String>.from(json['sharedWith'] as List? ?? []),
       encryptionKey: json['encryptionKey'] as String?,
     );
   }
+  final String id;
+  final String userId;
+  final String name;
+  final String originalName;
+  final DocumentType type;
+  final String mimeType;
+  final int fileSize;
+  final String? fileUrl;
+  final String? thumbnailUrl;
+  final String? localPath;
+  final String? description;
+  final String? associatedAppointmentId;
+  final String? associatedRecordId;
+  final List<String> tags;
+  final bool isEncrypted;
+  final Map<String, dynamic>? metadata;
+  final DocumentStatus status;
+  final DateTime uploadedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? expiresAt;
+  final bool isShared;
+  final List<String> sharedWith;
+  final String? encryptionKey;
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
@@ -156,7 +155,8 @@ class MedicalDocument extends Equatable {
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       localPath: localPath ?? this.localPath,
       description: description ?? this.description,
-      associatedAppointmentId: associatedAppointmentId ?? this.associatedAppointmentId,
+      associatedAppointmentId:
+          associatedAppointmentId ?? this.associatedAppointmentId,
       associatedRecordId: associatedRecordId ?? this.associatedRecordId,
       tags: tags ?? this.tags,
       isEncrypted: isEncrypted ?? this.isEncrypted,
@@ -213,8 +213,19 @@ class MedicalDocument extends Equatable {
   /// Get formatted upload date
   String get formattedUploadDate {
     final months = [
-      '', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+      '',
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez',
     ];
     return '${uploadedAt.day} ${months[uploadedAt.month]} ${uploadedAt.year}';
   }
@@ -223,7 +234,7 @@ class MedicalDocument extends Equatable {
   String get timeAgo {
     final now = DateTime.now();
     final difference = now.difference(uploadedAt);
-    
+
     if (difference.inDays > 365) {
       final years = (difference.inDays / 365).floor();
       return '$years ano${years > 1 ? 's' : ''} atrás';
@@ -260,14 +271,7 @@ class MedicalDocument extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-        id,
-        userId,
-        name,
-        type,
-        fileSize,
-        updatedAt,
-      ];
+  List<Object?> get props => [id, userId, name, type, fileSize, updatedAt];
 
   @override
   String toString() {
@@ -289,13 +293,38 @@ enum DocumentType {
   biopsy('biopsy', 'Biópsia', '#673AB7', 'science'),
   ecg('ecg', 'Eletrocardiograma', '#E91E63', 'monitor_heart'),
   eeg('eeg', 'Eletroencefalograma', '#9C27B0', 'psychology'),
-  vaccinationCard('vaccination_card', 'Cartão de Vacinação', '#8BC34A', 'vaccines'),
-  insuranceCard('insurance_card', 'Cartão do Convênio', '#00BCD4', 'credit_card'),
-  identityDocument('identity_document', 'Documento de Identidade', '#FF5722', 'badge'),
-  consentForm('consent_form', 'Termo de Consentimento', '#795548', 'assignment'),
+  vaccinationCard(
+    'vaccination_card',
+    'Cartão de Vacinação',
+    '#8BC34A',
+    'vaccines',
+  ),
+  insuranceCard(
+    'insurance_card',
+    'Cartão do Convênio',
+    '#00BCD4',
+    'credit_card',
+  ),
+  identityDocument(
+    'identity_document',
+    'Documento de Identidade',
+    '#FF5722',
+    'badge',
+  ),
+  consentForm(
+    'consent_form',
+    'Termo de Consentimento',
+    '#795548',
+    'assignment',
+  ),
   beforePhoto('before_photo', 'Foto Antes', '#3F51B5', 'camera_alt'),
   afterPhoto('after_photo', 'Foto Depois', '#009688', 'camera_alt'),
-  progressPhoto('progress_photo', 'Foto de Progresso', '#CDDC39', 'photo_camera'),
+  progressPhoto(
+    'progress_photo',
+    'Foto de Progresso',
+    '#CDDC39',
+    'photo_camera',
+  ),
   invoice('invoice', 'Nota Fiscal', '#FF9800', 'receipt'),
   other('other', 'Outro', '#9E9E9E', 'description');
 
@@ -315,35 +344,35 @@ enum DocumentType {
 
   /// Get exam document types
   static List<DocumentType> get examTypes => [
-        examResult,
-        xray,
-        ultrasound,
-        mri,
-        ctScan,
-        bloodTest,
-        urineTest,
-        biopsy,
-        ecg,
-        eeg,
-      ];
+    examResult,
+    xray,
+    ultrasound,
+    mri,
+    ctScan,
+    bloodTest,
+    urineTest,
+    biopsy,
+    ecg,
+    eeg,
+  ];
 
   /// Get administrative document types
   static List<DocumentType> get administrativeTypes => [
-        prescription,
-        medicalReport,
-        vaccinationCard,
-        insuranceCard,
-        identityDocument,
-        consentForm,
-        invoice,
-      ];
+    prescription,
+    medicalReport,
+    vaccinationCard,
+    insuranceCard,
+    identityDocument,
+    consentForm,
+    invoice,
+  ];
 
   /// Get photo document types
   static List<DocumentType> get photoTypes => [
-        beforePhoto,
-        afterPhoto,
-        progressPhoto,
-      ];
+    beforePhoto,
+    afterPhoto,
+    progressPhoto,
+  ];
 
   /// Check if type is a photo
   bool get isPhoto {
@@ -399,16 +428,6 @@ enum DocumentStatus {
 
 /// Document Share Permission
 class DocumentSharePermission extends Equatable {
-  final String id;
-  final String documentId;
-  final String sharedWithId;
-  final String sharedWithType; // 'user', 'clinic', 'professional'
-  final String sharedWithName;
-  final List<DocumentPermission> permissions;
-  final DateTime? expiresAt;
-  final DateTime createdAt;
-  final bool isActive;
-
   const DocumentSharePermission({
     required this.id,
     required this.documentId,
@@ -431,13 +450,22 @@ class DocumentSharePermission extends Equatable {
       permissions: (json['permissions'] as List)
           .map((p) => DocumentPermission.fromString(p as String))
           .toList(),
-      expiresAt: json['expiresAt'] != null 
-          ? DateTime.parse(json['expiresAt'] as String) 
+      expiresAt: json['expiresAt'] != null
+          ? DateTime.parse(json['expiresAt'] as String)
           : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
       isActive: json['isActive'] as bool? ?? true,
     );
   }
+  final String id;
+  final String documentId;
+  final String sharedWithId;
+  final String sharedWithType; // 'user', 'clinic', 'professional'
+  final String sharedWithName;
+  final List<DocumentPermission> permissions;
+  final DateTime? expiresAt;
+  final DateTime createdAt;
+  final bool isActive;
 
   Map<String, dynamic> toJson() {
     return {
@@ -490,6 +518,10 @@ enum DocumentPermission {
   /// Get standard permissions for different share types
   static List<DocumentPermission> get viewOnlyPermissions => [view];
   static List<DocumentPermission> get standardPermissions => [view, download];
-  static List<DocumentPermission> get fullPermissions => [view, download, share];
+  static List<DocumentPermission> get fullPermissions => [
+    view,
+    download,
+    share,
+  ];
   static List<DocumentPermission> get adminPermissions => values;
 }

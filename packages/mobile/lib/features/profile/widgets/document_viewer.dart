@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/medical_document.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/models/medical_document.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Document Viewer Widget
 /// Displays document information with preview and actions
 class DocumentViewer extends StatelessWidget {
-  final MedicalDocument document;
-  final VoidCallback? onTap;
-  final VoidCallback? onDownload;
-  final VoidCallback? onShare;
-  final VoidCallback? onDelete;
-
   const DocumentViewer({
     Key? key,
     required this.document,
@@ -19,16 +13,21 @@ class DocumentViewer extends StatelessWidget {
     this.onShare,
     this.onDelete,
   }) : super(key: key);
+  final MedicalDocument document;
+  final VoidCallback? onTap;
+  final VoidCallback? onDownload;
+  final VoidCallback? onShare;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
-    final typeColor = Color(int.parse(document.type.color.substring(1), radix: 16) + 0xFF000000);
-    
+    final typeColor = Color(
+      int.parse(document.type.color.substring(1), radix: 16) + 0xFF000000,
+    );
+
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -63,10 +62,7 @@ class DocumentViewer extends StatelessWidget {
           decoration: BoxDecoration(
             color: typeColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: typeColor.withOpacity(0.3),
-              width: 1,
-            ),
+            border: Border.all(color: typeColor.withOpacity(0.3)),
           ),
           child: document.canPreview
               ? ClipRRect(
@@ -104,7 +100,10 @@ class DocumentViewer extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: typeColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
@@ -121,7 +120,10 @@ class DocumentViewer extends StatelessWidget {
                   const SizedBox(width: 8),
                   if (document.isEncrypted) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.success.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(6),
@@ -129,11 +131,7 @@ class DocumentViewer extends StatelessWidget {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.lock,
-                            size: 10,
-                            color: AppColors.success,
-                          ),
+                          Icon(Icons.lock, size: 10, color: AppColors.success),
                           SizedBox(width: 2),
                           Text(
                             'Seguro',
@@ -179,11 +177,7 @@ class DocumentViewer extends StatelessWidget {
 
   /// Build default document icon
   Widget _buildDefaultIcon(Color typeColor) {
-    return Icon(
-      _getDocumentIcon(),
-      size: 24,
-      color: typeColor,
-    );
+    return Icon(_getDocumentIcon(), size: 24, color: typeColor);
   }
 
   /// Build document information
@@ -191,7 +185,7 @@ class DocumentViewer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (document.description?.isNotEmpty == true) ...[
+        if (document.description?.isNotEmpty ?? false) ...[
           Text(
             document.description!,
             style: const TextStyle(
@@ -206,10 +200,7 @@ class DocumentViewer extends StatelessWidget {
         ],
         Text(
           'Arquivo: ${document.originalName}',
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
       ],
     );
@@ -231,11 +222,7 @@ class DocumentViewer extends StatelessWidget {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.share,
-                  size: 12,
-                  color: AppColors.info,
-                ),
+                Icon(Icons.share, size: 12, color: AppColors.info),
                 SizedBox(width: 4),
                 Text(
                   'Compartilhado',
@@ -259,11 +246,7 @@ class DocumentViewer extends StatelessWidget {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.warning,
-                  size: 12,
-                  color: AppColors.warning,
-                ),
+                Icon(Icons.warning, size: 12, color: AppColors.warning),
                 SizedBox(width: 4),
                 Text(
                   'Expirado',
@@ -287,11 +270,7 @@ class DocumentViewer extends StatelessWidget {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.visibility,
-                  size: 12,
-                  color: AppColors.success,
-                ),
+                Icon(Icons.visibility, size: 12, color: AppColors.success),
                 SizedBox(width: 4),
                 Text(
                   'Visualizar',

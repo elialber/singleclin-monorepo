@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/clinic.dart';
-import '../widgets/clinic_card.dart';
-import '../controllers/clinic_discovery_controller.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/widgets/clinic_card.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/controllers/clinic_discovery_controller.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ClinicDiscoveryScreen extends StatelessWidget {
-  const ClinicDiscoveryScreen({Key? key}) : super(key: key);
+  const ClinicDiscoveryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +21,17 @@ class ClinicDiscoveryScreen extends StatelessWidget {
             _buildSearchBar(context, controller),
             _buildQuickFilters(controller),
             _buildActiveFiltersIndicator(controller),
-            Expanded(
-              child: _buildClinicList(controller),
-            ),
+            Expanded(child: _buildClinicList(controller)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, ClinicDiscoveryController controller) {
+  Widget _buildHeader(
+    BuildContext context,
+    ClinicDiscoveryController controller,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.white,
@@ -48,17 +49,16 @@ class ClinicDiscoveryScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Obx(() => Text(
-                  controller.isLoadingLocation
-                      ? 'Localizando...'
-                      : controller.selectedSpecializations.isEmpty
-                          ? 'Clínicas próximas de você'
-                          : '${controller.filteredClinics.length} clínicas encontradas',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                Obx(
+                  () => Text(
+                    controller.isLoadingLocation
+                        ? 'Localizando...'
+                        : controller.selectedSpecializations.isEmpty
+                        ? 'Clínicas próximas de você'
+                        : '${controller.filteredClinics.length} clínicas encontradas',
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
-                )),
+                ),
               ],
             ),
           ),
@@ -73,7 +73,10 @@ class ClinicDiscoveryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, ClinicDiscoveryController controller) {
+  Widget _buildSearchBar(
+    BuildContext context,
+    ClinicDiscoveryController controller,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.white,
@@ -87,14 +90,8 @@ class ClinicDiscoveryScreen extends StatelessWidget {
           onChanged: controller.searchClinics,
           decoration: InputDecoration(
             hintText: 'Buscar por categoria, serviço ou nome da clínica',
-            hintStyle: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 14,
-            ),
-            prefixIcon: Icon(
-              Icons.search,
-              color: Colors.grey[500],
-            ),
+            hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+            prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -110,48 +107,60 @@ class ClinicDiscoveryScreen extends StatelessWidget {
     return Container(
       height: 60,
       color: Colors.white,
-      child: Obx(() => ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: controller.availableSpecializations.length,
-        itemBuilder: (context, index) {
-          final specialization = controller.availableSpecializations[index];
-          final isSelected = controller.selectedSpecializations.contains(specialization);
-          
-          return Container(
-            margin: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
-            child: FilterChip(
-              label: Text(
-                specialization,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: isSelected ? AppColors.white : AppColors.textSecondary,
+      child: Obx(
+        () => ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: controller.availableSpecializations.length,
+          itemBuilder: (context, index) {
+            final specialization = controller.availableSpecializations[index];
+            final isSelected = controller.selectedSpecializations.contains(
+              specialization,
+            );
+
+            return Container(
+              margin: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
+              child: FilterChip(
+                label: Text(
+                  specialization,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: isSelected
+                        ? AppColors.white
+                        : AppColors.textSecondary,
+                  ),
                 ),
-              ),
-              selected: isSelected,
-              onSelected: (selected) {
-                print('🎯 Chip clicado: $specialization, selecionado: $selected');
-                print('🏷️ Estado antes: ${controller.selectedSpecializations}');
+                selected: isSelected,
+                onSelected: (selected) {
+                  print(
+                    '🎯 Chip clicado: $specialization, selecionado: $selected',
+                  );
+                  print(
+                    '🏷️ Estado antes: ${controller.selectedSpecializations}',
+                  );
 
-                if (selected) {
-                  controller.addSpecializationFilter(specialization);
-                } else {
-                  controller.removeSpecializationFilter(specialization);
-                }
+                  if (selected) {
+                    controller.addSpecializationFilter(specialization);
+                  } else {
+                    controller.removeSpecializationFilter(specialization);
+                  }
 
-                print('🏷️ Estado depois: ${controller.selectedSpecializations}');
-              },
-              backgroundColor: AppColors.surface,
-              selectedColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                  print(
+                    '🏷️ Estado depois: ${controller.selectedSpecializations}',
+                  );
+                },
+                backgroundColor: AppColors.surface,
+                selectedColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                showCheckmark: false,
               ),
-              showCheckmark: false,
-            ),
-          );
-        },
-      )),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -168,18 +177,11 @@ class ClinicDiscoveryScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.primary.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: AppColors.primary.withOpacity(0.3),
-            width: 1,
-          ),
+          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.filter_list,
-              color: AppColors.primary,
-              size: 20,
-            ),
+            const Icon(Icons.filter_list, color: AppColors.primary, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -211,9 +213,7 @@ class ClinicDiscoveryScreen extends StatelessWidget {
   Widget _buildClinicList(ClinicDiscoveryController controller) {
     return Obx(() {
       if (controller.isLoading) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
+        return const Center(child: CircularProgressIndicator());
       }
 
       if (controller.filteredClinics.isEmpty) {
@@ -260,10 +260,7 @@ class ClinicDiscoveryScreen extends StatelessWidget {
           Text(
             'Tente ajustar os filtros ou buscar por outro termo',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
@@ -276,8 +273,10 @@ class ClinicDiscoveryScreen extends StatelessWidget {
     );
   }
 
-
-  void _showSearchModal(BuildContext context, ClinicDiscoveryController controller) {
+  void _showSearchModal(
+    BuildContext context,
+    ClinicDiscoveryController controller,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -287,19 +286,16 @@ class ClinicDiscoveryScreen extends StatelessWidget {
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.8,
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Busca Avançada',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             // Advanced search options will be implemented here
-            const Text('Recursos de busca avançada em desenvolvimento...'),
+            Text('Recursos de busca avançada em desenvolvimento...'),
           ],
         ),
       ),
@@ -309,6 +305,4 @@ class ClinicDiscoveryScreen extends StatelessWidget {
   void _navigateToClinicDetails(Clinic clinic) {
     Get.toNamed('/clinic-details', arguments: clinic);
   }
-
-
 }

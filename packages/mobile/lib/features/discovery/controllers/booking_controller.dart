@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../../../core/services/api_service.dart';
-import '../../../core/constants/app_constants.dart';
-import '../models/booking.dart';
-import '../models/clinic.dart';
-import '../models/service.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
+import 'package:singleclin_mobile/features/discovery/models/booking.dart';
+import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
 
 /// Booking controller managing appointment scheduling and calendar integration
 class BookingController extends GetxController {
@@ -20,18 +20,18 @@ class BookingController extends GetxController {
   final _selectedProfessional = Rxn<String>();
   final _bookingNotes = ''.obs;
   final _agreedToTerms = false.obs;
-  
+
   // Calendar state
   final _focusedDay = DateTime.now().obs;
   final _calendarFormat = CalendarFormat.month.obs;
   final _availableDates = <DateTime>[].obs;
   final _availableTimeSlots = <TimeSlot>[].obs;
-  
+
   // Loading states
   final _isLoadingAvailability = false.obs;
   final _isLoadingTimeSlots = false.obs;
   final _isCreatingBooking = false.obs;
-  
+
   // UI state
   final _currentStep = 0.obs;
   final _bookingReminders = const BookingReminders().obs;
@@ -120,8 +120,10 @@ class BookingController extends GetxController {
   void initializeBooking(Clinic clinic, [Service? service]) {
     _selectedClinic.value = clinic;
     _selectedService.value = service;
-    _currentStep.value = service != null ? 1 : 0; // Skip service selection if provided
-    
+    _currentStep.value = service != null
+        ? 1
+        : 0; // Skip service selection if provided
+
     if (service != null) {
       _loadServiceAvailability();
     }
@@ -134,7 +136,7 @@ class BookingController extends GetxController {
     _selectedTimeSlot.value = null;
     _selectedPackageDeal.value = null;
     _totalSessions.value = 1;
-    
+
     _loadServiceAvailability();
   }
 
@@ -148,20 +150,18 @@ class BookingController extends GetxController {
   Future<void> _loadServiceAvailability() async {
     final service = _selectedService.value;
     final clinic = _selectedClinic.value;
-    
+
     if (service == null || clinic == null) return;
 
     try {
       _isLoadingAvailability.value = true;
-      
-      final endDate = DateTime.now().add(Duration(days: daysAhead));
-      final response = await _apiService.get(
-        '/clinics/${clinic.id}/services/${service.id}/availability',
-        {
-          'startDate': DateTime.now().toIso8601String(),
-          'endDate': endDate.toIso8601String(),
-        },
-      );
+
+      final endDate = DateTime.now().add(const Duration(days: daysAhead));
+      final response = await _apiService
+          .get('/clinics/${clinic.id}/services/${service.id}/availability', {
+            'startDate': DateTime.now().toIso8601String(),
+            'endDate': endDate.toIso8601String(),
+          });
 
       if (response.isSuccess && response.data != null) {
         final datesData = response.data['availableDates'] as List;
@@ -169,7 +169,6 @@ class BookingController extends GetxController {
             .map((d) => DateTime.parse(d as String))
             .toList();
       }
-
     } catch (e) {
       _handleError('Erro ao carregar disponibilidade', e);
     } finally {
@@ -180,20 +179,21 @@ class BookingController extends GetxController {
   /// Check if date is available for booking
   bool isDateAvailable(DateTime date) {
     if (date.isBefore(DateTime.now())) return false;
-    
+
     if (_availableDates.isEmpty) {
       // If no specific availability data, check service general availability
       return _selectedService.value?.isAvailableOn(date) ?? false;
     }
-    
-    return _availableDates.any((availableDate) =>
-        isSameDay(availableDate, date));
+
+    return _availableDates.any(
+      (availableDate) => isSameDay(availableDate, date),
+    );
   }
 
   /// Select booking date
   void selectDate(DateTime date) {
     if (!isDateAvailable(date)) return;
-    
+
     _selectedDate.value = date;
     _selectedTimeSlot.value = null; // Reset time selection
     _loadTimeSlots(date);
@@ -203,17 +203,15 @@ class BookingController extends GetxController {
   Future<void> _loadTimeSlots(DateTime date) async {
     final service = _selectedService.value;
     final clinic = _selectedClinic.value;
-    
+
     if (service == null || clinic == null) return;
 
     try {
       _isLoadingTimeSlots.value = true;
-      
+
       final response = await _apiService.get(
         '/clinics/${clinic.id}/services/${service.id}/timeslots',
-        {
-          'date': date.toIso8601String(),
-        },
+        {'date': date.toIso8601String()},
       );
 
       if (response.isSuccess && response.data != null) {
@@ -222,7 +220,6 @@ class BookingController extends GetxController {
             .map((slot) => TimeSlot.fromJson(slot))
             .toList();
       }
-
     } catch (e) {
       _handleError('Erro ao carregar horários', e);
       // Generate default time slots as fallback
@@ -242,21 +239,23 @@ class BookingController extends GetxController {
     for (int hour = startHour; hour < endHour; hour++) {
       for (int minute = 0; minute < 60; minute += slotDuration) {
         if (hour == endHour - 1 && minute > 0) break;
-        
-        slots.add(TimeSlot(
-          time: TimeOfDay(hour: hour, minute: minute),
-          isAvailable: true,
-        ));
+
+        slots.add(
+          TimeSlot(
+            time: TimeOfDay(hour: hour, minute: minute),
+            isAvailable: true,
+          ),
+        );
       }
     }
-    
+
     _availableTimeSlots.value = slots;
   }
 
   /// Select time slot
   void selectTimeSlot(TimeSlot timeSlot) {
     if (!timeSlot.isAvailable) return;
-    
+
     _selectedTimeSlot.value = timeSlot;
     _selectedProfessional.value = timeSlot.professionalId;
   }
@@ -315,7 +314,10 @@ class BookingController extends GetxController {
         agreedToTerms: _agreedToTerms.value,
       );
 
-      final response = await _apiService.post('/bookings', bookingRequest.toJson());
+      final response = await _apiService.post(
+        '/bookings',
+        bookingRequest.toJson(),
+      );
 
       if (response.isSuccess) {
         _showBookingSuccessDialog();
@@ -324,7 +326,6 @@ class BookingController extends GetxController {
       } else {
         throw Exception(response.message ?? 'Erro ao criar agendamento');
       }
-
     } catch (e) {
       _handleError('Erro ao confirmar agendamento', e);
       return false;
@@ -339,22 +340,22 @@ class BookingController extends GetxController {
       Get.snackbar('Erro', 'Clínica não selecionada');
       return false;
     }
-    
+
     if (_selectedService.value == null) {
       Get.snackbar('Erro', 'Serviço não selecionado');
       return false;
     }
-    
+
     if (_selectedDate.value == null) {
       Get.snackbar('Erro', 'Data não selecionada');
       return false;
     }
-    
+
     if (_selectedTimeSlot.value == null) {
       Get.snackbar('Erro', 'Horário não selecionado');
       return false;
     }
-    
+
     if (!_agreedToTerms.value) {
       Get.snackbar('Erro', 'É necessário aceitar os termos e condições');
       return false;
@@ -367,22 +368,24 @@ class BookingController extends GetxController {
   void _showBookingSuccessDialog() {
     Get.dialog(
       AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.check_circle, color: Colors.green, size: 28),
-            const SizedBox(width: 12),
-            const Text('Agendamento Confirmado!'),
+            SizedBox(width: 12),
+            Text('Agendamento Confirmado!'),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Seu agendamento foi confirmado com sucesso.'),
+            const Text('Seu agendamento foi confirmado com sucesso.'),
             const SizedBox(height: 16),
             Text('Clínica: ${_selectedClinic.value?.name}'),
             Text('Serviço: ${_selectedService.value?.name}'),
-            Text('Data: ${_selectedDate.value?.day}/${_selectedDate.value?.month}/${_selectedDate.value?.year}'),
+            Text(
+              'Data: ${_selectedDate.value?.day}/${_selectedDate.value?.month}/${_selectedDate.value?.year}',
+            ),
             Text('Horário: ${_selectedTimeSlot.value?.formattedTime}'),
             const SizedBox(height: 16),
             Text(
@@ -425,12 +428,11 @@ class BookingController extends GetxController {
     Get.dialog(
       AlertDialog(
         title: const Text('Cancelar Agendamento'),
-        content: const Text('Tem certeza de que deseja cancelar este agendamento?'),
+        content: const Text(
+          'Tem certeza de que deseja cancelar este agendamento?',
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Não'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Não')),
           TextButton(
             onPressed: () {
               Get.back(); // Close dialog
@@ -466,7 +468,7 @@ class BookingController extends GetxController {
     return {
       'clinic': _selectedClinic.value?.name ?? '',
       'service': _selectedService.value?.name ?? '',
-      'date': _selectedDate.value != null 
+      'date': _selectedDate.value != null
           ? '${_selectedDate.value!.day}/${_selectedDate.value!.month}/${_selectedDate.value!.year}'
           : '',
       'time': _selectedTimeSlot.value?.formattedTime ?? '',

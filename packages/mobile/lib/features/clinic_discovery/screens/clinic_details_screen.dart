@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/clinic.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ClinicDetailsScreen extends StatefulWidget {
-  final Clinic? clinic;
-  
   const ClinicDetailsScreen({super.key, this.clinic});
+  final Clinic? clinic;
 
   @override
   State<ClinicDetailsScreen> createState() => _ClinicDetailsScreenState();
@@ -15,7 +14,7 @@ class ClinicDetailsScreen extends StatefulWidget {
 class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
   late PageController _pageController;
   int _currentImageIndex = 0;
-  
+
   // Dynamic images list from backend
   late List<String> _images;
 
@@ -23,9 +22,9 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
   void initState() {
     super.initState();
     final Clinic clinicData = widget.clinic ?? Get.arguments as Clinic;
-    
+
     _pageController = PageController();
-    
+
     // Use images from backend or fallback to main image
     if (clinicData.images.isNotEmpty) {
       _images = clinicData.images;
@@ -33,7 +32,9 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
       _images = [clinicData.imageUrl];
     } else {
       // Only show placeholder if no images at all
-      _images = ['https://via.placeholder.com/400x250?text=Sem+Imagem+Disponível'];
+      _images = [
+        'https://via.placeholder.com/400x250?text=Sem+Imagem+Disponível',
+      ];
     }
   }
 
@@ -46,23 +47,20 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final Clinic clinicData = widget.clinic ?? Get.arguments as Clinic;
-    
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           clinicData.name,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
         ),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.onPrimary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, size: 20),
-          onPressed: () => Get.back(),
+          onPressed: Get.back,
         ),
       ),
       body: SingleChildScrollView(
@@ -70,7 +68,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Carousel with Indicators
-            Container(
+            SizedBox(
               height: 250,
               child: Stack(
                 children: [
@@ -86,7 +84,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                     itemBuilder: (context, index) {
                       return Container(
                         width: double.infinity,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: AppColors.surfaceVariant,
                         ),
                         child: Image.network(
@@ -101,9 +99,10 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                               child: Center(
                                 child: CircularProgressIndicator(
                                   color: AppColors.primary,
-                                  value: loadingProgress.expectedTotalBytes != null
+                                  value:
+                                      loadingProgress.expectedTotalBytes != null
                                       ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
+                                            loadingProgress.expectedTotalBytes!
                                       : null,
                                 ),
                               ),
@@ -112,7 +111,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               color: AppColors.surfaceVariant,
-                              child: Column(
+                              child: const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
@@ -120,7 +119,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                                     size: 60,
                                     color: AppColors.mediumGrey,
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: 8),
                                   Text(
                                     'Imagem indisponível',
                                     style: TextStyle(
@@ -136,7 +135,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       );
                     },
                   ),
-                  
+
                   // Navigation Arrows
                   if (_images.length > 1) ...[
                     // Left Arrow
@@ -170,7 +169,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                         ),
                       ),
                     ),
-                    
+
                     // Right Arrow
                     Positioned(
                       right: 16,
@@ -203,7 +202,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       ),
                     ),
                   ],
-                  
+
                   // Page Indicators
                   if (_images.length > 1)
                     Positioned(
@@ -227,8 +226,8 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                               width: _currentImageIndex == index ? 24 : 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: _currentImageIndex == index 
-                                    ? AppColors.white 
+                                color: _currentImageIndex == index
+                                    ? AppColors.white
                                     : AppColors.white.withOpacity(0.5),
                                 borderRadius: BorderRadius.circular(4),
                                 boxShadow: [
@@ -245,14 +244,17 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                         ),
                       ),
                     ),
-                  
+
                   // Image Counter
                   if (_images.length > 1)
                     Positioned(
                       top: 16,
                       right: 16,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.black.withOpacity(0.6),
                           borderRadius: BorderRadius.circular(16),
@@ -270,7 +272,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                 ],
               ),
             ),
-            
+
             // Content
             Padding(
               padding: const EdgeInsets.all(20),
@@ -305,17 +307,20 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                           ],
                         ),
                       ),
-                      
+
                       // Status Badge
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: clinicData.isAvailable 
+                          color: clinicData.isAvailable
                               ? AppColors.success.withOpacity(0.1)
                               : AppColors.error.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: clinicData.isAvailable 
+                            color: clinicData.isAvailable
                                 ? AppColors.success.withOpacity(0.3)
                                 : AppColors.error.withOpacity(0.3),
                           ),
@@ -327,7 +332,9 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                               width: 6,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: clinicData.isAvailable ? AppColors.success : AppColors.error,
+                                color: clinicData.isAvailable
+                                    ? AppColors.success
+                                    : AppColors.error,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -337,7 +344,9 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: clinicData.isAvailable ? AppColors.success : AppColors.error,
+                                color: clinicData.isAvailable
+                                    ? AppColors.success
+                                    : AppColors.error,
                               ),
                             ),
                           ],
@@ -345,13 +354,13 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Rating and Distance
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.star,
                         color: AppColors.warning,
                         size: 18,
@@ -373,18 +382,14 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                           color: AppColors.textSecondary,
                         ),
                       ),
-                      
+
                       const SizedBox(width: 16),
-                      
-                      Container(
-                        width: 1,
-                        height: 16,
-                        color: AppColors.divider,
-                      ),
-                      
+
+                      Container(width: 1, height: 16, color: AppColors.divider),
+
                       const SizedBox(width: 16),
-                      
-                      Icon(
+
+                      const Icon(
                         Icons.location_on,
                         color: AppColors.primary,
                         size: 16,
@@ -399,9 +404,9 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Address Card
                   Container(
                     width: double.infinity,
@@ -410,11 +415,11 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.divider),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: AppColors.shadow,
                           blurRadius: 4,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
@@ -447,9 +452,9 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Contact Info
                   Container(
                     width: double.infinity,
@@ -458,11 +463,11 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.divider),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: AppColors.shadow,
                           blurRadius: 4,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
@@ -534,9 +539,9 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Services
                   Container(
                     width: double.infinity,
@@ -545,11 +550,11 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.divider),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: AppColors.shadow,
                           blurRadius: 4,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
@@ -565,40 +570,42 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        ...clinicData.services.map((service) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 20,
-                                height: 20,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.success,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.check,
-                                  size: 12,
-                                  color: AppColors.white,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  service['name'] ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.textPrimary,
+                        ...clinicData.services.map(
+                          (service) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.success,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.check,
+                                    size: 12,
+                                    color: AppColors.white,
                                   ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    service['name'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        )),
+                        ),
                       ],
                     ),
                   ),
-                  
+
                   // Bottom padding for fixed button
                   const SizedBox(height: 80),
                 ],
@@ -609,13 +616,13 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.surface,
           boxShadow: [
             BoxShadow(
               color: AppColors.shadow,
               blurRadius: 8,
-              offset: const Offset(0, -4),
+              offset: Offset(0, -4),
             ),
           ],
         ),
@@ -651,10 +658,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen> {
               ),
               child: const Text(
                 'Agendar Consulta',
-                style: TextStyle(
-                  fontSize: 16, 
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),

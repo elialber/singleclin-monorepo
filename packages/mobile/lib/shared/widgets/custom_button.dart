@@ -1,22 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 enum ButtonVariant { primary, secondary, outline, text, danger }
+
 enum ButtonSize { small, medium, large }
 
 class CustomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final ButtonVariant variant;
-  final ButtonSize size;
-  final bool isLoading;
-  final bool isFullWidth;
-  final Widget? icon;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-  final EdgeInsetsGeometry? padding;
-  final double? borderRadius;
-
   const CustomButton({
     Key? key,
     required this.text,
@@ -31,6 +20,17 @@ class CustomButton extends StatelessWidget {
     this.padding,
     this.borderRadius,
   }) : super(key: key);
+  final String text;
+  final VoidCallback? onPressed;
+  final ButtonVariant variant;
+  final ButtonSize size;
+  final bool isLoading;
+  final bool isFullWidth;
+  final Widget? icon;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final EdgeInsetsGeometry? padding;
+  final double? borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class CustomButton extends StatelessWidget {
           child: buttonChild,
         );
         break;
-      
+
       case ButtonVariant.outline:
         button = OutlinedButton(
           onPressed: isLoading ? null : onPressed,
@@ -56,7 +56,7 @@ class CustomButton extends StatelessWidget {
           child: buttonChild,
         );
         break;
-      
+
       case ButtonVariant.text:
       case ButtonVariant.secondary:
         button = TextButton(
@@ -68,10 +68,7 @@ class CustomButton extends StatelessWidget {
     }
 
     if (isFullWidth) {
-      return SizedBox(
-        width: double.infinity,
-        child: button,
-      );
+      return SizedBox(width: double.infinity, child: button);
     }
 
     return button;
@@ -82,40 +79,39 @@ class CustomButton extends StatelessWidget {
     final sizes = _getSizes();
 
     return ButtonStyle(
-      backgroundColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.disabled)) {
+      backgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
           return AppColors.lightGrey;
         }
         return colors['background'];
       }),
-      foregroundColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.disabled)) {
+      foregroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
           return AppColors.mediumGrey;
         }
         return colors['foreground'];
       }),
       side: variant == ButtonVariant.outline
-          ? MaterialStateProperty.all(
-              BorderSide(color: colors['border'] ?? AppColors.primary))
+          ? WidgetStateProperty.all(
+              BorderSide(color: colors['border'] ?? AppColors.primary),
+            )
           : null,
-      padding: MaterialStateProperty.all(
-        padding ?? EdgeInsets.symmetric(
-          horizontal: sizes['horizontal']!,
-          vertical: sizes['vertical']!,
-        ),
+      padding: WidgetStateProperty.all(
+        padding ??
+            EdgeInsets.symmetric(
+              horizontal: sizes['horizontal']!,
+              vertical: sizes['vertical']!,
+            ),
       ),
-      shape: MaterialStateProperty.all(
+      shape: WidgetStateProperty.all(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius ?? 12),
         ),
       ),
-      textStyle: MaterialStateProperty.all(
-        TextStyle(
-          fontSize: sizes['fontSize'],
-          fontWeight: FontWeight.w600,
-        ),
+      textStyle: WidgetStateProperty.all(
+        TextStyle(fontSize: sizes['fontSize'], fontWeight: FontWeight.w600),
       ),
-      elevation: MaterialStateProperty.all(
+      elevation: WidgetStateProperty.all(
         variant == ButtonVariant.primary || variant == ButtonVariant.danger
             ? 2.0
             : 0.0,
@@ -131,28 +127,28 @@ class CustomButton extends StatelessWidget {
           'foreground': foregroundColor ?? AppColors.white,
           'border': null,
         };
-      
+
       case ButtonVariant.secondary:
         return {
           'background': backgroundColor ?? AppColors.lightGrey,
           'foreground': foregroundColor ?? AppColors.darkGrey,
           'border': null,
         };
-      
+
       case ButtonVariant.outline:
         return {
           'background': backgroundColor ?? Colors.transparent,
           'foreground': foregroundColor ?? AppColors.primary,
           'border': AppColors.primary,
         };
-      
+
       case ButtonVariant.text:
         return {
           'background': backgroundColor ?? Colors.transparent,
           'foreground': foregroundColor ?? AppColors.primary,
           'border': null,
         };
-      
+
       case ButtonVariant.danger:
         return {
           'background': backgroundColor ?? AppColors.error,
@@ -165,25 +161,13 @@ class CustomButton extends StatelessWidget {
   Map<String, double> _getSizes() {
     switch (size) {
       case ButtonSize.small:
-        return {
-          'horizontal': 16.0,
-          'vertical': 8.0,
-          'fontSize': 14.0,
-        };
-      
+        return {'horizontal': 16.0, 'vertical': 8.0, 'fontSize': 14.0};
+
       case ButtonSize.medium:
-        return {
-          'horizontal': 24.0,
-          'vertical': 16.0,
-          'fontSize': 16.0,
-        };
-      
+        return {'horizontal': 24.0, 'vertical': 16.0, 'fontSize': 16.0};
+
       case ButtonSize.large:
-        return {
-          'horizontal': 32.0,
-          'vertical': 20.0,
-          'fontSize': 18.0,
-        };
+        return {'horizontal': 32.0, 'vertical': 20.0, 'fontSize': 18.0};
     }
   }
 
@@ -206,11 +190,7 @@ class CustomButton extends StatelessWidget {
     if (icon != null) {
       return Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          icon!,
-          const SizedBox(width: 8),
-          Text(text),
-        ],
+        children: [icon!, const SizedBox(width: 8), Text(text)],
       );
     }
 
@@ -219,15 +199,6 @@ class CustomButton extends StatelessWidget {
 }
 
 class CustomIconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onPressed;
-  final Color? backgroundColor;
-  final Color? iconColor;
-  final double? size;
-  final double? iconSize;
-  final String? tooltip;
-  final EdgeInsetsGeometry? padding;
-
   const CustomIconButton({
     Key? key,
     required this.icon,
@@ -239,6 +210,14 @@ class CustomIconButton extends StatelessWidget {
     this.tooltip,
     this.padding,
   }) : super(key: key);
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final Color? backgroundColor;
+  final Color? iconColor;
+  final double? size;
+  final double? iconSize;
+  final String? tooltip;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -262,10 +241,7 @@ class CustomIconButton extends StatelessWidget {
     );
 
     if (tooltip != null) {
-      return Tooltip(
-        message: tooltip!,
-        child: button,
-      );
+      return Tooltip(message: tooltip, child: button);
     }
 
     return button;
@@ -273,13 +249,6 @@ class CustomIconButton extends StatelessWidget {
 }
 
 class CustomFloatingActionButton extends StatelessWidget {
-  final VoidCallback? onPressed;
-  final IconData icon;
-  final String? label;
-  final bool isExtended;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-
   const CustomFloatingActionButton({
     Key? key,
     this.onPressed,
@@ -289,6 +258,12 @@ class CustomFloatingActionButton extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
   }) : super(key: key);
+  final VoidCallback? onPressed;
+  final IconData icon;
+  final String? label;
+  final bool isExtended;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {

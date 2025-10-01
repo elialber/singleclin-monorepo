@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import '../models/feedback_report.dart';
-import '../../../core/services/api_service.dart';
-import '../../credits/controllers/credits_controller.dart';
+import 'package:singleclin_mobile/features/engagement/models/feedback_report.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/credits/controllers/credits_controller.dart';
 
 /// Controller for app feedback and improvement suggestions
 class FeedbackController extends GetxController {
@@ -21,18 +21,18 @@ class FeedbackController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool isSubmitting = false.obs;
   final RxString error = ''.obs;
-  
+
   final RxList<FeedbackReport> myReports = <FeedbackReport>[].obs;
   final RxList<FeatureRequest> featureRequests = <FeatureRequest>[].obs;
   final RxList<RoadmapItem> roadmapItems = <RoadmapItem>[].obs;
   final RxList<BetaProgram> betaPrograms = <BetaProgram>[].obs;
-  
+
   // Form state
   final Rx<FeedbackType> selectedType = FeedbackType.suggestion.obs;
   final Rx<FeedbackCategory> selectedCategory = FeedbackCategory.general.obs;
   final Rx<FeedbackPriority> selectedPriority = FeedbackPriority.medium.obs;
   final RxList<File> screenshots = <File>[].obs;
-  
+
   // Device and app info
   final Rx<Map<String, dynamic>> deviceInfo = Rx<Map<String, dynamic>>({});
   String appVersion = '';
@@ -62,7 +62,7 @@ class FeedbackController extends GetxController {
       error.value = '';
 
       final response = await _apiService.get('/user/feedback');
-      
+
       final List<FeedbackReport> reports = (response.data['reports'] as List)
           .map((json) => FeedbackReport.fromJson(json))
           .toList();
@@ -78,11 +78,10 @@ class FeedbackController extends GetxController {
   /// Load feature requests for voting
   Future<void> loadFeatureRequests() async {
     try {
-      final response = await _apiService.get('/feedback/feature-requests', queryParameters: {
-        'status': 'open',
-        'sort': 'votes',
-        'limit': 50,
-      });
+      final response = await _apiService.get(
+        '/feedback/feature-requests',
+        queryParameters: {'status': 'open', 'sort': 'votes', 'limit': 50},
+      );
 
       final List<FeatureRequest> requests = (response.data['requests'] as List)
           .map((json) => FeatureRequest.fromJson(json))
@@ -147,13 +146,16 @@ class FeedbackController extends GetxController {
         'osVersion': osVersion,
       };
 
-      final response = await _apiService.post('/user/feedback', data: feedbackData);
-      
+      final response = await _apiService.post(
+        '/user/feedback',
+        data: feedbackData,
+      );
+
       final newReport = FeedbackReport.fromJson(response.data['report']);
       myReports.insert(0, newReport);
 
       // Award SG credits for valuable feedback
-      if (selectedType.value == FeedbackType.bugReport || 
+      if (selectedType.value == FeedbackType.bugReport ||
           selectedType.value == FeedbackType.featureRequest) {
         await _creditsController.awardCreditsForFeedback(newReport.id);
       }
@@ -196,8 +198,8 @@ class FeedbackController extends GetxController {
       // Optimistic update
       final updatedRequest = request.copyWith(
         hasVoted: !isCurrentlyVoted,
-        votesCount: isCurrentlyVoted 
-            ? request.votesCount - 1 
+        votesCount: isCurrentlyVoted
+            ? request.votesCount - 1
             : request.votesCount + 1,
       );
       featureRequests[requestIndex] = updatedRequest;
@@ -207,7 +209,7 @@ class FeedbackController extends GetxController {
 
       Get.snackbar(
         isCurrentlyVoted ? 'Voto removido' : 'Voto registrado!',
-        isCurrentlyVoted 
+        isCurrentlyVoted
             ? 'Seu voto foi removido'
             : 'Obrigado por votar nesta funcionalidade',
         snackPosition: SnackPosition.BOTTOM,
@@ -235,9 +237,7 @@ class FeedbackController extends GetxController {
       // Optimistic update
       final updatedItem = item.copyWith(
         hasVoted: !isCurrentlyVoted,
-        userVotes: isCurrentlyVoted 
-            ? item.userVotes - 1 
-            : item.userVotes + 1,
+        userVotes: isCurrentlyVoted ? item.userVotes - 1 : item.userVotes + 1,
       );
       roadmapItems[itemIndex] = updatedItem;
 
@@ -398,7 +398,7 @@ class FeedbackController extends GetxController {
           screenshot,
           fileField: 'screenshot',
         );
-        
+
         uploadedUrls.add(response.data['url']);
       }
 
@@ -413,11 +413,12 @@ class FeedbackController extends GetxController {
     try {
       final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      
+
       appVersion = packageInfo.version;
 
       if (Platform.isAndroid) {
-        final AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
+        final AndroidDeviceInfo androidInfo =
+            await deviceInfoPlugin.androidInfo;
         osVersion = 'Android ${androidInfo.version.release}';
         deviceInfo.value = {
           'platform': 'Android',
@@ -479,8 +480,8 @@ class FeedbackController extends GetxController {
 
   /// Check if should award credits
   bool _shouldAwardCredits() {
-    return selectedType.value == FeedbackType.bugReport || 
-           selectedType.value == FeedbackType.featureRequest;
+    return selectedType.value == FeedbackType.bugReport ||
+        selectedType.value == FeedbackType.featureRequest;
   }
 
   /// Get type display name
@@ -586,19 +587,23 @@ class FeedbackController extends GetxController {
   List<Map<String, String>> get feedbackTemplates => [
     {
       'title': 'Bug na tela de login',
-      'description': 'Quando tento fazer login, o app trava e fecha automaticamente. Isso acontece sempre que...'
+      'description':
+          'Quando tento fazer login, o app trava e fecha automaticamente. Isso acontece sempre que...',
     },
     {
       'title': 'Sugestão: Filtros avançados',
-      'description': 'Seria muito útil ter filtros mais específicos na busca por clínicas, como distância, preços, especialidades...'
+      'description':
+          'Seria muito útil ter filtros mais específicos na busca por clínicas, como distância, preços, especialidades...',
     },
     {
       'title': 'Melhoria no design',
-      'description': 'A tela principal poderia ter um design mais limpo e intuitivo. Sugiro...'
+      'description':
+          'A tela principal poderia ter um design mais limpo e intuitivo. Sugiro...',
     },
     {
       'title': 'Problema com notificações',
-      'description': 'Não estou recebendo notificações de agendamentos confirmados. Já verifiquei as configurações e...'
+      'description':
+          'Não estou recebendo notificações de agendamentos confirmados. Já verifiquei as configurações e...',
     },
   ];
 
@@ -611,12 +616,12 @@ class FeedbackController extends GetxController {
   /// Get user feedback statistics
   Map<String, int> get userFeedbackStats {
     final Map<String, int> stats = {};
-    
+
     for (final report in myReports) {
       final status = getStatusDisplayName(report.status);
       stats[status] = (stats[status] ?? 0) + 1;
     }
-    
+
     return stats;
   }
 }

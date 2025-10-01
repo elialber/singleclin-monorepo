@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_strings.dart';
 
 class SgCreditWidget extends StatelessWidget {
-  final int credits;
-  final VoidCallback? onTap;
-  final bool showRenewInfo;
-  final DateTime? renewDate;
-  final bool compact;
-
   const SgCreditWidget({
     Key? key,
     required this.credits,
@@ -17,6 +11,11 @@ class SgCreditWidget extends StatelessWidget {
     this.renewDate,
     this.compact = false,
   }) : super(key: key);
+  final int credits;
+  final VoidCallback? onTap;
+  final bool showRenewInfo;
+  final DateTime? renewDate;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +33,7 @@ class SgCreditWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.sgPrimary.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.sgPrimary, width: 1),
+          border: Border.all(color: AppColors.sgPrimary),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -153,7 +152,7 @@ class SgCreditWidget extends StatelessWidget {
 
   Widget _buildRenewInfo() {
     final daysUntilRenew = _calculateDaysUntilRenew();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -163,11 +162,7 @@ class SgCreditWidget extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.refresh,
-            size: 14,
-            color: Colors.white,
-          ),
+          const Icon(Icons.refresh, size: 14, color: Colors.white),
           const SizedBox(width: 4),
           Text(
             _getRenewText(daysUntilRenew),
@@ -184,10 +179,10 @@ class SgCreditWidget extends StatelessWidget {
 
   int _calculateDaysUntilRenew() {
     if (renewDate == null) return 0;
-    
+
     final now = DateTime.now();
     final difference = renewDate!.difference(now);
-    
+
     return difference.inDays > 0 ? difference.inDays : 0;
   }
 
@@ -205,27 +200,27 @@ class SgCreditWidget extends StatelessWidget {
 }
 
 class SgCostChip extends StatelessWidget {
-  final int cost;
-  final bool isAffordable;
-  final double fontSize;
-
   const SgCostChip({
     Key? key,
     required this.cost,
     required this.isAffordable,
     this.fontSize = 12,
   }) : super(key: key);
+  final int cost;
+  final bool isAffordable;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isAffordable ? AppColors.sgPrimary.withOpacity(0.1) : AppColors.lightGrey,
+        color: isAffordable
+            ? AppColors.sgPrimary.withOpacity(0.1)
+            : AppColors.lightGrey,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isAffordable ? AppColors.sgPrimary : AppColors.mediumGrey,
-          width: 1,
         ),
       ),
       child: Row(
@@ -252,14 +247,6 @@ class SgCostChip extends StatelessWidget {
 }
 
 class SgTransactionItem extends StatelessWidget {
-  final String title;
-  final String description;
-  final int amount;
-  final bool isPositive;
-  final DateTime date;
-  final IconData? icon;
-  final VoidCallback? onTap;
-
   const SgTransactionItem({
     Key? key,
     required this.title,
@@ -270,6 +257,13 @@ class SgTransactionItem extends StatelessWidget {
     this.icon,
     this.onTap,
   }) : super(key: key);
+  final String title;
+  final String description;
+  final int amount;
+  final bool isPositive;
+  final DateTime date;
+  final IconData? icon;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -278,7 +272,7 @@ class SgTransactionItem extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isPositive 
+          color: isPositive
               ? AppColors.success.withOpacity(0.1)
               : AppColors.error.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
@@ -291,17 +285,11 @@ class SgTransactionItem extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
       ),
       subtitle: Text(
         description,
-        style: const TextStyle(
-          fontSize: 12,
-          color: AppColors.mediumGrey,
-        ),
+        style: const TextStyle(fontSize: 12, color: AppColors.mediumGrey),
       ),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -317,10 +305,7 @@ class SgTransactionItem extends StatelessWidget {
           ),
           Text(
             _formatDate(date),
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppColors.mediumGrey,
-            ),
+            style: const TextStyle(fontSize: 10, color: AppColors.mediumGrey),
           ),
         ],
       ),
@@ -330,7 +315,7 @@ class SgTransactionItem extends StatelessWidget {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays == 0) {
       return 'Hoje';
     } else if (difference.inDays == 1) {

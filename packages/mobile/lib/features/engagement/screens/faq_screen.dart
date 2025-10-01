@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/faq_controller.dart';
-import '../widgets/faq_expandable_item.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/faq_controller.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/faq_expandable_item.dart';
 
 class FaqScreen extends StatelessWidget {
   const FaqScreen({super.key});
@@ -55,12 +55,19 @@ class FaqScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
-                        children: controller.searchSuggestions.take(3).map((suggestion) {
+                        children: controller.searchSuggestions.take(3).map((
+                          suggestion,
+                        ) {
                           return ActionChip(
                             label: Text(suggestion),
-                            onPressed: () => controller.selectSuggestion(suggestion),
-                            backgroundColor: const Color(0xFF005156).withOpacity(0.1),
-                            labelStyle: const TextStyle(color: Color(0xFF005156)),
+                            onPressed: () =>
+                                controller.selectSuggestion(suggestion),
+                            backgroundColor: const Color(
+                              0xFF005156,
+                            ).withOpacity(0.1),
+                            labelStyle: const TextStyle(
+                              color: Color(0xFF005156),
+                            ),
                           );
                         }).toList(),
                       ),
@@ -81,33 +88,39 @@ class FaqScreen extends StatelessWidget {
                         FilterChip(
                           label: const Text('Todas'),
                           selected: controller.selectedCategory == 'Todas',
-                          onSelected: (_) => controller.filterByCategory('Todas'),
+                          onSelected: (_) =>
+                              controller.filterByCategory('Todas'),
                           backgroundColor: Colors.grey[200],
                           selectedColor: const Color(0xFF005156),
                           labelStyle: TextStyle(
-                            color: controller.selectedCategory == 'Todas' 
-                                ? Colors.white 
+                            color: controller.selectedCategory == 'Todas'
+                                ? Colors.white
                                 : Colors.black,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        ...controller.categories.where((cat) => cat != 'Todas').map((category) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Text(category),
-                              selected: controller.selectedCategory == category,
-                              onSelected: (_) => controller.filterByCategory(category),
-                              backgroundColor: Colors.grey[200],
-                              selectedColor: const Color(0xFF005156),
-                              labelStyle: TextStyle(
-                                color: controller.selectedCategory == category 
-                                    ? Colors.white 
-                                    : Colors.black,
-                              ),
-                            ),
-                          );
-                        }),
+                        ...controller.categories
+                            .where((cat) => cat != 'Todas')
+                            .map((category) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: FilterChip(
+                                  label: Text(category),
+                                  selected:
+                                      controller.selectedCategory == category,
+                                  onSelected: (_) =>
+                                      controller.filterByCategory(category),
+                                  backgroundColor: Colors.grey[200],
+                                  selectedColor: const Color(0xFF005156),
+                                  labelStyle: TextStyle(
+                                    color:
+                                        controller.selectedCategory == category
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              );
+                            }),
                       ],
                     ),
                   ),
@@ -118,33 +131,35 @@ class FaqScreen extends StatelessWidget {
                 child: controller.isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : controller.filteredFaqs.isEmpty
-                        ? _buildEmptyState(controller)
-                        : RefreshIndicator(
-                            onRefresh: controller.loadFaqs,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: controller.filteredFaqs.length,
-                              itemBuilder: (context, index) {
-                                final faq = controller.filteredFaqs[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: FaqExpandableItem(
-                                    faq: faq,
-                                    onExpanded: (expanded) {
-                                      if (expanded) {
-                                        controller.trackView(faq.id);
-                                      }
-                                    },
-                                    onVote: (helpful) => controller.voteFaq(faq.id, helpful),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+                    ? _buildEmptyState(controller)
+                    : RefreshIndicator(
+                        onRefresh: controller.loadFaqs,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: controller.filteredFaqs.length,
+                          itemBuilder: (context, index) {
+                            final faq = controller.filteredFaqs[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: FaqExpandableItem(
+                                faq: faq,
+                                onExpanded: (expanded) {
+                                  if (expanded) {
+                                    controller.trackView(faq.id);
+                                  }
+                                },
+                                onVote: (helpful) =>
+                                    controller.voteFaq(faq.id, helpful),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
               ),
 
               // Popular questions banner
-              if (controller.searchQuery.isEmpty && controller.popularFaqs.isNotEmpty)
+              if (controller.searchQuery.isEmpty &&
+                  controller.popularFaqs.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.all(16),
                   padding: const EdgeInsets.all(16),
@@ -217,10 +232,7 @@ class FaqScreen extends StatelessWidget {
             const SizedBox(height: 16),
             const Text(
               'Nenhuma pergunta encontrada',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
             const SizedBox(height: 8),
             Text(
@@ -249,10 +261,7 @@ class FaqScreen extends StatelessWidget {
             SizedBox(height: 16),
             Text(
               'Nenhuma pergunta disponível',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
           ],
         ),
@@ -296,12 +305,12 @@ class FaqScreen extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
-                    onPressed: () => Get.back(),
+                    onPressed: Get.back,
                   ),
                 ],
               ),
               const Divider(),
-              
+
               // Chat messages
               Expanded(
                 child: ListView.builder(
@@ -309,9 +318,11 @@ class FaqScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final message = controller.chatbotMessages[index];
                     final isUser = message['sender'] == 'user';
-                    
+
                     return Align(
-                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isUser
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Container(
                         margin: const EdgeInsets.symmetric(vertical: 4),
                         padding: const EdgeInsets.all(12),
@@ -319,7 +330,7 @@ class FaqScreen extends StatelessWidget {
                           maxWidth: MediaQuery.of(context).size.width * 0.7,
                         ),
                         decoration: BoxDecoration(
-                          color: isUser 
+                          color: isUser
                               ? const Color(0xFF005156)
                               : Colors.grey[200],
                           borderRadius: BorderRadius.circular(18),
@@ -335,7 +346,7 @@ class FaqScreen extends StatelessWidget {
                   },
                 ),
               ),
-              
+
               // Message input
               Row(
                 children: [
@@ -355,7 +366,9 @@ class FaqScreen extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.send),
                     onPressed: () {
-                      controller.sendToChatbot(controller.chatbotController.text);
+                      controller.sendToChatbot(
+                        controller.chatbotController.text,
+                      );
                     },
                     color: const Color(0xFF005156),
                   ),

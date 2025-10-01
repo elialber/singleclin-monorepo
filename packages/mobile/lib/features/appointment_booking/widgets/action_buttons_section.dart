@@ -3,12 +3,9 @@ import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ActionButtonsSection extends StatefulWidget {
+  const ActionButtonsSection({Key? key, required this.clinic})
+    : super(key: key);
   final Clinic clinic;
-
-  const ActionButtonsSection({
-    Key? key,
-    required this.clinic,
-  }) : super(key: key);
 
   @override
   State<ActionButtonsSection> createState() => _ActionButtonsSectionState();
@@ -24,20 +21,19 @@ class _ActionButtonsSectionState extends State<ActionButtonsSection> {
         // Save Button
         Expanded(
           child: InkWell(
-            onTap: () => _handleSaveToggle(),
+            onTap: _handleSaveToggle,
             borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: _isSaved 
+                color: _isSaved
                     ? AppColors.primary.withOpacity(0.1)
                     : Colors.grey[100],
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _isSaved 
+                  color: _isSaved
                       ? AppColors.primary.withOpacity(0.3)
                       : Colors.grey[300]!,
-                  width: 1,
                 ),
               ),
               child: Row(
@@ -62,32 +58,25 @@ class _ActionButtonsSectionState extends State<ActionButtonsSection> {
             ),
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // Share Button
         Expanded(
           child: InkWell(
-            onTap: () => _handleShare(),
+            onTap: _handleShare,
             borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey[300]!,
-                  width: 1,
-                ),
+                border: Border.all(color: Colors.grey[300]!),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.share_outlined,
-                    color: Colors.grey[600],
-                    size: 20,
-                  ),
+                  Icon(Icons.share_outlined, color: Colors.grey[600], size: 20),
                   const SizedBox(width: 8),
                   Text(
                     'Compartilhar',
@@ -115,7 +104,7 @@ class _ActionButtonsSectionState extends State<ActionButtonsSection> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          _isSaved 
+          _isSaved
               ? '${widget.clinic.name} foi salva nos seus favoritos'
               : '${widget.clinic.name} foi removida dos favoritos',
         ),
@@ -151,11 +140,8 @@ class _ActionButtonsSectionState extends State<ActionButtonsSection> {
 }
 
 class _ShareOptionsBottomSheet extends StatelessWidget {
+  const _ShareOptionsBottomSheet({required this.clinic});
   final Clinic clinic;
-
-  const _ShareOptionsBottomSheet({
-    required this.clinic,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -178,9 +164,9 @@ class _ShareOptionsBottomSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Title
           Text(
             'Compartilhar ${clinic.name}',
@@ -190,9 +176,9 @@ class _ShareOptionsBottomSheet extends StatelessWidget {
               color: Colors.black87,
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Share Options
           Column(
             children: [
@@ -228,9 +214,9 @@ class _ShareOptionsBottomSheet extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Cancel Button
           SizedBox(
             width: double.infinity,
@@ -241,10 +227,7 @@ class _ShareOptionsBottomSheet extends StatelessWidget {
               ),
               child: const Text(
                 'Cancelar',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
           ),
@@ -256,25 +239,25 @@ class _ShareOptionsBottomSheet extends StatelessWidget {
   void _shareViaWhatsApp(BuildContext context) {
     Navigator.pop(context);
     // TODO: Implement WhatsApp sharing
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Abrindo WhatsApp...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Abrindo WhatsApp...')));
   }
 
   void _shareViaSMS(BuildContext context) {
     Navigator.pop(context);
     // TODO: Implement SMS sharing
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Abrindo SMS...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Abrindo SMS...')));
   }
 
   void _shareViaEmail(BuildContext context) {
     Navigator.pop(context);
     // TODO: Implement email sharing
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Abrindo email...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Abrindo email...')));
   }
 
   void _copyLink(BuildContext context) {
@@ -298,17 +281,16 @@ class _ShareOptionsBottomSheet extends StatelessWidget {
 }
 
 class _ShareOption extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
   const _ShareOption({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
   });
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -326,11 +308,7 @@ class _ShareOption extends StatelessWidget {
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 20,
-              ),
+              child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(width: 16),
             Text(

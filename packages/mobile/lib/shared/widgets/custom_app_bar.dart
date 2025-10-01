@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final List<Widget>? actions;
-  final Widget? leading;
-  final bool showBackButton;
-  final VoidCallback? onBackPressed;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-  final double? elevation;
-  final bool centerTitle;
-  final Widget? flexibleSpace;
-  final PreferredSizeWidget? bottom;
-  final SystemUiOverlayStyle? systemOverlayStyle;
-
   const CustomAppBar({
     Key? key,
     required this.title,
@@ -31,6 +18,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.bottom,
     this.systemOverlayStyle,
   }) : super(key: key);
+  final String title;
+  final List<Widget>? actions;
+  final Widget? leading;
+  final bool showBackButton;
+  final VoidCallback? onBackPressed;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final double? elevation;
+  final bool centerTitle;
+  final Widget? flexibleSpace;
+  final PreferredSizeWidget? bottom;
+  final SystemUiOverlayStyle? systemOverlayStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -66,24 +65,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(
-    kToolbarHeight + (bottom?.preferredSize.height ?? 0.0),
-  );
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0.0));
 }
 
 class SliverCustomAppBar extends StatelessWidget {
-  final String title;
-  final List<Widget>? actions;
-  final Widget? leading;
-  final bool showBackButton;
-  final VoidCallback? onBackPressed;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-  final double expandedHeight;
-  final Widget? flexibleSpace;
-  final bool pinned;
-  final bool floating;
-
   const SliverCustomAppBar({
     Key? key,
     required this.title,
@@ -98,6 +84,17 @@ class SliverCustomAppBar extends StatelessWidget {
     this.pinned = true,
     this.floating = false,
   }) : super(key: key);
+  final String title;
+  final List<Widget>? actions;
+  final Widget? leading;
+  final bool showBackButton;
+  final VoidCallback? onBackPressed;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final double expandedHeight;
+  final Widget? flexibleSpace;
+  final bool pinned;
+  final bool floating;
 
   @override
   Widget build(BuildContext context) {
@@ -118,29 +115,31 @@ class SliverCustomAppBar extends StatelessWidget {
       floating: floating,
       leading: leading ?? (showBackButton ? _buildBackButton(context) : null),
       actions: actions,
-      flexibleSpace: flexibleSpace ?? FlexibleSpaceBar(
-        title: Text(
-          title,
-          style: TextStyle(
-            color: foregroundColor ?? AppColors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                backgroundColor ?? AppColors.primary,
-                (backgroundColor ?? AppColors.primary).withOpacity(0.8),
-              ],
+      flexibleSpace:
+          flexibleSpace ??
+          FlexibleSpaceBar(
+            title: Text(
+              title,
+              style: TextStyle(
+                color: foregroundColor ?? AppColors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            centerTitle: true,
+            background: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    backgroundColor ?? AppColors.primary,
+                    (backgroundColor ?? AppColors.primary).withOpacity(0.8),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 

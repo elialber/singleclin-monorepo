@@ -1,16 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../models/feedback_report.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/feedback_report.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Feedback form widget for collecting user feedback
 class FeedbackForm extends StatefulWidget {
-  final Function(Map<String, dynamic>) onSubmit;
-  final bool isSubmitting;
-  final String? error;
-  final List<Map<String, String>>? templates;
-
   const FeedbackForm({
     Key? key,
     required this.onSubmit,
@@ -18,6 +13,10 @@ class FeedbackForm extends StatefulWidget {
     this.error,
     this.templates,
   }) : super(key: key);
+  final Function(Map<String, dynamic>) onSubmit;
+  final bool isSubmitting;
+  final String? error;
+  final List<Map<String, String>>? templates;
 
   @override
   State<FeedbackForm> createState() => _FeedbackFormState();
@@ -27,11 +26,11 @@ class _FeedbackFormState extends State<FeedbackForm> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   FeedbackType _selectedType = FeedbackType.suggestion;
   FeedbackCategory _selectedCategory = FeedbackCategory.general;
   FeedbackPriority _selectedPriority = FeedbackPriority.medium;
-  List<File> _screenshots = [];
+  final List<File> _screenshots = [];
 
   @override
   void dispose() {
@@ -79,9 +78,9 @@ class _FeedbackFormState extends State<FeedbackForm> {
       children: [
         Text(
           'Tipo de Feedback',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -122,18 +121,19 @@ class _FeedbackFormState extends State<FeedbackForm> {
       children: [
         Text(
           'Categoria',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<FeedbackCategory>(
-          value: _selectedCategory,
+          initialValue: _selectedCategory,
           decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
           items: FeedbackCategory.values.map((category) {
             return DropdownMenuItem(
@@ -159,9 +159,9 @@ class _FeedbackFormState extends State<FeedbackForm> {
       children: [
         Text(
           'Título',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -187,15 +187,16 @@ class _FeedbackFormState extends State<FeedbackForm> {
       children: [
         Text(
           'Descrição',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _descriptionController,
           decoration: const InputDecoration(
-            hintText: 'Descreva em detalhes sua experiência, problema ou sugestão',
+            hintText:
+                'Descreva em detalhes sua experiência, problema ou sugestão',
             border: OutlineInputBorder(),
           ),
           maxLines: 5,
@@ -216,9 +217,9 @@ class _FeedbackFormState extends State<FeedbackForm> {
       children: [
         Text(
           'Templates',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         SizedBox(
@@ -254,9 +255,9 @@ class _FeedbackFormState extends State<FeedbackForm> {
       children: [
         Text(
           'Prioridade',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Row(
@@ -279,15 +280,17 @@ class _FeedbackFormState extends State<FeedbackForm> {
                   selectedColor: _getPriorityColor(priority).withOpacity(0.1),
                   checkmarkColor: _getPriorityColor(priority),
                   side: BorderSide(
-                    color: isSelected 
-                        ? _getPriorityColor(priority) 
+                    color: isSelected
+                        ? _getPriorityColor(priority)
                         : AppColors.lightGrey,
                   ),
                   labelStyle: TextStyle(
-                    color: isSelected 
-                        ? _getPriorityColor(priority) 
+                    color: isSelected
+                        ? _getPriorityColor(priority)
                         : AppColors.mediumGrey,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                     fontSize: 12,
                   ),
                 ),
@@ -307,16 +310,16 @@ class _FeedbackFormState extends State<FeedbackForm> {
           children: [
             Text(
               'Capturas de Tela',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 8),
             Text(
               '(Opcional)',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.mediumGrey,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
             ),
           ],
         ),
@@ -336,7 +339,7 @@ class _FeedbackFormState extends State<FeedbackForm> {
       label: const Text('Adicionar Captura de Tela'),
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        side: BorderSide(color: AppColors.lightGrey),
+        side: const BorderSide(color: AppColors.lightGrey),
       ),
     );
   }
@@ -351,7 +354,6 @@ class _FeedbackFormState extends State<FeedbackForm> {
             crossAxisCount: 3,
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
-            childAspectRatio: 1,
           ),
           itemCount: _screenshots.length + (_screenshots.length < 5 ? 1 : 0),
           itemBuilder: (context, index) {
@@ -361,13 +363,13 @@ class _FeedbackFormState extends State<FeedbackForm> {
                 onTap: _addScreenshot,
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.lightGrey, style: BorderStyle.solid),
+                    border: Border.all(color: AppColors.lightGrey),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.add_a_photo,
                         color: AppColors.mediumGrey,
                       ),
@@ -422,9 +424,9 @@ class _FeedbackFormState extends State<FeedbackForm> {
         const SizedBox(height: 8),
         Text(
           'Máximo de 5 capturas de tela',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.mediumGrey,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
         ),
       ],
     );
@@ -440,18 +442,14 @@ class _FeedbackFormState extends State<FeedbackForm> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline,
-            color: AppColors.error,
-            size: 20,
-          ),
+          const Icon(Icons.error_outline, color: AppColors.error, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               widget.error!,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.error,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.error),
             ),
           ),
         ],
@@ -475,9 +473,9 @@ class _FeedbackFormState extends State<FeedbackForm> {
     );
   }
 
-  void _addScreenshot() async {
+  Future<void> _addScreenshot() async {
     if (_screenshots.length >= 5) return;
-    
+
     // This would integrate with image picker
     // For now, just show a placeholder
     showModalBottomSheet(
@@ -523,7 +521,7 @@ class _FeedbackFormState extends State<FeedbackForm> {
         'description': _descriptionController.text.trim(),
         'screenshots': _screenshots,
       };
-      
+
       widget.onSubmit(data);
     }
   }
@@ -595,16 +593,15 @@ class _FeedbackFormState extends State<FeedbackForm> {
 
 /// Feature request voting card
 class FeatureRequestCard extends StatelessWidget {
-  final FeatureRequest request;
-  final VoidCallback? onVote;
-  final VoidCallback? onComment;
-
   const FeatureRequestCard({
     Key? key,
     required this.request,
     this.onVote,
     this.onComment,
   }) : super(key: key);
+  final FeatureRequest request;
+  final VoidCallback? onVote;
+  final VoidCallback? onComment;
 
   @override
   Widget build(BuildContext context) {
@@ -627,9 +624,8 @@ class FeatureRequestCard extends StatelessWidget {
                     children: [
                       Text(
                         request.title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -665,7 +661,7 @@ class FeatureRequestCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.category,
                   size: 16,
                   color: AppColors.mediumGrey,
@@ -673,9 +669,9 @@ class FeatureRequestCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   request.category,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.mediumGrey,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
                 ),
                 const Spacer(),
                 if (onComment != null)
@@ -699,7 +695,7 @@ class FeatureRequestCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: request.hasVoted 
+          color: request.hasVoted
               ? AppColors.primary.withOpacity(0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -710,13 +706,19 @@ class FeatureRequestCard extends StatelessWidget {
         child: Column(
           children: [
             Icon(
-              request.hasVoted ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_up,
-              color: request.hasVoted ? AppColors.primary : AppColors.mediumGrey,
+              request.hasVoted
+                  ? Icons.keyboard_arrow_up
+                  : Icons.keyboard_arrow_up,
+              color: request.hasVoted
+                  ? AppColors.primary
+                  : AppColors.mediumGrey,
             ),
             Text(
               '${request.votesCount}',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: request.hasVoted ? AppColors.primary : AppColors.mediumGrey,
+                color: request.hasVoted
+                    ? AppColors.primary
+                    : AppColors.mediumGrey,
                 fontWeight: FontWeight.bold,
               ),
             ),

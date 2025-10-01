@@ -1,24 +1,6 @@
-enum ReferralStatus {
-  pending,
-  approved,
-  rejected,
-  expired
-}
+enum ReferralStatus { pending, approved, rejected, expired }
 
 class Referral {
-  final String id;
-  final String referralProgramId;
-  final String referredUserId;
-  final String? referredUserName;
-  final String? referredUserEmail;
-  final int creditsEarned;
-  final ReferralStatus status;
-  final String? rejectionReason;
-  final DateTime referredAt;
-  final DateTime? approvedAt;
-  final DateTime? rejectedAt;
-  final DateTime? expiresAt;
-
   Referral({
     required this.id,
     required this.referralProgramId,
@@ -59,6 +41,18 @@ class Referral {
           : null,
     );
   }
+  final String id;
+  final String referralProgramId;
+  final String referredUserId;
+  final String? referredUserName;
+  final String? referredUserEmail;
+  final int creditsEarned;
+  final ReferralStatus status;
+  final String? rejectionReason;
+  final DateTime referredAt;
+  final DateTime? approvedAt;
+  final DateTime? rejectedAt;
+  final DateTime? expiresAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -103,22 +97,6 @@ class Referral {
 }
 
 class ReferralProgram {
-  final String id;
-  final String userId;
-  final String referralCode;
-  final String qrCodeUrl;
-  final int bonusCredits;
-  final int totalReferrals;
-  final int approvedReferrals;
-  final int pendingReferrals;
-  final int totalCreditsEarned;
-  final List<Referral> referrals;
-  final Map<String, int> monthlyStats; // month -> referrals count
-  final int currentRanking;
-  final String? rankingTier; // 'bronze', 'silver', 'gold', 'platinum'
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   ReferralProgram({
     required this.id,
     required this.userId,
@@ -150,7 +128,8 @@ class ReferralProgram {
       totalCreditsEarned: json['totalCreditsEarned'] ?? 0,
       referrals: json['referrals'] != null
           ? List<Referral>.from(
-              json['referrals'].map((x) => Referral.fromJson(x)))
+              json['referrals'].map((x) => Referral.fromJson(x)),
+            )
           : [],
       monthlyStats: json['monthlyStats'] != null
           ? Map<String, int>.from(json['monthlyStats'])
@@ -161,6 +140,21 @@ class ReferralProgram {
       updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
+  final String id;
+  final String userId;
+  final String referralCode;
+  final String qrCodeUrl;
+  final int bonusCredits;
+  final int totalReferrals;
+  final int approvedReferrals;
+  final int pendingReferrals;
+  final int totalCreditsEarned;
+  final List<Referral> referrals;
+  final Map<String, int> monthlyStats; // month -> referrals count
+  final int currentRanking;
+  final String? rankingTier; // 'bronze', 'silver', 'gold', 'platinum'
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -211,7 +205,8 @@ class ReferralProgram {
   }
 
   int get thisMonthReferrals {
-    final currentMonth = '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}';
+    final currentMonth =
+        '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}';
     return monthlyStats[currentMonth] ?? 0;
   }
 

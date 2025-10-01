@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/clinic_service.dart';
+import 'package:singleclin_mobile/features/clinic_services/models/clinic_service.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ServiceListItem extends StatelessWidget {
-  final ClinicService service;
-  final int userCredits;
-  final bool creditsLoaded;
-  final VoidCallback onBookPressed;
-
   const ServiceListItem({
     Key? key,
     required this.service,
@@ -15,20 +10,26 @@ class ServiceListItem extends StatelessWidget {
     required this.creditsLoaded,
     required this.onBookPressed,
   }) : super(key: key);
+  final ClinicService service;
+  final int userCredits;
+  final bool creditsLoaded;
+  final VoidCallback onBookPressed;
 
   @override
   Widget build(BuildContext context) {
-    print('DEBUG: ServiceListItem building for: ${service.name} - Price: ${service.price}');
+    print(
+      'DEBUG: ServiceListItem building for: ${service.name} - Price: ${service.price}',
+    );
     final canAfford = userCredits >= service.price;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: service.isAvailable 
-              ? AppColors.divider 
+          color: service.isAvailable
+              ? AppColors.divider
               : AppColors.error.withOpacity(0.3),
         ),
         boxShadow: [
@@ -67,7 +68,7 @@ class ServiceListItem extends StatelessWidget {
                       : _buildPlaceholderImage(),
                 ),
               ),
-              
+
               // Service details
               Expanded(
                 child: Padding(
@@ -84,8 +85,8 @@ class ServiceListItem extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: service.isAvailable 
-                                    ? AppColors.textPrimary 
+                                color: service.isAvailable
+                                    ? AppColors.textPrimary
                                     : AppColors.textSecondary,
                               ),
                               maxLines: 2,
@@ -94,12 +95,15 @@ class ServiceListItem extends StatelessWidget {
                           ),
                           if (!service.isAvailable)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.error.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Indisponível',
                                 style: TextStyle(
                                   fontSize: 10,
@@ -110,28 +114,31 @@ class ServiceListItem extends StatelessWidget {
                             ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 4),
-                      
+
                       // Category
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           service.category,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       // Price and duration
                       Row(
                         children: [
@@ -140,11 +147,13 @@ class ServiceListItem extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: canAfford ? AppColors.success : AppColors.error,
+                              color: canAfford
+                                  ? AppColors.success
+                                  : AppColors.error,
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Icon(
+                          const Icon(
                             Icons.access_time,
                             size: 16,
                             color: AppColors.textSecondary,
@@ -152,7 +161,7 @@ class ServiceListItem extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             service.formattedDuration,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),
@@ -165,14 +174,14 @@ class ServiceListItem extends StatelessWidget {
               ),
             ],
           ),
-          
+
           // Description
           if (service.description.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Text(
                 service.description,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                   height: 1.4,
@@ -181,13 +190,13 @@ class ServiceListItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-          
+
           // Action buttons and status
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.background,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(12),
                 bottomRight: Radius.circular(12),
               ),
@@ -196,15 +205,11 @@ class ServiceListItem extends StatelessWidget {
               children: [
                 // Credits indicator - only show if credits are loaded and insufficient
                 if (creditsLoaded && !canAfford && service.isAvailable)
-                  Expanded(
+                  const Expanded(
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.warning,
-                          size: 16,
-                          color: AppColors.warning,
-                        ),
-                        const SizedBox(width: 4),
+                        Icon(Icons.warning, size: 16, color: AppColors.warning),
+                        SizedBox(width: 4),
                         Text(
                           'Créditos insuficientes',
                           style: TextStyle(
@@ -218,15 +223,17 @@ class ServiceListItem extends StatelessWidget {
                   )
                 else
                   const Spacer(),
-                
+
                 // Action button
                 SizedBox(
                   height: 36,
                   child: ElevatedButton(
-                    onPressed: service.isAvailable && canAfford ? onBookPressed : null,
+                    onPressed: service.isAvailable && canAfford
+                        ? onBookPressed
+                        : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: service.isAvailable && canAfford 
-                          ? AppColors.primary 
+                      backgroundColor: service.isAvailable && canAfford
+                          ? AppColors.primary
                           : AppColors.mediumGrey,
                       foregroundColor: AppColors.onPrimary,
                       elevation: 0,
@@ -270,13 +277,7 @@ class ServiceListItem extends StatelessWidget {
 
     return Container(
       color: AppColors.primary.withOpacity(0.1),
-      child: Center(
-        child: Icon(
-          icon,
-          color: AppColors.primary,
-          size: 32,
-        ),
-      ),
+      child: Center(child: Icon(icon, color: AppColors.primary, size: 32)),
     );
   }
 }

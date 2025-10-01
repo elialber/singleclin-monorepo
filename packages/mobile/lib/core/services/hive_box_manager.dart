@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../models/cache_entity.dart';
+import 'package:singleclin_mobile/core/models/cache_entity.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
@@ -32,19 +32,19 @@ class HiveBoxManager extends GetxService {
 
   // Box size limits (in KB)
   static const Map<BoxType, int> _boxSizeLimits = {
-    BoxType.users: 5000,        // 5MB
-    BoxType.clinics: 10000,     // 10MB
-    BoxType.plans: 2000,        // 2MB
-    BoxType.userPlans: 3000,    // 3MB
+    BoxType.users: 5000, // 5MB
+    BoxType.clinics: 10000, // 10MB
+    BoxType.plans: 2000, // 2MB
+    BoxType.userPlans: 3000, // 3MB
     BoxType.transactions: 8000, // 8MB
-    BoxType.qrCodes: 1000,      // 1MB
+    BoxType.qrCodes: 1000, // 1MB
     BoxType.appointments: 5000, // 5MB
     BoxType.creditHistory: 8000, // 8MB
-    BoxType.favorites: 1000,    // 1MB
-    BoxType.searchCache: 5000,  // 5MB
-    BoxType.metadata: 1000,     // 1MB
+    BoxType.favorites: 1000, // 1MB
+    BoxType.searchCache: 5000, // 5MB
+    BoxType.metadata: 1000, // 1MB
     BoxType.operationQueue: 2000, // 2MB
-    BoxType.preferences: 500,   // 500KB
+    BoxType.preferences: 500, // 500KB
   };
 
   @override
@@ -80,7 +80,6 @@ class HiveBoxManager extends GetxService {
 
       print('✅ HiveBoxManager initialized with ${_boxes.length} boxes');
       await _performMaintenanceTasks();
-
     } catch (e) {
       print('❌ HiveBoxManager initialization failed: $e');
       rethrow;
@@ -92,7 +91,7 @@ class HiveBoxManager extends GetxService {
       final boxName = _boxNames[boxType]!;
 
       // Check if already initialized
-      if (_boxInitialized[boxType] == true) {
+      if (_boxInitialized[boxType] ?? false) {
         return;
       }
 
@@ -115,7 +114,6 @@ class HiveBoxManager extends GetxService {
       await _initializeBoxData(boxType, box);
 
       print('📦 Initialized box: $boxName (${box.length} items)');
-
     } catch (e) {
       print('❌ Failed to initialize box ${boxType.name}: $e');
       _boxInitialized[boxType] = false;
@@ -154,7 +152,8 @@ class HiveBoxManager extends GetxService {
 
   /// Get a box instance by type
   Box<dynamic>? getBox(BoxType boxType) {
-    if (!_boxInitialized.containsKey(boxType) || _boxInitialized[boxType] != true) {
+    if (!_boxInitialized.containsKey(boxType) ||
+        _boxInitialized[boxType] != true) {
       print('⚠️ Box ${boxType.name} not initialized, lazy loading...');
       // Trigger lazy initialization
       Future.microtask(() => _initializeBox(boxType));
@@ -165,7 +164,8 @@ class HiveBoxManager extends GetxService {
 
   /// Ensure a box is initialized (lazy loading)
   Future<Box<dynamic>> ensureBox(BoxType boxType) async {
-    if (!_boxInitialized.containsKey(boxType) || _boxInitialized[boxType] != true) {
+    if (!_boxInitialized.containsKey(boxType) ||
+        _boxInitialized[boxType] != true) {
       await _initializeBox(boxType);
     }
     return _boxes[boxType]!;
@@ -173,7 +173,7 @@ class HiveBoxManager extends GetxService {
 
   /// Check if a box is initialized
   bool isBoxInitialized(BoxType boxType) {
-    return _boxInitialized[boxType] == true;
+    return _boxInitialized[boxType] ?? false;
   }
 
   /// Get box statistics
@@ -260,7 +260,9 @@ class HiveBoxManager extends GetxService {
       if (metadataBox == null) return;
 
       final lastCleanup = metadataBox.get('last_cleanup');
-      final lastCleanupDate = lastCleanup != null ? DateTime.parse(lastCleanup) : DateTime(2000);
+      final lastCleanupDate = lastCleanup != null
+          ? DateTime.parse(lastCleanup)
+          : DateTime(2000);
 
       // Perform maintenance every 24 hours
       if (DateTime.now().difference(lastCleanupDate).inHours >= 24) {
@@ -277,7 +279,6 @@ class HiveBoxManager extends GetxService {
 
         print('✅ Hive maintenance completed');
       }
-
     } catch (e) {
       print('❌ Hive maintenance failed: $e');
     }
@@ -289,7 +290,9 @@ class HiveBoxManager extends GetxService {
 
       final stats = await getBoxStats(boxType);
       if (stats['usagePercent'] > 80) {
-        print('⚠️ Box ${stats['boxName']} is ${stats['usagePercent']}% full, cleaning up...');
+        print(
+          '⚠️ Box ${stats['boxName']} is ${stats['usagePercent']}% full, cleaning up...',
+        );
         await _cleanupBoxByAge(boxType);
       }
     }
@@ -302,7 +305,9 @@ class HiveBoxManager extends GetxService {
     // Get all items with timestamps
     final itemsWithAge = <String, DateTime>{};
     for (final key in box.keys) {
-      final timestamp = metadataBox.get('${_boxNames[boxType]}_${key}_timestamp');
+      final timestamp = metadataBox.get(
+        '${_boxNames[boxType]}_${key}_timestamp',
+      );
       if (timestamp != null) {
         itemsWithAge[key.toString()] = DateTime.parse(timestamp);
       }
@@ -321,7 +326,9 @@ class HiveBoxManager extends GetxService {
       await metadataBox.delete('${_boxNames[boxType]}_${item.key}_timestamp');
     }
 
-    print('🧹 Cleaned up ${itemsToRemove.length} old items from ${_boxNames[boxType]}');
+    print(
+      '🧹 Cleaned up ${itemsToRemove.length} old items from ${_boxNames[boxType]}',
+    );
   }
 
   Future<void> _compactBoxesIfNeeded() async {
@@ -374,11 +381,16 @@ class HiveBoxManager extends GetxService {
   }
 
   /// Import box data from backup
-  Future<void> importBoxData(BoxType boxType, Map<String, dynamic> backupData) async {
+  Future<void> importBoxData(
+    BoxType boxType,
+    Map<String, dynamic> backupData,
+  ) async {
     final box = await ensureBox(boxType);
 
     if (backupData['boxType'] != boxType.name) {
-      throw ArgumentError('Backup data is for ${backupData['boxType']}, not ${boxType.name}');
+      throw ArgumentError(
+        'Backup data is for ${backupData['boxType']}, not ${boxType.name}',
+      );
     }
 
     final data = backupData['data'] as Map<String, dynamic>;

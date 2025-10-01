@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
-import '../models/community_post.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/community_post.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Community post card widget
 class CommunityPostCard extends StatelessWidget {
-  final CommunityPost post;
-  final VoidCallback? onTap;
-  final VoidCallback? onLike;
-  final VoidCallback? onComment;
-  final VoidCallback? onShare;
-  final VoidCallback? onBookmark;
-  final VoidCallback? onReport;
-  final bool isCompact;
-
   const CommunityPostCard({
     Key? key,
     required this.post,
@@ -26,15 +17,21 @@ class CommunityPostCard extends StatelessWidget {
     this.onReport,
     this.isCompact = false,
   }) : super(key: key);
+  final CommunityPost post;
+  final VoidCallback? onTap;
+  final VoidCallback? onLike;
+  final VoidCallback? onComment;
+  final VoidCallback? onShare;
+  final VoidCallback? onBookmark;
+  final VoidCallback? onReport;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -83,7 +80,10 @@ class CommunityPostCard extends StatelessWidget {
                   if (post.clinicName != null) ...[
                     const SizedBox(width: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -145,15 +145,11 @@ class CommunityPostCard extends StatelessWidget {
       return Container(
         width: 44,
         height: 44,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
           color: AppColors.lightGrey,
         ),
-        child: const Icon(
-          Icons.person,
-          color: AppColors.mediumGrey,
-          size: 24,
-        ),
+        child: const Icon(Icons.person, color: AppColors.mediumGrey, size: 24),
       );
     }
 
@@ -260,11 +256,7 @@ class CommunityPostCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 12,
-          color: AppColors.primary,
-        ),
+        Icon(icon, size: 12, color: AppColors.primary),
         const SizedBox(width: 2),
         Text(
           label,
@@ -305,7 +297,7 @@ class CommunityPostCard extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.location_on,
                 size: 14,
                 color: AppColors.mediumGrey,
@@ -313,9 +305,9 @@ class CommunityPostCard extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 post.clinicName!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.mediumGrey,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
               ),
             ],
           ),
@@ -366,9 +358,7 @@ class CommunityPostCard extends StatelessWidget {
                   width: 120,
                   height: 120,
                   color: AppColors.lightGrey,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: const Center(child: CircularProgressIndicator()),
                 ),
                 errorWidget: (context, url, error) => Container(
                   width: 120,
@@ -427,15 +417,15 @@ class CommunityPostCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${post.likesCount}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.mediumGrey,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
                 ),
               ],
             ),
           ),
         ),
-        
+
         // Comment button
         InkWell(
           onTap: onComment,
@@ -445,7 +435,7 @@ class CommunityPostCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.chat_bubble_outline,
                   size: 18,
                   color: AppColors.mediumGrey,
@@ -453,15 +443,15 @@ class CommunityPostCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${post.commentsCount}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.mediumGrey,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
                 ),
               ],
             ),
           ),
         ),
-        
+
         // Share button
         InkWell(
           onTap: onShare,
@@ -471,7 +461,7 @@ class CommunityPostCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.share_outlined,
                   size: 18,
                   color: AppColors.mediumGrey,
@@ -479,17 +469,17 @@ class CommunityPostCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${post.sharesCount}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.mediumGrey,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
                 ),
               ],
             ),
           ),
         ),
-        
+
         const Spacer(),
-        
+
         // Bookmark button
         InkWell(
           onTap: onBookmark,
@@ -499,7 +489,9 @@ class CommunityPostCard extends StatelessWidget {
             child: Icon(
               post.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
               size: 20,
-              color: post.isBookmarked ? AppColors.primary : AppColors.mediumGrey,
+              color: post.isBookmarked
+                  ? AppColors.primary
+                  : AppColors.mediumGrey,
             ),
           ),
         ),
@@ -510,11 +502,6 @@ class CommunityPostCard extends StatelessWidget {
 
 /// Post comment widget
 class PostCommentCard extends StatelessWidget {
-  final PostComment comment;
-  final VoidCallback? onLike;
-  final VoidCallback? onReply;
-  final VoidCallback? onReport;
-
   const PostCommentCard({
     Key? key,
     required this.comment,
@@ -522,6 +509,10 @@ class PostCommentCard extends StatelessWidget {
     this.onReply,
     this.onReport,
   }) : super(key: key);
+  final PostComment comment;
+  final VoidCallback? onLike;
+  final VoidCallback? onReply;
+  final VoidCallback? onReport;
 
   @override
   Widget build(BuildContext context) {
@@ -540,11 +531,11 @@ class PostCommentCard extends StatelessWidget {
                 radius: 16,
                 backgroundColor: AppColors.primaryLight,
                 child: Text(
-                  comment.isAnonymous 
-                      ? '?' 
-                      : comment.userName.isNotEmpty 
-                          ? comment.userName[0].toUpperCase() 
-                          : 'U',
+                  comment.isAnonymous
+                      ? '?'
+                      : comment.userName.isNotEmpty
+                      ? comment.userName[0].toUpperCase()
+                      : 'U',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -558,13 +549,17 @@ class PostCommentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      comment.isAnonymous ? 'Usuário Anônimo' : comment.userName,
+                      comment.isAnonymous
+                          ? 'Usuário Anônimo'
+                          : comment.userName,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      DateFormat('dd/MM/yyyy • HH:mm').format(comment.createdAt),
+                      DateFormat(
+                        'dd/MM/yyyy • HH:mm',
+                      ).format(comment.createdAt),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.mediumGrey,
                       ),
@@ -596,9 +591,9 @@ class PostCommentCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             comment.content,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              height: 1.4,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(height: 1.4),
           ),
           if (comment.images.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -631,14 +626,21 @@ class PostCommentCard extends StatelessWidget {
                 onTap: onLike,
                 borderRadius: BorderRadius.circular(16),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        comment.isLikedByMe ? Icons.favorite : Icons.favorite_border,
+                        comment.isLikedByMe
+                            ? Icons.favorite
+                            : Icons.favorite_border,
                         size: 14,
-                        color: comment.isLikedByMe ? Colors.red : AppColors.mediumGrey,
+                        color: comment.isLikedByMe
+                            ? Colors.red
+                            : AppColors.mediumGrey,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -656,7 +658,10 @@ class PostCommentCard extends StatelessWidget {
                 onTap: onReply,
                 borderRadius: BorderRadius.circular(16),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   child: Text(
                     'Responder',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -691,7 +696,7 @@ class PostCommentCard extends StatelessWidget {
                   },
                   child: Text(
                     'Ver mais ${comment.replies.length - 2} respostas',
-                    style: TextStyle(color: AppColors.primary),
+                    style: const TextStyle(color: AppColors.primary),
                   ),
                 ),
               ),
@@ -704,11 +709,6 @@ class PostCommentCard extends StatelessWidget {
 
 /// Community event card
 class CommunityEventCard extends StatelessWidget {
-  final CommunityEvent event;
-  final VoidCallback? onJoin;
-  final VoidCallback? onLeave;
-  final VoidCallback? onTap;
-
   const CommunityEventCard({
     Key? key,
     required this.event,
@@ -716,6 +716,10 @@ class CommunityEventCard extends StatelessWidget {
     this.onLeave,
     this.onTap,
   }) : super(key: key);
+  final CommunityEvent event;
+  final VoidCallback? onJoin;
+  final VoidCallback? onLeave;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -740,17 +744,19 @@ class CommunityEventCard extends StatelessWidget {
                       children: [
                         Text(
                           event.title,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          DateFormat('dd/MM/yyyy • HH:mm').format(event.startTime),
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          DateFormat(
+                            'dd/MM/yyyy • HH:mm',
+                          ).format(event.startTime),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
                         ),
                       ],
                     ),
@@ -787,7 +793,7 @@ class CommunityEventCard extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.people,
                     size: 16,
                     color: AppColors.mediumGrey,
@@ -856,11 +862,7 @@ class CommunityEventCard extends StatelessWidget {
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 24,
-      ),
+      child: Icon(icon, color: color, size: 24),
     );
   }
 

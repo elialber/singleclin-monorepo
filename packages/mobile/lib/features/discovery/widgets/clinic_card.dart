@@ -2,18 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/sg_credit_widget.dart';
-import '../../clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 
 /// Clinic card widget optimized for mobile with touch-friendly design
 class ClinicCard extends StatelessWidget {
-  final Clinic clinic;
-  final VoidCallback? onTap;
-  final VoidCallback? onFavoritePressed;
-  final bool showDistance;
-  final bool compact;
-
   const ClinicCard({
     Key? key,
     required this.clinic,
@@ -22,15 +16,18 @@ class ClinicCard extends StatelessWidget {
     this.showDistance = true,
     this.compact = false,
   }) : super(key: key);
+  final Clinic clinic;
+  final VoidCallback? onTap;
+  final VoidCallback? onFavoritePressed;
+  final bool showDistance;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -115,9 +112,7 @@ class ClinicCard extends StatelessWidget {
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(
                 color: AppColors.lightGrey.withOpacity(0.3),
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                child: const Center(child: CircularProgressIndicator()),
               ),
               errorWidget: (context, url, error) => _buildImagePlaceholder(),
             )
@@ -155,10 +150,7 @@ class ClinicCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.transparent,
-              Colors.black.withOpacity(0.7),
-            ],
+            colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
           ),
         ),
       ),
@@ -177,14 +169,17 @@ class ClinicCard extends StatelessWidget {
             children: [
               if (clinic.isPartner)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(Icons.verified, color: Colors.white, size: 12),
                       SizedBox(width: 2),
                       Text(
@@ -201,7 +196,10 @@ class ClinicCard extends StatelessWidget {
               const Spacer(),
               if (clinic.isAvailable)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.success,
                     borderRadius: BorderRadius.circular(12),
@@ -231,10 +229,7 @@ class ClinicCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             clinic.address,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -253,15 +248,9 @@ class ClinicCard extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: IconButton(
-          icon: const Icon(
-            Icons.favorite_border,
-            color: AppColors.mediumGrey,
-          ),
+          icon: const Icon(Icons.favorite_border, color: AppColors.mediumGrey),
           onPressed: onFavoritePressed,
-          constraints: const BoxConstraints(
-            minWidth: 40,
-            minHeight: 40,
-          ),
+          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
         ),
       ),
     );
@@ -305,10 +294,7 @@ class ClinicCard extends StatelessWidget {
   Widget _buildClinicName() {
     return Text(
       clinic.name,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-      ),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
@@ -319,44 +305,28 @@ class ClinicCard extends StatelessWidget {
       children: [
         RatingBarIndicator(
           rating: clinic.rating,
-          itemBuilder: (context, index) => const Icon(
-            Icons.star,
-            color: AppColors.sgPrimary,
-          ),
-          itemCount: 5,
+          itemBuilder: (context, index) =>
+              const Icon(Icons.star, color: AppColors.sgPrimary),
           itemSize: 14,
           unratedColor: AppColors.lightGrey,
         ),
         const SizedBox(width: 4),
         Text(
           clinic.rating.toStringAsFixed(1),
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 12,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
         ),
         const SizedBox(width: 4),
         Text(
           '(${clinic.reviewCount})',
-          style: const TextStyle(
-            color: AppColors.mediumGrey,
-            fontSize: 12,
-          ),
+          style: const TextStyle(color: AppColors.mediumGrey, fontSize: 12),
         ),
         if (showDistance && clinic.distance > 0) ...[
           const SizedBox(width: 8),
-          const Icon(
-            Icons.location_on,
-            size: 12,
-            color: AppColors.mediumGrey,
-          ),
+          const Icon(Icons.location_on, size: 12, color: AppColors.mediumGrey),
           const SizedBox(width: 2),
           Text(
             '${clinic.distance.toStringAsFixed(1)}km',
-            style: const TextStyle(
-              color: AppColors.mediumGrey,
-              fontSize: 12,
-            ),
+            style: const TextStyle(color: AppColors.mediumGrey, fontSize: 12),
           ),
         ],
       ],
@@ -365,10 +335,14 @@ class ClinicCard extends StatelessWidget {
 
   Widget _buildPriceRange() {
     final minPrice = clinic.services.isNotEmpty
-        ? clinic.services.map((s) => s['price'] as double? ?? 1.0).reduce((a, b) => a < b ? a : b)
+        ? clinic.services
+              .map((s) => s['price'] as double? ?? 1.0)
+              .reduce((a, b) => a < b ? a : b)
         : 1.0;
     final maxPrice = clinic.services.isNotEmpty
-        ? clinic.services.map((s) => s['price'] as double? ?? 1.0).reduce((a, b) => a > b ? a : b)
+        ? clinic.services
+              .map((s) => s['price'] as double? ?? 1.0)
+              .reduce((a, b) => a > b ? a : b)
         : 1.0;
 
     final priceText = minPrice == maxPrice
@@ -387,7 +361,7 @@ class ClinicCard extends StatelessWidget {
 
   Widget _buildServiceInfo() {
     final mainServices = clinic.services.take(3).toList();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -438,10 +412,7 @@ class ClinicCard extends StatelessWidget {
           children: [
             const Text(
               'A partir de',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.mediumGrey,
-              ),
+              style: TextStyle(fontSize: 12, color: AppColors.mediumGrey),
             ),
             Text(
               _getPriceRangeText(),
@@ -460,7 +431,9 @@ class ClinicCard extends StatelessWidget {
               clinic.isAvailable ? 'Disponível' : 'Indisponível',
               style: TextStyle(
                 fontSize: 12,
-                color: clinic.isAvailable ? AppColors.success : AppColors.mediumGrey,
+                color: clinic.isAvailable
+                    ? AppColors.success
+                    : AppColors.mediumGrey,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -517,10 +490,14 @@ class ClinicCard extends StatelessWidget {
 
   String _getPriceRangeText() {
     final minPrice = clinic.services.isNotEmpty
-        ? clinic.services.map((s) => s['price'] as double? ?? 1.0).reduce((a, b) => a < b ? a : b)
+        ? clinic.services
+              .map((s) => s['price'] as double? ?? 1.0)
+              .reduce((a, b) => a < b ? a : b)
         : 1.0;
     final maxPrice = clinic.services.isNotEmpty
-        ? clinic.services.map((s) => s['price'] as double? ?? 1.0).reduce((a, b) => a > b ? a : b)
+        ? clinic.services
+              .map((s) => s['price'] as double? ?? 1.0)
+              .reduce((a, b) => a > b ? a : b)
         : 1.0;
 
     return minPrice == maxPrice

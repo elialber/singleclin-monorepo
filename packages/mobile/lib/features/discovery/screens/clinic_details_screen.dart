@@ -4,24 +4,20 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../shared/widgets/sg_credit_widget.dart';
-import '../controllers/discovery_controller.dart';
-import '../controllers/booking_controller.dart';
-import '../models/clinic.dart';
-import '../models/service.dart';
-import '../widgets/service_card.dart';
-import 'booking_screen.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/booking_controller.dart';
+import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
+import 'package:singleclin_mobile/features/discovery/widgets/service_card.dart';
+import 'package:singleclin_mobile/features/discovery/screens/booking_screen.dart';
 
 /// Clinic details screen with gallery, services, and booking CTA
 class ClinicDetailsScreen extends StatefulWidget {
+  const ClinicDetailsScreen({Key? key, required this.clinic}) : super(key: key);
   final Clinic clinic;
-
-  const ClinicDetailsScreen({
-    Key? key,
-    required this.clinic,
-  }) : super(key: key);
 
   @override
   State<ClinicDetailsScreen> createState() => _ClinicDetailsScreenState();
@@ -29,13 +25,14 @@ class ClinicDetailsScreen extends StatefulWidget {
 
 class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
     with SingleTickerProviderStateMixin {
-  final DiscoveryController discoveryController = Get.find<DiscoveryController>();
+  final DiscoveryController discoveryController =
+      Get.find<DiscoveryController>();
   final BookingController bookingController = Get.put(BookingController());
-  
+
   late TabController _tabController;
   late PageController _imageController;
   late ScrollController _scrollController;
-  
+
   final _currentImageIndex = 0.obs;
   final _showAppBarTitle = false.obs;
 
@@ -45,7 +42,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
     _tabController = TabController(length: 4, vsync: this);
     _imageController = PageController();
     _scrollController = ScrollController();
-    
+
     _scrollController.addListener(_onScroll);
     _loadClinicDetails();
   }
@@ -93,36 +90,31 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
   }
 
   Widget _buildSliverAppBar() {
-    return Obx(() => SliverAppBar(
-          expandedHeight: 300,
-          floating: false,
-          pinned: true,
-          backgroundColor: AppColors.primary,
-          title: _showAppBarTitle.value
-              ? Text(widget.clinic.name)
-              : null,
-          actions: [
-            IconButton(
-              icon: Icon(
-                widget.clinic.isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: widget.clinic.isFavorite ? Colors.red : Colors.white,
-              ),
-              onPressed: () => discoveryController.toggleClinicFavorite(widget.clinic.id),
+    return Obx(
+      () => SliverAppBar(
+        expandedHeight: 300,
+        pinned: true,
+        backgroundColor: AppColors.primary,
+        title: _showAppBarTitle.value ? Text(widget.clinic.name) : null,
+        actions: [
+          IconButton(
+            icon: Icon(
+              widget.clinic.isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: widget.clinic.isFavorite ? Colors.red : Colors.white,
             ),
-            IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: _shareClinic,
-            ),
-          ],
-          flexibleSpace: FlexibleSpaceBar(
-            background: _buildImageGallery(),
+            onPressed: () =>
+                discoveryController.toggleClinicFavorite(widget.clinic.id),
           ),
-        ));
+          IconButton(icon: const Icon(Icons.share), onPressed: _shareClinic),
+        ],
+        flexibleSpace: FlexibleSpaceBar(background: _buildImageGallery()),
+      ),
+    );
   }
 
   Widget _buildImageGallery() {
-    final images = widget.clinic.images.isNotEmpty 
-        ? widget.clinic.images 
+    final images = widget.clinic.images.isNotEmpty
+        ? widget.clinic.images
         : ['']; // Placeholder for empty images
 
     return Stack(
@@ -146,7 +138,8 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
                             child: CircularProgressIndicator(),
                           ),
                         ),
-                        errorWidget: (context, url, error) => _buildImagePlaceholder(),
+                        errorWidget: (context, url, error) =>
+                            _buildImagePlaceholder(),
                       )
                     : _buildImagePlaceholder(),
               ),
@@ -175,22 +168,24 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
             bottom: 16,
             left: 0,
             right: 0,
-            child: Obx(() => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: images.asMap().entries.map((entry) {
-                    return Container(
-                      width: 8,
-                      height: 8,
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentImageIndex.value == entry.key
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.4),
-                      ),
-                    );
-                  }).toList(),
-                )),
+            child: Obx(
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: images.asMap().entries.map((entry) {
+                  return Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentImageIndex.value == entry.key
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.4),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         // Status badges
         Positioned(
@@ -199,7 +194,11 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           child: Row(
             children: [
               if (widget.clinic.isVerified)
-                _buildStatusBadge('Verificado', Icons.verified, AppColors.primary),
+                _buildStatusBadge(
+                  'Verificado',
+                  Icons.verified,
+                  AppColors.primary,
+                ),
               if (widget.clinic.isCurrentlyOpen)
                 _buildStatusBadge('Aberto', Icons.schedule, AppColors.success),
             ],
@@ -287,7 +286,6 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
                             Icons.star,
                             color: AppColors.sgPrimary,
                           ),
-                          itemCount: 5,
                           itemSize: 18,
                         ),
                         const SizedBox(width: 8),
@@ -301,9 +299,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
                         const SizedBox(width: 4),
                         Text(
                           widget.clinic.formattedReviews,
-                          style: const TextStyle(
-                            color: AppColors.mediumGrey,
-                          ),
+                          style: const TextStyle(color: AppColors.mediumGrey),
                         ),
                       ],
                     ),
@@ -312,7 +308,10 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
               ),
               if (widget.clinic.distanceKm != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -360,7 +359,9 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           child: _buildInfoTile(
             Icons.schedule,
             'Horário',
-            widget.clinic.isCurrentlyOpen ? 'Aberto agora' : widget.clinic.nextOpeningTime,
+            widget.clinic.isCurrentlyOpen
+                ? 'Aberto agora'
+                : widget.clinic.nextOpeningTime,
           ),
         ),
         const SizedBox(width: 16),
@@ -378,11 +379,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
   Widget _buildInfoTile(IconData icon, String title, String subtitle) {
     return Column(
       children: [
-        Icon(
-          icon,
-          color: AppColors.primary,
-          size: 24,
-        ),
+        Icon(icon, color: AppColors.primary, size: 24),
         const SizedBox(height: 4),
         Text(
           title,
@@ -395,10 +392,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
         const SizedBox(height: 2),
         Text(
           subtitle,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           textAlign: TextAlign.center,
         ),
       ],
@@ -425,7 +419,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
   }
 
   Widget _buildTabContent() {
-    return Container(
+    return SizedBox(
       height: 400, // Fixed height for tab content
       child: TabBarView(
         controller: _tabController,
@@ -443,9 +437,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
     final services = widget.clinic.services;
 
     if (services.isEmpty) {
-      return const Center(
-        child: Text('Nenhum serviço disponível'),
-      );
+      return const Center(child: Text('Nenhum serviço disponível'));
     }
 
     return ListView.builder(
@@ -471,10 +463,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           if (widget.clinic.description.isNotEmpty) ...[
             const Text(
               'Descrição',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
@@ -486,10 +475,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           if (widget.clinic.specialtyDescription != null) ...[
             const Text(
               'Especialidades',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
@@ -500,10 +486,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           ],
           const Text(
             'Comodidades',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -563,7 +546,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              onPressed: () => _openDirections(),
+              onPressed: _openDirections,
               icon: const Icon(Icons.directions),
               label: const Text('Como chegar'),
             ),
@@ -577,9 +560,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
     return const Center(
       child: Text(
         'Sistema de avaliações em desenvolvimento',
-        style: TextStyle(
-          color: AppColors.mediumGrey,
-        ),
+        style: TextStyle(color: AppColors.mediumGrey),
       ),
     );
   }
@@ -589,9 +570,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: AppColors.lightGrey),
-        ),
+        border: Border(top: BorderSide(color: AppColors.lightGrey)),
       ),
       child: Column(
         children: [
@@ -600,10 +579,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
             children: [
               const Text(
                 'Agendar consulta',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               Text(
                 'A partir de ${widget.clinic.priceRange}',
@@ -686,7 +662,6 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
               Expanded(
                 child: ServiceCard(
                   service: service,
-                  compact: false,
                   onBookPressed: () {
                     Get.back();
                     _bookService(service);
@@ -702,42 +677,36 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
 
   void _bookService(Service service) {
     bookingController.initializeBooking(widget.clinic, service);
-    Get.to(
-      () => const BookingScreen(),
-      transition: Transition.rightToLeft,
-    );
+    Get.to(() => const BookingScreen(), transition: Transition.rightToLeft);
   }
 
   void _bookNow() {
     bookingController.initializeBooking(widget.clinic);
-    Get.to(
-      () => const BookingScreen(),
-      transition: Transition.rightToLeft,
-    );
+    Get.to(() => const BookingScreen(), transition: Transition.rightToLeft);
   }
 
-  void _makePhoneCall(String phone) async {
+  Future<void> _makePhoneCall(String phone) async {
     final uri = Uri.parse('tel:$phone');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
   }
 
-  void _sendEmail(String email) async {
+  Future<void> _sendEmail(String email) async {
     final uri = Uri.parse('mailto:$email');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
   }
 
-  void _openWebsite(String website) async {
+  Future<void> _openWebsite(String website) async {
     final uri = Uri.parse(website);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
-  void _openDirections() async {
+  Future<void> _openDirections() async {
     final uri = Uri.parse(
       'https://www.google.com/maps/dir/?api=1&destination=${widget.clinic.latitude},${widget.clinic.longitude}',
     );

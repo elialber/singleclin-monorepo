@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/user_profile.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Profile Header Widget
 /// Displays user photo, name, and completion progress
 class ProfileHeader extends StatelessWidget {
-  final UserProfile profile;
-  final bool isEditing;
-  final bool isUpdatingPhoto;
-  final VoidCallback? onPhotoUpdate;
-  final VoidCallback? onPhotoRemove;
-
   const ProfileHeader({
     Key? key,
     required this.profile,
@@ -19,6 +13,11 @@ class ProfileHeader extends StatelessWidget {
     this.onPhotoUpdate,
     this.onPhotoRemove,
   }) : super(key: key);
+  final UserProfile profile;
+  final bool isEditing;
+  final bool isUpdatingPhoto;
+  final VoidCallback? onPhotoUpdate;
+  final VoidCallback? onPhotoRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +68,7 @@ class ProfileHeader extends StatelessWidget {
             ],
           ),
           child: ClipOval(
-            child: profile.photoUrl?.isNotEmpty == true
+            child: profile.photoUrl?.isNotEmpty ?? false
                 ? Image.network(
                     profile.photoUrl!,
                     width: 100,
@@ -121,7 +120,7 @@ class ProfileHeader extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (profile.photoUrl?.isNotEmpty == true) ...[
+                  if (profile.photoUrl?.isNotEmpty ?? false) ...[
                     const PopupMenuItem(
                       value: 'remove',
                       child: Row(
@@ -143,11 +142,7 @@ class ProfileHeader extends StatelessWidget {
                           valueColor: AlwaysStoppedAnimation(Colors.white),
                         ),
                       )
-                    : const Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                    : const Icon(Icons.edit, color: Colors.white, size: 20),
                 offset: const Offset(0, 30),
               ),
             ),
@@ -162,7 +157,7 @@ class ProfileHeader extends StatelessWidget {
     return Container(
       width: 100,
       height: 100,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
         gradient: AppColors.primaryGradient,
       ),
@@ -195,10 +190,7 @@ class ProfileHeader extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           profile.email,
-          style: const TextStyle(
-            fontSize: 16,
-            color: AppColors.textSecondary,
-          ),
+          style: const TextStyle(fontSize: 16, color: AppColors.textSecondary),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 12),
@@ -256,16 +248,13 @@ class ProfileHeader extends StatelessWidget {
   /// Build completion progress
   Widget _buildCompletionProgress() {
     final completionPercentage = profile.completionPercentage;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
       ),
       child: Column(
         children: [
@@ -304,11 +293,11 @@ class ProfileHeader extends StatelessWidget {
               value: completionPercentage,
               backgroundColor: AppColors.lightGrey,
               valueColor: AlwaysStoppedAnimation(
-                completionPercentage >= 0.8 
-                    ? AppColors.success 
-                    : completionPercentage >= 0.5 
-                        ? AppColors.warning 
-                        : AppColors.error,
+                completionPercentage >= 0.8
+                    ? AppColors.success
+                    : completionPercentage >= 0.5
+                    ? AppColors.warning
+                    : AppColors.error,
               ),
               minHeight: 6,
             ),

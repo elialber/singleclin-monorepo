@@ -6,27 +6,17 @@ enum WalletTransactionType {
   bonus,
   cashback,
   subscription,
-  purchase
+  purchase,
 }
 
 enum WalletCurrency {
   sg, // SingleClin Credits
   brl, // Brazilian Real
   cashback, // Cashback points
-  loyalty // Loyalty points
+  loyalty, // Loyalty points
 }
 
 class WalletBalance {
-  final String id;
-  final String userId;
-  final WalletCurrency currency;
-  final double balance;
-  final double lockedBalance; // Reserved for pending transactions
-  final double lifetimeEarned;
-  final double lifetimeSpent;
-  final DateTime lastUpdated;
-  final Map<String, dynamic>? metadata;
-
   WalletBalance({
     required this.id,
     required this.userId,
@@ -55,6 +45,15 @@ class WalletBalance {
       metadata: json['metadata'],
     );
   }
+  final String id;
+  final String userId;
+  final WalletCurrency currency;
+  final double balance;
+  final double lockedBalance; // Reserved for pending transactions
+  final double lifetimeEarned;
+  final double lifetimeSpent;
+  final DateTime lastUpdated;
+  final Map<String, dynamic>? metadata;
 
   Map<String, dynamic> toJson() {
     return {
@@ -116,7 +115,7 @@ class WalletBalance {
       case WalletCurrency.sg:
         return 'SG';
       case WalletCurrency.brl:
-        return 'R\$';
+        return r'R$';
       case WalletCurrency.cashback:
         return 'CB';
       case WalletCurrency.loyalty:
@@ -135,19 +134,6 @@ class WalletBalance {
 }
 
 class WalletTransaction {
-  final String id;
-  final String walletId;
-  final String userId;
-  final WalletTransactionType type;
-  final WalletCurrency currency;
-  final double amount;
-  final double balanceAfter;
-  final String description;
-  final String? referenceId; // ID of related entity (booking, purchase, etc.)
-  final String? referenceType; // Type of related entity
-  final Map<String, dynamic>? metadata;
-  final DateTime createdAt;
-
   WalletTransaction({
     required this.id,
     required this.walletId,
@@ -185,6 +171,18 @@ class WalletTransaction {
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
+  final String id;
+  final String walletId;
+  final String userId;
+  final WalletTransactionType type;
+  final WalletCurrency currency;
+  final double amount;
+  final double balanceAfter;
+  final String description;
+  final String? referenceId; // ID of related entity (booking, purchase, etc.)
+  final String? referenceType; // Type of related entity
+  final Map<String, dynamic>? metadata;
+  final DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -224,20 +222,22 @@ class WalletTransaction {
     }
   }
 
-  bool get isCredit => type == WalletTransactionType.credit ||
-                       type == WalletTransactionType.refund ||
-                       type == WalletTransactionType.bonus ||
-                       type == WalletTransactionType.cashback ||
-                       type == WalletTransactionType.subscription;
+  bool get isCredit =>
+      type == WalletTransactionType.credit ||
+      type == WalletTransactionType.refund ||
+      type == WalletTransactionType.bonus ||
+      type == WalletTransactionType.cashback ||
+      type == WalletTransactionType.subscription;
 
-  bool get isDebit => type == WalletTransactionType.debit ||
-                      type == WalletTransactionType.transfer ||
-                      type == WalletTransactionType.purchase;
+  bool get isDebit =>
+      type == WalletTransactionType.debit ||
+      type == WalletTransactionType.transfer ||
+      type == WalletTransactionType.purchase;
 
   String get amountDisplay {
-    String prefix = isCredit ? '+' : '-';
+    final String prefix = isCredit ? '+' : '-';
     String value = '';
-    
+
     switch (currency) {
       case WalletCurrency.sg:
         value = '${amount.toInt()} SG';
@@ -252,7 +252,7 @@ class WalletTransaction {
         value = '${amount.toInt()} pts';
         break;
     }
-    
+
     return '$prefix$value';
   }
 
@@ -271,16 +271,6 @@ class WalletTransaction {
 }
 
 class WalletSummary {
-  final String userId;
-  final List<WalletBalance> balances;
-  final List<WalletTransaction> recentTransactions;
-  final double totalSgCredits;
-  final double totalCashback;
-  final double totalLoyaltyPoints;
-  final double monthlySgSpending;
-  final double monthlyCashbackEarned;
-  final DateTime lastUpdated;
-
   WalletSummary({
     required this.userId,
     required this.balances,
@@ -298,11 +288,15 @@ class WalletSummary {
       userId: json['userId'] ?? '',
       balances: json['balances'] != null
           ? List<WalletBalance>.from(
-              json['balances'].map((x) => WalletBalance.fromJson(x)))
+              json['balances'].map((x) => WalletBalance.fromJson(x)),
+            )
           : [],
       recentTransactions: json['recentTransactions'] != null
           ? List<WalletTransaction>.from(
-              json['recentTransactions'].map((x) => WalletTransaction.fromJson(x)))
+              json['recentTransactions'].map(
+                (x) => WalletTransaction.fromJson(x),
+              ),
+            )
           : [],
       totalSgCredits: (json['totalSgCredits'] ?? 0.0).toDouble(),
       totalCashback: (json['totalCashback'] ?? 0.0).toDouble(),
@@ -312,6 +306,15 @@ class WalletSummary {
       lastUpdated: DateTime.parse(json['lastUpdated']),
     );
   }
+  final String userId;
+  final List<WalletBalance> balances;
+  final List<WalletTransaction> recentTransactions;
+  final double totalSgCredits;
+  final double totalCashback;
+  final double totalLoyaltyPoints;
+  final double monthlySgSpending;
+  final double monthlyCashbackEarned;
+  final DateTime lastUpdated;
 
   WalletBalance? getBalance(WalletCurrency currency) {
     return balances.firstWhere(
@@ -337,15 +340,17 @@ class WalletSummary {
     // Convert all balances to BRL equivalent for display
     // This would need proper exchange rates in a real implementation
     return totalSgCredits * 0.5 + // Assume 1 SG = R$ 0.50
-           (brlBalance?.balance ?? 0) +
-           totalCashback * 0.01 + // Assume 1 cashback point = R$ 0.01
-           totalLoyaltyPoints * 0.005; // Assume 1 loyalty point = R$ 0.005
+        (brlBalance?.balance ?? 0) +
+        totalCashback * 0.01 + // Assume 1 cashback point = R$ 0.01
+        totalLoyaltyPoints * 0.005; // Assume 1 loyalty point = R$ 0.005
   }
 
-  String get totalWalletValueDisplay => 'R\$ ${totalWalletValue.toStringAsFixed(2)}';
+  String get totalWalletValueDisplay =>
+      'R\$ ${totalWalletValue.toStringAsFixed(2)}';
 
-  bool get hasAnyBalance => totalSgCredits > 0 ||
-                           totalCashback > 0 ||
-                           totalLoyaltyPoints > 0 ||
-                           (brlBalance?.balance ?? 0) > 0;
+  bool get hasAnyBalance =>
+      totalSgCredits > 0 ||
+      totalCashback > 0 ||
+      totalLoyaltyPoints > 0 ||
+      (brlBalance?.balance ?? 0) > 0;
 }

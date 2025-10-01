@@ -43,8 +43,10 @@ class NetworkService extends GetxService {
   bool get isMobile => connectionType == ConnectivityResult.mobile;
   bool get isEthernet => connectionType == ConnectivityResult.ethernet;
   bool get isOffline => !isConnected;
-  bool get hasGoodConnection => isConnected && connectionQuality != ConnectionQuality.poor;
-  bool get shouldLimitData => isMobile && connectionQuality == ConnectionQuality.poor;
+  bool get hasGoodConnection =>
+      isConnected && connectionQuality != ConnectionQuality.poor;
+  bool get shouldLimitData =>
+      isMobile && connectionQuality == ConnectionQuality.poor;
 
   @override
   Future<void> onInit() async {
@@ -68,7 +70,9 @@ class NetworkService extends GetxService {
       // Start periodic quality testing
       _startQualityTesting();
 
-      print('✅ NetworkService initialized - Connected: $isConnected, Type: $connectionType');
+      print(
+        '✅ NetworkService initialized - Connected: $isConnected, Type: $connectionType',
+      );
     } catch (e) {
       print('❌ NetworkService initialization failed: $e');
       // Set default offline state
@@ -111,7 +115,7 @@ class NetworkService extends GetxService {
     }
   }
 
-  void _testAndUpdateConnection() async {
+  Future<void> _testAndUpdateConnection() async {
     final isActuallyConnected = await _testInternetConnection();
     _isConnected.value = isActuallyConnected;
 
@@ -262,7 +266,9 @@ class NetworkService extends GetxService {
       Timer(timeout, () {
         subscription.cancel();
         if (!completer.isCompleted) {
-          completer.completeError(TimeoutException('Network connection timeout', timeout));
+          completer.completeError(
+            TimeoutException('Network connection timeout', timeout),
+          );
         }
       });
     }
@@ -271,7 +277,8 @@ class NetworkService extends GetxService {
   }
 
   /// Execute function when network becomes available
-  Future<T?> executeWhenOnline<T>(Future<T> Function() function, {
+  Future<T?> executeWhenOnline<T>(
+    Future<T> Function() function, {
     Duration? timeout,
     T? fallback,
   }) async {
@@ -334,18 +341,12 @@ class NetworkService extends GetxService {
 }
 
 /// Enum for connection quality levels
-enum ConnectionQuality {
-  none,
-  poor,
-  fair,
-  good,
-  excellent,
-}
+enum ConnectionQuality { none, poor, fair, good, excellent }
 
 /// Exception for network timeout
 class NetworkTimeoutException implements Exception {
-  final String message;
   NetworkTimeoutException(this.message);
+  final String message;
 
   @override
   String toString() => 'NetworkTimeoutException: $message';

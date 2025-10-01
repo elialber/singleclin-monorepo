@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'dart:typed_data';
-import '../core/constants/app_colors.dart';
-import '../shared/widgets/singleclin_logo.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/singleclin_logo.dart';
 
 class AppIconGenerator {
   static Future<Uint8List> generateAppIcon({int size = 512}) async {
@@ -18,14 +18,11 @@ class AppIconGenerator {
     final gradient = const LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [
-        AppColors.primary,
-        AppColors.primaryDark,
-      ],
+      colors: [AppColors.primary, AppColors.primaryDark],
     ).createShader(rect);
-    
+
     paint.shader = gradient;
-    
+
     // Draw rounded rectangle background
     final rrect = RRect.fromRectAndRadius(
       rect,
@@ -37,23 +34,19 @@ class AppIconGenerator {
     final centerX = size / 2;
     final centerY = size / 2;
     final circleRadius = size * 0.32; // 32% of size
-    
+
     paint.shader = null;
     paint.color = Colors.white;
-    canvas.drawCircle(
-      Offset(centerX, centerY),
-      circleRadius,
-      paint,
-    );
+    canvas.drawCircle(Offset(centerX, centerY), circleRadius, paint);
 
     // Draw medical cross (simplified version of SingleClinLogo)
     final crossPaint = Paint()
       ..color = AppColors.primary
       ..style = PaintingStyle.fill;
-    
+
     final crossSize = size * 0.18; // 18% of size
     final crossThickness = crossSize * 0.3;
-    
+
     // Horizontal bar
     canvas.drawRect(
       Rect.fromCenter(
@@ -63,7 +56,7 @@ class AppIconGenerator {
       ),
       crossPaint,
     );
-    
+
     // Vertical bar
     canvas.drawRect(
       Rect.fromCenter(
@@ -78,7 +71,7 @@ class AppIconGenerator {
     final sgPaint = Paint()
       ..color = AppColors.sgPrimary
       ..style = PaintingStyle.fill;
-    
+
     canvas.drawCircle(
       Offset(centerX + circleRadius * 0.6, centerY - circleRadius * 0.6),
       size * 0.04, // 4% of size
@@ -89,7 +82,7 @@ class AppIconGenerator {
     final picture = recorder.endRecording();
     final img = await picture.toImage(size, size);
     final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-    
+
     return byteData!.buffer.asUint8List();
   }
 
@@ -102,10 +95,7 @@ class AppIconGenerator {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary,
-            AppColors.primaryDark,
-          ],
+          colors: [AppColors.primary, AppColors.primaryDark],
         ),
         boxShadow: [
           BoxShadow(
@@ -126,15 +116,10 @@ class AppIconGenerator {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: Center(
-                child: SingleClinLogo(
-                  size: size * 0.36,
-                  color: AppColors.primary,
-                ),
-              ),
+              child: Center(child: SingleClinLogo(size: size * 0.36)),
             ),
           ),
-          
+
           // SG accent dot
           Positioned(
             right: size * 0.15,
@@ -145,10 +130,7 @@ class AppIconGenerator {
               decoration: BoxDecoration(
                 color: AppColors.sgPrimary,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: size * 0.01,
-                ),
+                border: Border.all(color: Colors.white, width: size * 0.01),
               ),
             ),
           ),
@@ -184,12 +166,12 @@ class AppIconPreviewScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
-            
+
             // Large preview
             AppIconGenerator.buildIconPreview(size: 200),
-            
+
             const SizedBox(height: 32),
-            
+
             // Different sizes preview
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -210,16 +192,16 @@ class AppIconPreviewScreen extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    AppIconGenerator.buildIconPreview(size: 120),
+                    AppIconGenerator.buildIconPreview(),
                     const SizedBox(height: 8),
                     const Text('120x120', style: TextStyle(fontSize: 12)),
                   ],
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             ElevatedButton(
               onPressed: () async {
                 // Generate and save icon (in a real app)

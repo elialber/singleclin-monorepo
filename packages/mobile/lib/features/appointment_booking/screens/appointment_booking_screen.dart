@@ -11,12 +11,9 @@ import 'package:singleclin_mobile/features/clinic_services/screens/clinic_servic
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class AppointmentBookingScreen extends StatelessWidget {
+  const AppointmentBookingScreen({Key? key, required this.clinic})
+    : super(key: key);
   final Clinic clinic;
-
-  const AppointmentBookingScreen({
-    Key? key,
-    required this.clinic,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +44,7 @@ class AppointmentBookingScreen extends StatelessWidget {
               children: [
                 // Back Button
                 InkWell(
-                  onTap: () => Get.back(),
+                  onTap: Get.back,
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     child: const Icon(
@@ -74,21 +71,24 @@ class AppointmentBookingScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 // Credits Display
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.account_balance_wallet,
                         color: Colors.white,
                         size: 16,
                       ),
-                      const SizedBox(width: 4),
-                      const Text(
+                      SizedBox(width: 4),
+                      Text(
                         '120', // This should come from user state
                         style: TextStyle(
                           color: Colors.white,
@@ -109,7 +109,7 @@ class AppointmentBookingScreen extends StatelessWidget {
                 children: [
                   // Image Carousel
                   ClinicImageCarousel(clinic: clinic),
-                  
+
                   // Main Content Container
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -118,23 +118,22 @@ class AppointmentBookingScreen extends StatelessWidget {
                       children: [
                         // Clinic Info Section
                         ClinicInfoSection(clinic: clinic),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Action Buttons (Save/Share)
                         ActionButtonsSection(clinic: clinic),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Reviews Section
                         ReviewsSection(clinic: clinic),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Subscription Section
                         SubscriptionSection(clinic: clinic),
-                        
-                                       
+
                         // Bottom spacing for fixed CTA button
                         const SizedBox(height: 80),
                       ],
@@ -167,13 +166,12 @@ class AppointmentBookingScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // Navigate to services selection - Direct approach
-                print('DEBUG: Navigating to clinic services with clinic: ${clinic.name}');
+                print(
+                  'DEBUG: Navigating to clinic services with clinic: ${clinic.name}',
+                );
                 try {
                   // Using direct navigation as fallback
-                  Get.to(
-                    () => ClinicServicesScreen(),
-                    arguments: clinic,
-                  );
+                  Get.to(ClinicServicesScreen.new, arguments: clinic);
                   print('DEBUG: Direct navigation called successfully');
                 } catch (e) {
                   print('DEBUG: Navigation error: $e');
@@ -190,10 +188,7 @@ class AppointmentBookingScreen extends StatelessWidget {
               ),
               child: const Text(
                 'Ver serviços',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
           ),

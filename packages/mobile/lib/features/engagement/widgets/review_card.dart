@@ -1,22 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
-import '../models/review.dart';
-import '../../../core/constants/app_colors.dart';
-import 'rating_stars.dart';
+import 'package:singleclin_mobile/features/engagement/models/review.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/rating_stars.dart';
 
 /// Card widget for displaying user reviews
 class ReviewCard extends StatelessWidget {
-  final Review review;
-  final bool showClinicInfo;
-  final bool showServiceInfo;
-  final bool isCompact;
-  final VoidCallback? onTap;
-  final Function(bool)? onHelpfulVote;
-  final VoidCallback? onReport;
-  final VoidCallback? onDelete;
-  final bool canDelete;
-
   const ReviewCard({
     Key? key,
     required this.review,
@@ -29,15 +19,22 @@ class ReviewCard extends StatelessWidget {
     this.onDelete,
     this.canDelete = false,
   }) : super(key: key);
+  final Review review;
+  final bool showClinicInfo;
+  final bool showServiceInfo;
+  final bool isCompact;
+  final VoidCallback? onTap;
+  final Function(bool)? onHelpfulVote;
+  final VoidCallback? onReport;
+  final VoidCallback? onDelete;
+  final bool canDelete;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -54,7 +51,8 @@ class ReviewCard extends StatelessWidget {
                 _buildTitle(context),
                 const SizedBox(height: 8),
                 _buildContent(context),
-                if (review.beforePhotos.isNotEmpty || review.afterPhotos.isNotEmpty) ...[
+                if (review.beforePhotos.isNotEmpty ||
+                    review.afterPhotos.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   _buildPhotos(context),
                 ],
@@ -82,11 +80,7 @@ class ReviewCard extends StatelessWidget {
             shape: BoxShape.circle,
             gradient: AppColors.primaryGradient,
           ),
-          child: const Icon(
-            Icons.person,
-            color: Colors.white,
-            size: 20,
-          ),
+          child: const Icon(Icons.person, color: Colors.white, size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -95,15 +89,15 @@ class ReviewCard extends StatelessWidget {
             children: [
               Text(
                 'Usuário verificado',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
               ),
               Text(
                 DateFormat('dd/MM/yyyy').format(review.createdAt),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.mediumGrey,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
               ),
             ],
           ),
@@ -149,10 +143,7 @@ class ReviewCard extends StatelessWidget {
   Widget _buildRating(BuildContext context) {
     return Row(
       children: [
-        RatingStars(
-          rating: review.overallRating,
-          size: 18,
-        ),
+        RatingStars(rating: review.overallRating, size: 18),
         const SizedBox(width: 8),
         Text(
           review.overallRating.toStringAsFixed(1),
@@ -173,11 +164,7 @@ class ReviewCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.thumb_up,
-                  size: 12,
-                  color: AppColors.success,
-                ),
+                const Icon(Icons.thumb_up, size: 12, color: AppColors.success),
                 const SizedBox(width: 4),
                 Text(
                   'Recomenda',
@@ -221,7 +208,7 @@ class ReviewCard extends StatelessWidget {
           Row(
             children: [
               if (showClinicInfo) ...[
-                Icon(
+                const Icon(
                   Icons.location_on,
                   size: 14,
                   color: AppColors.mediumGrey,
@@ -229,9 +216,9 @@ class ReviewCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   'Clínica exemplo', // Would come from clinic data
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.mediumGrey,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
                 ),
               ],
               if (showClinicInfo && showServiceInfo)
@@ -242,7 +229,7 @@ class ReviewCard extends StatelessWidget {
                   color: AppColors.lightGrey,
                 ),
               if (showServiceInfo) ...[
-                Icon(
+                const Icon(
                   Icons.medical_services,
                   size: 14,
                   color: AppColors.mediumGrey,
@@ -250,9 +237,9 @@ class ReviewCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   'Serviço exemplo', // Would come from service data
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.mediumGrey,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
                 ),
               ],
             ],
@@ -297,9 +284,7 @@ class ReviewCard extends StatelessWidget {
                       width: 80,
                       height: 80,
                       color: AppColors.lightGrey,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      child: const Center(child: CircularProgressIndicator()),
                     ),
                     errorWidget: (context, url, error) => Container(
                       width: 80,
@@ -353,7 +338,7 @@ class ReviewCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.thumb_up_outlined,
                     size: 16,
                     color: AppColors.mediumGrey,
@@ -377,7 +362,7 @@ class ReviewCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.thumb_down_outlined,
                     size: 16,
                     color: AppColors.mediumGrey,
@@ -463,13 +448,8 @@ class ReviewCard extends StatelessWidget {
               Navigator.of(context).pop();
               onDelete!();
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text(
-              'Excluir',
-              style: TextStyle(color: Colors.white),
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Excluir', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -479,14 +459,10 @@ class ReviewCard extends StatelessWidget {
 
 /// Compact review card for lists
 class CompactReviewCard extends StatelessWidget {
+  const CompactReviewCard({Key? key, required this.review, this.onTap})
+    : super(key: key);
   final Review review;
   final VoidCallback? onTap;
-
-  const CompactReviewCard({
-    Key? key,
-    required this.review,
-    this.onTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -502,12 +478,6 @@ class CompactReviewCard extends StatelessWidget {
 
 /// Review summary widget for clinic/service pages
 class ReviewSummary extends StatelessWidget {
-  final double averageRating;
-  final int totalReviews;
-  final Map<int, int> ratingBreakdown;
-  final List<Review> recentReviews;
-  final VoidCallback? onSeeAllReviews;
-
   const ReviewSummary({
     Key? key,
     required this.averageRating,
@@ -516,6 +486,11 @@ class ReviewSummary extends StatelessWidget {
     required this.recentReviews,
     this.onSeeAllReviews,
   }) : super(key: key);
+  final double averageRating;
+  final int totalReviews;
+  final Map<int, int> ratingBreakdown;
+  final List<Review> recentReviews;
+  final VoidCallback? onSeeAllReviews;
 
   @override
   Widget build(BuildContext context) {
@@ -530,9 +505,9 @@ class ReviewSummary extends StatelessWidget {
               children: [
                 Text(
                   'Avaliações',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 if (onSeeAllReviews != null)
@@ -553,16 +528,14 @@ class ReviewSummary extends StatelessWidget {
                     children: [
                       Text(
                         averageRating.toStringAsFixed(1),
-                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
+                        style: Theme.of(context).textTheme.displayMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
                       ),
                       const SizedBox(height: 4),
-                      RatingStars(
-                        rating: averageRating,
-                        size: 20,
-                      ),
+                      RatingStars(rating: averageRating),
                       const SizedBox(height: 4),
                       Text(
                         '$totalReviews avaliações',
@@ -587,15 +560,19 @@ class ReviewSummary extends StatelessWidget {
               const SizedBox(height: 24),
               Text(
                 'Avaliações Recentes',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
-              ...recentReviews.take(2).map((review) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: CompactReviewCard(review: review),
-              )),
+              ...recentReviews
+                  .take(2)
+                  .map(
+                    (review) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: CompactReviewCard(review: review),
+                    ),
+                  ),
             ],
           ],
         ),
@@ -606,12 +583,8 @@ class ReviewSummary extends StatelessWidget {
 
 /// Review stats widget for user profile
 class UserReviewStats extends StatelessWidget {
+  const UserReviewStats({Key? key, required this.stats}) : super(key: key);
   final ReviewStats stats;
-
-  const UserReviewStats({
-    Key? key,
-    required this.stats,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -624,9 +597,9 @@ class UserReviewStats extends StatelessWidget {
           children: [
             Text(
               'Suas Estatísticas',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
@@ -674,9 +647,9 @@ class UserReviewStats extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Conquistas',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -684,7 +657,10 @@ class UserReviewStats extends StatelessWidget {
                 runSpacing: 8,
                 children: stats.badges.map((badge) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       gradient: AppColors.sgGradient,
                       borderRadius: BorderRadius.circular(16),
@@ -692,7 +668,7 @@ class UserReviewStats extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.military_tech,
                           size: 16,
                           color: Colors.white,
@@ -732,11 +708,7 @@ class UserReviewStats extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: AppColors.primary,
-            size: 24,
-          ),
+          Icon(icon, color: AppColors.primary, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
@@ -748,9 +720,9 @@ class UserReviewStats extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.mediumGrey,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
             textAlign: TextAlign.center,
           ),
         ],

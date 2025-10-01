@@ -1,11 +1,9 @@
 import 'package:get/get.dart';
-import '../controllers/credit_history_controller.dart';
+import 'package:singleclin_mobile/features/credits/controllers/credit_history_controller.dart';
 
 class CreditsBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<CreditHistoryController>(
-      () => CreditHistoryController(),
-    );
+    Get.lazyPut<CreditHistoryController>(CreditHistoryController.new);
   }
 }

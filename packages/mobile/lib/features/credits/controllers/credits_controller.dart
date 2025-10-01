@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/credit_transaction_model.dart';
-import '../models/subscription_plan.dart';
-import '../models/wallet_balance.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
+import 'package:singleclin_mobile/features/credits/models/subscription_plan.dart';
+import 'package:singleclin_mobile/features/credits/models/wallet_balance.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class CreditsController extends GetxController {
   // Reactive variables
@@ -41,7 +41,7 @@ class CreditsController extends GetxController {
   String get totalBalanceDisplay => '$sgBalance SG';
   String get lockedBalanceDisplay => '$lockedBalance SG bloqueados';
 
-  String get usageDisplay => 
+  String get usageDisplay =>
       '$monthlyCreditsUsed de $monthlyCreditsTotal créditos usados este mês';
 
   String get subscriptionStatusDisplay {
@@ -84,16 +84,16 @@ class CreditsController extends GetxController {
   Future<void> loadCreditsOverview() async {
     try {
       _isLoading.value = true;
-      
+
       // Mock API call - replace with actual API service
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Mock data
       _sgBalance.value = 245;
       _lockedBalance.value = 15;
       _monthlyCreditsUsed.value = 68;
       _monthlyCreditsTotal.value = 200;
-      
+
       // Mock subscription
       _subscription.value = UserSubscription(
         id: '1',
@@ -128,7 +128,6 @@ class CreditsController extends GetxController {
           category: 'premium',
         ),
       );
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -144,7 +143,7 @@ class CreditsController extends GetxController {
     try {
       // Mock API call
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       _recentTransactions.assignAll([
         CreditTransactionModel(
           id: '1',
@@ -201,7 +200,6 @@ class CreditsController extends GetxController {
           createdAt: DateTime.now().subtract(const Duration(days: 10)),
         ),
       ]);
-      
     } catch (e) {
       print('Error loading recent transactions: $e');
     }
@@ -211,7 +209,7 @@ class CreditsController extends GetxController {
     try {
       // Mock API call
       await Future.delayed(const Duration(milliseconds: 300));
-      
+
       _walletSummary.value = WalletSummary(
         userId: 'user123',
         balances: [
@@ -243,7 +241,6 @@ class CreditsController extends GetxController {
         monthlyCashbackEarned: 8.5,
         lastUpdated: DateTime.now(),
       );
-      
     } catch (e) {
       print('Error loading wallet summary: $e');
     }
@@ -260,10 +257,10 @@ class CreditsController extends GetxController {
   Future<void> purchaseCredits(String packageId) async {
     try {
       _isLoading.value = true;
-      
+
       // Mock purchase flow
       await Future.delayed(const Duration(seconds: 2));
-      
+
       Get.snackbar(
         'Sucesso',
         'Créditos adicionados com sucesso!',
@@ -271,10 +268,9 @@ class CreditsController extends GetxController {
         backgroundColor: Get.theme.primaryColor,
         colorText: Get.theme.colorScheme.onPrimary,
       );
-      
+
       // Refresh data after purchase
       await refreshCreditsData();
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -289,10 +285,10 @@ class CreditsController extends GetxController {
   Future<void> changeSubscription(String planId) async {
     try {
       _isLoading.value = true;
-      
+
       // Mock subscription change
       await Future.delayed(const Duration(seconds: 1));
-      
+
       Get.snackbar(
         'Sucesso',
         'Plano alterado com sucesso!',
@@ -300,9 +296,8 @@ class CreditsController extends GetxController {
         backgroundColor: Get.theme.primaryColor,
         colorText: Get.theme.colorScheme.onPrimary,
       );
-      
+
       await refreshCreditsData();
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -339,18 +334,17 @@ class CreditsController extends GetxController {
       if (confirmed != true) return;
 
       _isLoading.value = true;
-      
+
       // Mock cancellation
       await Future.delayed(const Duration(seconds: 1));
-      
+
       Get.snackbar(
         'Assinatura Cancelada',
         'Sua assinatura será cancelada no final do período atual',
         snackPosition: SnackPosition.BOTTOM,
       );
-      
+
       await refreshCreditsData();
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -364,7 +358,7 @@ class CreditsController extends GetxController {
 
   void showLowBalanceWarning() {
     if (!isLowBalance) return;
-    
+
     Get.snackbar(
       'Saldo Baixo',
       'Seus créditos SG estão acabando. Considere comprar mais créditos.',
@@ -379,7 +373,7 @@ class CreditsController extends GetxController {
 
   void showRenewalReminder() {
     if (!isNearRenewal) return;
-    
+
     Get.snackbar(
       'Renovação Próxima',
       'Sua assinatura será renovada em breve',
@@ -394,25 +388,28 @@ class CreditsController extends GetxController {
 
   // Animation helpers for UI
   bool get shouldShowSparkleAnimation => sgBalance > _sgBalance.value;
-  
+
   void triggerCreditAnimation() {
     // This can be used to trigger golden animations in UI
     update(['credit_animation']);
   }
 
   // ===== ENGAGEMENT MODULE INTEGRATION =====
-  
+
   /// Award credits for writing a review
-  Future<void> awardCreditsForReview(String reviewId, {bool hasPhotos = false}) async {
+  Future<void> awardCreditsForReview(
+    String reviewId, {
+    bool hasPhotos = false,
+  }) async {
     try {
       final amount = hasPhotos ? 5 : 3; // 5 SG with photos, 3 SG without
-      
+
       // Mock API call - replace with actual API service
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Update local balance
       _sgBalance.value += amount;
-      
+
       // Add to transaction history
       final transaction = CreditTransactionModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -421,37 +418,36 @@ class CreditsController extends GetxController {
         balanceAfter: _sgBalance.value,
         type: TransactionType.bonus,
         source: TransactionSource.reviewBonus,
-        description: hasPhotos 
+        description: hasPhotos
             ? 'Avaliação com fotos enviada'
             : 'Avaliação enviada',
         createdAt: DateTime.now(),
         relatedEntityId: reviewId,
         relatedEntityType: 'review',
       );
-      
+
       _recentTransactions.insert(0, transaction);
-      
+
       showEngagementAchievement(
         hasPhotos ? 'Avaliação completa com fotos!' : 'Avaliação enviada!',
         amount,
       );
-      
     } catch (e) {
       print('Error awarding credits for review: $e');
     }
   }
-  
+
   /// Award credits for community participation
   Future<void> awardCreditsForCommunityPost(String postId) async {
     try {
       const amount = 2; // 2 SG per community post
-      
+
       // Mock API call
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Update local balance
       _sgBalance.value += amount;
-      
+
       // Add to transaction history
       final transaction = CreditTransactionModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -465,25 +461,24 @@ class CreditsController extends GetxController {
         relatedEntityId: postId,
         relatedEntityType: 'community_post',
       );
-      
+
       _recentTransactions.insert(0, transaction);
-      
     } catch (e) {
       print('Error awarding credits for community post: $e');
     }
   }
-  
+
   /// Award credits for valuable feedback
   Future<void> awardCreditsForFeedback(String feedbackId) async {
     try {
       const amount = 3; // 3 SG for valuable feedback
-      
+
       // Mock API call
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Update local balance
       _sgBalance.value += amount;
-      
+
       // Add to transaction history
       final transaction = CreditTransactionModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -497,22 +492,24 @@ class CreditsController extends GetxController {
         relatedEntityId: feedbackId,
         relatedEntityType: 'feedback',
       );
-      
+
       _recentTransactions.insert(0, transaction);
-      
+
       showEngagementAchievement('Feedback valioso!', amount);
-      
     } catch (e) {
       print('Error awarding credits for feedback: $e');
     }
   }
-  
+
   /// Award credits for community engagement
-  Future<void> awardCreditsForCommunityEngagement(String action, String reference) async {
+  Future<void> awardCreditsForCommunityEngagement(
+    String action,
+    String reference,
+  ) async {
     try {
       int amount;
       String description;
-      
+
       switch (action) {
         case 'helpful_comment':
           amount = 2;
@@ -530,13 +527,13 @@ class CreditsController extends GetxController {
           amount = 1;
           description = 'Participação na comunidade';
       }
-      
+
       // Mock API call
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Update local balance
       _sgBalance.value += amount;
-      
+
       // Add to transaction history
       final transaction = CreditTransactionModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -550,18 +547,17 @@ class CreditsController extends GetxController {
         relatedEntityId: reference,
         relatedEntityType: 'engagement',
       );
-      
+
       _recentTransactions.insert(0, transaction);
-      
+
       if (amount >= 5) {
         showEngagementAchievement(description, amount);
       }
-      
     } catch (e) {
       print('Error awarding credits for community engagement: $e');
     }
   }
-  
+
   /// Show engagement achievement notification
   void showEngagementAchievement(String achievement, int creditsEarned) {
     Get.snackbar(
@@ -579,66 +575,71 @@ class CreditsController extends GetxController {
           color: Colors.white.withOpacity(0.2),
           shape: BoxShape.circle,
         ),
-        child: const Icon(
-          Icons.military_tech,
-          color: Colors.white,
-          size: 24,
-        ),
+        child: const Icon(Icons.military_tech, color: Colors.white, size: 24),
       ),
     );
   }
-  
+
   /// Get engagement bonus multiplier based on user activity
   double getEngagementMultiplier() {
     final recentBonusTransactions = _recentTransactions
         .where((t) => t.type == TransactionType.bonus)
         .where((t) => DateTime.now().difference(t.createdAt).inDays <= 30)
         .length;
-    
-    if (recentBonusTransactions >= 20) return 1.5; // 50% bonus for very active users
+
+    if (recentBonusTransactions >= 20)
+      return 1.5; // 50% bonus for very active users
     if (recentBonusTransactions >= 10) return 1.3; // 30% bonus for active users
-    if (recentBonusTransactions >= 5) return 1.1;  // 10% bonus for regular users
+    if (recentBonusTransactions >= 5) return 1.1; // 10% bonus for regular users
     return 1.0; // No bonus for inactive users
   }
-  
+
   /// Get user engagement level
   String getUserEngagementLevel() {
     final monthlyEngagement = getEngagementEarningsThisMonth();
-    
+
     if (monthlyEngagement >= 50) return 'Usuário Super Ativo';
     if (monthlyEngagement >= 25) return 'Usuário Muito Ativo';
     if (monthlyEngagement >= 10) return 'Usuário Ativo';
     if (monthlyEngagement >= 5) return 'Usuário Regular';
     return 'Novo Usuário';
   }
-  
+
   /// Get engagement earnings this month
   double getEngagementEarningsThisMonth() {
     final now = DateTime.now();
-    final startOfMonth = DateTime(now.year, now.month, 1);
-    
+    final startOfMonth = DateTime(now.year, now.month);
+
     return _recentTransactions
         .where((t) => t.type == TransactionType.bonus)
         .where((t) => t.createdAt.isAfter(startOfMonth))
-        .where((t) => _isEngagementTransaction(t))
+        .where(_isEngagementTransaction)
         .fold(0.0, (sum, t) => sum + t.amount);
   }
-  
+
   bool _isEngagementTransaction(CreditTransactionModel transaction) {
-    final engagementKeywords = ['Avaliação', 'comunidade', 'Feedback', 'evento', 'beta'];
-    return engagementKeywords.any((keyword) => transaction.description.contains(keyword));
+    final engagementKeywords = [
+      'Avaliação',
+      'comunidade',
+      'Feedback',
+      'evento',
+      'beta',
+    ];
+    return engagementKeywords.any(
+      (keyword) => transaction.description.contains(keyword),
+    );
   }
-  
+
   /// Check if user can earn engagement credits today
   bool canEarnEngagementCredits(String type) {
     final today = DateTime.now();
     final startOfDay = DateTime(today.year, today.month, today.day);
-    
+
     final todayCount = _recentTransactions
         .where((t) => t.createdAt.isAfter(startOfDay))
         .where((t) => t.description.contains(_getEngagementKeyword(type)))
         .length;
-    
+
     // Limit daily earnings per type
     switch (type) {
       case 'review':
@@ -651,7 +652,7 @@ class CreditsController extends GetxController {
         return true;
     }
   }
-  
+
   String _getEngagementKeyword(String type) {
     switch (type) {
       case 'review':
@@ -663,10 +664,5 @@ class CreditsController extends GetxController {
       default:
         return '';
     }
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }

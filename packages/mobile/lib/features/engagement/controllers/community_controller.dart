@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import '../models/community_post.dart';
-import '../../../core/services/api_service.dart';
-import '../../credits/controllers/credits_controller.dart';
+import 'package:singleclin_mobile/features/engagement/models/community_post.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/credits/controllers/credits_controller.dart';
 
 /// Controller for community interactions and social features
 class CommunityController extends GetxController {
@@ -21,22 +21,22 @@ class CommunityController extends GetxController {
   final RxBool isLoadingMore = false.obs;
   final RxBool isPosting = false.obs;
   final RxString error = ''.obs;
-  
+
   final RxList<CommunityPost> posts = <CommunityPost>[].obs;
   final RxList<CommunityEvent> events = <CommunityEvent>[].obs;
   final Rx<CommunityStats?> stats = Rx<CommunityStats?>(null);
-  
+
   // Filters and sorting
   final Rx<CommunityGroup> selectedGroup = CommunityGroup.general.obs;
   final Rx<PostType> selectedPostType = PostType.experience.obs;
   final RxString selectedSort = 'recent'.obs;
-  
+
   // Post creation
   final RxList<File> selectedImages = <File>[].obs;
   final RxList<String> selectedTags = <String>[].obs;
   final RxBool isAnonymous = false.obs;
   final Rx<PostVisibility> postVisibility = PostVisibility.public.obs;
-  
+
   // Pagination
   int _currentPage = 1;
   bool _hasMoreData = true;
@@ -71,12 +71,15 @@ class CommunityController extends GetxController {
       refresh ? isLoading.value = true : isLoadingMore.value = true;
       error.value = '';
 
-      final response = await _apiService.get('/community/posts', queryParameters: {
-        'page': _currentPage,
-        'group': selectedGroup.value.name,
-        'sort': selectedSort.value,
-        'limit': 20,
-      });
+      final response = await _apiService.get(
+        '/community/posts',
+        queryParameters: {
+          'page': _currentPage,
+          'group': selectedGroup.value.name,
+          'sort': selectedSort.value,
+          'limit': 20,
+        },
+      );
 
       final List<CommunityPost> newPosts = (response.data['posts'] as List)
           .map((json) => CommunityPost.fromJson(json))
@@ -111,14 +114,15 @@ class CommunityController extends GetxController {
   /// Load upcoming events
   Future<void> loadUpcomingEvents() async {
     try {
-      final response = await _apiService.get('/community/events', queryParameters: {
-        'upcoming': true,
-        'limit': 10,
-      });
+      final response = await _apiService.get(
+        '/community/events',
+        queryParameters: {'upcoming': true, 'limit': 10},
+      );
 
-      final List<CommunityEvent> upcomingEvents = (response.data['events'] as List)
-          .map((json) => CommunityEvent.fromJson(json))
-          .toList();
+      final List<CommunityEvent> upcomingEvents =
+          (response.data['events'] as List)
+              .map((json) => CommunityEvent.fromJson(json))
+              .toList();
 
       events.assignAll(upcomingEvents);
     } catch (e) {
@@ -148,8 +152,11 @@ class CommunityController extends GetxController {
         'visibility': postVisibility.value.name,
       };
 
-      final response = await _apiService.post('/community/posts', data: postData);
-      
+      final response = await _apiService.post(
+        '/community/posts',
+        data: postData,
+      );
+
       final newPost = CommunityPost.fromJson(response.data['post']);
       posts.insert(0, newPost);
 
@@ -194,8 +201,8 @@ class CommunityController extends GetxController {
       // Optimistic update
       final updatedPost = post.copyWith(
         isLikedByMe: !isCurrentlyLiked,
-        likesCount: isCurrentlyLiked 
-            ? post.likesCount - 1 
+        likesCount: isCurrentlyLiked
+            ? post.likesCount - 1
             : post.likesCount + 1,
       );
       posts[postIndex] = updatedPost;
@@ -223,17 +230,17 @@ class CommunityController extends GetxController {
       final isCurrentlyBookmarked = post.isBookmarked;
 
       // Optimistic update
-      final updatedPost = post.copyWith(
-        isBookmarked: !isCurrentlyBookmarked,
-      );
+      final updatedPost = post.copyWith(isBookmarked: !isCurrentlyBookmarked);
       posts[postIndex] = updatedPost;
 
       // API call
       await _apiService.post('/community/posts/$postId/bookmark');
 
       Get.snackbar(
-        isCurrentlyBookmarked ? 'Removido dos favoritos' : 'Salvo nos favoritos',
-        isCurrentlyBookmarked 
+        isCurrentlyBookmarked
+            ? 'Removido dos favoritos'
+            : 'Salvo nos favoritos',
+        isCurrentlyBookmarked
             ? 'Post removido da sua lista de favoritos'
             : 'Post salvo na sua lista de favoritos',
         snackPosition: SnackPosition.BOTTOM,
@@ -302,9 +309,7 @@ class CommunityController extends GetxController {
       final postIndex = posts.indexWhere((p) => p.id == postId);
       if (postIndex != -1) {
         final post = posts[postIndex];
-        final updatedPost = post.copyWith(
-          sharesCount: post.sharesCount + 1,
-        );
+        final updatedPost = post.copyWith(sharesCount: post.sharesCount + 1);
         posts[postIndex] = updatedPost;
       }
 
@@ -345,9 +350,10 @@ class CommunityController extends GetxController {
   /// Report post
   Future<void> reportPost(String postId, String reason) async {
     try {
-      await _apiService.post('/community/posts/$postId/report', data: {
-        'reason': reason,
-      });
+      await _apiService.post(
+        '/community/posts/$postId/report',
+        data: {'reason': reason},
+      );
 
       Get.snackbar(
         'Denúncia enviada',
@@ -482,7 +488,7 @@ class CommunityController extends GetxController {
           image,
           fileField: 'image',
         );
-        
+
         uploadedUrls.add(response.data['url']);
       }
 
@@ -538,6 +544,7 @@ class CommunityController extends GetxController {
   }
 
   /// Refresh all data
+  @override
   Future<void> refresh() async {
     await Future.wait([
       loadPosts(refresh: true),
@@ -635,7 +642,7 @@ class CommunityController extends GetxController {
   /// Get engagement level for user
   String get userEngagementLevel {
     final score = stats.value?.engagementScore ?? 0;
-    
+
     if (score >= 1000) {
       return 'Influenciador da Comunidade';
     } else if (score >= 500) {

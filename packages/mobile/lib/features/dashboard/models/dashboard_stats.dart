@@ -2,17 +2,6 @@ import 'package:flutter/foundation.dart';
 
 /// Dashboard statistics model for SingleClin mobile app
 class DashboardStats {
-  final double sgBalance;
-  final DateTime? renewalDate;
-  final int totalAppointments;
-  final int completedAppointments;
-  final int upcomingAppointments;
-  final int cancelledAppointments;
-  final DateTime lastUpdated;
-  final bool hasActiveSubscription;
-  final String? subscriptionPlan;
-  final Map<String, int> categoryUsage;
-
   const DashboardStats({
     required this.sgBalance,
     this.renewalDate,
@@ -61,6 +50,16 @@ class DashboardStats {
           : const {},
     );
   }
+  final double sgBalance;
+  final DateTime? renewalDate;
+  final int totalAppointments;
+  final int completedAppointments;
+  final int upcomingAppointments;
+  final int cancelledAppointments;
+  final DateTime lastUpdated;
+  final bool hasActiveSubscription;
+  final String? subscriptionPlan;
+  final Map<String, int> categoryUsage;
 
   Map<String, dynamic> toJson() {
     return {
@@ -93,11 +92,14 @@ class DashboardStats {
       sgBalance: sgBalance ?? this.sgBalance,
       renewalDate: renewalDate ?? this.renewalDate,
       totalAppointments: totalAppointments ?? this.totalAppointments,
-      completedAppointments: completedAppointments ?? this.completedAppointments,
+      completedAppointments:
+          completedAppointments ?? this.completedAppointments,
       upcomingAppointments: upcomingAppointments ?? this.upcomingAppointments,
-      cancelledAppointments: cancelledAppointments ?? this.cancelledAppointments,
+      cancelledAppointments:
+          cancelledAppointments ?? this.cancelledAppointments,
       lastUpdated: lastUpdated ?? this.lastUpdated,
-      hasActiveSubscription: hasActiveSubscription ?? this.hasActiveSubscription,
+      hasActiveSubscription:
+          hasActiveSubscription ?? this.hasActiveSubscription,
       subscriptionPlan: subscriptionPlan ?? this.subscriptionPlan,
       categoryUsage: categoryUsage ?? this.categoryUsage,
     );
@@ -145,17 +147,17 @@ class DashboardStats {
   /// Get most used category
   String get mostUsedCategory {
     if (categoryUsage.isEmpty) return '';
-    
+
     String topCategory = '';
     int maxUsage = 0;
-    
+
     categoryUsage.forEach((category, usage) {
       if (usage > maxUsage) {
         maxUsage = usage;
         topCategory = category;
       }
     });
-    
+
     return topCategory;
   }
 

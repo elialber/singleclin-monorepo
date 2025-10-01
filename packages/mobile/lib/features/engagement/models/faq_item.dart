@@ -2,22 +2,6 @@ import 'package:equatable/equatable.dart';
 
 /// FAQ Item model for frequently asked questions
 class FaqItem extends Equatable {
-  final String id;
-  final String question;
-  final String answer;
-  final FaqCategory category;
-  final List<String> tags;
-  final int viewCount;
-  final int helpfulCount;
-  final int notHelpfulCount;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  final int sortOrder;
-  final bool isPublished;
-  final List<String> relatedQuestions;
-  final String? videoUrl;
-  final List<String> attachments;
-
   const FaqItem({
     required this.id,
     required this.question,
@@ -60,6 +44,21 @@ class FaqItem extends Equatable {
       attachments: List<String>.from(json['attachments'] as List),
     );
   }
+  final String id;
+  final String question;
+  final String answer;
+  final FaqCategory category;
+  final List<String> tags;
+  final int viewCount;
+  final int helpfulCount;
+  final int notHelpfulCount;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final int sortOrder;
+  final bool isPublished;
+  final List<String> relatedQuestions;
+  final String? videoUrl;
+  final List<String> attachments;
 
   Map<String, dynamic> toJson() {
     return {
@@ -119,22 +118,22 @@ class FaqItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        question,
-        answer,
-        category,
-        tags,
-        viewCount,
-        helpfulCount,
-        notHelpfulCount,
-        createdAt,
-        updatedAt,
-        sortOrder,
-        isPublished,
-        relatedQuestions,
-        videoUrl,
-        attachments,
-      ];
+    id,
+    question,
+    answer,
+    category,
+    tags,
+    viewCount,
+    helpfulCount,
+    notHelpfulCount,
+    createdAt,
+    updatedAt,
+    sortOrder,
+    isPublished,
+    relatedQuestions,
+    videoUrl,
+    attachments,
+  ];
 }
 
 /// FAQ Categories
@@ -148,17 +147,11 @@ enum FaqCategory {
   services,
   technical,
   privacy,
-  policies
+  policies,
 }
 
 /// FAQ Search Result
 class FaqSearchResult extends Equatable {
-  final List<FaqItem> items;
-  final String searchTerm;
-  final int totalCount;
-  final Map<FaqCategory, int> categoryCount;
-  final List<String> suggestions;
-
   const FaqSearchResult({
     required this.items,
     required this.searchTerm,
@@ -185,6 +178,11 @@ class FaqSearchResult extends Equatable {
       suggestions: List<String>.from(json['suggestions'] as List),
     );
   }
+  final List<FaqItem> items;
+  final String searchTerm;
+  final int totalCount;
+  final Map<FaqCategory, int> categoryCount;
+  final List<String> suggestions;
 
   Map<String, dynamic> toJson() {
     return {
@@ -202,24 +200,16 @@ class FaqSearchResult extends Equatable {
 
   @override
   List<Object> get props => [
-        items,
-        searchTerm,
-        totalCount,
-        categoryCount,
-        suggestions,
-      ];
+    items,
+    searchTerm,
+    totalCount,
+    categoryCount,
+    suggestions,
+  ];
 }
 
 /// Chatbot Response
 class ChatbotResponse extends Equatable {
-  final String id;
-  final String message;
-  final List<String> suggestions;
-  final List<FaqItem> relatedFaqs;
-  final bool needsHumanSupport;
-  final double confidence;
-  final String intent;
-
   const ChatbotResponse({
     required this.id,
     required this.message,
@@ -243,6 +233,13 @@ class ChatbotResponse extends Equatable {
       intent: json['intent'] as String,
     );
   }
+  final String id;
+  final String message;
+  final List<String> suggestions;
+  final List<FaqItem> relatedFaqs;
+  final bool needsHumanSupport;
+  final double confidence;
+  final String intent;
 
   Map<String, dynamic> toJson() {
     return {
@@ -258,27 +255,18 @@ class ChatbotResponse extends Equatable {
 
   @override
   List<Object> get props => [
-        id,
-        message,
-        suggestions,
-        relatedFaqs,
-        needsHumanSupport,
-        confidence,
-        intent,
-      ];
+    id,
+    message,
+    suggestions,
+    relatedFaqs,
+    needsHumanSupport,
+    confidence,
+    intent,
+  ];
 }
 
 /// FAQ Statistics
 class FaqStats extends Equatable {
-  final int totalItems;
-  final int totalViews;
-  final int helpfulVotes;
-  final int notHelpfulVotes;
-  final Map<FaqCategory, int> categoryViews;
-  final List<FaqItem> topViewed;
-  final List<FaqItem> mostHelpful;
-  final double avgHelpfulRating;
-
   const FaqStats({
     required this.totalItems,
     required this.totalViews,
@@ -313,16 +301,24 @@ class FaqStats extends Equatable {
       avgHelpfulRating: (json['avgHelpfulRating'] as num).toDouble(),
     );
   }
+  final int totalItems;
+  final int totalViews;
+  final int helpfulVotes;
+  final int notHelpfulVotes;
+  final Map<FaqCategory, int> categoryViews;
+  final List<FaqItem> topViewed;
+  final List<FaqItem> mostHelpful;
+  final double avgHelpfulRating;
 
   @override
   List<Object> get props => [
-        totalItems,
-        totalViews,
-        helpfulVotes,
-        notHelpfulVotes,
-        categoryViews,
-        topViewed,
-        mostHelpful,
-        avgHelpfulRating,
-      ];
+    totalItems,
+    totalViews,
+    helpfulVotes,
+    notHelpfulVotes,
+    categoryViews,
+    topViewed,
+    mostHelpful,
+    avgHelpfulRating,
+  ];
 }

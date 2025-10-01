@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../shared/widgets/sg_credit_widget.dart';
-import '../controllers/booking_controller.dart';
-import '../models/booking.dart';
-import '../widgets/service_card.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/booking_controller.dart';
+import 'package:singleclin_mobile/features/discovery/models/booking.dart';
+import 'package:singleclin_mobile/features/discovery/widgets/service_card.dart';
 
 /// Booking screen with step-by-step appointment scheduling
 class BookingScreen extends StatefulWidget {
-  const BookingScreen({Key? key}) : super(key: key);
+  const BookingScreen({super.key});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -31,7 +31,10 @@ class _BookingScreenState extends State<BookingScreen>
       vsync: this,
     );
     _stepAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _stepAnimationController, curve: Curves.easeInOut),
+      CurvedAnimation(
+        parent: _stepAnimationController,
+        curve: Curves.easeInOut,
+      ),
     );
     _stepAnimationController.forward();
   }
@@ -55,7 +58,7 @@ class _BookingScreenState extends State<BookingScreen>
             Expanded(
               child: FadeTransition(
                 opacity: _stepAnimation,
-                child: Obx(() => _buildStepContent()),
+                child: Obx(_buildStepContent),
               ),
             ),
             _buildBottomNavigationBar(),
@@ -66,72 +69,81 @@ class _BookingScreenState extends State<BookingScreen>
   }
 
   PreferredSizeWidget _buildAppBar() {
-    return Obx(() => CustomAppBar(
-          title: controller.stepTitle,
-          showBackButton: true,
-          onBackPressed: _handleBackPress,
-        ));
+    return Obx(
+      () => CustomAppBar(
+        title: controller.stepTitle,
+        onBackPressed: _handleBackPress,
+      ),
+    );
   }
 
   Widget _buildStepIndicator() {
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.white,
-      child: Obx(() => Row(
-            children: List.generate(BookingController.maxSteps, (index) {
-              final isActive = index == controller.currentStep;
-              final isCompleted = index < controller.currentStep;
+      child: Obx(
+        () => Row(
+          children: List.generate(BookingController.maxSteps, (index) {
+            final isActive = index == controller.currentStep;
+            final isCompleted = index < controller.currentStep;
 
-              return Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(
-                    right: index < BookingController.maxSteps - 1 ? 8 : 0,
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isCompleted
-                              ? AppColors.primary
-                              : isActive
-                                  ? AppColors.primary
-                                  : AppColors.lightGrey,
-                        ),
-                        child: Center(
-                          child: isCompleted
-                              ? const Icon(
-                                  Icons.check,
-                                  color: Colors.white,
-                                  size: 16,
-                                )
-                              : Text(
-                                  '${index + 1}',
-                                  style: TextStyle(
-                                    color: isActive ? Colors.white : AppColors.mediumGrey,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _getStepLabel(index),
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: isActive ? AppColors.primary : AppColors.mediumGrey,
-                          fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+            return Expanded(
+              child: Container(
+                margin: EdgeInsets.only(
+                  right: index < BookingController.maxSteps - 1 ? 8 : 0,
                 ),
-              );
-            }),
-          )),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isCompleted
+                            ? AppColors.primary
+                            : isActive
+                            ? AppColors.primary
+                            : AppColors.lightGrey,
+                      ),
+                      child: Center(
+                        child: isCompleted
+                            ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                            : Text(
+                                '${index + 1}',
+                                style: TextStyle(
+                                  color: isActive
+                                      ? Colors.white
+                                      : AppColors.mediumGrey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _getStepLabel(index),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: isActive
+                            ? AppColors.primary
+                            : AppColors.mediumGrey,
+                        fontWeight: isActive
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
     );
   }
 
@@ -164,24 +176,26 @@ class _BookingScreenState extends State<BookingScreen>
             'Selecione o procedimento que deseja agendar',
           ),
           const SizedBox(height: 16),
-          ...clinic.services.map((service) => Obx(() {
-            final isSelected = controller.selectedService?.id == service.id;
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.lightGrey,
-                  width: isSelected ? 2 : 1,
+          ...clinic.services.map(
+            (service) => Obx(() {
+              final isSelected = controller.selectedService?.id == service.id;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : AppColors.lightGrey,
+                    width: isSelected ? 2 : 1,
+                  ),
                 ),
-              ),
-              child: ServiceCard(
-                service: service,
-                compact: true,
-                onTap: () => controller.selectService(service),
-              ),
-            );
-          })).toList(),
+                child: ServiceCard(
+                  service: service,
+                  compact: true,
+                  onTap: () => controller.selectService(service),
+                ),
+              );
+            }),
+          ),
         ],
       ),
     );
@@ -288,55 +302,53 @@ class _BookingScreenState extends State<BookingScreen>
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Obx(() => TableCalendar(
-              firstDay: DateTime.now(),
-              lastDay: DateTime.now().add(const Duration(days: 90)),
-              focusedDay: controller.focusedDay,
-              selectedDayPredicate: (day) {
-                return controller.selectedDate != null &&
-                    isSameDay(controller.selectedDate!, day);
-              },
-              calendarFormat: controller.calendarFormat,
-              availableGestures: AvailableGestures.all,
-              onDaySelected: (selectedDay, focusedDay) {
-                if (controller.isDateAvailable(selectedDay)) {
-                  controller.selectDate(selectedDay);
-                  controller.updateFocusedDay(focusedDay);
-                  _stepAnimationController.forward();
-                }
-              },
-              onFormatChanged: (format) {
-                controller.toggleCalendarFormat();
-              },
-              enabledDayPredicate: controller.isDateAvailable,
-              calendarStyle: const CalendarStyle(
-                outsideDaysVisible: false,
-                selectedDecoration: BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-                todayDecoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  shape: BoxShape.circle,
-                ),
-                disabledDecoration: BoxDecoration(
-                  color: AppColors.lightGrey,
-                  shape: BoxShape.circle,
-                ),
+        child: Obx(
+          () => TableCalendar(
+            firstDay: DateTime.now(),
+            lastDay: DateTime.now().add(const Duration(days: 90)),
+            focusedDay: controller.focusedDay,
+            selectedDayPredicate: (day) {
+              return controller.selectedDate != null &&
+                  isSameDay(controller.selectedDate, day);
+            },
+            calendarFormat: controller.calendarFormat,
+            onDaySelected: (selectedDay, focusedDay) {
+              if (controller.isDateAvailable(selectedDay)) {
+                controller.selectDate(selectedDay);
+                controller.updateFocusedDay(focusedDay);
+                _stepAnimationController.forward();
+              }
+            },
+            onFormatChanged: (format) {
+              controller.toggleCalendarFormat();
+            },
+            enabledDayPredicate: controller.isDateAvailable,
+            calendarStyle: const CalendarStyle(
+              outsideDaysVisible: false,
+              selectedDecoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
               ),
-              headerStyle: const HeaderStyle(
-                formatButtonVisible: true,
-                titleCentered: true,
-                formatButtonShowsNext: false,
-                formatButtonDecoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                ),
-                formatButtonTextStyle: TextStyle(
-                  color: Colors.white,
-                ),
+              todayDecoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                shape: BoxShape.circle,
               ),
-            )),
+              disabledDecoration: BoxDecoration(
+                color: AppColors.lightGrey,
+                shape: BoxShape.circle,
+              ),
+            ),
+            headerStyle: const HeaderStyle(
+              titleCentered: true,
+              formatButtonShowsNext: false,
+              formatButtonDecoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.all(Radius.circular(12.0)),
+              ),
+              formatButtonTextStyle: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -348,10 +360,7 @@ class _BookingScreenState extends State<BookingScreen>
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            const Icon(
-              Icons.calendar_today,
-              color: AppColors.primary,
-            ),
+            const Icon(Icons.calendar_today, color: AppColors.primary),
             const SizedBox(width: 12),
             Text(
               'Data selecionada: ${controller.selectedDate!.day}/${controller.selectedDate!.month}/${controller.selectedDate!.year}',
@@ -381,41 +390,43 @@ class _BookingScreenState extends State<BookingScreen>
         final timeSlot = controller.availableTimeSlots[index];
         final isSelected = controller.selectedTimeSlot?.time == timeSlot.time;
 
-        return Obx(() => Material(
-              color: timeSlot.isAvailable
-                  ? (isSelected ? AppColors.primary : Colors.white)
-                  : AppColors.lightGrey,
+        return Obx(
+          () => Material(
+            color: timeSlot.isAvailable
+                ? (isSelected ? AppColors.primary : Colors.white)
+                : AppColors.lightGrey,
+            borderRadius: BorderRadius.circular(8),
+            child: InkWell(
+              onTap: timeSlot.isAvailable
+                  ? () => controller.selectTimeSlot(timeSlot)
+                  : null,
               borderRadius: BorderRadius.circular(8),
-              child: InkWell(
-                onTap: timeSlot.isAvailable
-                    ? () => controller.selectTimeSlot(timeSlot)
-                    : null,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isSelected
-                          ? AppColors.primary
-                          : timeSlot.isAvailable
-                              ? AppColors.lightGrey
-                              : Colors.transparent,
-                    ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isSelected
+                        ? AppColors.primary
+                        : timeSlot.isAvailable
+                        ? AppColors.lightGrey
+                        : Colors.transparent,
                   ),
-                  child: Center(
-                    child: Text(
-                      timeSlot.formattedTime,
-                      style: TextStyle(
-                        color: timeSlot.isAvailable
-                            ? (isSelected ? Colors.white : AppColors.darkGrey)
-                            : AppColors.mediumGrey,
-                        fontWeight: FontWeight.w600,
-                      ),
+                ),
+                child: Center(
+                  child: Text(
+                    timeSlot.formattedTime,
+                    style: TextStyle(
+                      color: timeSlot.isAvailable
+                          ? (isSelected ? Colors.white : AppColors.darkGrey)
+                          : AppColors.mediumGrey,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
-            ));
+            ),
+          ),
+        );
       },
     );
   }
@@ -431,10 +442,7 @@ class _BookingScreenState extends State<BookingScreen>
           children: [
             const Text(
               'Resumo do Agendamento',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
             _buildSummaryRow('Clínica', summary['clinic']),
@@ -450,10 +458,7 @@ class _BookingScreenState extends State<BookingScreen>
               children: [
                 const Text(
                   'Total',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 SgCostChip(
                   cost: controller.totalCostSG,
@@ -476,18 +481,11 @@ class _BookingScreenState extends State<BookingScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.mediumGrey,
-            ),
-          ),
+          Text(label, style: const TextStyle(color: AppColors.mediumGrey)),
           Flexible(
             child: Text(
               value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w500),
               textAlign: TextAlign.end,
             ),
           ),
@@ -505,10 +503,7 @@ class _BookingScreenState extends State<BookingScreen>
           children: [
             const Text(
               'Observações (opcional)',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -534,44 +529,51 @@ class _BookingScreenState extends State<BookingScreen>
           children: [
             const Text(
               'Lembretes',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
-            Obx(() => Column(
-                  children: [
-                    SwitchListTile(
-                      title: const Text('1 dia antes'),
-                      subtitle: const Text('Receber lembrete 24h antes'),
-                      value: controller.bookingReminders.oneDayBefore,
-                      onChanged: (value) {
-                        controller.updateReminders(BookingReminders(
+            Obx(
+              () => Column(
+                children: [
+                  SwitchListTile(
+                    title: const Text('1 dia antes'),
+                    subtitle: const Text('Receber lembrete 24h antes'),
+                    value: controller.bookingReminders.oneDayBefore,
+                    onChanged: (value) {
+                      controller.updateReminders(
+                        BookingReminders(
                           oneDayBefore: value,
-                          oneHourBefore: controller.bookingReminders.oneHourBefore,
-                          thirtyMinutesBefore: controller.bookingReminders.thirtyMinutesBefore,
-                        ));
-                      },
-                      activeColor: AppColors.primary,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    SwitchListTile(
-                      title: const Text('1 hora antes'),
-                      subtitle: const Text('Receber lembrete 1h antes'),
-                      value: controller.bookingReminders.oneHourBefore,
-                      onChanged: (value) {
-                        controller.updateReminders(BookingReminders(
-                          oneDayBefore: controller.bookingReminders.oneDayBefore,
+                          oneHourBefore:
+                              controller.bookingReminders.oneHourBefore,
+                          thirtyMinutesBefore:
+                              controller.bookingReminders.thirtyMinutesBefore,
+                        ),
+                      );
+                    },
+                    activeThumbColor: AppColors.primary,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  SwitchListTile(
+                    title: const Text('1 hora antes'),
+                    subtitle: const Text('Receber lembrete 1h antes'),
+                    value: controller.bookingReminders.oneHourBefore,
+                    onChanged: (value) {
+                      controller.updateReminders(
+                        BookingReminders(
+                          oneDayBefore:
+                              controller.bookingReminders.oneDayBefore,
                           oneHourBefore: value,
-                          thirtyMinutesBefore: controller.bookingReminders.thirtyMinutesBefore,
-                        ));
-                      },
-                      activeColor: AppColors.primary,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ],
-                )),
+                          thirtyMinutesBefore:
+                              controller.bookingReminders.thirtyMinutesBefore,
+                        ),
+                      );
+                    },
+                    activeThumbColor: AppColors.primary,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -579,15 +581,17 @@ class _BookingScreenState extends State<BookingScreen>
   }
 
   Widget _buildTermsAndConditions() {
-    return Obx(() => CheckboxListTile(
-          title: const Text('Aceito os termos e condições'),
-          subtitle: const Text('Li e concordo com as políticas de agendamento'),
-          value: controller.agreedToTerms,
-          onChanged: (value) => controller.toggleTermsAgreement(value ?? false),
-          activeColor: AppColors.primary,
-          contentPadding: EdgeInsets.zero,
-          controlAffinity: ListTileControlAffinity.leading,
-        ));
+    return Obx(
+      () => CheckboxListTile(
+        title: const Text('Aceito os termos e condições'),
+        subtitle: const Text('Li e concordo com as políticas de agendamento'),
+        value: controller.agreedToTerms,
+        onChanged: (value) => controller.toggleTermsAgreement(value ?? false),
+        activeColor: AppColors.primary,
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+      ),
+    );
   }
 
   Widget _buildBottomNavigationBar() {
@@ -600,45 +604,49 @@ class _BookingScreenState extends State<BookingScreen>
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: AppColors.lightGrey),
+        border: Border(top: BorderSide(color: AppColors.lightGrey)),
+      ),
+      child: Obx(
+        () => Row(
+          children: [
+            if (controller.canGoBack)
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _handleBackPress,
+                  child: const Text('Voltar'),
+                ),
+              ),
+            if (controller.canGoBack) const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: controller.currentStep == BookingController.maxSteps - 1
+                  ? ElevatedButton(
+                      onPressed:
+                          controller.canProceedToNextStep &&
+                              !controller.isCreatingBooking
+                          ? _confirmBooking
+                          : null,
+                      child: controller.isCreatingBooking
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('Confirmar Agendamento'),
+                    )
+                  : ElevatedButton(
+                      onPressed: controller.canProceedToNextStep
+                          ? _handleNextPress
+                          : null,
+                      child: const Text('Próximo'),
+                    ),
+            ),
+          ],
         ),
       ),
-      child: Obx(() => Row(
-            children: [
-              if (controller.canGoBack)
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _handleBackPress,
-                    child: const Text('Voltar'),
-                  ),
-                ),
-              if (controller.canGoBack) const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: controller.currentStep == BookingController.maxSteps - 1
-                    ? ElevatedButton(
-                        onPressed: controller.canProceedToNextStep && !controller.isCreatingBooking
-                            ? _confirmBooking
-                            : null,
-                        child: controller.isCreatingBooking
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text('Confirmar Agendamento'),
-                      )
-                    : ElevatedButton(
-                        onPressed: controller.canProceedToNextStep ? _handleNextPress : null,
-                        child: const Text('Próximo'),
-                      ),
-              ),
-            ],
-          )),
     );
   }
 
@@ -648,18 +656,10 @@ class _BookingScreenState extends State<BookingScreen>
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
-        Text(
-          subtitle,
-          style: const TextStyle(
-            color: AppColors.mediumGrey,
-          ),
-        ),
+        Text(subtitle, style: const TextStyle(color: AppColors.mediumGrey)),
       ],
     );
   }
@@ -684,7 +684,7 @@ class _BookingScreenState extends State<BookingScreen>
       _handleBackPress();
       return false;
     }
-    return await _showCancelDialog();
+    return _showCancelDialog();
   }
 
   void _handleBackPress() {
@@ -715,7 +715,9 @@ class _BookingScreenState extends State<BookingScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cancelar agendamento'),
-        content: const Text('Tem certeza de que deseja cancelar este agendamento?'),
+        content: const Text(
+          'Tem certeza de que deseja cancelar este agendamento?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),

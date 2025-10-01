@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import '../../core/repositories/base_repository.dart';
-import '../../core/services/cache_service.dart';
-import '../../core/services/network_service.dart';
-import '../models/user_model.dart';
+import 'package:singleclin_mobile/core/repositories/base_repository.dart';
+import 'package:singleclin_mobile/core/services/cache_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+import 'package:singleclin_mobile/data/models/user_model.dart';
 
 /// Repository for user data with offline-first capabilities
 ///
@@ -10,14 +10,10 @@ import '../models/user_model.dart';
 /// with automatic caching and offline support.
 class UserRepository extends BaseRepository<UserModel> {
   UserRepository({
-    required CacheService cacheService,
-    required NetworkService networkService,
-    required Dio dio,
-  }) : super(
-          cacheService: cacheService,
-          networkService: networkService,
-          dio: dio,
-        );
+    required super.cacheService,
+    required super.networkService,
+    required super.dio,
+  });
 
   @override
   String get boxName => 'users';
@@ -62,7 +58,10 @@ class UserRepository extends BaseRepository<UserModel> {
         if (offset != null) 'offset': offset,
       };
 
-      final response = await _dio.get('/api/users', queryParameters: queryParams);
+      final response = await _dio.get(
+        '/api/users',
+        queryParameters: queryParams,
+      );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List<dynamic> users = response.data['data']['users'] ?? [];
@@ -118,7 +117,7 @@ class UserRepository extends BaseRepository<UserModel> {
     final currentUserId = await _getCurrentUserId();
     if (currentUserId == null) return null;
 
-    return await get(currentUserId, forceRefresh: forceRefresh);
+    return get(currentUserId, forceRefresh: forceRefresh);
   }
 
   /// Update current user profile
@@ -126,52 +125,42 @@ class UserRepository extends BaseRepository<UserModel> {
     final currentUserId = await _getCurrentUserId();
     if (currentUserId == null) return null;
 
-    return await save(user, currentUserId);
+    return save(user, currentUserId);
   }
 
   /// Search users by name or email
-  Future<List<UserModel>> searchUsers(String query, {
+  Future<List<UserModel>> searchUsers(
+    String query, {
     int limit = 20,
     bool offlineOnly = false,
   }) async {
-    final filters = {
-      'search': query,
-    };
+    final filters = {'search': query};
 
-    return await getMany(
-      filters: filters,
-      limit: limit,
-      offlineOnly: offlineOnly,
-    );
+    return getMany(filters: filters, limit: limit, offlineOnly: offlineOnly);
   }
 
   /// Get users by role
-  Future<List<UserModel>> getUsersByRole(String role, {
+  Future<List<UserModel>> getUsersByRole(
+    String role, {
     int? limit,
     bool offlineOnly = false,
   }) async {
-    final filters = {
-      'role': role,
-    };
+    final filters = {'role': role};
 
-    return await getMany(
-      filters: filters,
-      limit: limit,
-      offlineOnly: offlineOnly,
-    );
+    return getMany(filters: filters, limit: limit, offlineOnly: offlineOnly);
   }
 
   /// Get favorite/recently viewed users
   Future<List<UserModel>> getFavoriteUsers({bool offlineOnly = false}) async {
     // This could be a cached list of frequently accessed users
-    return await getMany(
-      filters: {'favorites': true},
-      offlineOnly: offlineOnly,
-    );
+    return getMany(filters: {'favorites': true}, offlineOnly: offlineOnly);
   }
 
   /// Cache user preferences locally
-  Future<void> cacheUserPreferences(String userId, Map<String, dynamic> preferences) async {
+  Future<void> cacheUserPreferences(
+    String userId,
+    Map<String, dynamic> preferences,
+  ) async {
     final cacheKey = getCacheKey('${userId}_preferences');
     await _cacheService.put(boxName, cacheKey, preferences);
   }
@@ -222,13 +211,18 @@ class UserRepository extends BaseRepository<UserModel> {
 
   Future<void> _preloadUserActivity(String userId) async {
     try {
-      final response = await _dio.get('/api/user/$userId/activity',
-        queryParameters: {'limit': 50});
+      final response = await _dio.get(
+        '/api/user/$userId/activity',
+        queryParameters: {'limit': 50},
+      );
 
       if (response.statusCode == 200) {
         final cacheKey = getCacheKey('${userId}_activity');
-        await _cacheService.putList(boxName, cacheKey,
-          List<Map<String, dynamic>>.from(response.data['data']));
+        await _cacheService.putList(
+          boxName,
+          cacheKey,
+          List<Map<String, dynamic>>.from(response.data['data']),
+        );
       }
     } catch (e) {
       print('❌ Failed to preload user activity: $e');
@@ -263,7 +257,9 @@ class UserRepository extends BaseRepository<UserModel> {
 
     // Filter out non-user keys (preferences, activity, etc.)
     return keys
-        .where((key) => !key.contains('preferences') && !key.contains('activity'))
+        .where(
+          (key) => !key.contains('preferences') && !key.contains('activity'),
+        )
         .take(10) // Limit to most recent 10 users
         .toList();
   }

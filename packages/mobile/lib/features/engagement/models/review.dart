@@ -2,30 +2,6 @@ import 'package:equatable/equatable.dart';
 
 /// Review model for user reviews system
 class Review extends Equatable {
-  final String id;
-  final String userId;
-  final String clinicId;
-  final String serviceId;
-  final String appointmentId;
-  final double overallRating;
-  final double serviceRating;
-  final double cleanlinessRating;
-  final double staffRating;
-  final double valueRating;
-  final String title;
-  final String comment;
-  final List<String> tags;
-  final List<String> beforePhotos;
-  final List<String> afterPhotos;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  final ReviewStatus status;
-  final bool isRecommended;
-  final bool wouldReturn;
-  final int helpfulCount;
-  final int notHelpfulCount;
-  final List<ReviewResponse> responses;
-
   const Review({
     required this.id,
     required this.userId,
@@ -70,7 +46,7 @@ class Review extends Equatable {
       beforePhotos: List<String>.from(json['beforePhotos'] as List),
       afterPhotos: List<String>.from(json['afterPhotos'] as List),
       createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null 
+      updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
       status: ReviewStatus.values.firstWhere(
@@ -81,11 +57,36 @@ class Review extends Equatable {
       wouldReturn: json['wouldReturn'] as bool,
       helpfulCount: json['helpfulCount'] as int,
       notHelpfulCount: json['notHelpfulCount'] as int,
-      responses: (json['responses'] as List<dynamic>?)
-          ?.map((r) => ReviewResponse.fromJson(r as Map<String, dynamic>))
-          .toList() ?? [],
+      responses:
+          (json['responses'] as List<dynamic>?)
+              ?.map((r) => ReviewResponse.fromJson(r as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
+  final String id;
+  final String userId;
+  final String clinicId;
+  final String serviceId;
+  final String appointmentId;
+  final double overallRating;
+  final double serviceRating;
+  final double cleanlinessRating;
+  final double staffRating;
+  final double valueRating;
+  final String title;
+  final String comment;
+  final List<String> tags;
+  final List<String> beforePhotos;
+  final List<String> afterPhotos;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final ReviewStatus status;
+  final bool isRecommended;
+  final bool wouldReturn;
+  final int helpfulCount;
+  final int notHelpfulCount;
+  final List<ReviewResponse> responses;
 
   Map<String, dynamic> toJson() {
     return {
@@ -169,51 +170,37 @@ class Review extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        clinicId,
-        serviceId,
-        appointmentId,
-        overallRating,
-        serviceRating,
-        cleanlinessRating,
-        staffRating,
-        valueRating,
-        title,
-        comment,
-        tags,
-        beforePhotos,
-        afterPhotos,
-        createdAt,
-        updatedAt,
-        status,
-        isRecommended,
-        wouldReturn,
-        helpfulCount,
-        notHelpfulCount,
-        responses,
-      ];
+    id,
+    userId,
+    clinicId,
+    serviceId,
+    appointmentId,
+    overallRating,
+    serviceRating,
+    cleanlinessRating,
+    staffRating,
+    valueRating,
+    title,
+    comment,
+    tags,
+    beforePhotos,
+    afterPhotos,
+    createdAt,
+    updatedAt,
+    status,
+    isRecommended,
+    wouldReturn,
+    helpfulCount,
+    notHelpfulCount,
+    responses,
+  ];
 }
 
 /// Review status enum
-enum ReviewStatus {
-  pending,
-  approved,
-  rejected,
-  flagged,
-  archived
-}
+enum ReviewStatus { pending, approved, rejected, flagged, archived }
 
 /// Review response from clinic
 class ReviewResponse extends Equatable {
-  final String id;
-  final String reviewId;
-  final String clinicId;
-  final String responseText;
-  final DateTime createdAt;
-  final String respondentName;
-  final String respondentRole;
-
   const ReviewResponse({
     required this.id,
     required this.reviewId,
@@ -235,6 +222,13 @@ class ReviewResponse extends Equatable {
       respondentRole: json['respondentRole'] as String,
     );
   }
+  final String id;
+  final String reviewId;
+  final String clinicId;
+  final String responseText;
+  final DateTime createdAt;
+  final String respondentName;
+  final String respondentRole;
 
   Map<String, dynamic> toJson() {
     return {
@@ -250,25 +244,18 @@ class ReviewResponse extends Equatable {
 
   @override
   List<Object> get props => [
-        id,
-        reviewId,
-        clinicId,
-        responseText,
-        createdAt,
-        respondentName,
-        respondentRole,
-      ];
+    id,
+    reviewId,
+    clinicId,
+    responseText,
+    createdAt,
+    respondentName,
+    respondentRole,
+  ];
 }
 
 /// Review statistics for user
 class ReviewStats extends Equatable {
-  final int totalReviews;
-  final double averageRating;
-  final int helpfulVotes;
-  final int reviewsThisMonth;
-  final String topCategory;
-  final List<ReviewBadge> badges;
-
   const ReviewStats({
     required this.totalReviews,
     required this.averageRating,
@@ -290,27 +277,26 @@ class ReviewStats extends Equatable {
           .toList(),
     );
   }
+  final int totalReviews;
+  final double averageRating;
+  final int helpfulVotes;
+  final int reviewsThisMonth;
+  final String topCategory;
+  final List<ReviewBadge> badges;
 
   @override
   List<Object> get props => [
-        totalReviews,
-        averageRating,
-        helpfulVotes,
-        reviewsThisMonth,
-        topCategory,
-        badges,
-      ];
+    totalReviews,
+    averageRating,
+    helpfulVotes,
+    reviewsThisMonth,
+    topCategory,
+    badges,
+  ];
 }
 
 /// Review badge for gamification
 class ReviewBadge extends Equatable {
-  final String id;
-  final String name;
-  final String description;
-  final String iconPath;
-  final DateTime earnedAt;
-  final BadgeLevel level;
-
   const ReviewBadge({
     required this.id,
     required this.name,
@@ -333,6 +319,12 @@ class ReviewBadge extends Equatable {
       ),
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final String iconPath;
+  final DateTime earnedAt;
+  final BadgeLevel level;
 
   Map<String, dynamic> toJson() {
     return {

@@ -44,7 +44,9 @@ class PlanCard extends StatelessWidget {
         elevation: 4,
         child: Container(
           width: double.infinity, // Garante largura total
-          constraints: const BoxConstraints(minHeight: 220), // Consistente com o outro card
+          constraints: const BoxConstraints(
+            minHeight: 220,
+          ), // Consistente com o outro card
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: const Center(
             child: Column(
@@ -55,7 +57,10 @@ class PlanCard extends StatelessWidget {
                 SizedBox(height: 16),
                 Text(
                   'Carregando plano...',
-                  style: TextStyle(fontSize: 14, color: Colors.grey), // Fonte maior para consistência
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ), // Fonte maior para consistência
                 ),
               ],
             ),
@@ -74,51 +79,64 @@ class PlanCard extends StatelessWidget {
         elevation: 4,
         child: Container(
           width: double.infinity, // Garante largura total
-          constraints: const BoxConstraints(minHeight: 220), // Altura mínima maior para melhor visualização
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24), // Padding mais espaçoso
+          constraints: const BoxConstraints(
+            minHeight: 220,
+          ), // Altura mínima maior para melhor visualização
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ), // Padding mais espaçoso
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center, // Centralização melhor
             mainAxisSize: MainAxisSize.min,
             children: [
-            Icon(Icons.credit_card_off, size: 48, color: Colors.grey[400]), // Ícone maior
-            const SizedBox(height: 16), // Espaçamento maior
-            Text(
-              'Nenhum plano ativo',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith( // titleMedium para melhor legibilidade
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Você não possui um plano ativo\nno momento',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[500],
-                fontSize: 14, // Fonte maior para melhor leitura
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 20), // Espaçamento maior antes do botão
-            SizedBox(
-              height: 40, // Altura maior para o botão
-              child: ElevatedButton(
-                onPressed: onRefresh,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  minimumSize: const Size(120, 40), // Tamanho mínimo maior
-                ),
-                child: const Text(
-                  'Atualizar',
-                  style: TextStyle(fontSize: 14), // Fonte maior
+              Icon(
+                Icons.credit_card_off,
+                size: 48,
+                color: Colors.grey[400],
+              ), // Ícone maior
+              const SizedBox(height: 16), // Espaçamento maior
+              Text(
+                'Nenhum plano ativo',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  // titleMedium para melhor legibilidade
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Você não possui um plano ativo\nno momento',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[500],
+                  fontSize: 14, // Fonte maior para melhor leitura
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 20), // Espaçamento maior antes do botão
+              SizedBox(
+                height: 40, // Altura maior para o botão
+                child: ElevatedButton(
+                  onPressed: onRefresh,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    minimumSize: const Size(120, 40), // Tamanho mínimo maior
+                  ),
+                  child: const Text(
+                    'Atualizar',
+                    style: TextStyle(fontSize: 14), // Fonte maior
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 
@@ -141,12 +159,12 @@ class PlanCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: AppColors.singleclinSecondaryGradient.map((color) => 
-                color.withValues(alpha: 0.9)).toList(),
+              colors: AppColors.singleclinSecondaryGradient
+                  .map((color) => color.withValues(alpha: 0.9))
+                  .toList(),
             ),
             border: Border.all(
-              color: AppColors.singleclinPrimary.withValues(alpha: 0.2), 
-              width: 1,
+              color: AppColors.singleclinPrimary.withValues(alpha: 0.2),
             ),
           ),
           child: Column(
@@ -396,7 +414,8 @@ class PlanCard extends StatelessWidget {
       case 'red':
         return AppColors.error;
       default:
-        return AppColors.singleclinPrimary; // Using brand primary color as default
+        return AppColors
+            .singleclinPrimary; // Using brand primary color as default
     }
   }
 }

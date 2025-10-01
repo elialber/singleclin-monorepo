@@ -2,27 +2,6 @@ import 'package:equatable/equatable.dart';
 
 /// Feedback report model for app improvements and bug reports
 class FeedbackReport extends Equatable {
-  final String id;
-  final String userId;
-  final FeedbackType type;
-  final FeedbackCategory category;
-  final String title;
-  final String description;
-  final FeedbackPriority priority;
-  final List<String> screenshots;
-  final Map<String, dynamic> deviceInfo;
-  final String appVersion;
-  final String osVersion;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  final FeedbackStatus status;
-  final int votesCount;
-  final bool hasVoted;
-  final List<String> tags;
-  final String? developerResponse;
-  final DateTime? resolvedAt;
-  final List<FeedbackComment> comments;
-
   const FeedbackReport({
     required this.id,
     required this.userId,
@@ -83,11 +62,33 @@ class FeedbackReport extends Equatable {
       resolvedAt: json['resolvedAt'] != null
           ? DateTime.parse(json['resolvedAt'] as String)
           : null,
-      comments: (json['comments'] as List<dynamic>?)
-          ?.map((c) => FeedbackComment.fromJson(c as Map<String, dynamic>))
-          .toList() ?? [],
+      comments:
+          (json['comments'] as List<dynamic>?)
+              ?.map((c) => FeedbackComment.fromJson(c as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
+  final String id;
+  final String userId;
+  final FeedbackType type;
+  final FeedbackCategory category;
+  final String title;
+  final String description;
+  final FeedbackPriority priority;
+  final List<String> screenshots;
+  final Map<String, dynamic> deviceInfo;
+  final String appVersion;
+  final String osVersion;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final FeedbackStatus status;
+  final int votesCount;
+  final bool hasVoted;
+  final List<String> tags;
+  final String? developerResponse;
+  final DateTime? resolvedAt;
+  final List<FeedbackComment> comments;
 
   Map<String, dynamic> toJson() {
     return {
@@ -162,40 +163,31 @@ class FeedbackReport extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        type,
-        category,
-        title,
-        description,
-        priority,
-        screenshots,
-        deviceInfo,
-        appVersion,
-        osVersion,
-        createdAt,
-        updatedAt,
-        status,
-        votesCount,
-        hasVoted,
-        tags,
-        developerResponse,
-        resolvedAt,
-        comments,
-      ];
+    id,
+    userId,
+    type,
+    category,
+    title,
+    description,
+    priority,
+    screenshots,
+    deviceInfo,
+    appVersion,
+    osVersion,
+    createdAt,
+    updatedAt,
+    status,
+    votesCount,
+    hasVoted,
+    tags,
+    developerResponse,
+    resolvedAt,
+    comments,
+  ];
 }
 
 /// Feedback comment for discussions
 class FeedbackComment extends Equatable {
-  final String id;
-  final String feedbackId;
-  final String userId;
-  final String userName;
-  final String userRole; // 'user', 'developer', 'moderator'
-  final String content;
-  final DateTime createdAt;
-  final bool isOfficial;
-
   const FeedbackComment({
     required this.id,
     required this.feedbackId,
@@ -219,6 +211,14 @@ class FeedbackComment extends Equatable {
       isOfficial: json['isOfficial'] as bool,
     );
   }
+  final String id;
+  final String feedbackId;
+  final String userId;
+  final String userName;
+  final String userRole; // 'user', 'developer', 'moderator'
+  final String content;
+  final DateTime createdAt;
+  final bool isOfficial;
 
   Map<String, dynamic> toJson() {
     return {
@@ -235,34 +235,19 @@ class FeedbackComment extends Equatable {
 
   @override
   List<Object> get props => [
-        id,
-        feedbackId,
-        userId,
-        userName,
-        userRole,
-        content,
-        createdAt,
-        isOfficial,
-      ];
+    id,
+    feedbackId,
+    userId,
+    userName,
+    userRole,
+    content,
+    createdAt,
+    isOfficial,
+  ];
 }
 
 /// Feature request model for new features
 class FeatureRequest extends Equatable {
-  final String id;
-  final String title;
-  final String description;
-  final String category;
-  final int votesCount;
-  final bool hasVoted;
-  final RequestStatus status;
-  final RequestPriority priority;
-  final DateTime createdAt;
-  final DateTime? plannedFor;
-  final String? estimatedEffort;
-  final List<String> tags;
-  final List<FeedbackComment> comments;
-  final String? roadmapUrl;
-
   const FeatureRequest({
     required this.id,
     required this.title,
@@ -302,12 +287,28 @@ class FeatureRequest extends Equatable {
           : null,
       estimatedEffort: json['estimatedEffort'] as String?,
       tags: List<String>.from(json['tags'] as List),
-      comments: (json['comments'] as List<dynamic>?)
-          ?.map((c) => FeedbackComment.fromJson(c as Map<String, dynamic>))
-          .toList() ?? [],
+      comments:
+          (json['comments'] as List<dynamic>?)
+              ?.map((c) => FeedbackComment.fromJson(c as Map<String, dynamic>))
+              .toList() ??
+          [],
       roadmapUrl: json['roadmapUrl'] as String?,
     );
   }
+  final String id;
+  final String title;
+  final String description;
+  final String category;
+  final int votesCount;
+  final bool hasVoted;
+  final RequestStatus status;
+  final RequestPriority priority;
+  final DateTime createdAt;
+  final DateTime? plannedFor;
+  final String? estimatedEffort;
+  final List<String> tags;
+  final List<FeedbackComment> comments;
+  final String? roadmapUrl;
 
   Map<String, dynamic> toJson() {
     return {
@@ -330,37 +331,25 @@ class FeatureRequest extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        category,
-        votesCount,
-        hasVoted,
-        status,
-        priority,
-        createdAt,
-        plannedFor,
-        estimatedEffort,
-        tags,
-        comments,
-        roadmapUrl,
-      ];
+    id,
+    title,
+    description,
+    category,
+    votesCount,
+    hasVoted,
+    status,
+    priority,
+    createdAt,
+    plannedFor,
+    estimatedEffort,
+    tags,
+    comments,
+    roadmapUrl,
+  ];
 }
 
 /// Product roadmap item
 class RoadmapItem extends Equatable {
-  final String id;
-  final String title;
-  final String description;
-  final RoadmapStatus status;
-  final DateTime? plannedRelease;
-  final String category;
-  final List<String> tags;
-  final int userVotes;
-  final bool hasVoted;
-  final String? progress;
-  final List<String> features;
-
   const RoadmapItem({
     required this.id,
     required this.title,
@@ -395,6 +384,17 @@ class RoadmapItem extends Equatable {
       features: List<String>.from(json['features'] as List),
     );
   }
+  final String id;
+  final String title;
+  final String description;
+  final RoadmapStatus status;
+  final DateTime? plannedRelease;
+  final String category;
+  final List<String> tags;
+  final int userVotes;
+  final bool hasVoted;
+  final String? progress;
+  final List<String> features;
 
   Map<String, dynamic> toJson() {
     return {
@@ -414,34 +414,22 @@ class RoadmapItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        status,
-        plannedRelease,
-        category,
-        tags,
-        userVotes,
-        hasVoted,
-        progress,
-        features,
-      ];
+    id,
+    title,
+    description,
+    status,
+    plannedRelease,
+    category,
+    tags,
+    userVotes,
+    hasVoted,
+    progress,
+    features,
+  ];
 }
 
 /// Beta program enrollment
 class BetaProgram extends Equatable {
-  final String id;
-  final String name;
-  final String description;
-  final DateTime startDate;
-  final DateTime? endDate;
-  final bool isEnrolled;
-  final int maxParticipants;
-  final int currentParticipants;
-  final List<String> requirements;
-  final List<String> benefits;
-  final BetaStatus status;
-
   const BetaProgram({
     required this.id,
     required this.name,
@@ -476,6 +464,17 @@ class BetaProgram extends Equatable {
       ),
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final DateTime startDate;
+  final DateTime? endDate;
+  final bool isEnrolled;
+  final int maxParticipants;
+  final int currentParticipants;
+  final List<String> requirements;
+  final List<String> benefits;
+  final BetaStatus status;
 
   Map<String, dynamic> toJson() {
     return {
@@ -495,18 +494,18 @@ class BetaProgram extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        startDate,
-        endDate,
-        isEnrolled,
-        maxParticipants,
-        currentParticipants,
-        requirements,
-        benefits,
-        status,
-      ];
+    id,
+    name,
+    description,
+    startDate,
+    endDate,
+    isEnrolled,
+    maxParticipants,
+    currentParticipants,
+    requirements,
+    benefits,
+    status,
+  ];
 }
 
 /// Enums for feedback system
@@ -516,7 +515,7 @@ enum FeedbackType {
   improvement,
   suggestion,
   compliment,
-  complaint
+  complaint,
 }
 
 enum FeedbackCategory {
@@ -527,15 +526,10 @@ enum FeedbackCategory {
   accessibility,
   security,
   content,
-  integration
+  integration,
 }
 
-enum FeedbackPriority {
-  low,
-  medium,
-  high,
-  critical
-}
+enum FeedbackPriority { low, medium, high, critical }
 
 enum FeedbackStatus {
   submitted,
@@ -544,7 +538,7 @@ enum FeedbackStatus {
   testing,
   resolved,
   rejected,
-  archived
+  archived,
 }
 
 enum RequestStatus {
@@ -554,27 +548,11 @@ enum RequestStatus {
   inDevelopment,
   testing,
   released,
-  rejected
+  rejected,
 }
 
-enum RequestPriority {
-  low,
-  medium,
-  high,
-  critical
-}
+enum RequestPriority { low, medium, high, critical }
 
-enum RoadmapStatus {
-  planned,
-  inProgress,
-  testing,
-  released,
-  cancelled
-}
+enum RoadmapStatus { planned, inProgress, testing, released, cancelled }
 
-enum BetaStatus {
-  planned,
-  recruiting,
-  active,
-  ended
-}
+enum BetaStatus { planned, recruiting, active, ended }

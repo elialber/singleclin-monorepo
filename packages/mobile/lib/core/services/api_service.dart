@@ -18,95 +18,121 @@ class ApiService extends getx.GetxService {
   }
 
   Future<void> _initializeDio() async {
-    _dio = Dio(BaseOptions(
-      baseUrl: AppConstants.baseUrl,
-      connectTimeout: AppConstants.timeoutDuration,
-      receiveTimeout: AppConstants.timeoutDuration,
-      sendTimeout: AppConstants.timeoutDuration,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    ));
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: AppConstants.baseUrl,
+        connectTimeout: AppConstants.timeoutDuration,
+        receiveTimeout: AppConstants.timeoutDuration,
+        sendTimeout: AppConstants.timeoutDuration,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
 
     // Configure SSL certificate handling for development
     if (kDebugMode) {
       (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
         final HttpClient client = HttpClient();
-        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
         return client;
       };
     }
 
     // Interceptor para adicionar token de autenticação
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        // First try to get JWT token directly from storage (fastest path)
-        String? token = await _storageService.getString(AppConstants.tokenKey);
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          // First try to get JWT token directly from storage (fastest path)
+          String? token = await _storageService.getString(
+            AppConstants.tokenKey,
+          );
 
-        if (kDebugMode) {
-          print('🔑 DEBUG: Direct JWT token check: ${token != null ? "Found (${token!.length} chars)" : "Not found"}');
-        }
-
-        // If no JWT token, try AuthController (Firebase tokens)
-        if (token == null || token.isEmpty) {
-          try {
-            final authController = getx.Get.find<AuthController>();
-            token = await authController.getCurrentToken();
-
-            if (kDebugMode) {
-              print('🔑 DEBUG: Firebase token from AuthController: ${token != null ? "Found" : "Not found"}');
-            }
-          } catch (e) {
-            if (kDebugMode) {
-              print('⚠️ DEBUG: AuthController not found, trying storage fallback: $e');
-            }
-          }
-        }
-
-        // Final fallback check
-        if (kDebugMode && (token == null || token.isEmpty)) {
-          print('❌ DEBUG: No token available for request to: ${options.path}');
-        }
-
-        if (token != null && token.isNotEmpty) {
-          options.headers['Authorization'] = 'Bearer $token';
           if (kDebugMode) {
-            print('✅ DEBUG: Authorization header added to request');
+            print(
+              '🔑 DEBUG: Direct JWT token check: ${token != null ? "Found (${token.length} chars)" : "Not found"}',
+            );
           }
-        } else {
-          if (kDebugMode) {
-            print('❌ DEBUG: No token available for request to: ${options.path}');
-          }
-        }
 
-        handler.next(options);
-      },
-      onError: (error, handler) async {
-        if (error.response?.statusCode == 401) {
-          // Check if this is an endpoint where we want to handle 401 gracefully
-          final requestPath = error.requestOptions.path;
-          final isCreditsEndpoint = requestPath.contains('/Appointments/my-credits');
-          final isScheduleEndpoint = requestPath.contains('/Appointments/schedule');
-          final isConfirmEndpoint = requestPath.contains('/Appointments/confirm');
+          // If no JWT token, try AuthController (Firebase tokens)
+          if (token == null || token.isEmpty) {
+            try {
+              final authController = getx.Get.find<AuthController>();
+              token = await authController.getCurrentToken();
 
-          if (!isCreditsEndpoint && !isScheduleEndpoint && !isConfirmEndpoint) {
-            // Token expirado - fazer logout apenas se não for um endpoint de agendamento
-            await _handleUnauthorized();
+              if (kDebugMode) {
+                print(
+                  '🔑 DEBUG: Firebase token from AuthController: ${token != null ? "Found" : "Not found"}',
+                );
+              }
+            } catch (e) {
+              if (kDebugMode) {
+                print(
+                  '⚠️ DEBUG: AuthController not found, trying storage fallback: $e',
+                );
+              }
+            }
           }
-        }
-        handler.next(error);
-      },
-    ));
+
+          // Final fallback check
+          if (kDebugMode && (token == null || token.isEmpty)) {
+            print(
+              '❌ DEBUG: No token available for request to: ${options.path}',
+            );
+          }
+
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+            if (kDebugMode) {
+              print('✅ DEBUG: Authorization header added to request');
+            }
+          } else {
+            if (kDebugMode) {
+              print(
+                '❌ DEBUG: No token available for request to: ${options.path}',
+              );
+            }
+          }
+
+          handler.next(options);
+        },
+        onError: (error, handler) async {
+          if (error.response?.statusCode == 401) {
+            // Check if this is an endpoint where we want to handle 401 gracefully
+            final requestPath = error.requestOptions.path;
+            final isCreditsEndpoint = requestPath.contains(
+              '/Appointments/my-credits',
+            );
+            final isScheduleEndpoint = requestPath.contains(
+              '/Appointments/schedule',
+            );
+            final isConfirmEndpoint = requestPath.contains(
+              '/Appointments/confirm',
+            );
+
+            if (!isCreditsEndpoint &&
+                !isScheduleEndpoint &&
+                !isConfirmEndpoint) {
+              // Token expirado - fazer logout apenas se não for um endpoint de agendamento
+              await _handleUnauthorized();
+            }
+          }
+          handler.next(error);
+        },
+      ),
+    );
 
     // Interceptor para logs (apenas em debug)
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      error: true,
-      requestHeader: false,
-      responseHeader: false,
-    ));
+    _dio.interceptors.add(
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+        requestHeader: false,
+        responseHeader: false,
+      ),
+    );
   }
 
   /// GET request
@@ -216,20 +242,15 @@ class ApiService extends getx.GetxService {
     ProgressCallback? onSendProgress,
   }) async {
     try {
-      FormData formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(
-          filePath,
-          filename: fileName,
-        ),
+      final FormData formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(filePath, filename: fileName),
         ...?data,
       });
 
       final response = await _dio.post(
         path,
         data: formData,
-        options: Options(
-          contentType: 'multipart/form-data',
-        ),
+        options: Options(contentType: 'multipart/form-data'),
         onSendProgress: onSendProgress,
       );
       return response;
@@ -263,13 +284,14 @@ class ApiService extends getx.GetxService {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
         return Exception(AppConstants.timeoutError);
-      
+
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
-        final message = error.response?.data?['message'] ?? 
-                       error.response?.statusMessage ?? 
-                       AppConstants.genericError;
-        
+        final message =
+            error.response?.data?['message'] ??
+            error.response?.statusMessage ??
+            AppConstants.genericError;
+
         switch (statusCode) {
           case 401:
             return Exception(AppConstants.unauthorizedError);
@@ -280,13 +302,13 @@ class ApiService extends getx.GetxService {
           default:
             return Exception(message);
         }
-      
+
       case DioExceptionType.cancel:
         return Exception('Requisição cancelada');
-      
+
       case DioExceptionType.connectionError:
         return Exception(AppConstants.networkError);
-      
+
       default:
         return Exception(AppConstants.genericError);
     }
@@ -296,9 +318,9 @@ class ApiService extends getx.GetxService {
   Future<void> _handleUnauthorized() async {
     await _storageService.remove(AppConstants.tokenKey);
     await _storageService.remove(AppConstants.userKey);
-    
+
     getx.Get.offAllNamed('/login');
-    
+
     getx.Get.snackbar(
       'Sessão Expirada',
       'Faça login novamente',

@@ -1,17 +1,18 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import '../../../core/services/storage_service.dart';
-import '../models/onboarding_step.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
+import 'package:singleclin_mobile/features/onboarding/models/onboarding_step.dart';
 
-class OnboardingController extends GetxController with GetSingleTickerProviderStateMixin {
+class OnboardingController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   late PageController pageController;
   late AnimationController animationController;
-  
+
   // Observables
   final RxInt currentStep = 0.obs;
   final RxBool isLoading = false.obs;
   final RxBool isFirstLaunch = true.obs;
-  
+
   // Services
   final StorageService _storageService = Get.find<StorageService>();
 
@@ -47,7 +48,8 @@ class OnboardingController extends GetxController with GetSingleTickerProviderSt
   Future<void> _checkFirstLaunch() async {
     try {
       isLoading.value = true;
-      final hasSeenOnboarding = await _storageService.getBool(_firstLaunchKey) ?? false;
+      final hasSeenOnboarding =
+          await _storageService.getBool(_firstLaunchKey) ?? false;
       isFirstLaunch.value = !hasSeenOnboarding;
     } catch (e) {
       print('Error checking first launch: $e');
@@ -62,39 +64,41 @@ class OnboardingController extends GetxController with GetSingleTickerProviderSt
     const OnboardingStep(
       id: 0,
       title: 'Bem-vindo ao SingleClin',
-      description: 'Descubra a nova forma de cuidar da sua estética e saúde com tecnologia e praticidade.',
+      description:
+          'Descubra a nova forma de cuidar da sua estética e saúde com tecnologia e praticidade.',
       imageAsset: 'assets/images/onboarding/welcome.png',
       lottieAsset: 'assets/animations/welcome.json',
     ),
     const OnboardingStep(
       id: 1,
       title: 'Créditos SG',
-      description: 'Use nossos créditos dourados SG para agendar procedimentos nas melhores clínicas parceiras.',
+      description:
+          'Use nossos créditos dourados SG para agendar procedimentos nas melhores clínicas parceiras.',
       imageAsset: 'assets/images/onboarding/sg_credits.png',
       lottieAsset: 'assets/animations/credits.json',
-      customData: {
-        'highlightColor': '#FFB000',
-        'showCreditAnimation': true,
-      },
+      customData: {'highlightColor': '#FFB000', 'showCreditAnimation': true},
     ),
     const OnboardingStep(
       id: 2,
       title: 'Encontre Especialistas',
-      description: 'Conecte-se com profissionais qualificados em estética, injetáveis e saúde preventiva.',
+      description:
+          'Conecte-se com profissionais qualificados em estética, injetáveis e saúde preventiva.',
       imageAsset: 'assets/images/onboarding/specialists.png',
       lottieAsset: 'assets/animations/specialists.json',
     ),
     const OnboardingStep(
       id: 3,
       title: 'Agende com Facilidade',
-      description: 'Marque seus procedimentos de forma rápida e segura, tudo pelo app.',
+      description:
+          'Marque seus procedimentos de forma rápida e segura, tudo pelo app.',
       imageAsset: 'assets/images/onboarding/booking.png',
       lottieAsset: 'assets/animations/booking.json',
     ),
   ];
 
   /// Get current onboarding step
-  OnboardingStep get currentOnboardingStep => onboardingSteps[currentStep.value];
+  OnboardingStep get currentOnboardingStep =>
+      onboardingSteps[currentStep.value];
 
   /// Check if is last step
   bool get isLastStep => currentStep.value == onboardingSteps.length - 1;
@@ -103,7 +107,8 @@ class OnboardingController extends GetxController with GetSingleTickerProviderSt
   bool get isFirstStep => currentStep.value == 0;
 
   /// Get progress percentage
-  double get progressPercentage => (currentStep.value + 1) / onboardingSteps.length;
+  double get progressPercentage =>
+      (currentStep.value + 1) / onboardingSteps.length;
 
   /// Navigate to next step
   Future<void> nextStep() async {
@@ -181,13 +186,12 @@ class OnboardingController extends GetxController with GetSingleTickerProviderSt
   Future<void> completeOnboarding() async {
     try {
       isLoading.value = true;
-      
+
       // Mark onboarding as completed
       await _storageService.setBool(_firstLaunchKey, true);
-      
+
       // Navigate to dashboard with replacement
       Get.offAllNamed('/dashboard');
-      
     } catch (e) {
       print('Error completing onboarding: $e');
       Get.snackbar(
@@ -221,13 +225,9 @@ class OnboardingController extends GetxController with GetSingleTickerProviderSt
 
   /// Get fade animation for current step
   Animation<double> getFadeAnimation() {
-    return Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: animationController,
-      curve: Curves.easeIn,
-    ));
+    return Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: animationController, curve: Curves.easeIn),
+    );
   }
 
   /// Get slide animation for current step
@@ -235,21 +235,16 @@ class OnboardingController extends GetxController with GetSingleTickerProviderSt
     return Tween<Offset>(
       begin: const Offset(0.3, 0.0),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: animationController,
-      curve: Curves.easeOutBack,
-    ));
+    ).animate(
+      CurvedAnimation(parent: animationController, curve: Curves.easeOutBack),
+    );
   }
 
   /// Get scale animation for current step
   Animation<double> getScaleAnimation() {
-    return Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: animationController,
-      curve: Curves.elasticOut,
-    ));
+    return Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: animationController, curve: Curves.elasticOut),
+    );
   }
 
   /// Vibrate device for feedback

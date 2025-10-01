@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import '../models/referral.dart';
+import 'package:singleclin_mobile/features/credits/models/referral.dart';
 
 class ReferralController extends GetxController {
   // Reactive variables
@@ -11,7 +11,7 @@ class ReferralController extends GetxController {
   final _referrals = <Referral>[].obs;
   final _stats = <String, dynamic>{}.obs;
   final _leaderboard = <Map<String, dynamic>>[].obs;
-  
+
   // Getters
   bool get isLoading => _isLoading.value;
   bool get isGeneratingCode => _isGeneratingCode.value;
@@ -19,7 +19,7 @@ class ReferralController extends GetxController {
   List<Referral> get referrals => _referrals;
   Map<String, dynamic> get stats => _stats;
   List<Map<String, dynamic>> get leaderboard => _leaderboard;
-  
+
   String get referralCode => referralProgram?.referralCode ?? '';
   String get qrCodeUrl => referralProgram?.qrCodeUrl ?? '';
   int get totalReferrals => referralProgram?.totalReferrals ?? 0;
@@ -29,17 +29,19 @@ class ReferralController extends GetxController {
   int get bonusCredits => referralProgram?.bonusCredits ?? 10;
   int get currentRanking => referralProgram?.currentRanking ?? 0;
   String get rankingTier => referralProgram?.rankingTier ?? 'bronze';
-  
+
   String get shareMessage => referralProgram?.shareMessage ?? '';
   String get shareUrl => referralProgram?.shareUrl ?? '';
   double get conversionRate => referralProgram?.conversionRate ?? 0;
-  String get conversionRateDisplay => referralProgram?.conversionRateDisplay ?? '0%';
-  
+  String get conversionRateDisplay =>
+      referralProgram?.conversionRateDisplay ?? '0%';
+
   List<Referral> get recentReferrals => referralProgram?.recentReferrals ?? [];
   int get thisMonthReferrals => referralProgram?.thisMonthReferrals ?? 0;
   bool get isTopPerformer => referralProgram?.isTopPerformer ?? false;
-  
-  Map<String, dynamic> get nextTierRequirements => referralProgram?.nextTierRequirements ?? {};
+
+  Map<String, dynamic> get nextTierRequirements =>
+      referralProgram?.nextTierRequirements ?? {};
 
   @override
   void onInit() {
@@ -52,34 +54,30 @@ class ReferralController extends GetxController {
   Future<void> loadReferralProgram() async {
     try {
       _isLoading.value = true;
-      
+
       // Mock API call
       await Future.delayed(const Duration(seconds: 1));
-      
+
       _referralProgram.value = ReferralProgram(
         id: 'ref_123',
         userId: 'user_123',
         referralCode: 'SINGLECLIN2024',
-        qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://singleclin.com/app?ref=SINGLECLIN2024',
+        qrCodeUrl:
+            'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://singleclin.com/app?ref=SINGLECLIN2024',
         bonusCredits: 10,
         totalReferrals: 12,
         approvedReferrals: 8,
         pendingReferrals: 2,
         totalCreditsEarned: 80,
         referrals: _generateMockReferrals(),
-        monthlyStats: {
-          '2024-01': 2,
-          '2024-02': 4,
-          '2024-03': 6,
-        },
+        monthlyStats: {'2024-01': 2, '2024-02': 4, '2024-03': 6},
         currentRanking: 15,
         rankingTier: 'silver',
         createdAt: DateTime.now().subtract(const Duration(days: 90)),
         updatedAt: DateTime.now(),
       );
-      
+
       _referrals.assignAll(_referralProgram.value?.referrals ?? []);
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -95,17 +93,17 @@ class ReferralController extends GetxController {
     try {
       // Mock API call for additional stats
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       _stats.assignAll({
         'totalPotentialCredits': totalReferrals * bonusCredits,
-        'successRate': approvedReferrals / (totalReferrals > 0 ? totalReferrals : 1) * 100,
+        'successRate':
+            approvedReferrals / (totalReferrals > 0 ? totalReferrals : 1) * 100,
         'averagePerMonth': totalReferrals / 3, // last 3 months
         'nextTierCreditsNeeded': _calculateNextTierCreditsNeeded(),
         'monthlyTrend': 'up', // 'up', 'down', 'stable'
         'bestMonth': '2024-03',
         'bestMonthCount': 6,
       });
-      
     } catch (e) {
       print('Error loading referral stats: $e');
     }
@@ -115,7 +113,7 @@ class ReferralController extends GetxController {
     try {
       // Mock leaderboard data
       await Future.delayed(const Duration(milliseconds: 300));
-      
+
       _leaderboard.assignAll([
         {
           'rank': 1,
@@ -148,7 +146,6 @@ class ReferralController extends GetxController {
         },
         // ... more entries
       ]);
-      
     } catch (e) {
       print('Error loading leaderboard: $e');
     }
@@ -156,7 +153,7 @@ class ReferralController extends GetxController {
 
   Future<void> generateNewReferralCode() async {
     if (_isGeneratingCode.value) return;
-    
+
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: const Text('Gerar Novo Código'),
@@ -176,25 +173,27 @@ class ReferralController extends GetxController {
         ],
       ),
     );
-    
+
     if (confirmed != true) return;
-    
+
     try {
       _isGeneratingCode.value = true;
-      
+
       // Mock code generation
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // Generate new code (mock)
-      final newCode = 'SINGLE${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
-      
+      final newCode =
+          'SINGLE${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+
       // Update referral program
       _referralProgram.value = _referralProgram.value!.copyWith(
         referralCode: newCode,
-        qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://singleclin.com/app?ref=$newCode',
+        qrCodeUrl:
+            'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://singleclin.com/app?ref=$newCode',
         updatedAt: DateTime.now(),
       );
-      
+
       Get.snackbar(
         'Novo Código Gerado!',
         'Seu novo código de indicação: $newCode',
@@ -203,7 +202,6 @@ class ReferralController extends GetxController {
         colorText: Get.theme.colorScheme.onPrimary,
         duration: const Duration(seconds: 4),
       );
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -217,14 +215,10 @@ class ReferralController extends GetxController {
 
   Future<void> shareReferralCode() async {
     try {
-      await Share.share(
-        shareMessage,
-        subject: 'Conheça o SingleClin!',
-      );
-      
+      await Share.share(shareMessage, subject: 'Conheça o SingleClin!');
+
       // Track share action for analytics
       _trackShare('general');
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -236,17 +230,17 @@ class ReferralController extends GetxController {
 
   Future<void> shareViaWhatsApp() async {
     try {
-      final whatsappUrl = 'https://wa.me/?text=${Uri.encodeComponent(shareMessage)}';
-      
+      final whatsappUrl =
+          'https://wa.me/?text=${Uri.encodeComponent(shareMessage)}';
+
       // In a real app, you would use url_launcher here
       Get.snackbar(
         'WhatsApp',
         'Abrindo WhatsApp para compartilhar...',
         snackPosition: SnackPosition.BOTTOM,
       );
-      
+
       _trackShare('whatsapp');
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -264,9 +258,8 @@ class ReferralController extends GetxController {
         'Abrindo Instagram Stories para compartilhar...',
         snackPosition: SnackPosition.BOTTOM,
       );
-      
+
       _trackShare('instagram');
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -284,9 +277,8 @@ class ReferralController extends GetxController {
         'Abrindo app de mensagens...',
         snackPosition: SnackPosition.BOTTOM,
       );
-      
+
       _trackShare('sms');
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -304,9 +296,8 @@ class ReferralController extends GetxController {
         'Abrindo app de email...',
         snackPosition: SnackPosition.BOTTOM,
       );
-      
+
       _trackShare('email');
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -326,9 +317,8 @@ class ReferralController extends GetxController {
         backgroundColor: Get.theme.primaryColor,
         colorText: Get.theme.colorScheme.onPrimary,
       );
-      
+
       _trackShare('copy');
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -348,9 +338,8 @@ class ReferralController extends GetxController {
         backgroundColor: Get.theme.primaryColor,
         colorText: Get.theme.colorScheme.onPrimary,
       );
-      
+
       _trackShare('copy_link');
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -385,17 +374,21 @@ class ReferralController extends GetxController {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             _buildDetailRow('Usuário', referral.displayName),
-            _buildDetailRow('Data da Indicação', 
-              '${referral.referredAt.day}/${referral.referredAt.month}/${referral.referredAt.year}'),
+            _buildDetailRow(
+              'Data da Indicação',
+              '${referral.referredAt.day}/${referral.referredAt.month}/${referral.referredAt.year}',
+            ),
             _buildDetailRow('Créditos', referral.creditsDisplay),
-            
+
             if (referral.isApproved) ...[
-              _buildDetailRow('Aprovada em', 
-                referral.approvedAt != null 
-                  ? '${referral.approvedAt!.day}/${referral.approvedAt!.month}/${referral.approvedAt!.year}'
-                  : 'N/A'),
+              _buildDetailRow(
+                'Aprovada em',
+                referral.approvedAt != null
+                    ? '${referral.approvedAt!.day}/${referral.approvedAt!.month}/${referral.approvedAt!.year}'
+                    : 'N/A',
+              ),
             ] else if (referral.isRejected) ...[
               const SizedBox(height: 8),
               Text(
@@ -410,12 +403,12 @@ class ReferralController extends GetxController {
                 style: TextStyle(color: Colors.red.shade600),
               ),
             ],
-            
+
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Get.back(),
+                onPressed: Get.back,
                 child: const Text('Fechar'),
               ),
             ),
@@ -447,7 +440,7 @@ class ReferralController extends GetxController {
   Widget _buildStatusChip(ReferralStatus status) {
     Color color;
     String text;
-    
+
     switch (status) {
       case ReferralStatus.pending:
         color = Colors.orange;
@@ -466,7 +459,7 @@ class ReferralController extends GetxController {
         text = 'Expirada';
         break;
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -510,19 +503,19 @@ class ReferralController extends GetxController {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Expanded(
               child: ListView.builder(
                 itemCount: leaderboard.length,
                 itemBuilder: (context, index) {
                   final entry = leaderboard[index];
                   final isCurrentUser = entry['isCurrentUser'] ?? false;
-                  
+
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isCurrentUser 
+                      color: isCurrentUser
                           ? Get.theme.primaryColor.withOpacity(0.1)
                           : Colors.grey.shade50,
                       borderRadius: BorderRadius.circular(8),
@@ -558,8 +551,8 @@ class ReferralController extends GetxController {
                               Text(
                                 entry['name'],
                                 style: TextStyle(
-                                  fontWeight: isCurrentUser 
-                                      ? FontWeight.bold 
+                                  fontWeight: isCurrentUser
+                                      ? FontWeight.bold
                                       : FontWeight.normal,
                                 ),
                               ),
@@ -607,7 +600,7 @@ class ReferralController extends GetxController {
       default:
         color = Colors.brown;
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
@@ -647,7 +640,7 @@ class ReferralController extends GetxController {
       'user_id': 'user_123',
       'timestamp': DateTime.now().toIso8601String(),
     };
-    
+
     print('Share tracked: $shareData');
   }
 
@@ -686,11 +679,6 @@ class ReferralController extends GetxController {
         rejectedAt: DateTime.now().subtract(const Duration(days: 8)),
       ),
     ];
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }
 

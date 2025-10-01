@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../shared/widgets/custom_bottom_nav.dart';
-import '../controllers/discovery_controller.dart';
-import '../controllers/filters_controller.dart';
-import '../../clinic_discovery/models/clinic.dart';
-import '../widgets/clinic_card.dart';
-import 'map_view_screen.dart';
-import 'filters_screen.dart';
-import 'clinic_details_screen.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/filters_controller.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/discovery/widgets/clinic_card.dart';
+import 'package:singleclin_mobile/features/discovery/screens/map_view_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/filters_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/clinic_details_screen.dart';
 
 /// Main discovery screen with dual view mode (list/map) and search functionality
 class DiscoveryScreen extends StatefulWidget {
-  const DiscoveryScreen({Key? key}) : super(key: key);
+  const DiscoveryScreen({super.key});
 
   @override
   State<DiscoveryScreen> createState() => _DiscoveryScreenState();
@@ -25,26 +25,30 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
     with TickerProviderStateMixin {
   final DiscoveryController controller = Get.put(DiscoveryController());
   final FiltersController filtersController = Get.put(FiltersController());
-  
+
   final TextEditingController _searchController = TextEditingController();
-  final PagingController<int, Clinic> _pagingController =
-      PagingController(firstPageKey: 0);
-  
+  final PagingController<int, Clinic> _pagingController = PagingController(
+    firstPageKey: 0,
+  );
+
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _fadeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeAnimationController, curve: Curves.easeInOut),
+      CurvedAnimation(
+        parent: _fadeAnimationController,
+        curve: Curves.easeInOut,
+      ),
     );
-    
+
     _setupPagination();
     _setupSearchListener();
     _fadeAnimationController.forward();
@@ -64,17 +68,22 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
         controller.loadMoreClinics();
       }
     });
-    
+
     // Listen to clinic updates
     ever(controller.filteredClinics, (List<Clinic> clinics) {
       if (controller.currentPage == 1) {
         _pagingController.refresh();
-        _pagingController.appendPage(clinics, controller.hasMoreData ? 1 : null);
+        _pagingController.appendPage(
+          clinics,
+          controller.hasMoreData ? 1 : null,
+        );
       } else {
-        final newClinics = clinics.skip((controller.currentPage - 1) * 20).toList();
+        final newClinics = clinics
+            .skip((controller.currentPage - 1) * 20)
+            .toList();
         if (newClinics.isNotEmpty) {
           _pagingController.appendPage(
-            newClinics, 
+            newClinics,
             controller.hasMoreData ? controller.currentPage : null,
           );
         }
@@ -101,9 +110,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
               _buildSearchBar(),
               _buildFiltersRow(),
               _buildViewModeToggle(),
-              Expanded(
-                child: Obx(() => _buildContent()),
-              ),
+              Expanded(child: Obx(_buildContent)),
             ],
           ),
         ),
@@ -124,10 +131,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
           final hasActiveFilters = controller.hasActiveFilters;
           return Stack(
             children: [
-              IconButton(
-                icon: const Icon(Icons.tune),
-                onPressed: _openFilters,
-              ),
+              IconButton(icon: const Icon(Icons.tune), onPressed: _openFilters),
               if (hasActiveFilters)
                 Positioned(
                   right: 8,
@@ -184,9 +188,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
           fillColor: Colors.white,
         ),
         textInputAction: TextInputAction.search,
-        onSubmitted: (value) {
-          controller.updateSearchQuery(value);
-        },
+        onSubmitted: controller.updateSearchQuery,
       ),
     );
   }
@@ -218,9 +220,13 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
               icon: const Icon(Icons.filter_list, size: 16),
               label: Text(activeCount > 0 ? '($activeCount)' : 'Filtros'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: activeCount > 0 ? AppColors.primary : AppColors.mediumGrey,
+                foregroundColor: activeCount > 0
+                    ? AppColors.primary
+                    : AppColors.mediumGrey,
                 side: BorderSide(
-                  color: activeCount > 0 ? AppColors.primary : AppColors.lightGrey,
+                  color: activeCount > 0
+                      ? AppColors.primary
+                      : AppColors.lightGrey,
                 ),
               ),
             );
@@ -266,13 +272,19 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
       case 'Hoje':
         return filters.availability.todayOnly == true;
       case 'Até 100SG':
-        return filters.priceRange.maxPrice != null && filters.priceRange.maxPrice! <= 100;
+        return filters.priceRange.maxPrice != null &&
+            filters.priceRange.maxPrice! <= 100;
       case '4★+':
-        return filters.rating.minimumRating != null && filters.rating.minimumRating! >= 4.0;
+        return filters.rating.minimumRating != null &&
+            filters.rating.minimumRating! >= 4.0;
       case 'Estética':
-        return filters.categories.selectedCategories.contains('Estética Facial');
+        return filters.categories.selectedCategories.contains(
+          'Estética Facial',
+        );
       case 'Injetáveis':
-        return filters.categories.selectedCategories.contains('Terapias Injetáveis');
+        return filters.categories.selectedCategories.contains(
+          'Terapias Injetáveis',
+        );
       default:
         return false;
     }
@@ -311,8 +323,8 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
           Obx(() {
             final count = controller.searchResultsCount;
             return Text(
-              count > 0 
-                  ? '$count ${count == 1 ? 'resultado' : 'resultados'}' 
+              count > 0
+                  ? '$count ${count == 1 ? 'resultado' : 'resultados'}'
                   : 'Nenhum resultado',
               style: Get.textTheme.bodyMedium?.copyWith(
                 color: AppColors.mediumGrey,
@@ -320,26 +332,30 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
             );
           }),
           const Spacer(),
-          Obx(() => ToggleButtons(
-            borderRadius: BorderRadius.circular(8),
-            isSelected: [
-              controller.currentViewMode == ViewMode.list,
-              controller.currentViewMode == ViewMode.map,
-            ],
-            onPressed: (index) {
-              controller.setViewMode(index == 0 ? ViewMode.list : ViewMode.map);
-            },
-            children: const [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Icon(Icons.list),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Icon(Icons.map),
-              ),
-            ],
-          )),
+          Obx(
+            () => ToggleButtons(
+              borderRadius: BorderRadius.circular(8),
+              isSelected: [
+                controller.currentViewMode == ViewMode.list,
+                controller.currentViewMode == ViewMode.map,
+              ],
+              onPressed: (index) {
+                controller.setViewMode(
+                  index == 0 ? ViewMode.list : ViewMode.map,
+                );
+              },
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Icon(Icons.list),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Icon(Icons.map),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -369,7 +385,8 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
           firstPageErrorIndicatorBuilder: (context) => _buildErrorState(),
           newPageErrorIndicatorBuilder: (context) => _buildErrorState(),
           firstPageProgressIndicatorBuilder: (context) => _buildLoadingState(),
-          newPageProgressIndicatorBuilder: (context) => _buildLoadingMoreState(),
+          newPageProgressIndicatorBuilder: (context) =>
+              _buildLoadingMoreState(),
           noItemsFoundIndicatorBuilder: (context) => _buildEmptyState(),
         ),
       ),
@@ -407,9 +424,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
   Widget _buildLoadingMoreState() {
     return const Padding(
       padding: EdgeInsets.all(16),
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
+      child: Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -492,10 +507,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
   }
 
   void _openFilters() {
-    Get.to(
-      () => const FiltersScreen(),
-      transition: Transition.rightToLeft,
-    );
+    Get.to(() => const FiltersScreen(), transition: Transition.rightToLeft);
   }
 
   void _applyQuickFilter(String filterName) {

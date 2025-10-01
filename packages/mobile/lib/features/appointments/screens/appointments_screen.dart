@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/appointments_controller.dart';
-import '../widgets/appointment_card.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/appointments/controllers/appointments_controller.dart';
+import 'package:singleclin_mobile/features/appointments/widgets/appointment_card.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Appointments Screen
 /// Main appointments management screen with tabbed interface
 class AppointmentsScreen extends GetView<AppointmentsController> {
-  const AppointmentsScreen({Key? key}) : super(key: key);
+  const AppointmentsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +30,7 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
         children: [
           _buildStatsHeader(),
           _buildTabBar(),
-          Expanded(
-            child: _buildTabBarView(),
-          ),
+          Expanded(child: _buildTabBarView()),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -49,17 +47,12 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
   Widget _buildStatsHeader() {
     return Obx(() {
       final stats = controller.appointmentStats;
-      
+
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.primary.withOpacity(0.05),
-          border: Border(
-            bottom: BorderSide(
-              color: AppColors.divider,
-              width: 1,
-            ),
-          ),
+          border: const Border(bottom: BorderSide(color: AppColors.divider)),
         ),
         child: Row(
           children: [
@@ -87,7 +80,12 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
     });
   }
 
-  Widget _buildStatItem(String label, String value, Color color, IconData icon) {
+  Widget _buildStatItem(
+    String label,
+    String value,
+    Color color,
+    IconData icon,
+  ) {
     return Expanded(
       child: Column(
         children: [
@@ -109,7 +107,7 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
@@ -123,14 +121,9 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
   /// Build tab bar
   Widget _buildTabBar() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.divider,
-            width: 1,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.divider)),
       ),
       child: TabBar(
         controller: controller.tabController,
@@ -151,11 +144,7 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
   Widget _buildTabBarView() {
     return TabBarView(
       controller: controller.tabController,
-      children: [
-        _buildUpcomingTab(),
-        _buildHistoryTab(),
-        _buildCancelledTab(),
-      ],
+      children: [_buildUpcomingTab(), _buildHistoryTab(), _buildCancelledTab()],
     );
   }
 
@@ -189,8 +178,10 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
               child: AppointmentCard(
                 appointment: appointments[index],
                 onTap: () => _navigateToDetails(appointments[index]),
-                onCancel: () => controller.cancelAppointment(appointments[index].id),
-                onReschedule: () => controller.rescheduleAppointment(appointments[index].id),
+                onCancel: () =>
+                    controller.cancelAppointment(appointments[index].id),
+                onReschedule: () =>
+                    controller.rescheduleAppointment(appointments[index].id),
               ),
             );
           },
@@ -227,7 +218,7 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
               child: AppointmentCard(
                 appointment: appointments[index],
                 onTap: () => _navigateToDetails(appointments[index]),
-                onRate: appointments[index].canRate 
+                onRate: appointments[index].canRate
                     ? () => controller.rateAppointment(appointments[index].id)
                     : null,
               ),
@@ -291,15 +282,11 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.lightGrey,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 48,
-                color: AppColors.mediumGrey,
-              ),
+              child: Icon(icon, size: 48, color: AppColors.mediumGrey),
             ),
             const SizedBox(height: 24),
             Text(
@@ -327,7 +314,10 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 12,
+                  ),
                 ),
                 child: Text(actionText),
               ),
@@ -345,8 +335,10 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
 
   /// Show search dialog
   void _showSearchDialog() {
-    final searchController = TextEditingController(text: controller.searchQuery);
-    
+    final searchController = TextEditingController(
+      text: controller.searchQuery,
+    );
+
     Get.dialog(
       AlertDialog(
         title: const Text('Pesquisar Agendamentos'),
@@ -367,10 +359,7 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
             },
             child: const Text('Limpar'),
           ),
-          ElevatedButton(
-            onPressed: () => Get.back(),
-            child: const Text('OK'),
-          ),
+          ElevatedButton(onPressed: Get.back, child: const Text('OK')),
         ],
       ),
     );
@@ -394,16 +383,10 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
                 const Expanded(
                   child: Text(
                     'Filtros',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(Icons.close),
-                ),
+                IconButton(onPressed: Get.back, icon: const Icon(Icons.close)),
               ],
             ),
             const SizedBox(height: 16),
@@ -412,7 +395,7 @@ class AppointmentsScreen extends GetView<AppointmentsController> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Get.back(),
+                onPressed: Get.back,
                 child: const Text('Aplicar Filtros'),
               ),
             ),

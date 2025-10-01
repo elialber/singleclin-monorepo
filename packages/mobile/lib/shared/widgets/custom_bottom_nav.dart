@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../core/constants/app_colors.dart';
-import '../../routes/app_routes.dart';
-import '../controllers/bottom_nav_controller.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
+import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
 
 class CustomBottomNav extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onTap;
-
   const CustomBottomNav({
     Key? key,
     required this.currentIndex,
     required this.onTap,
   }) : super(key: key);
+  final int currentIndex;
+  final Function(int) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +75,7 @@ class CustomBottomNav extends StatelessWidget {
     required String route,
   }) {
     final isSelected = currentIndex == index;
-    
+
     return GestureDetector(
       onTap: () {
         onTap(index);
@@ -85,7 +84,7 @@ class CustomBottomNav extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected 
+          color: isSelected
               ? AppColors.primary.withOpacity(0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
@@ -118,4 +117,3 @@ class CustomBottomNav extends StatelessWidget {
     );
   }
 }
-

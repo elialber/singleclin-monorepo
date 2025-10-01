@@ -3,12 +3,8 @@ import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class SubscriptionSection extends StatefulWidget {
+  const SubscriptionSection({Key? key, required this.clinic}) : super(key: key);
   final Clinic clinic;
-
-  const SubscriptionSection({
-    Key? key,
-    required this.clinic,
-  }) : super(key: key);
 
   @override
   State<SubscriptionSection> createState() => _SubscriptionSectionState();
@@ -16,7 +12,7 @@ class SubscriptionSection extends StatefulWidget {
 
 class _SubscriptionSectionState extends State<SubscriptionSection> {
   bool _isSubscribed = false; // This should come from user state
-  
+
   // Mock subscription plans
   final List<SubscriptionPlan> _subscriptionPlans = [
     SubscriptionPlan(
@@ -82,10 +78,7 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                 const SizedBox(height: 4),
                 Text(
                   'Tenha acesso privilegiado',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -93,13 +86,11 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: _isSubscribed 
-                    ? Colors.green[50] 
-                    : Colors.orange[50],
+                color: _isSubscribed ? Colors.green[50] : Colors.orange[50],
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: _isSubscribed 
-                      ? Colors.green[200]! 
+                  color: _isSubscribed
+                      ? Colors.green[200]!
                       : Colors.orange[200]!,
                 ),
               ),
@@ -109,7 +100,9 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                   Icon(
                     _isSubscribed ? Icons.check_circle : Icons.info,
                     size: 14,
-                    color: _isSubscribed ? Colors.green[700] : Colors.orange[700],
+                    color: _isSubscribed
+                        ? Colors.green[700]
+                        : Colors.orange[700],
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -117,7 +110,9 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: _isSubscribed ? Colors.green[700] : Colors.orange[700],
+                      color: _isSubscribed
+                          ? Colors.green[700]
+                          : Colors.orange[700],
                     ),
                   ),
                 ],
@@ -125,9 +120,9 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Current Status Card
         Container(
           padding: const EdgeInsets.all(16),
@@ -153,21 +148,23 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                   size: 24,
                 ),
               ),
-              
+
               const SizedBox(width: 16),
-              
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _isSubscribed 
-                          ? 'Você é assinante Premium' 
+                      _isSubscribed
+                          ? 'Você é assinante Premium'
                           : 'Torne-se um assinante',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: _isSubscribed ? Colors.green[700] : Colors.grey[700],
+                        color: _isSubscribed
+                            ? Colors.green[700]
+                            : Colors.grey[700],
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -177,18 +174,23 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                           : 'Tenha acesso prioritário e descontos especiais',
                       style: TextStyle(
                         fontSize: 12,
-                        color: _isSubscribed ? Colors.green[600] : Colors.grey[600],
+                        color: _isSubscribed
+                            ? Colors.green[600]
+                            : Colors.grey[600],
                       ),
                     ),
                   ],
                 ),
               ),
-              
+
               if (!_isSubscribed)
                 InkWell(
-                  onTap: () => _showSubscriptionOptions(),
+                  onTap: _showSubscriptionOptions,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20),
@@ -206,11 +208,11 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
             ],
           ),
         ),
-        
+
         // Benefits Preview
         if (!_isSubscribed) ...[
           const SizedBox(height: 16),
-          
+
           Text(
             'Benefícios da assinatura',
             style: TextStyle(
@@ -219,9 +221,9 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
               color: Colors.grey[700],
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Column(
             children: [
               _buildBenefitItem(
@@ -241,22 +243,22 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Subscribe Button
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: () => _showSubscriptionOptions(),
+              onPressed: _showSubscriptionOptions,
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.primary),
+                side: const BorderSide(color: AppColors.primary),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
-              child: Text(
+              child: const Text(
                 'Ver planos de assinatura',
                 style: TextStyle(
                   fontSize: 14,
@@ -267,11 +269,11 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
             ),
           ),
         ],
-        
+
         // Current Subscription Info
         if (_isSubscribed) ...[
           const SizedBox(height: 16),
-          
+
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -293,8 +295,8 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                         color: Colors.grey[800],
                       ),
                     ),
-                    Text(
-                      'R\$ 69,90/mês',
+                    const Text(
+                      r'R$ 69,90/mês',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -303,24 +305,21 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 Text(
                   'Próxima renovação: 15 de outubro',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => _showManageSubscription(),
+                        onPressed: _showManageSubscription,
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: Colors.grey[400]!),
                           shape: RoundedRectangleBorder(
@@ -329,17 +328,14 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                         ),
                         child: const Text(
                           'Gerenciar',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => _showUpgradeOptions(),
+                        onPressed: _showUpgradeOptions,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -380,15 +376,11 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              size: 16,
-              color: AppColors.primary,
-            ),
+            child: Icon(icon, size: 16, color: AppColors.primary),
           ),
-          
+
           const SizedBox(width: 12),
-          
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,10 +395,7 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
                 ),
                 Text(
                   description,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -423,7 +412,7 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
       isScrollControlled: true,
       builder: (context) => _SubscriptionOptionsBottomSheet(
         plans: _subscriptionPlans,
-        onPlanSelected: (plan) => _subscribeToPlan(plan),
+        onPlanSelected: _subscribeToPlan,
       ),
     );
   }
@@ -433,7 +422,7 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
     setState(() {
       _isSubscribed = true;
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Assinatura ${plan.name} ativada com sucesso!'),
@@ -444,27 +433,26 @@ class _SubscriptionSectionState extends State<SubscriptionSection> {
 
   void _showManageSubscription() {
     // TODO: Navigate to subscription management screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Gerenciar assinatura...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Gerenciar assinatura...')));
   }
 
   void _showUpgradeOptions() {
     // TODO: Show upgrade options
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Opções de upgrade...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Opções de upgrade...')));
   }
 }
 
 class _SubscriptionOptionsBottomSheet extends StatelessWidget {
-  final List<SubscriptionPlan> plans;
-  final Function(SubscriptionPlan) onPlanSelected;
-
   const _SubscriptionOptionsBottomSheet({
     required this.plans,
     required this.onPlanSelected,
   });
+  final List<SubscriptionPlan> plans;
+  final Function(SubscriptionPlan) onPlanSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -487,7 +475,7 @@ class _SubscriptionOptionsBottomSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -500,17 +488,17 @@ class _SubscriptionOptionsBottomSheet extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 Column(
-                  children: plans.map((plan) => 
-                    _buildPlanCard(context, plan)
-                  ).toList(),
+                  children: plans
+                      .map((plan) => _buildPlanCard(context, plan))
+                      .toList(),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 SizedBox(
                   width: double.infinity,
                   child: TextButton(
@@ -562,7 +550,10 @@ class _SubscriptionOptionsBottomSheet extends StatelessWidget {
                   ),
                   if (plan.isPopular)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(12),
@@ -578,14 +569,14 @@ class _SubscriptionOptionsBottomSheet extends StatelessWidget {
                     ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               Row(
                 children: [
                   Text(
                     'R\$ ${plan.price.toStringAsFixed(2)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
@@ -593,42 +584,41 @@ class _SubscriptionOptionsBottomSheet extends StatelessWidget {
                   ),
                   Text(
                     '/${plan.period}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: plan.benefits.map((benefit) => 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.check,
-                          size: 16,
-                          color: Colors.green[600],
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            benefit,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[700],
+                children: plan.benefits
+                    .map(
+                      (benefit) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check,
+                              size: 16,
+                              color: Colors.green[600],
                             ),
-                          ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                benefit,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )
-                ).toList(),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
           ),
@@ -639,13 +629,6 @@ class _SubscriptionOptionsBottomSheet extends StatelessWidget {
 }
 
 class SubscriptionPlan {
-  final String id;
-  final String name;
-  final double price;
-  final String period;
-  final List<String> benefits;
-  final bool isPopular;
-
   SubscriptionPlan({
     required this.id,
     required this.name,
@@ -654,4 +637,10 @@ class SubscriptionPlan {
     required this.benefits,
     required this.isPopular,
   });
+  final String id;
+  final String name;
+  final double price;
+  final String period;
+  final List<String> benefits;
+  final bool isPopular;
 }

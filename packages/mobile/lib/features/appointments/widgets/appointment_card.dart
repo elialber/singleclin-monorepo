@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
-import '../models/appointment.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/appointments/models/appointment.dart';
 
 /// Appointment Card Widget
 /// Displays appointment information in a card format
 class AppointmentCard extends StatelessWidget {
-  final Appointment appointment;
-  final VoidCallback? onTap;
-  final VoidCallback? onCancel;
-  final VoidCallback? onReschedule;
-  final VoidCallback? onRate;
-  final bool showRefundInfo;
-
   const AppointmentCard({
     Key? key,
     required this.appointment,
@@ -21,14 +14,18 @@ class AppointmentCard extends StatelessWidget {
     this.onRate,
     this.showRefundInfo = false,
   }) : super(key: key);
+  final Appointment appointment;
+  final VoidCallback? onTap;
+  final VoidCallback? onCancel;
+  final VoidCallback? onReschedule;
+  final VoidCallback? onRate;
+  final bool showRefundInfo;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -78,7 +75,10 @@ class AppointmentCard extends StatelessWidget {
               if (appointment.isToday) ...[
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.warning.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -104,16 +104,13 @@ class AppointmentCard extends StatelessWidget {
   /// Build status badge
   Widget _buildStatusBadge() {
     final status = appointment.status;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: status.lightColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: status.color.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: status.color.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -159,7 +156,9 @@ class AppointmentCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.getCategoryColor(appointment.categoryName).withOpacity(0.1),
+                color: AppColors.getCategoryColor(
+                  appointment.categoryName,
+                ).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -252,10 +251,7 @@ class AppointmentCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.sgGradient.colors.first.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.sgPrimary.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.sgPrimary.withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -278,9 +274,9 @@ class AppointmentCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
+                const Text(
                   'Créditos utilizados',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.sgPrimary,
                     fontWeight: FontWeight.w600,
@@ -320,18 +316,11 @@ class AppointmentCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.success.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.success.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.success.withOpacity(0.3)),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.attach_money,
-            size: 16,
-            color: AppColors.success,
-          ),
+          const Icon(Icons.attach_money, size: 16, color: AppColors.success),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -397,7 +386,8 @@ class AppointmentCard extends StatelessWidget {
           ),
         ],
         if (onRate != null) ...[
-          if (onCancel != null || onReschedule != null) const SizedBox(width: 12),
+          if (onCancel != null || onReschedule != null)
+            const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton.icon(
               onPressed: onRate,
@@ -418,7 +408,7 @@ class AppointmentCard extends StatelessWidget {
   /// Check if card has actions
   bool _hasActions() {
     return (onCancel != null && appointment.canCancel) ||
-           (onReschedule != null && appointment.canReschedule) ||
-           onRate != null;
+        (onReschedule != null && appointment.canReschedule) ||
+        onRate != null;
   }
 }

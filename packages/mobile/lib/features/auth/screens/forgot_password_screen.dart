@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -30,10 +30,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               SizedBox(height: 16),
               Text(
                 'Em desenvolvimento...',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../models/credit_package.dart';
+import 'package:singleclin_mobile/features/credits/models/credit_package.dart';
 
 class BuyCreditsController extends GetxController {
   // Reactive variables
@@ -22,8 +22,9 @@ class BuyCreditsController extends GetxController {
   String get promoCode => _promoCode.value;
   double get appliedDiscount => _appliedDiscount.value;
 
-  bool get canPurchase => selectedPackage != null && selectedPaymentMethod != null;
-  
+  bool get canPurchase =>
+      selectedPackage != null && selectedPaymentMethod != null;
+
   double get finalPrice {
     if (selectedPackage == null) return 0;
     final originalPrice = selectedPackage!.price;
@@ -34,7 +35,8 @@ class BuyCreditsController extends GetxController {
 
   double get totalSavings {
     if (selectedPackage == null) return 0;
-    return selectedPackage!.savings + (selectedPackage!.price * appliedDiscount / 100);
+    return selectedPackage!.savings +
+        (selectedPackage!.price * appliedDiscount / 100);
   }
 
   String get totalSavingsDisplay => 'R\$ ${totalSavings.toStringAsFixed(2)}';
@@ -49,10 +51,10 @@ class BuyCreditsController extends GetxController {
   Future<void> loadCreditPackages() async {
     try {
       _isLoading.value = true;
-      
+
       // Mock API call
       await Future.delayed(const Duration(seconds: 1));
-      
+
       _packages.assignAll([
         CreditPackage(
           id: 'starter_100',
@@ -111,7 +113,6 @@ class BuyCreditsController extends GetxController {
           },
         ),
       ]);
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -127,7 +128,7 @@ class BuyCreditsController extends GetxController {
     try {
       // Mock API call
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       _paymentMethods.assignAll([
         PaymentMethod(
           id: 'pix',
@@ -157,14 +158,13 @@ class BuyCreditsController extends GetxController {
           createdAt: DateTime.now().subtract(const Duration(days: 10)),
         ),
       ]);
-      
+
       // Auto-select default payment method
       final defaultMethod = _paymentMethods.firstWhere(
         (method) => method.isDefault,
         orElse: () => _paymentMethods.first,
       );
       _selectedPaymentMethod.value = defaultMethod;
-      
     } catch (e) {
       print('Error loading payment methods: $e');
     }
@@ -188,10 +188,10 @@ class BuyCreditsController extends GetxController {
 
     try {
       _isLoading.value = true;
-      
+
       // Mock promo code validation
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Mock promo codes
       final promoDiscounts = {
         'PRIMEIRA10': 10.0,
@@ -201,11 +201,11 @@ class BuyCreditsController extends GetxController {
       };
 
       final discount = promoDiscounts[code.toUpperCase()];
-      
+
       if (discount != null) {
         _promoCode.value = code.toUpperCase();
         _appliedDiscount.value = discount;
-        
+
         Get.snackbar(
           'Promocode Aplicado!',
           'Você ganhou ${discount.toInt()}% de desconto',
@@ -220,7 +220,6 @@ class BuyCreditsController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
         );
       }
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -249,7 +248,7 @@ class BuyCreditsController extends GetxController {
 
     try {
       _isProcessingPurchase.value = true;
-      
+
       // Show processing dialog
       Get.dialog(
         AlertDialog(
@@ -265,13 +264,13 @@ class BuyCreditsController extends GetxController {
         ),
         barrierDismissible: false,
       );
-      
+
       // Mock payment processing
       await Future.delayed(const Duration(seconds: 3));
-      
+
       // Close processing dialog
       Get.back();
-      
+
       // Show success dialog
       final package = selectedPackage!;
       Get.dialog(
@@ -283,7 +282,7 @@ class BuyCreditsController extends GetxController {
             children: [
               Text('Parabéns! Você adquiriu ${package.credits} créditos SG.'),
               const SizedBox(height: 8),
-              Text('Valor pago: ${finalPriceDisplay}'),
+              Text('Valor pago: $finalPriceDisplay'),
               if (appliedDiscount > 0)
                 Text('Desconto aplicado: ${appliedDiscount.toInt()}%'),
               const SizedBox(height: 8),
@@ -311,10 +310,9 @@ class BuyCreditsController extends GetxController {
           ],
         ),
       );
-      
+
       // Track purchase for analytics
       _trackPurchase(package);
-      
     } catch (e) {
       Get.back(); // Close any open dialog
       Get.snackbar(
@@ -343,7 +341,7 @@ class BuyCreditsController extends GetxController {
       'payment_method': selectedPaymentMethod?.type,
       'promo_code': promoCode.isEmpty ? null : promoCode,
     };
-    
+
     print('Purchase tracked: $purchaseData');
   }
 
@@ -370,16 +368,16 @@ class BuyCreditsController extends GetxController {
       ),
     );
 
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       _paymentMethods.removeWhere((m) => m.id == method.id);
-      
+
       // If removed method was selected, select another one
       if (selectedPaymentMethod?.id == method.id) {
-        _selectedPaymentMethod.value = _paymentMethods.isNotEmpty 
-            ? _paymentMethods.first 
+        _selectedPaymentMethod.value = _paymentMethods.isNotEmpty
+            ? _paymentMethods.first
             : null;
       }
-      
+
       Get.snackbar(
         'Método Removido',
         '${method.displayName} foi removido com sucesso',
@@ -467,7 +465,11 @@ class BuyCreditsController extends GetxController {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.access_time, color: Colors.orange.shade700, size: 16),
+                    Icon(
+                      Icons.access_time,
+                      color: Colors.orange.shade700,
+                      size: 16,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       package.promoTimeRemainingDisplay,
@@ -495,10 +497,5 @@ class BuyCreditsController extends GetxController {
         ),
       ),
     );
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }

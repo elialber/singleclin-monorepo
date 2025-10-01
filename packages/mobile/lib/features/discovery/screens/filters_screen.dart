@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../controllers/filters_controller.dart';
-import '../models/filter_options.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/filters_controller.dart';
+import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
 
 /// Advanced filters screen with mobile-optimized touch interactions
 class FiltersScreen extends StatefulWidget {
-  const FiltersScreen({Key? key}) : super(key: key);
+  const FiltersScreen({super.key});
 
   @override
   State<FiltersScreen> createState() => _FiltersScreenState();
@@ -59,7 +59,6 @@ class _FiltersScreenState extends State<FiltersScreen>
   PreferredSizeWidget _buildAppBar() {
     return CustomAppBar(
       title: 'Filtros',
-      showBackButton: true,
       actions: [
         TextButton(
           onPressed: controller.resetFilters,
@@ -73,29 +72,17 @@ class _FiltersScreenState extends State<FiltersScreen>
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: AppColors.lightGrey),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.lightGrey)),
       ),
       child: TabBar(
         controller: _tabController,
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.mediumGrey,
         indicatorColor: AppColors.primary,
-        indicatorWeight: 2,
         tabs: const [
-          Tab(
-            icon: Icon(Icons.tune),
-            text: 'Básico',
-          ),
-          Tab(
-            icon: Icon(Icons.location_on),
-            text: 'Localização',
-          ),
-          Tab(
-            icon: Icon(Icons.settings),
-            text: 'Avançado',
-          ),
+          Tab(icon: Icon(Icons.tune), text: 'Básico'),
+          Tab(icon: Icon(Icons.location_on), text: 'Localização'),
+          Tab(icon: Icon(Icons.settings), text: 'Avançado'),
         ],
       ),
     );
@@ -159,10 +146,7 @@ class _FiltersScreenState extends State<FiltersScreen>
       children: [
         const Text(
           'Filtros Rápidos',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -182,249 +166,267 @@ class _FiltersScreenState extends State<FiltersScreen>
   }
 
   Widget _buildPriceRangeFilter() {
-    return Obx(() => _buildFilterSection(
-          title: 'Faixa de Preço (SG)',
-          subtitle: controller.priceRangeText,
-          child: Column(
-            children: [
-              RangeSlider(
-                values: controller.priceRangeValues,
-                min: 0,
-                max: 500,
-                divisions: 50,
-                labels: RangeLabels(
-                  '${controller.priceRangeValues.start.round()}SG',
-                  '${controller.priceRangeValues.end.round()}SG',
-                ),
-                onChanged: controller.updatePriceRange,
+    return Obx(
+      () => _buildFilterSection(
+        title: 'Faixa de Preço (SG)',
+        subtitle: controller.priceRangeText,
+        child: Column(
+          children: [
+            RangeSlider(
+              values: controller.priceRangeValues,
+              max: 500,
+              divisions: 50,
+              labels: RangeLabels(
+                '${controller.priceRangeValues.start.round()}SG',
+                '${controller.priceRangeValues.end.round()}SG',
               ),
-              const SizedBox(height: 8),
-              Row(
-                children: PriceRangeFilter.commonRanges.map((range) {
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: OutlinedButton(
-                        onPressed: () {
-                          controller.updatePriceRange(RangeValues(
+              onChanged: controller.updatePriceRange,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: PriceRangeFilter.commonRanges.map((range) {
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: OutlinedButton(
+                      onPressed: () {
+                        controller.updatePriceRange(
+                          RangeValues(
                             range.minPrice?.toDouble() ?? 0,
                             range.maxPrice?.toDouble() ?? 500,
-                          ));
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                        ),
-                        child: Text(
-                          range.displayText,
-                          style: const TextStyle(fontSize: 10),
-                          textAlign: TextAlign.center,
-                        ),
+                          ),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                      child: Text(
+                        range.displayText,
+                        style: const TextStyle(fontSize: 10),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ));
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildRatingFilter() {
-    return Obx(() => _buildFilterSection(
-          title: 'Avaliação Mínima',
-          subtitle: controller.ratingText,
-          child: Column(
-            children: [
-              Slider(
-                value: controller.minimumRating,
-                min: 0,
-                max: 5,
-                divisions: 10,
-                label: '${controller.minimumRating.toStringAsFixed(1)}★',
-                onChanged: controller.updateMinimumRating,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: RatingFilter.commonFilters.map((filter) {
-                  return OutlinedButton(
-                    onPressed: () {
-                      controller.updateMinimumRating(
-                        filter.minimumRating ?? 0,
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
+    return Obx(
+      () => _buildFilterSection(
+        title: 'Avaliação Mínima',
+        subtitle: controller.ratingText,
+        child: Column(
+          children: [
+            Slider(
+              value: controller.minimumRating,
+              max: 5,
+              divisions: 10,
+              label: '${controller.minimumRating.toStringAsFixed(1)}★',
+              onChanged: controller.updateMinimumRating,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: RatingFilter.commonFilters.map((filter) {
+                return OutlinedButton(
+                  onPressed: () {
+                    controller.updateMinimumRating(filter.minimumRating ?? 0);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
-                    child: Text(
-                      filter.displayText,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ));
+                  ),
+                  child: Text(
+                    filter.displayText,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildCategoriesFilter() {
-    return Obx(() => _buildFilterSection(
-          title: 'Categorias',
-          subtitle: controller.selectedCategoriesText,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: controller.selectAllCategories,
-                    child: const Text('Selecionar Todas'),
-                  ),
-                  TextButton(
-                    onPressed: controller.clearAllCategories,
-                    child: const Text('Limpar'),
-                  ),
-                ],
-              ),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: CategoryFilter.availableCategories.map((category) {
-                  final isSelected = controller.tempFilters.categories.selectedCategories.contains(category);
-                  return FilterChip(
-                    label: Text(category),
-                    selected: isSelected,
-                    onSelected: (_) => controller.toggleCategory(category),
-                    selectedColor: AppColors.primary.withOpacity(0.2),
-                    checkmarkColor: AppColors.primary,
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ));
+    return Obx(
+      () => _buildFilterSection(
+        title: 'Categorias',
+        subtitle: controller.selectedCategoriesText,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: controller.selectAllCategories,
+                  child: const Text('Selecionar Todas'),
+                ),
+                TextButton(
+                  onPressed: controller.clearAllCategories,
+                  child: const Text('Limpar'),
+                ),
+              ],
+            ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: CategoryFilter.availableCategories.map((category) {
+                final isSelected = controller
+                    .tempFilters
+                    .categories
+                    .selectedCategories
+                    .contains(category);
+                return FilterChip(
+                  label: Text(category),
+                  selected: isSelected,
+                  onSelected: (_) => controller.toggleCategory(category),
+                  selectedColor: AppColors.primary.withOpacity(0.2),
+                  checkmarkColor: AppColors.primary,
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildAvailabilityFilter() {
-    return Obx(() => _buildFilterSection(
-          title: 'Disponibilidade',
-          subtitle: controller.tempFilters.availability.displayText,
-          child: Column(
-            children: [
-              SwitchListTile(
-                title: const Text('Disponível hoje'),
-                value: controller.tempFilters.availability.todayOnly,
-                onChanged: controller.setAvailabilityToday,
-                activeColor: AppColors.primary,
-              ),
-              SwitchListTile(
-                title: const Text('Disponível esta semana'),
-                value: controller.tempFilters.availability.thisWeekOnly,
-                onChanged: controller.setAvailabilityThisWeek,
-                activeColor: AppColors.primary,
-              ),
-              ListTile(
-                title: const Text('Data específica'),
-                subtitle: controller.tempFilters.availability.specificDate != null
-                    ? Text('${controller.tempFilters.availability.specificDate!.day}/${controller.tempFilters.availability.specificDate!.month}')
-                    : const Text('Nenhuma data selecionada'),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: _selectSpecificDate,
-              ),
-            ],
-          ),
-        ));
+    return Obx(
+      () => _buildFilterSection(
+        title: 'Disponibilidade',
+        subtitle: controller.tempFilters.availability.displayText,
+        child: Column(
+          children: [
+            SwitchListTile(
+              title: const Text('Disponível hoje'),
+              value: controller.tempFilters.availability.todayOnly,
+              onChanged: controller.setAvailabilityToday,
+              activeThumbColor: AppColors.primary,
+            ),
+            SwitchListTile(
+              title: const Text('Disponível esta semana'),
+              value: controller.tempFilters.availability.thisWeekOnly,
+              onChanged: controller.setAvailabilityThisWeek,
+              activeThumbColor: AppColors.primary,
+            ),
+            ListTile(
+              title: const Text('Data específica'),
+              subtitle: controller.tempFilters.availability.specificDate != null
+                  ? Text(
+                      '${controller.tempFilters.availability.specificDate!.day}/${controller.tempFilters.availability.specificDate!.month}',
+                    )
+                  : const Text('Nenhuma data selecionada'),
+              trailing: const Icon(Icons.calendar_today),
+              onTap: _selectSpecificDate,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildCurrentLocationCard() {
-    return Obx(() => Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.my_location,
-                  color: controller.tempFilters.location != null
-                      ? AppColors.primary
-                      : AppColors.mediumGrey,
+    return Obx(
+      () => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(
+                Icons.my_location,
+                color: controller.tempFilters.location != null
+                    ? AppColors.primary
+                    : AppColors.mediumGrey,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Localização Atual',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      controller.tempFilters.location?.displayText ??
+                          'Não definida',
+                      style: const TextStyle(
+                        color: AppColors.mediumGrey,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Localização Atual',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      Text(
-                        controller.tempFilters.location?.displayText ?? 'Não definida',
-                        style: const TextStyle(
-                          color: AppColors.mediumGrey,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+              if (controller.isLocationLoading)
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                IconButton(
+                  onPressed: controller.updateLocationFilter,
+                  icon: const Icon(Icons.refresh),
                 ),
-                controller.isLocationLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : IconButton(
-                        onPressed: controller.updateLocationFilter,
-                        icon: const Icon(Icons.refresh),
-                      ),
-              ],
-            ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildDistanceFilter() {
-    return Obx(() => _buildFilterSection(
-          title: 'Distância Máxima',
-          subtitle: controller.distanceText,
-          child: Column(
-            children: [
-              Slider(
-                value: controller.distanceValue,
-                min: 0.5,
-                max: 50,
-                divisions: 50,
-                label: controller.distanceText,
-                onChanged: controller.updateDistance,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: DistanceFilter.commonDistances.map((distance) {
-                  return OutlinedButton(
-                    onPressed: () => controller.updateDistance(distance),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
+    return Obx(
+      () => _buildFilterSection(
+        title: 'Distância Máxima',
+        subtitle: controller.distanceText,
+        child: Column(
+          children: [
+            Slider(
+              value: controller.distanceValue,
+              min: 0.5,
+              max: 50,
+              divisions: 50,
+              label: controller.distanceText,
+              onChanged: controller.updateDistance,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: DistanceFilter.commonDistances.map((distance) {
+                return OutlinedButton(
+                  onPressed: () => controller.updateDistance(distance),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
-                    child: Text(
-                      distance < 1
-                          ? '${(distance * 1000).toInt()}m'
-                          : '${distance.toStringAsFixed(1)}km',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ));
+                  ),
+                  child: Text(
+                    distance < 1
+                        ? '${(distance * 1000).toInt()}m'
+                        : '${distance.toStringAsFixed(1)}km',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildLocationOptions() {
@@ -452,95 +454,103 @@ class _FiltersScreenState extends State<FiltersScreen>
   }
 
   Widget _buildClinicOptions() {
-    return Obx(() => _buildFilterSection(
-          title: 'Opções da Clínica',
-          child: Column(
-            children: [
-              SwitchListTile(
-                title: const Text('Apenas clínicas verificadas'),
-                subtitle: const Text('Clínicas com selo de verificação'),
-                value: controller.tempFilters.onlyVerifiedClinics,
-                onChanged: controller.toggleVerifiedClinicsOnly,
-                activeColor: AppColors.primary,
-              ),
-              SwitchListTile(
-                title: const Text('Aceita créditos SG'),
-                subtitle: const Text('Clínicas que aceitam pagamento com SG'),
-                value: controller.tempFilters.onlyAcceptingSG,
-                onChanged: controller.toggleAcceptingSGOnly,
-                activeColor: AppColors.primary,
-              ),
-              SwitchListTile(
-                title: const Text('Com promoções'),
-                subtitle: const Text('Clínicas com ofertas especiais'),
-                value: controller.tempFilters.onlyWithPromotion,
-                onChanged: controller.togglePromotionOnly,
-                activeColor: AppColors.primary,
-              ),
-            ],
-          ),
-        ));
+    return Obx(
+      () => _buildFilterSection(
+        title: 'Opções da Clínica',
+        child: Column(
+          children: [
+            SwitchListTile(
+              title: const Text('Apenas clínicas verificadas'),
+              subtitle: const Text('Clínicas com selo de verificação'),
+              value: controller.tempFilters.onlyVerifiedClinics,
+              onChanged: controller.toggleVerifiedClinicsOnly,
+              activeThumbColor: AppColors.primary,
+            ),
+            SwitchListTile(
+              title: const Text('Aceita créditos SG'),
+              subtitle: const Text('Clínicas que aceitam pagamento com SG'),
+              value: controller.tempFilters.onlyAcceptingSG,
+              onChanged: controller.toggleAcceptingSGOnly,
+              activeThumbColor: AppColors.primary,
+            ),
+            SwitchListTile(
+              title: const Text('Com promoções'),
+              subtitle: const Text('Clínicas com ofertas especiais'),
+              value: controller.tempFilters.onlyWithPromotion,
+              onChanged: controller.togglePromotionOnly,
+              activeThumbColor: AppColors.primary,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildAmenitiesFilter() {
-    return Obx(() => _buildFilterSection(
-          title: 'Comodidades',
-          subtitle: controller.selectedAmenitiesText,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: controller.clearAllAmenities,
-                    child: const Text('Limpar'),
-                  ),
-                ],
-              ),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: controller.availableAmenities.map((amenity) {
-                  final isSelected = controller.tempFilters.amenities.contains(amenity);
-                  return FilterChip(
-                    label: Text(amenity),
-                    selected: isSelected,
-                    onSelected: (_) => controller.toggleAmenity(amenity),
-                    selectedColor: AppColors.primary.withOpacity(0.2),
-                    checkmarkColor: AppColors.primary,
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ));
+    return Obx(
+      () => _buildFilterSection(
+        title: 'Comodidades',
+        subtitle: controller.selectedAmenitiesText,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: controller.clearAllAmenities,
+                  child: const Text('Limpar'),
+                ),
+              ],
+            ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: controller.availableAmenities.map((amenity) {
+                final isSelected = controller.tempFilters.amenities.contains(
+                  amenity,
+                );
+                return FilterChip(
+                  label: Text(amenity),
+                  selected: isSelected,
+                  onSelected: (_) => controller.toggleAmenity(amenity),
+                  selectedColor: AppColors.primary.withOpacity(0.2),
+                  checkmarkColor: AppColors.primary,
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildSortOptions() {
-    return Obx(() => _buildFilterSection(
-          title: 'Ordenar por',
-          child: Column(
-            children: SortOption.values.map((option) {
-              return RadioListTile<SortOption>(
-                title: Text(option.displayName),
-                value: option,
-                groupValue: controller.tempFilters.sortBy,
-                onChanged: (value) {
-                  if (value != null) {
-                    controller.updateSortOption(value);
-                  }
-                },
-                activeColor: AppColors.primary,
-              );
-            }).toList(),
-          ),
-        ));
+    return Obx(
+      () => _buildFilterSection(
+        title: 'Ordenar por',
+        child: Column(
+          children: SortOption.values.map((option) {
+            return RadioListTile<SortOption>(
+              title: Text(option.displayName),
+              value: option,
+              groupValue: controller.tempFilters.sortBy,
+              onChanged: (value) {
+                if (value != null) {
+                  controller.updateSortOption(value);
+                }
+              },
+              activeColor: AppColors.primary,
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   Widget _buildFilterSection({
     required String title,
-    String? subtitle,
     required Widget child,
+    String? subtitle,
   }) {
     return Card(
       child: Padding(
@@ -590,67 +600,68 @@ class _FiltersScreenState extends State<FiltersScreen>
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: AppColors.lightGrey),
-        ),
+        border: Border(top: BorderSide(color: AppColors.lightGrey)),
       ),
-      child: Obx(() => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (controller.activeFiltersCount > 0)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${controller.activeFiltersCount} ${controller.activeFiltersCount == 1 ? 'filtro ativo' : 'filtros ativos'}',
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                    ),
+      child: Obx(
+        () => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (controller.activeFiltersCount > 0)
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${controller.activeFiltersCount} ${controller.activeFiltersCount == 1 ? 'filtro ativo' : 'filtros ativos'}',
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
                   ),
                 ),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: controller.hasChanges
-                          ? controller.cancelFilters
-                          : () => Get.back(),
-                      child: const Text('Cancelar'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: controller.applyFilters,
-                      child: const Text('Aplicar Filtros'),
-                    ),
-                  ),
-                ],
               ),
-            ],
-          )),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: controller.hasChanges
+                        ? controller.cancelFilters
+                        : Get.back,
+                    child: const Text('Cancelar'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: controller.applyFilters,
+                    child: const Text('Aplicar Filtros'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  void _selectSpecificDate() async {
+  Future<void> _selectSpecificDate() async {
     final date = await showDatePicker(
       context: context,
-      initialDate: controller.tempFilters.availability.specificDate ?? 
-                  DateTime.now().add(const Duration(days: 1)),
+      initialDate:
+          controller.tempFilters.availability.specificDate ??
+          DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 90)),
     );
-    
+
     if (date != null) {
       controller.setSpecificDateAvailability(date, null);
     }

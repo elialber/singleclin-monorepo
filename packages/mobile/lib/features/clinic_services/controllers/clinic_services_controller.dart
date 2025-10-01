@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import '../models/clinic_service.dart';
-import '../services/clinic_services_api.dart';
-import '../../clinic_discovery/models/clinic.dart';
-import '../../../presentation/controllers/auth_controller.dart';
-import '../../../data/services/user_api_service.dart';
+import 'package:singleclin_mobile/features/clinic_services/models/clinic_service.dart';
+import 'package:singleclin_mobile/features/clinic_services/services/clinic_services_api.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/data/services/user_api_service.dart';
 
 class ClinicServicesController extends GetxController {
   final RxList<ClinicService> services = <ClinicService>[].obs;
@@ -12,11 +12,11 @@ class ClinicServicesController extends GetxController {
   final RxString error = ''.obs;
   final RxInt userCredits = 0.obs;
   final RxBool creditsLoaded = false.obs;
-  
+
   Clinic? _clinic;
   final AuthController _authController = Get.find<AuthController>();
   final UserApiService _userApiService = UserApiService();
-  
+
   Clinic get clinic {
     if (_clinic == null) {
       throw Exception('Clinic data not initialized');
@@ -27,30 +27,30 @@ class ClinicServicesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
+
     print('DEBUG: ClinicServicesController onInit called');
-    
+
     try {
       // Get clinic data from arguments
       final arguments = Get.arguments;
       print('DEBUG: Arguments received: $arguments');
       print('DEBUG: Arguments type: ${arguments.runtimeType}');
-      
+
       if (arguments == null) {
         print('DEBUG: Arguments is null');
         _handleNavigationError('Dados da clínica não encontrados (null)');
         return;
       }
-      
+
       if (arguments is! Clinic) {
         print('DEBUG: Arguments is not Clinic type');
         _handleNavigationError('Dados da clínica inválidos');
         return;
       }
-      
+
       _clinic = arguments;
       print('DEBUG: Clinic set successfully: ${_clinic!.name}');
-      
+
       // Load credits first, then services to ensure proper validation
       loadUserCredits().then((_) {
         // Always use API to get real service IDs and data
@@ -61,7 +61,7 @@ class ClinicServicesController extends GetxController {
       _handleNavigationError('Erro ao inicializar: $e');
     }
   }
-  
+
   void _handleNavigationError(String message) {
     print('DEBUG: Handling navigation error: $message');
     Get.back();
@@ -74,7 +74,6 @@ class ClinicServicesController extends GetxController {
     );
   }
 
-
   /// Load services from API
   Future<void> loadServices() async {
     print('DEBUG: loadServices() API called');
@@ -82,11 +81,15 @@ class ClinicServicesController extends GetxController {
       isLoading.value = true;
       error.value = '';
       print('DEBUG: Loading set to true');
-      
+
       print('DEBUG: Calling API for clinic ID: ${clinic.id}');
-      final loadedServices = await ClinicServicesApi.getClinicServices(clinic.id);
+      final loadedServices = await ClinicServicesApi.getClinicServices(
+        clinic.id,
+      );
       services.value = loadedServices;
-      print('DEBUG: Services loaded from API: ${loadedServices.length} services');
+      print(
+        'DEBUG: Services loaded from API: ${loadedServices.length} services',
+      );
     } catch (e) {
       print('DEBUG: API error: $e');
       error.value = 'Erro ao carregar serviços: $e';
@@ -109,7 +112,9 @@ class ClinicServicesController extends GetxController {
 
       final userId = _authController.currentUser?.id;
       print('DEBUG: loadUserCredits - userId: $userId');
-      print('DEBUG: loadUserCredits - currentUser: ${_authController.currentUser}');
+      print(
+        'DEBUG: loadUserCredits - currentUser: ${_authController.currentUser}',
+      );
 
       // Force sync user with backend to ensure user exists
       try {
@@ -127,12 +132,15 @@ class ClinicServicesController extends GetxController {
 
       if (userId != null) {
         try {
-          final creditsResponse = await ClinicServicesApi.getUserCredits(userId);
+          final creditsResponse = await ClinicServicesApi.getUserCredits(
+            userId,
+          );
           print('DEBUG: Credits response: $creditsResponse');
 
           // Try different response structures
           dynamic creditsData = creditsResponse;
-          if (creditsResponse.containsKey('data') && creditsResponse['data'] != null) {
+          if (creditsResponse.containsKey('data') &&
+              creditsResponse['data'] != null) {
             creditsData = creditsResponse['data'];
           }
 
@@ -141,9 +149,11 @@ class ClinicServicesController extends GetxController {
           if (creditsData is Map) {
             // API response structure: {"data": {"totalAvailableCredits": 0}}
             if (creditsData.containsKey('totalAvailableCredits')) {
-              totalCredits = (creditsData['totalAvailableCredits'] as num).toInt();
+              totalCredits = (creditsData['totalAvailableCredits'] as num)
+                  .toInt();
             } else if (creditsData.containsKey('TotalAvailableCredits')) {
-              totalCredits = (creditsData['TotalAvailableCredits'] as num).toInt();
+              totalCredits = (creditsData['TotalAvailableCredits'] as num)
+                  .toInt();
             } else if (creditsData.containsKey('credits')) {
               totalCredits = (creditsData['credits'] as num).toInt();
             }
@@ -159,13 +169,15 @@ class ClinicServicesController extends GetxController {
         }
       } else {
         print('DEBUG: User not authenticated, using mock credits');
-        userCredits.value = 100; // Mock credits for testing when not authenticated
+        userCredits.value =
+            100; // Mock credits for testing when not authenticated
       }
     } catch (e) {
       print('DEBUG: Error in loadUserCredits: $e');
       userCredits.value = 100; // Fallback credits
     } finally {
-      creditsLoaded.value = true; // Mark credits as loaded regardless of success/failure
+      creditsLoaded.value =
+          true; // Mark credits as loaded regardless of success/failure
     }
   }
 
@@ -177,7 +189,7 @@ class ClinicServicesController extends GetxController {
   void showBookingConfirmation(ClinicService service) {
     Get.dialog(
       AlertDialog(
-        title: Text('Confirmar Agendamento'),
+        title: const Text('Confirmar Agendamento'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,18 +210,12 @@ class ClinicServicesController extends GetxController {
             const SizedBox(height: 16),
             Text(
               'Seus créditos: ${userCredits.value}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () => _confirmBooking(service),
             child: const Text('Confirmar'),
@@ -267,11 +273,15 @@ class ClinicServicesController extends GetxController {
       }
 
       // Step 1: Schedule appointment and get confirmation token
-      print('DEBUG: Scheduling appointment with clinicId: ${clinic.id}, serviceId: ${service.id}');
+      print(
+        'DEBUG: Scheduling appointment with clinicId: ${clinic.id}, serviceId: ${service.id}',
+      );
       final scheduleResponse = await ClinicServicesApi.scheduleAppointment(
         clinicId: clinic.id,
         serviceId: service.id,
-        appointmentDate: DateTime.now().add(const Duration(days: 1)), // Mock date
+        appointmentDate: DateTime.now().add(
+          const Duration(days: 1),
+        ), // Mock date
       );
 
       print('DEBUG: Schedule response: $scheduleResponse');
@@ -279,9 +289,9 @@ class ClinicServicesController extends GetxController {
       // Extract confirmation token from response
       String? confirmationToken;
       try {
-        if (scheduleResponse is Map && scheduleResponse.containsKey('confirmationToken')) {
+        if (scheduleResponse.containsKey('confirmationToken')) {
           confirmationToken = scheduleResponse['confirmationToken']?.toString();
-        } else if (scheduleResponse is Map && scheduleResponse.containsKey('data')) {
+        } else if (scheduleResponse.containsKey('data')) {
           final data = scheduleResponse['data'];
           if (data is Map && data.containsKey('confirmationToken')) {
             confirmationToken = data['confirmationToken']?.toString();
@@ -311,7 +321,6 @@ class ClinicServicesController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        duration: const Duration(seconds: 3),
       );
 
       // Navigate back
@@ -342,5 +351,4 @@ class ClinicServicesController extends GetxController {
       isLoading.value = false;
     }
   }
-
 }

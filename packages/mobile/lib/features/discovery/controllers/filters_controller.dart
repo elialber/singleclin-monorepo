@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../core/services/location_service.dart';
-import '../models/filter_options.dart';
-import 'discovery_controller.dart';
+import 'package:singleclin_mobile/core/services/location_service.dart';
+import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
 
 /// Filters controller managing advanced filtering options and search refinement
 class FiltersController extends GetxController {
   final LocationService _locationService = Get.find<LocationService>();
-  final DiscoveryController _discoveryController = Get.find<DiscoveryController>();
+  final DiscoveryController _discoveryController =
+      Get.find<DiscoveryController>();
 
   // Current filter state
   final _currentFilters = FilterOptions.defaultFilters.obs;
@@ -19,7 +20,7 @@ class FiltersController extends GetxController {
 
   // Filter UI state
   final _expandedSections = <String, bool>{}.obs;
-  final _priceRangeValues = RangeValues(0, 500).obs;
+  final _priceRangeValues = const RangeValues(0, 500).obs;
   final _distanceValue = 10.0.obs;
   final _minimumRating = 0.0.obs;
 
@@ -101,15 +102,16 @@ class FiltersController extends GetxController {
   Future<void> updateLocationFilter() async {
     try {
       _isLocationLoading.value = true;
-      
+
       final position = await _locationService.getCurrentPosition();
       final locationFilter = LocationFilter(
         latitude: position.latitude,
         longitude: position.longitude,
       );
-      
-      _tempFilters.value = _tempFilters.value.copyWith(location: locationFilter);
-      
+
+      _tempFilters.value = _tempFilters.value.copyWith(
+        location: locationFilter,
+      );
     } catch (e) {
       Get.snackbar(
         'Erro de Localização',
@@ -124,19 +126,19 @@ class FiltersController extends GetxController {
   /// Update price range filter
   void updatePriceRange(RangeValues values) {
     _priceRangeValues.value = values;
-    
+
     final priceFilter = PriceRangeFilter(
       minPrice: values.start > 0 ? values.start.toInt() : null,
       maxPrice: values.end < 500 ? values.end.toInt() : null,
     );
-    
+
     _tempFilters.value = _tempFilters.value.copyWith(priceRange: priceFilter);
   }
 
   /// Update distance filter
   void updateDistance(double distance) {
     _distanceValue.value = distance;
-    
+
     final userLocation = _discoveryController.userLocation;
     final distanceFilter = userLocation != null
         ? DistanceFilter(
@@ -145,18 +147,18 @@ class FiltersController extends GetxController {
             centerLongitude: userLocation.longitude,
           )
         : DistanceFilter(maxDistanceKm: distance);
-    
+
     _tempFilters.value = _tempFilters.value.copyWith(distance: distanceFilter);
   }
 
   /// Update minimum rating filter
   void updateMinimumRating(double rating) {
     _minimumRating.value = rating;
-    
-    final ratingFilter = rating > 0 
+
+    final ratingFilter = rating > 0
         ? RatingFilter(minimumRating: rating)
         : const RatingFilter();
-    
+
     _tempFilters.value = _tempFilters.value.copyWith(rating: ratingFilter);
   }
 
@@ -164,8 +166,10 @@ class FiltersController extends GetxController {
   void toggleCategory(String category) {
     final currentCategories = _tempFilters.value.categories;
     final updatedCategories = currentCategories.toggleCategory(category);
-    
-    _tempFilters.value = _tempFilters.value.copyWith(categories: updatedCategories);
+
+    _tempFilters.value = _tempFilters.value.copyWith(
+      categories: updatedCategories,
+    );
   }
 
   /// Clear all selected categories
@@ -177,7 +181,7 @@ class FiltersController extends GetxController {
 
   /// Select all categories
   void selectAllCategories() {
-    final allCategories = CategoryFilter(
+    const allCategories = CategoryFilter(
       selectedCategories: CategoryFilter.availableCategories,
     );
     _tempFilters.value = _tempFilters.value.copyWith(categories: allCategories);
@@ -188,8 +192,10 @@ class FiltersController extends GetxController {
     final availability = value
         ? const AvailabilityFilter(todayOnly: true)
         : const AvailabilityFilter();
-    
-    _tempFilters.value = _tempFilters.value.copyWith(availability: availability);
+
+    _tempFilters.value = _tempFilters.value.copyWith(
+      availability: availability,
+    );
   }
 
   /// Update availability filter for this week
@@ -197,8 +203,10 @@ class FiltersController extends GetxController {
     final availability = value
         ? const AvailabilityFilter(thisWeekOnly: true)
         : const AvailabilityFilter();
-    
-    _tempFilters.value = _tempFilters.value.copyWith(availability: availability);
+
+    _tempFilters.value = _tempFilters.value.copyWith(
+      availability: availability,
+    );
   }
 
   /// Set specific date availability
@@ -207,8 +215,10 @@ class FiltersController extends GetxController {
       specificDate: date,
       specificTime: time,
     );
-    
-    _tempFilters.value = _tempFilters.value.copyWith(availability: availability);
+
+    _tempFilters.value = _tempFilters.value.copyWith(
+      availability: availability,
+    );
   }
 
   /// Toggle verified clinics only
@@ -220,29 +230,27 @@ class FiltersController extends GetxController {
 
   /// Toggle accepting SG only
   void toggleAcceptingSGOnly(bool value) {
-    _tempFilters.value = _tempFilters.value.copyWith(
-      onlyAcceptingSG: value,
-    );
+    _tempFilters.value = _tempFilters.value.copyWith(onlyAcceptingSG: value);
   }
 
   /// Toggle promotion only
   void togglePromotionOnly(bool value) {
-    _tempFilters.value = _tempFilters.value.copyWith(
-      onlyWithPromotion: value,
-    );
+    _tempFilters.value = _tempFilters.value.copyWith(onlyWithPromotion: value);
   }
 
   /// Toggle amenity selection
   void toggleAmenity(String amenity) {
     final currentAmenities = List<String>.from(_tempFilters.value.amenities);
-    
+
     if (currentAmenities.contains(amenity)) {
       currentAmenities.remove(amenity);
     } else {
       currentAmenities.add(amenity);
     }
-    
-    _tempFilters.value = _tempFilters.value.copyWith(amenities: currentAmenities);
+
+    _tempFilters.value = _tempFilters.value.copyWith(
+      amenities: currentAmenities,
+    );
   }
 
   /// Clear all amenities
@@ -260,7 +268,7 @@ class FiltersController extends GetxController {
     final preset = QuickFilters.presets
         .firstWhereOrNull((p) => p.key == presetName)
         ?.value;
-    
+
     if (preset != null) {
       _tempFilters.value = preset.copyWith(
         location: _tempFilters.value.location, // Keep current location
@@ -273,9 +281,9 @@ class FiltersController extends GetxController {
   void applyFilters() {
     _currentFilters.value = _tempFilters.value;
     _discoveryController.updateFilters(_currentFilters.value);
-    
+
     Get.back(); // Close filters screen
-    
+
     Get.snackbar(
       'Filtros Aplicados',
       _getFiltersAppliedMessage(),

@@ -1,43 +1,42 @@
 import 'package:geolocator/geolocator.dart';
-import '../models/clinic.dart';
-import '../../../data/services/clinic_api_service.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
 
 class ClinicDiscoveryService {
   final ClinicApiService _clinicApiService = ClinicApiService();
-  
+
   // Cache for clinics to avoid excessive API calls
   List<Clinic>? _cachedClinics;
   DateTime? _lastFetchTime;
   static const Duration _cacheExpiration = Duration(minutes: 5);
 
-
   Future<List<Clinic>> getNearbyClinics({Position? position}) async {
     try {
       // Check if we have cached data that's still valid
-      if (_cachedClinics != null && 
-          _lastFetchTime != null && 
+      if (_cachedClinics != null &&
+          _lastFetchTime != null &&
           DateTime.now().difference(_lastFetchTime!) < _cacheExpiration) {
         print('📦 Using cached clinic data');
         return List.from(_cachedClinics!);
       }
 
       print('🌐 Fetching clinics from backend API...');
-      
+
       // Fetch real clinics from backend
       final clinics = await _clinicApiService.getActiveClinics();
-      
+
       // Cache the results
       _cachedClinics = clinics;
       _lastFetchTime = DateTime.now();
-      
+
       print('✅ Fetched ${clinics.length} clinics from backend');
-      
+
       // If no clinics from backend, return empty list
       if (clinics.isEmpty) {
         print('⚠️ No clinics from backend, returning empty list');
         return [];
       }
-      
+
       return clinics;
     } catch (e) {
       print('❌ Error fetching clinics from backend: $e');
@@ -50,21 +49,21 @@ class ClinicDiscoveryService {
   Future<List<Clinic>> searchClinicsByName(String name) async {
     try {
       print('🔍 Searching clinics by name: $name');
-      
+
       // Use API search if available
       final searchResults = await _clinicApiService.searchClinics(name);
-      
+
       if (searchResults.isNotEmpty) {
         return searchResults;
       }
-      
+
       // Fallback to local search in cached data
       final allClinics = await getNearbyClinics();
       final query = name.toLowerCase();
-      
+
       return allClinics.where((clinic) {
         return clinic.name.toLowerCase().contains(query) ||
-               clinic.address.toLowerCase().contains(query);
+            clinic.address.toLowerCase().contains(query);
       }).toList();
     } catch (e) {
       print('❌ Error searching clinics: $e');
@@ -82,8 +81,9 @@ class ClinicDiscoveryService {
       final allClinics = await getNearbyClinics();
 
       return allClinics.where((clinic) {
-        return clinic.specializations.any((spec) =>
-            spec.toLowerCase() == specialization.toLowerCase());
+        return clinic.specializations.any(
+          (spec) => spec.toLowerCase() == specialization.toLowerCase(),
+        );
       }).toList();
     } catch (e) {
       print('❌ Error searching clinics by specialization: $e');
@@ -112,8 +112,9 @@ class ClinicDiscoveryService {
       // Use real API when available
       final allClinics = await getNearbyClinics();
 
-      return allClinics.where((clinic) =>
-          favoriteIds.contains(clinic.id)).toList();
+      return allClinics
+          .where((clinic) => favoriteIds.contains(clinic.id))
+          .toList();
     } catch (e) {
       print('❌ Error getting favorite clinics: $e');
       return [];
@@ -123,14 +124,14 @@ class ClinicDiscoveryService {
   Future<Clinic?> getClinicById(String id) async {
     try {
       print('🏥 Fetching clinic by ID: $id');
-      
+
       // Try to get from API first
       final clinic = await _clinicApiService.getClinicById(id);
-      
+
       if (clinic != null) {
         return clinic;
       }
-      
+
       // Fallback to cached data
       final allClinics = await getNearbyClinics();
       try {
@@ -174,16 +175,23 @@ class ClinicDiscoveryService {
 
       // Return clinics that are available now or have emergency services
       return allClinics.where((clinic) {
-        return clinic.isAvailable && (
-          clinic.services.any((service) =>
-              (service['name'] ?? '').toLowerCase().contains('urgência') ||
-              (service['name'] ?? '').toLowerCase().contains('pronto socorro') ||
-              (service['name'] ?? '').toLowerCase().contains('emergência')
-          ) ||
-          clinic.nextAvailableSlot?.isBefore(
-            DateTime.now().add(const Duration(hours: 2))
-          ) == true
-        );
+        return clinic.isAvailable &&
+            (clinic.services.any(
+                      (service) =>
+                          (service['name'] ?? '').toLowerCase().contains(
+                            'urgência',
+                          ) ||
+                          (service['name'] ?? '').toLowerCase().contains(
+                            'pronto socorro',
+                          ) ||
+                          (service['name'] ?? '').toLowerCase().contains(
+                            'emergência',
+                          ),
+                    ) ||
+                    clinic.nextAvailableSlot?.isBefore(
+                      DateTime.now().add(const Duration(hours: 2)),
+                    ) ??
+                false);
       }).toList();
     } catch (e) {
       print('❌ Error getting emergency clinics: $e');
@@ -192,7 +200,10 @@ class ClinicDiscoveryService {
   }
 
   // Method to update clinic availability - would typically call API
-  Future<bool> updateClinicAvailability(String clinicId, bool isAvailable) async {
+  Future<bool> updateClinicAvailability(
+    String clinicId,
+    bool isAvailable,
+  ) async {
     try {
       print('🔄 Updating clinic availability: $clinicId to $isAvailable');
 
@@ -219,7 +230,9 @@ class ClinicDiscoveryService {
     String? notes,
   }) async {
     try {
-      print('📅 Booking appointment at clinic $clinicId for patient $patientId');
+      print(
+        '📅 Booking appointment at clinic $clinicId for patient $patientId',
+      );
 
       // Verify clinic exists and is available
       final clinic = await getClinicById(clinicId);
@@ -241,7 +254,6 @@ class ClinicDiscoveryService {
 
       print('✅ Appointment booking simulation successful');
       return true;
-
     } catch (e) {
       print('❌ Error booking appointment: $e');
       return false;

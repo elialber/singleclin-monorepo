@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/errors/failures.dart';
-import '../../core/services/network_service.dart';
-import '../../core/services/sync_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+import 'package:singleclin_mobile/core/services/sync_service.dart';
 
 /// Base controller that all controllers should extend
 /// Provides common functionality for loading states, error handling, and offline-first operations
@@ -142,18 +142,21 @@ abstract class BaseController extends GetxController {
     } else if (e.toString().contains('TimeoutException')) {
       return const TimeoutFailure();
     } else if (e.toString().contains('FormatException')) {
-      return ValidationFailure(message: 'Formato de dados inválido', details: e);
-    } else if (e.toString().contains('unauthorized') || 
-               e.toString().contains('401')) {
+      return ValidationFailure(
+        message: 'Formato de dados inválido',
+        details: e,
+      );
+    } else if (e.toString().contains('unauthorized') ||
+        e.toString().contains('401')) {
       return const AuthorizationFailure();
-    } else if (e.toString().contains('forbidden') || 
-               e.toString().contains('403')) {
+    } else if (e.toString().contains('forbidden') ||
+        e.toString().contains('403')) {
       return const AuthorizationFailure(message: 'Acesso negado');
-    } else if (e.toString().contains('not found') || 
-               e.toString().contains('404')) {
+    } else if (e.toString().contains('not found') ||
+        e.toString().contains('404')) {
       return const NotFoundFailure();
     }
-    
+
     return UnknownFailure(message: e.toString(), details: e);
   }
 
@@ -250,7 +253,6 @@ abstract class BaseController extends GetxController {
       }
 
       return result;
-
     } on Exception catch (e) {
       final failure = _mapExceptionToFailure(e);
 
@@ -299,7 +301,6 @@ abstract class BaseController extends GetxController {
       }
 
       return result;
-
     } on Exception catch (e) {
       final failure = _mapExceptionToFailure(e);
 
@@ -337,7 +338,9 @@ abstract class BaseController extends GetxController {
       if (onNoConnection != null) {
         onNoConnection();
       } else {
-        setError(const NetworkFailure(message: 'Operação requer conexão com internet'));
+        setError(
+          const NetworkFailure(message: 'Operação requer conexão com internet'),
+        );
       }
       return null;
     }
@@ -369,7 +372,9 @@ abstract class BaseController extends GetxController {
           showSuccessSnackbar('${result.syncedCount} itens sincronizados');
         }
       } else {
-        showWarningSnackbar('Sincronização parcial: ${result.errorMessage ?? "erros encontrados"}');
+        showWarningSnackbar(
+          'Sincronização parcial: ${result.errorMessage ?? "erros encontrados"}',
+        );
       }
     } catch (e) {
       showErrorSnackbar('Erro na sincronização: $e');
@@ -393,9 +398,7 @@ abstract class BaseController extends GetxController {
 
       // Trigger auto-sync when connection is restored
       if (connected && hasCachedData) {
-        Future.delayed(const Duration(seconds: 2), () {
-          syncData();
-        });
+        Future.delayed(const Duration(seconds: 2), syncData);
       }
     });
   }

@@ -3,28 +3,6 @@ import 'package:equatable/equatable.dart';
 /// User Profile Model
 /// Comprehensive user profile with health information and LGPD compliance
 class UserProfile extends Equatable {
-  final String id;
-  final String email;
-  final String? photoUrl;
-  final PersonalInfo personalInfo;
-  final HealthInfo healthInfo;
-  final ContactInfo contactInfo;
-  final PrivacySettings privacySettings;
-  final NotificationSettings notificationSettings;
-  final List<String> emergencyContacts;
-  final List<String> allergies;
-  final List<String> medications;
-  final List<String> healthConditions;
-  final Map<String, dynamic>? additionalData;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final DateTime? lastLoginAt;
-  final bool isActive;
-  final bool isVerified;
-  final bool hasCompletedOnboarding;
-  final String? preferredLanguage;
-  final String? timezone;
-
   const UserProfile({
     required this.id,
     required this.email,
@@ -55,20 +33,34 @@ class UserProfile extends Equatable {
       id: json['id'] as String,
       email: json['email'] as String,
       photoUrl: json['photoUrl'] as String?,
-      personalInfo: PersonalInfo.fromJson(json['personalInfo'] as Map<String, dynamic>),
-      healthInfo: HealthInfo.fromJson(json['healthInfo'] as Map<String, dynamic>),
-      contactInfo: ContactInfo.fromJson(json['contactInfo'] as Map<String, dynamic>),
-      privacySettings: PrivacySettings.fromJson(json['privacySettings'] as Map<String, dynamic>),
-      notificationSettings: NotificationSettings.fromJson(json['notificationSettings'] as Map<String, dynamic>),
-      emergencyContacts: List<String>.from(json['emergencyContacts'] as List? ?? []),
+      personalInfo: PersonalInfo.fromJson(
+        json['personalInfo'] as Map<String, dynamic>,
+      ),
+      healthInfo: HealthInfo.fromJson(
+        json['healthInfo'] as Map<String, dynamic>,
+      ),
+      contactInfo: ContactInfo.fromJson(
+        json['contactInfo'] as Map<String, dynamic>,
+      ),
+      privacySettings: PrivacySettings.fromJson(
+        json['privacySettings'] as Map<String, dynamic>,
+      ),
+      notificationSettings: NotificationSettings.fromJson(
+        json['notificationSettings'] as Map<String, dynamic>,
+      ),
+      emergencyContacts: List<String>.from(
+        json['emergencyContacts'] as List? ?? [],
+      ),
       allergies: List<String>.from(json['allergies'] as List? ?? []),
       medications: List<String>.from(json['medications'] as List? ?? []),
-      healthConditions: List<String>.from(json['healthConditions'] as List? ?? []),
+      healthConditions: List<String>.from(
+        json['healthConditions'] as List? ?? [],
+      ),
       additionalData: json['additionalData'] as Map<String, dynamic>?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      lastLoginAt: json['lastLoginAt'] != null 
-          ? DateTime.parse(json['lastLoginAt'] as String) 
+      lastLoginAt: json['lastLoginAt'] != null
+          ? DateTime.parse(json['lastLoginAt'] as String)
           : null,
       isActive: json['isActive'] as bool? ?? true,
       isVerified: json['isVerified'] as bool? ?? false,
@@ -77,6 +69,27 @@ class UserProfile extends Equatable {
       timezone: json['timezone'] as String? ?? 'America/Sao_Paulo',
     );
   }
+  final String id;
+  final String email;
+  final String? photoUrl;
+  final PersonalInfo personalInfo;
+  final HealthInfo healthInfo;
+  final ContactInfo contactInfo;
+  final PrivacySettings privacySettings;
+  final NotificationSettings notificationSettings;
+  final List<String> emergencyContacts;
+  final List<String> allergies;
+  final List<String> medications;
+  final List<String> healthConditions;
+  final Map<String, dynamic>? additionalData;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? lastLoginAt;
+  final bool isActive;
+  final bool isVerified;
+  final bool hasCompletedOnboarding;
+  final String? preferredLanguage;
+  final String? timezone;
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
@@ -148,7 +161,8 @@ class UserProfile extends Equatable {
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       isActive: isActive ?? this.isActive,
       isVerified: isVerified ?? this.isVerified,
-      hasCompletedOnboarding: hasCompletedOnboarding ?? this.hasCompletedOnboarding,
+      hasCompletedOnboarding:
+          hasCompletedOnboarding ?? this.hasCompletedOnboarding,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       timezone: timezone ?? this.timezone,
     );
@@ -174,9 +188,9 @@ class UserProfile extends Equatable {
   /// Check if profile is complete
   bool get isProfileComplete {
     return personalInfo.isComplete &&
-           healthInfo.isComplete &&
-           contactInfo.isComplete &&
-           hasCompletedOnboarding;
+        healthInfo.isComplete &&
+        contactInfo.isComplete &&
+        hasCompletedOnboarding;
   }
 
   /// Get completion percentage
@@ -207,20 +221,20 @@ class UserProfile extends Equatable {
 
     // Photo
     totalFields += 1;
-    if (photoUrl?.isNotEmpty == true) completedFields++;
+    if (photoUrl?.isNotEmpty ?? false) completedFields++;
 
     return completedFields / totalFields;
   }
 
   @override
   List<Object?> get props => [
-        id,
-        email,
-        personalInfo,
-        healthInfo,
-        contactInfo,
-        updatedAt,
-      ];
+    id,
+    email,
+    personalInfo,
+    healthInfo,
+    contactInfo,
+    updatedAt,
+  ];
 
   @override
   String toString() {
@@ -230,14 +244,6 @@ class UserProfile extends Equatable {
 
 /// Personal Information
 class PersonalInfo extends Equatable {
-  final String fullName;
-  final DateTime? birthDate;
-  final String gender;
-  final String cpf;
-  final String rg;
-  final String? occupation;
-  final String? maritalStatus;
-
   const PersonalInfo({
     this.fullName = '',
     this.birthDate,
@@ -251,8 +257,8 @@ class PersonalInfo extends Equatable {
   factory PersonalInfo.fromJson(Map<String, dynamic> json) {
     return PersonalInfo(
       fullName: json['fullName'] as String? ?? '',
-      birthDate: json['birthDate'] != null 
-          ? DateTime.parse(json['birthDate'] as String) 
+      birthDate: json['birthDate'] != null
+          ? DateTime.parse(json['birthDate'] as String)
           : null,
       gender: json['gender'] as String? ?? '',
       cpf: json['cpf'] as String? ?? '',
@@ -261,6 +267,13 @@ class PersonalInfo extends Equatable {
       maritalStatus: json['maritalStatus'] as String?,
     );
   }
+  final String fullName;
+  final DateTime? birthDate;
+  final String gender;
+  final String cpf;
+  final String rg;
+  final String? occupation;
+  final String? maritalStatus;
 
   Map<String, dynamic> toJson() {
     return {
@@ -309,9 +322,9 @@ class PersonalInfo extends Equatable {
   /// Check if personal info is complete
   bool get isComplete {
     return fullName.isNotEmpty &&
-           birthDate != null &&
-           gender.isNotEmpty &&
-           cpf.isNotEmpty;
+        birthDate != null &&
+        gender.isNotEmpty &&
+        cpf.isNotEmpty;
   }
 
   @override
@@ -320,14 +333,6 @@ class PersonalInfo extends Equatable {
 
 /// Health Information
 class HealthInfo extends Equatable {
-  final String bloodType;
-  final double? weight;
-  final double? height;
-  final String? insuranceProvider;
-  final String? insuranceNumber;
-  final String? primaryDoctor;
-  final String? primaryDoctorPhone;
-
   const HealthInfo({
     this.bloodType = '',
     this.weight,
@@ -349,6 +354,13 @@ class HealthInfo extends Equatable {
       primaryDoctorPhone: json['primaryDoctorPhone'] as String?,
     );
   }
+  final String bloodType;
+  final double? weight;
+  final double? height;
+  final String? insuranceProvider;
+  final String? insuranceNumber;
+  final String? primaryDoctor;
+  final String? primaryDoctorPhone;
 
   Map<String, dynamic> toJson() {
     return {
@@ -392,7 +404,7 @@ class HealthInfo extends Equatable {
   String get bmiCategory {
     final bmiValue = bmi;
     if (bmiValue == null) return '';
-    
+
     if (bmiValue < 18.5) return 'Abaixo do peso';
     if (bmiValue < 25) return 'Peso normal';
     if (bmiValue < 30) return 'Sobrepeso';
@@ -410,39 +422,26 @@ class HealthInfo extends Equatable {
 
 /// Contact Information
 class ContactInfo extends Equatable {
-  final String phone;
-  final String? whatsapp;
-  final Address? address;
-
-  const ContactInfo({
-    this.phone = '',
-    this.whatsapp,
-    this.address,
-  });
+  const ContactInfo({this.phone = '', this.whatsapp, this.address});
 
   factory ContactInfo.fromJson(Map<String, dynamic> json) {
     return ContactInfo(
       phone: json['phone'] as String? ?? '',
       whatsapp: json['whatsapp'] as String?,
-      address: json['address'] != null 
+      address: json['address'] != null
           ? Address.fromJson(json['address'] as Map<String, dynamic>)
           : null,
     );
   }
+  final String phone;
+  final String? whatsapp;
+  final Address? address;
 
   Map<String, dynamic> toJson() {
-    return {
-      'phone': phone,
-      'whatsapp': whatsapp,
-      'address': address?.toJson(),
-    };
+    return {'phone': phone, 'whatsapp': whatsapp, 'address': address?.toJson()};
   }
 
-  ContactInfo copyWith({
-    String? phone,
-    String? whatsapp,
-    Address? address,
-  }) {
+  ContactInfo copyWith({String? phone, String? whatsapp, Address? address}) {
     return ContactInfo(
       phone: phone ?? this.phone,
       whatsapp: whatsapp ?? this.whatsapp,
@@ -461,15 +460,6 @@ class ContactInfo extends Equatable {
 
 /// Address Information
 class Address extends Equatable {
-  final String street;
-  final String number;
-  final String? complement;
-  final String neighborhood;
-  final String city;
-  final String state;
-  final String zipCode;
-  final String? country;
-
   const Address({
     required this.street,
     required this.number,
@@ -493,6 +483,14 @@ class Address extends Equatable {
       country: json['country'] as String? ?? 'Brasil',
     );
   }
+  final String street;
+  final String number;
+  final String? complement;
+  final String neighborhood;
+  final String city;
+  final String state;
+  final String zipCode;
+  final String? country;
 
   Map<String, dynamic> toJson() {
     return {
@@ -511,7 +509,7 @@ class Address extends Equatable {
   String get formattedAddress {
     final buffer = StringBuffer();
     buffer.write('$street, $number');
-    if (complement?.isNotEmpty == true) {
+    if (complement?.isNotEmpty ?? false) {
       buffer.write(' - $complement');
     }
     buffer.write('\n$neighborhood, $city - $state\nCEP: $zipCode');
@@ -519,20 +517,18 @@ class Address extends Equatable {
   }
 
   @override
-  List<Object?> get props => [street, number, neighborhood, city, state, zipCode];
+  List<Object?> get props => [
+    street,
+    number,
+    neighborhood,
+    city,
+    state,
+    zipCode,
+  ];
 }
 
 /// Privacy Settings for LGPD compliance
 class PrivacySettings extends Equatable {
-  final bool dataProcessingConsent;
-  final bool marketingConsent;
-  final bool analyticsConsent;
-  final bool sharingConsent;
-  final DateTime? consentDate;
-  final bool allowDataExport;
-  final bool allowDataDeletion;
-  final List<String> dataProcessingPurposes;
-
   const PrivacySettings({
     this.dataProcessingConsent = false,
     this.marketingConsent = false,
@@ -550,14 +546,24 @@ class PrivacySettings extends Equatable {
       marketingConsent: json['marketingConsent'] as bool? ?? false,
       analyticsConsent: json['analyticsConsent'] as bool? ?? false,
       sharingConsent: json['sharingConsent'] as bool? ?? false,
-      consentDate: json['consentDate'] != null 
-          ? DateTime.parse(json['consentDate'] as String) 
+      consentDate: json['consentDate'] != null
+          ? DateTime.parse(json['consentDate'] as String)
           : null,
       allowDataExport: json['allowDataExport'] as bool? ?? true,
       allowDataDeletion: json['allowDataDeletion'] as bool? ?? true,
-      dataProcessingPurposes: List<String>.from(json['dataProcessingPurposes'] as List? ?? []),
+      dataProcessingPurposes: List<String>.from(
+        json['dataProcessingPurposes'] as List? ?? [],
+      ),
     );
   }
+  final bool dataProcessingConsent;
+  final bool marketingConsent;
+  final bool analyticsConsent;
+  final bool sharingConsent;
+  final DateTime? consentDate;
+  final bool allowDataExport;
+  final bool allowDataDeletion;
+  final List<String> dataProcessingPurposes;
 
   Map<String, dynamic> toJson() {
     return {
@@ -574,24 +580,16 @@ class PrivacySettings extends Equatable {
 
   @override
   List<Object?> get props => [
-        dataProcessingConsent,
-        marketingConsent,
-        analyticsConsent,
-        sharingConsent,
-        consentDate,
-      ];
+    dataProcessingConsent,
+    marketingConsent,
+    analyticsConsent,
+    sharingConsent,
+    consentDate,
+  ];
 }
 
 /// Notification Settings
 class NotificationSettings extends Equatable {
-  final bool pushNotifications;
-  final bool emailNotifications;
-  final bool smsNotifications;
-  final bool appointmentReminders;
-  final bool promotionalNotifications;
-  final bool healthTips;
-  final int reminderHoursBefore;
-
   const NotificationSettings({
     this.pushNotifications = true,
     this.emailNotifications = true,
@@ -608,11 +606,19 @@ class NotificationSettings extends Equatable {
       emailNotifications: json['emailNotifications'] as bool? ?? true,
       smsNotifications: json['smsNotifications'] as bool? ?? false,
       appointmentReminders: json['appointmentReminders'] as bool? ?? true,
-      promotionalNotifications: json['promotionalNotifications'] as bool? ?? false,
+      promotionalNotifications:
+          json['promotionalNotifications'] as bool? ?? false,
       healthTips: json['healthTips'] as bool? ?? true,
       reminderHoursBefore: json['reminderHoursBefore'] as int? ?? 24,
     );
   }
+  final bool pushNotifications;
+  final bool emailNotifications;
+  final bool smsNotifications;
+  final bool appointmentReminders;
+  final bool promotionalNotifications;
+  final bool healthTips;
+  final int reminderHoursBefore;
 
   Map<String, dynamic> toJson() {
     return {
@@ -628,9 +634,9 @@ class NotificationSettings extends Equatable {
 
   @override
   List<Object?> get props => [
-        pushNotifications,
-        emailNotifications,
-        appointmentReminders,
-        reminderHoursBefore,
-      ];
+    pushNotifications,
+    emailNotifications,
+    appointmentReminders,
+    reminderHoursBefore,
+  ];
 }

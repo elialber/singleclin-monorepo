@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/faq_item.dart';
-import '../../../core/services/api_service.dart';
+import 'package:singleclin_mobile/features/engagement/models/faq_item.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
 
 /// Controller for FAQ and knowledge base
 class FaqController extends GetxController {
@@ -14,22 +14,22 @@ class FaqController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool isSearching = false.obs;
   final RxString error = ''.obs;
-  
+
   final RxList<FaqItem> faqItems = <FaqItem>[].obs;
   final RxList<FaqItem> searchResults = <FaqItem>[].obs;
   final RxList<String> searchSuggestions = <String>[].obs;
   final Rx<FaqStats?> stats = Rx<FaqStats?>(null);
-  
+
   // Filters and search
   final Rx<FaqCategory?> selectedCategory = Rx<FaqCategory?>(null);
   final RxString searchQuery = ''.obs;
   final RxList<String> searchHistory = <String>[].obs;
-  
+
   // Chatbot functionality
   final RxBool isChatbotActive = false.obs;
   final RxList<ChatbotResponse> chatbotResponses = <ChatbotResponse>[].obs;
   final messageController = TextEditingController();
-  
+
   // Expandable items state
   final RxSet<String> expandedItems = <String>{}.obs;
 
@@ -39,7 +39,7 @@ class FaqController extends GetxController {
     loadFaqItems();
     loadFaqStats();
     loadSearchHistory();
-    
+
     // Setup search debouncing
     searchController.addListener(_onSearchChanged);
   }
@@ -58,10 +58,13 @@ class FaqController extends GetxController {
       refresh ? isLoading.value = true : null;
       error.value = '';
 
-      final response = await _apiService.get('/faq/items', queryParameters: {
-        'category': selectedCategory.value?.name,
-        'published': true,
-      });
+      final response = await _apiService.get(
+        '/faq/items',
+        queryParameters: {
+          'category': selectedCategory.value?.name,
+          'published': true,
+        },
+      );
 
       final List<FaqItem> items = (response.data['items'] as List)
           .map((json) => FaqItem.fromJson(json))
@@ -97,10 +100,10 @@ class FaqController extends GetxController {
       isSearching.value = true;
       searchQuery.value = query.trim();
 
-      final response = await _apiService.get('/faq/search', queryParameters: {
-        'q': query.trim(),
-        'limit': 20,
-      });
+      final response = await _apiService.get(
+        '/faq/search',
+        queryParameters: {'q': query.trim(), 'limit': 20},
+      );
 
       final searchResult = FaqSearchResult.fromJson(response.data);
       searchResults.assignAll(searchResult.items);
@@ -120,10 +123,13 @@ class FaqController extends GetxController {
     if (message.trim().isEmpty) return;
 
     try {
-      final response = await _apiService.post('/faq/chatbot', data: {
-        'message': message.trim(),
-        'context': chatbotResponses.map((r) => r.message).toList(),
-      });
+      final response = await _apiService.post(
+        '/faq/chatbot',
+        data: {
+          'message': message.trim(),
+          'context': chatbotResponses.map((r) => r.message).toList(),
+        },
+      );
 
       final chatbotResponse = ChatbotResponse.fromJson(response.data);
       chatbotResponses.add(chatbotResponse);
@@ -137,7 +143,7 @@ class FaqController extends GetxController {
           'Posso conectar você com nosso suporte humano',
           snackPosition: SnackPosition.BOTTOM,
           mainButton: TextButton(
-            onPressed: () => _startHumanSupport(),
+            onPressed: _startHumanSupport,
             child: const Text('Sim', style: TextStyle(color: Colors.white)),
           ),
         );
@@ -164,9 +170,10 @@ class FaqController extends GetxController {
   /// Vote on FAQ helpfulness
   Future<void> voteOnFaq(String faqId, bool isHelpful) async {
     try {
-      await _apiService.post('/faq/$faqId/vote', data: {
-        'isHelpful': isHelpful,
-      });
+      await _apiService.post(
+        '/faq/$faqId/vote',
+        data: {'isHelpful': isHelpful},
+      );
 
       // Update local item
       _updateFaqVotes(faqId, isHelpful);
@@ -237,7 +244,7 @@ class FaqController extends GetxController {
   Future<void> _incrementViewCount(String itemId) async {
     try {
       await _apiService.post('/faq/$itemId/view');
-      
+
       // Update local item view count
       final itemIndex = faqItems.indexWhere((item) => item.id == itemId);
       if (itemIndex != -1) {
@@ -259,7 +266,9 @@ class FaqController extends GetxController {
       final item = faqItems[itemIndex];
       final updatedItem = item.copyWith(
         helpfulCount: isHelpful ? item.helpfulCount + 1 : item.helpfulCount,
-        notHelpfulCount: !isHelpful ? item.notHelpfulCount + 1 : item.notHelpfulCount,
+        notHelpfulCount: !isHelpful
+            ? item.notHelpfulCount + 1
+            : item.notHelpfulCount,
       );
       faqItems[itemIndex] = updatedItem;
     }
@@ -270,7 +279,9 @@ class FaqController extends GetxController {
       final item = searchResults[searchIndex];
       final updatedItem = item.copyWith(
         helpfulCount: isHelpful ? item.helpfulCount + 1 : item.helpfulCount,
-        notHelpfulCount: !isHelpful ? item.notHelpfulCount + 1 : item.notHelpfulCount,
+        notHelpfulCount: !isHelpful
+            ? item.notHelpfulCount + 1
+            : item.notHelpfulCount,
       );
       searchResults[searchIndex] = updatedItem;
     }
@@ -361,10 +372,12 @@ class FaqController extends GetxController {
   /// Get related FAQ items
   List<FaqItem> getRelatedFaqs(FaqItem item) {
     return faqItems
-        .where((faq) => 
-            faq.id != item.id &&
-            (faq.category == item.category ||
-             faq.tags.any((tag) => item.tags.contains(tag))))
+        .where(
+          (faq) =>
+              faq.id != item.id &&
+              (faq.category == item.category ||
+                  faq.tags.any((tag) => item.tags.contains(tag))),
+        )
         .take(3)
         .toList();
   }
@@ -372,9 +385,10 @@ class FaqController extends GetxController {
   /// Submit FAQ feedback
   Future<void> submitFeedback(String faqId, String feedback) async {
     try {
-      await _apiService.post('/faq/$faqId/feedback', data: {
-        'feedback': feedback,
-      });
+      await _apiService.post(
+        '/faq/$faqId/feedback',
+        data: {'feedback': feedback},
+      );
 
       Get.snackbar(
         'Feedback enviado!',
@@ -415,11 +429,11 @@ class FaqController extends GetxController {
     if (searchResults.isNotEmpty) {
       return searchResults;
     }
-    
+
     if (selectedCategory.value != null) {
       return getFaqByCategory(selectedCategory.value!);
     }
-    
+
     return faqItems;
   }
 }

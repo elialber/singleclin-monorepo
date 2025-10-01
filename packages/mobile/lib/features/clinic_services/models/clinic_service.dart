@@ -1,13 +1,4 @@
 class ClinicService {
-  final String id;
-  final String name;
-  final String description;
-  final double price;
-  final int duration; // Duration in minutes
-  final String category;
-  final bool isAvailable;
-  final String? imageUrl;
-
   ClinicService({
     required this.id,
     required this.name,
@@ -31,16 +22,24 @@ class ClinicService {
       imageUrl: json['imageUrl'],
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final double price;
+  final int duration; // Duration in minutes
+  final String category;
+  final bool isAvailable;
+  final String? imageUrl;
 
   /// Factory method to create services from clinic data
   static List<ClinicService> fromClinicServices(List<dynamic>? servicesJson) {
     if (servicesJson == null || servicesJson.isEmpty) {
       return [];
     }
-    
+
     return servicesJson
         .whereType<Map<String, dynamic>>()
-        .map((serviceJson) => ClinicService.fromJson(serviceJson))
+        .map(ClinicService.fromJson)
         .toList();
   }
 

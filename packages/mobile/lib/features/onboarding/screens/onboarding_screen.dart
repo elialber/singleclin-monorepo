@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/constants/app_colors.dart';
-import '../controllers/onboarding_controller.dart';
-import '../../../shared/widgets/sg_credit_widget.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/onboarding/controllers/onboarding_controller.dart';
+import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
 
 class OnboardingScreen extends GetView<OnboardingController> {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  const OnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +15,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
         child: Column(
           children: [
             _buildHeader(),
-            Expanded(
-              child: _buildPageView(),
-            ),
+            Expanded(child: _buildPageView()),
             _buildBottomSection(),
           ],
         ),
@@ -32,27 +30,27 @@ class OnboardingScreen extends GetView<OnboardingController> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Skip button
-          Obx(() => AnimatedOpacity(
-            opacity: controller.isLastStep ? 0.0 : 1.0,
-            duration: const Duration(milliseconds: 300),
-            child: TextButton(
-              onPressed: controller.isLastStep ? null : controller.skipToEnd,
-              child: const Text(
-                'Pular',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.mediumGrey,
+          Obx(
+            () => AnimatedOpacity(
+              opacity: controller.isLastStep ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 300),
+              child: TextButton(
+                onPressed: controller.isLastStep ? null : controller.skipToEnd,
+                child: const Text(
+                  'Pular',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.mediumGrey,
+                  ),
                 ),
               ),
             ),
-          )),
-          
-          // Progress indicator
-          Expanded(
-            child: Obx(() => _buildProgressIndicator()),
           ),
-          
+
+          // Progress indicator
+          Expanded(child: Obx(_buildProgressIndicator)),
+
           // Logo
           Container(
             width: 40,
@@ -88,7 +86,9 @@ class OnboardingScreen extends GetView<OnboardingController> {
               (index) => Expanded(
                 child: Container(
                   margin: EdgeInsets.only(
-                    right: index == controller.onboardingSteps.length - 1 ? 0 : 8,
+                    right: index == controller.onboardingSteps.length - 1
+                        ? 0
+                        : 8,
                   ),
                   height: 3,
                   decoration: BoxDecoration(
@@ -133,7 +133,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
       child: Column(
         children: [
           const SizedBox(height: 20),
-          
+
           // Image/Animation section
           Expanded(
             flex: 3,
@@ -153,7 +153,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
               },
             ),
           ),
-          
+
           // Text section
           Expanded(
             flex: 2,
@@ -177,7 +177,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
     if (step.id == 1) {
       return _buildSgCreditsDemo();
     }
-    
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -230,9 +230,9 @@ class OnboardingScreen extends GetView<OnboardingController> {
             );
           },
         ),
-        
+
         const SizedBox(height: 24),
-        
+
         // Benefits list
         Container(
           padding: const EdgeInsets.all(20),
@@ -282,11 +282,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
             color: AppColors.sgPrimary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            color: AppColors.sgPrimary,
-            size: 20,
-          ),
+          child: Icon(icon, color: AppColors.sgPrimary, size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -325,7 +321,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
           children: List.generate(3, (index) {
             final delay = index * 0.2;
             final animationValue = (value - delay).clamp(0.0, 1.0);
-            
+
             return Transform.scale(
               scale: animationValue,
               child: Container(
@@ -357,9 +353,9 @@ class OnboardingScreen extends GetView<OnboardingController> {
           ),
           textAlign: TextAlign.center,
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         Text(
           step.description,
           style: const TextStyle(
@@ -369,7 +365,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
           ),
           textAlign: TextAlign.center,
         ),
-        
+
         // Special content for SG credits step
         if (step.id == 1) ...[
           const SizedBox(height: 24),
@@ -399,78 +395,86 @@ class OnboardingScreen extends GetView<OnboardingController> {
       child: Column(
         children: [
           // Navigation buttons
-          Obx(() => Row(
-            children: [
-              // Back button
-              if (!controller.isFirstStep)
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: controller.previousStep,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: AppColors.mediumGrey),
-                    ),
-                    child: const Text(
-                      'Anterior',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.mediumGrey,
+          Obx(
+            () => Row(
+              children: [
+                // Back button
+                if (!controller.isFirstStep)
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: controller.previousStep,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: const BorderSide(color: AppColors.mediumGrey),
+                      ),
+                      child: const Text(
+                        'Anterior',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.mediumGrey,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              
-              if (!controller.isFirstStep) const SizedBox(width: 16),
-              
-              // Next/Complete button
-              Expanded(
-                flex: controller.isFirstStep ? 1 : 1,
-                child: ElevatedButton(
-                  onPressed: controller.isLoading.value ? null : controller.nextStep,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+
+                if (!controller.isFirstStep) const SizedBox(width: 16),
+
+                // Next/Complete button
+                Expanded(
+                  flex: controller.isFirstStep ? 1 : 1,
+                  child: ElevatedButton(
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : controller.nextStep,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    child: controller.isLoading.value
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                        : Text(
+                            controller.isLastStep ? 'Começar' : 'Próximo',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
-                  child: controller.isLoading.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          controller.isLastStep ? 'Começar' : 'Próximo',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
                 ),
-              ),
-            ],
-          )),
-          
+              ],
+            ),
+          ),
+
           // Skip hint
           const SizedBox(height: 16),
-          Obx(() => AnimatedOpacity(
-            opacity: controller.isLastStep ? 0.0 : 1.0,
-            duration: const Duration(milliseconds: 300),
-            child: Text(
-              'Você pode pular este tutorial a qualquer momento',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.mediumGrey.withOpacity(0.7),
+          Obx(
+            () => AnimatedOpacity(
+              opacity: controller.isLastStep ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 300),
+              child: Text(
+                'Você pode pular este tutorial a qualquer momento',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.mediumGrey.withOpacity(0.7),
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
-          )),
+          ),
         ],
       ),
     );

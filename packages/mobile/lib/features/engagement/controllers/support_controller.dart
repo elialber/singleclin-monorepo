@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import '../models/support_ticket.dart';
-import '../../../core/services/api_service.dart';
+import 'package:singleclin_mobile/features/engagement/models/support_ticket.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
 
 /// Controller for customer support system
 class SupportController extends GetxController {
@@ -19,16 +19,16 @@ class SupportController extends GetxController {
   final RxBool isSubmitting = false.obs;
   final RxBool isSendingMessage = false.obs;
   final RxString error = ''.obs;
-  
+
   final RxList<SupportTicket> tickets = <SupportTicket>[].obs;
   final Rx<SupportTicket?> selectedTicket = Rx<SupportTicket?>(null);
   final RxList<File> attachments = <File>[].obs;
-  
+
   // Chat functionality
   final Rx<ChatSession?> currentChatSession = Rx<ChatSession?>(null);
   final RxBool isChatLoading = false.obs;
   final RxBool isChatConnected = false.obs;
-  
+
   // Ticket creation
   final Rx<TicketCategory> selectedCategory = TicketCategory.general.obs;
   final Rx<TicketPriority> selectedPriority = TicketPriority.medium.obs;
@@ -54,10 +54,11 @@ class SupportController extends GetxController {
       error.value = '';
 
       final response = await _apiService.get('/user/support/tickets');
-      
-      final List<SupportTicket> loadedTickets = (response.data['tickets'] as List)
-          .map((json) => SupportTicket.fromJson(json))
-          .toList();
+
+      final List<SupportTicket> loadedTickets =
+          (response.data['tickets'] as List)
+              .map((json) => SupportTicket.fromJson(json))
+              .toList();
 
       tickets.assignAll(loadedTickets);
     } catch (e) {
@@ -86,8 +87,11 @@ class SupportController extends GetxController {
         'attachments': attachmentUrls,
       };
 
-      final response = await _apiService.post('/user/support/tickets', data: ticketData);
-      
+      final response = await _apiService.post(
+        '/user/support/tickets',
+        data: ticketData,
+      );
+
       final newTicket = SupportTicket.fromJson(response.data['ticket']);
       tickets.insert(0, newTicket);
 
@@ -147,7 +151,7 @@ class SupportController extends GetxController {
           updatedAt: DateTime.now(),
         );
         tickets[ticketIndex] = updatedTicket;
-        
+
         if (selectedTicket.value?.id == ticketId) {
           selectedTicket.value = updatedTicket;
         }
@@ -171,9 +175,10 @@ class SupportController extends GetxController {
     try {
       isChatLoading.value = true;
 
-      final response = await _apiService.post('/user/support/chat/start', data: {
-        'topic': 'Suporte Geral',
-      });
+      final response = await _apiService.post(
+        '/user/support/chat/start',
+        data: {'topic': 'Suporte Geral'},
+      );
 
       final chatSession = ChatSession.fromJson(response.data['session']);
       currentChatSession.value = chatSession;
@@ -203,7 +208,7 @@ class SupportController extends GetxController {
       );
 
       final chatMessage = ChatMessage.fromJson(response.data['message']);
-      
+
       // Update current session with new message
       final updatedSession = currentChatSession.value!.copyWith(
         messages: [...currentChatSession.value!.messages, chatMessage],
@@ -223,8 +228,10 @@ class SupportController extends GetxController {
     if (currentChatSession.value == null) return;
 
     try {
-      await _apiService.post('/user/support/chat/${currentChatSession.value!.id}/end');
-      
+      await _apiService.post(
+        '/user/support/chat/${currentChatSession.value!.id}/end',
+      );
+
       currentChatSession.value = null;
       isChatConnected.value = false;
     } catch (e) {
@@ -233,12 +240,16 @@ class SupportController extends GetxController {
   }
 
   /// Rate support experience
-  Future<void> rateSupportExperience(String ticketId, double rating, String? comment) async {
+  Future<void> rateSupportExperience(
+    String ticketId,
+    double rating,
+    String? comment,
+  ) async {
     try {
-      await _apiService.post('/user/support/tickets/$ticketId/rate', data: {
-        'rating': rating,
-        'comment': comment,
-      });
+      await _apiService.post(
+        '/user/support/tickets/$ticketId/rate',
+        data: {'rating': rating, 'comment': comment},
+      );
 
       // Update ticket with rating
       final ticketIndex = tickets.indexWhere((t) => t.id == ticketId);
@@ -307,7 +318,7 @@ class SupportController extends GetxController {
           attachment,
           fileField: 'attachment',
         );
-        
+
         uploadedUrls.add(response.data['url']);
       }
 
@@ -337,7 +348,7 @@ class SupportController extends GetxController {
   Future<void> closeTicket(String ticketId) async {
     try {
       await _apiService.post('/user/support/tickets/$ticketId/close');
-      
+
       final ticketIndex = tickets.indexWhere((t) => t.id == ticketId);
       if (ticketIndex != -1) {
         final updatedTicket = tickets[ticketIndex].copyWith(
@@ -462,7 +473,7 @@ class SupportController extends GetxController {
   /// Get estimated wait time for chat
   String get estimatedChatWaitTime {
     if (!isChatAvailable) return 'Indisponível';
-    
+
     // This would be calculated based on current queue
     return '< 5 minutos';
   }

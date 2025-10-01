@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/trust_center_controller.dart';
-import '../widgets/trust_badge.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/trust_center_controller.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/trust_badge.dart';
 
 class TrustCenterScreen extends StatelessWidget {
   const TrustCenterScreen({super.key});
@@ -99,10 +99,7 @@ class TrustCenterScreen extends StatelessWidget {
                         ),
                         const Text(
                           '/100',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(color: Colors.white70, fontSize: 16),
                         ),
                       ],
                     ),
@@ -111,10 +108,7 @@ class TrustCenterScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   _getSecurityScoreDescription(controller.securityScore),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -139,8 +133,8 @@ class TrustCenterScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: feature.isActive 
-                      ? Colors.green 
+                  backgroundColor: feature.isActive
+                      ? Colors.green
                       : Colors.grey,
                   child: Icon(
                     feature.isActive ? Icons.check : Icons.close,
@@ -153,7 +147,7 @@ class TrustCenterScreen extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 subtitle: Text(feature.description),
-                trailing: feature.isActive 
+                trailing: feature.isActive
                     ? const Icon(Icons.verified, color: Colors.green)
                     : null,
                 onTap: () => _showSecurityFeatureDetails(feature, controller),
@@ -178,13 +172,9 @@ class TrustCenterScreen extends StatelessWidget {
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: const Color(0xFF005156),
-                  child: Icon(
-                    Icons.security,
-                    color: Colors.white,
-                    size: 20,
-                  ),
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFF005156),
+                  child: Icon(Icons.security, color: Colors.white, size: 20),
                 ),
                 title: Text(
                   audit.name,
@@ -197,10 +187,7 @@ class TrustCenterScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Última auditoria: ${_formatDate(audit.lastAuditDate)}',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ],
                 ),
@@ -295,10 +282,7 @@ class TrustCenterScreen extends StatelessWidget {
                     SizedBox(height: 16),
                     Text(
                       'Certificações em processo',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -369,7 +353,11 @@ class TrustCenterScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            const Icon(Icons.date_range, size: 16, color: Colors.grey),
+                            const Icon(
+                              Icons.date_range,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               'Emitida: ${_formatDate(cert.issuedDate)}',
@@ -379,7 +367,11 @@ class TrustCenterScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 16),
-                            const Icon(Icons.event, size: 16, color: Colors.grey),
+                            const Icon(
+                              Icons.event,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               'Válida até: ${_formatDate(cert.expiryDate)}',
@@ -390,10 +382,12 @@ class TrustCenterScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        if (cert.certificateUrl != null) ...[
+                        ...[
                           const SizedBox(height: 12),
                           ElevatedButton.icon(
-                            onPressed: () => controller.viewCertificate(cert.certificateUrl!),
+                            onPressed: () => controller.viewCertificate(
+                              cert.certificateUrl!,
+                            ),
                             icon: const Icon(Icons.download),
                             label: const Text('Ver Certificado'),
                             style: ElevatedButton.styleFrom(
@@ -430,11 +424,7 @@ class TrustCenterScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                const Icon(
-                  Icons.verified_user,
-                  size: 48,
-                  color: Colors.green,
-                ),
+                const Icon(Icons.verified_user, size: 48, color: Colors.green),
                 const SizedBox(height: 12),
                 const Text(
                   'Conformidade LGPD',
@@ -480,10 +470,7 @@ class TrustCenterScreen extends StatelessWidget {
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ExpansionTile(
-                leading: Icon(
-                  category.icon,
-                  color: const Color(0xFF005156),
-                ),
+                leading: Icon(category.icon, color: const Color(0xFF005156)),
                 title: Text(
                   category.name,
                   style: const TextStyle(fontWeight: FontWeight.w500),
@@ -495,9 +482,9 @@ class TrustCenterScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Tipos de dados coletados:',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -508,10 +495,18 @@ class TrustCenterScreen extends StatelessWidget {
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Row(
                               children: [
-                                const Icon(Icons.fiber_manual_record, 
-                                           size: 8, color: Colors.grey),
+                                const Icon(
+                                  Icons.fiber_manual_record,
+                                  size: 8,
+                                  color: Colors.grey,
+                                ),
                                 const SizedBox(width: 8),
-                                Expanded(child: Text(type, style: const TextStyle(fontSize: 14))),
+                                Expanded(
+                                  child: Text(
+                                    type,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ),
                               ],
                             ),
                           );
@@ -551,11 +546,7 @@ class TrustCenterScreen extends StatelessWidget {
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: const Color(0xFF005156),
-                  child: Icon(
-                    right.icon,
-                    color: Colors.white,
-                    size: 20,
-                  ),
+                  child: Icon(right.icon, color: Colors.white, size: 20),
                 ),
                 title: Text(
                   right.title,
@@ -629,11 +620,7 @@ class TrustCenterScreen extends StatelessWidget {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: const Color(0xFF005156),
-              child: Icon(
-                policy.icon,
-                color: Colors.white,
-                size: 20,
-              ),
+              child: Icon(policy.icon, color: Colors.white, size: 20),
             ),
             title: Text(
               policy.title,
@@ -646,10 +633,7 @@ class TrustCenterScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Última atualização: ${_formatDate(policy.lastUpdated)}',
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
               ],
             ),
@@ -669,7 +653,10 @@ class TrustCenterScreen extends StatelessWidget {
     return 'Melhorias necessárias';
   }
 
-  void _showSecurityFeatureDetails(dynamic feature, TrustCenterController controller) {
+  void _showSecurityFeatureDetails(
+    dynamic feature,
+    TrustCenterController controller,
+  ) {
     Get.dialog(
       AlertDialog(
         title: Text(feature.name),
@@ -697,12 +684,7 @@ class TrustCenterScreen extends StatelessWidget {
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
-        ],
+        actions: [TextButton(onPressed: Get.back, child: const Text('Fechar'))],
       ),
     );
   }
@@ -723,12 +705,7 @@ class TrustCenterScreen extends StatelessWidget {
               Text('Próxima auditoria: ${_formatDate(audit.nextAuditDate!)}'),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
-        ],
+        actions: [TextButton(onPressed: Get.back, child: const Text('Fechar'))],
       ),
     );
   }
@@ -756,10 +733,7 @@ class TrustCenterScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
               controller.submitSecurityReport();
@@ -790,10 +764,7 @@ class TrustCenterScreen extends StatelessWidget {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Fechar')),
           ElevatedButton(
             onPressed: () => controller.openLgpdPolicy(),
             child: const Text('Ler Política Completa'),
@@ -809,10 +780,7 @@ class TrustCenterScreen extends StatelessWidget {
         title: Text(right.title),
         content: Text(right.description),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Fechar')),
           if (right.actionable)
             ElevatedButton(
               onPressed: () {
@@ -840,10 +808,7 @@ class TrustCenterScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Fechar')),
           ElevatedButton(
             onPressed: () => controller.openPolicy(policy.id),
             child: const Text('Ler Completa'),

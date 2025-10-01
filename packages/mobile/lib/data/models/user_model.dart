@@ -2,12 +2,6 @@ import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 
 /// User model in the data layer with offline-first capabilities
 class UserModel extends UserEntity {
-  // Offline-specific fields
-  final DateTime? lastSyncAt;
-  final bool isLocalOnly; // True if created offline and not synced yet
-  final int syncVersion; // For conflict resolution
-  final UserPreferences? preferences;
-
   const UserModel({
     required super.id,
     required super.email,
@@ -65,10 +59,17 @@ class UserModel extends UserEntity {
       isLocalOnly: json['isLocalOnly'] as bool? ?? false,
       syncVersion: json['syncVersion'] as int? ?? 1,
       preferences: json['preferences'] != null
-          ? UserPreferences.fromJson(json['preferences'] as Map<String, dynamic>)
+          ? UserPreferences.fromJson(
+              json['preferences'] as Map<String, dynamic>,
+            )
           : null,
     );
   }
+  // Offline-specific fields
+  final DateTime? lastSyncAt;
+  final bool isLocalOnly; // True if created offline and not synced yet
+  final int syncVersion; // For conflict resolution
+  final UserPreferences? preferences;
 
   /// Convert UserModel to JSON
   Map<String, dynamic> toJson() {
@@ -128,10 +129,7 @@ class UserModel extends UserEntity {
 
   /// Mark as synced with server
   UserModel markAsSynced() {
-    return copyWith(
-      lastSyncAt: DateTime.now(),
-      isLocalOnly: false,
-    );
+    return copyWith(lastSyncAt: DateTime.now(), isLocalOnly: false);
   }
 
   /// Increment sync version for conflict resolution
@@ -140,21 +138,12 @@ class UserModel extends UserEntity {
   }
 
   /// Check if user data needs sync
-  bool get needsSync => isLocalOnly ||
-      (lastSyncAt != null && updatedAt.isAfter(lastSyncAt!));
+  bool get needsSync =>
+      isLocalOnly || (lastSyncAt != null && updatedAt.isAfter(lastSyncAt!));
 }
 
 /// User preferences for offline functionality and app behavior
 class UserPreferences {
-  final bool offlineMode;
-  final bool autoSync;
-  final bool wifiOnlySync;
-  final String language;
-  final String theme;
-  final bool notificationsEnabled;
-  final bool locationEnabled;
-  final Map<String, dynamic> customSettings;
-
   const UserPreferences({
     this.offlineMode = false,
     this.autoSync = true,
@@ -178,6 +167,14 @@ class UserPreferences {
       customSettings: json['customSettings'] as Map<String, dynamic>? ?? {},
     );
   }
+  final bool offlineMode;
+  final bool autoSync;
+  final bool wifiOnlySync;
+  final String language;
+  final String theme;
+  final bool notificationsEnabled;
+  final bool locationEnabled;
+  final Map<String, dynamic> customSettings;
 
   Map<String, dynamic> toJson() {
     return {

@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/user_profile.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// LGPD Settings Widget
 /// Provides LGPD compliance controls and information
 class LgpdSettings extends StatelessWidget {
-  final PrivacySettings privacySettings;
-  final Function(String, bool)? onConsentUpdate;
-  final VoidCallback? onDataExport;
-  final VoidCallback? onAccountDeletion;
-  final bool isEditable;
-
   const LgpdSettings({
     Key? key,
     required this.privacySettings,
@@ -19,6 +13,11 @@ class LgpdSettings extends StatelessWidget {
     this.onAccountDeletion,
     this.isEditable = true,
   }) : super(key: key);
+  final PrivacySettings privacySettings;
+  final Function(String, bool)? onConsentUpdate;
+  final VoidCallback? onDataExport;
+  final VoidCallback? onAccountDeletion;
+  final bool isEditable;
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +27,7 @@ class LgpdSettings extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.info.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.info.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -57,16 +53,12 @@ class LgpdSettings extends StatelessWidget {
 
   /// Build section header
   Widget _buildHeader() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           children: [
-            Icon(
-              Icons.privacy_tip_outlined,
-              color: AppColors.info,
-              size: 20,
-            ),
+            Icon(Icons.privacy_tip_outlined, color: AppColors.info, size: 20),
             SizedBox(width: 8),
             Text(
               'Privacidade e Dados (LGPD)',
@@ -78,7 +70,7 @@ class LgpdSettings extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           'Gerencie como seus dados são utilizados de acordo com a Lei Geral de Proteção de Dados.',
           style: TextStyle(
@@ -99,17 +91,11 @@ class LgpdSettings extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.warning.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: AppColors.warning.withOpacity(0.3),
-          ),
+          border: Border.all(color: AppColors.warning.withOpacity(0.3)),
         ),
         child: const Row(
           children: [
-            Icon(
-              Icons.warning_outlined,
-              color: AppColors.warning,
-              size: 16,
-            ),
+            Icon(Icons.warning_outlined, color: AppColors.warning, size: 16),
             SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -127,16 +113,15 @@ class LgpdSettings extends StatelessWidget {
     }
 
     final consentDate = privacySettings.consentDate!;
-    final formattedDate = '${consentDate.day.toString().padLeft(2, '0')}/${consentDate.month.toString().padLeft(2, '0')}/${consentDate.year}';
+    final formattedDate =
+        '${consentDate.day.toString().padLeft(2, '0')}/${consentDate.month.toString().padLeft(2, '0')}/${consentDate.year}';
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.success.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.success.withOpacity(0.3),
-        ),
+        border: Border.all(color: AppColors.success.withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -177,9 +162,10 @@ class LgpdSettings extends StatelessWidget {
         const SizedBox(height: 12),
         _buildConsentSwitch(
           title: 'Processamento de Dados Pessoais',
-          subtitle: 'Autorizo o tratamento dos meus dados para prestação de serviços',
+          subtitle:
+              'Autorizo o tratamento dos meus dados para prestação de serviços',
           value: privacySettings.dataProcessingConsent,
-          onChanged: isEditable 
+          onChanged: isEditable
               ? (value) => onConsentUpdate?.call('data_processing', value)
               : null,
           isRequired: true,
@@ -188,7 +174,7 @@ class LgpdSettings extends StatelessWidget {
           title: 'Marketing e Comunicações',
           subtitle: 'Receber ofertas, promoções e conteúdos personalizados',
           value: privacySettings.marketingConsent,
-          onChanged: isEditable 
+          onChanged: isEditable
               ? (value) => onConsentUpdate?.call('marketing', value)
               : null,
         ),
@@ -196,15 +182,16 @@ class LgpdSettings extends StatelessWidget {
           title: 'Análise e Melhorias',
           subtitle: 'Usar dados para análises e melhoria dos serviços',
           value: privacySettings.analyticsConsent,
-          onChanged: isEditable 
+          onChanged: isEditable
               ? (value) => onConsentUpdate?.call('analytics', value)
               : null,
         ),
         _buildConsentSwitch(
           title: 'Compartilhamento com Parceiros',
-          subtitle: 'Compartilhar dados com clínicas parceiras para melhor atendimento',
+          subtitle:
+              'Compartilhar dados com clínicas parceiras para melhor atendimento',
           value: privacySettings.sharingConsent,
-          onChanged: isEditable 
+          onChanged: isEditable
               ? (value) => onConsentUpdate?.call('sharing', value)
               : null,
         ),
@@ -243,7 +230,10 @@ class LgpdSettings extends StatelessWidget {
                     ),
                     if (isRequired) ...[
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.error.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(6),
@@ -276,7 +266,7 @@ class LgpdSettings extends StatelessWidget {
           Switch(
             value: value,
             onChanged: isRequired ? null : onChanged,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),
@@ -308,7 +298,7 @@ class LgpdSettings extends StatelessWidget {
           icon: Icons.info_outlined,
           title: 'Transparência',
           subtitle: 'Saiba que dados coletamos e como são usados',
-          onTap: () => _showDataUsageDialog(),
+          onTap: _showDataUsageDialog,
           color: AppColors.primary,
         ),
         _buildDataRightItem(
@@ -327,8 +317,8 @@ class LgpdSettings extends StatelessWidget {
     required IconData icon,
     required String title,
     required String subtitle,
-    VoidCallback? onTap,
     required Color color,
+    VoidCallback? onTap,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -371,7 +361,7 @@ class LgpdSettings extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.chevron_right,
                 color: AppColors.mediumGrey,
                 size: 20,
@@ -441,10 +431,7 @@ class LgpdSettings extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
           ),
           const SizedBox(height: 4),
           Text(

@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../models/faq_item.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/faq_item.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Expandable FAQ item widget with smooth animations
 class FaqExpandableItem extends StatefulWidget {
-  final FaqItem item;
-  final bool isExpanded;
-  final VoidCallback onTap;
-  final Function(bool)? onHelpfulVote;
-  final VoidCallback? onFeedback;
-  final List<FaqItem>? relatedItems;
-
   const FaqExpandableItem({
     Key? key,
     required this.item,
@@ -21,6 +14,12 @@ class FaqExpandableItem extends StatefulWidget {
     this.onFeedback,
     this.relatedItems,
   }) : super(key: key);
+  final FaqItem item;
+  final bool isExpanded;
+  final VoidCallback onTap;
+  final Function(bool)? onHelpfulVote;
+  final VoidCallback? onFeedback;
+  final List<FaqItem>? relatedItems;
 
   @override
   State<FaqExpandableItem> createState() => _FaqExpandableItemState();
@@ -39,19 +38,15 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _expandAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     );
-    
-    _rotationAnimation = Tween<double>(
-      begin: 0.0,
-      end: 0.5,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+
+    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.5).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -77,9 +72,7 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
     return Card(
       elevation: widget.isExpanded ? 4 : 1,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Column(
         children: [
           InkWell(
@@ -97,10 +90,11 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
                       children: [
                         Text(
                           widget.item.question,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.darkGrey,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.darkGrey,
+                              ),
                         ),
                         if (widget.item.tags.isNotEmpty) ...[
                           const SizedBox(height: 4),
@@ -115,7 +109,7 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
                     builder: (context, child) {
                       return Transform.rotate(
                         angle: _rotationAnimation.value * 3.141592653589793,
-                        child: Icon(
+                        child: const Icon(
                           Icons.keyboard_arrow_down,
                           color: AppColors.primary,
                           size: 24,
@@ -176,11 +170,7 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 20,
-      ),
+      child: Icon(icon, color: color, size: 20),
     );
   }
 
@@ -227,7 +217,8 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
           ],
           const SizedBox(height: 16),
           _buildFooterActions(),
-          if (widget.relatedItems != null && widget.relatedItems!.isNotEmpty) ...[
+          if (widget.relatedItems != null &&
+              widget.relatedItems!.isNotEmpty) ...[
             const SizedBox(height: 16),
             _buildRelatedItems(),
           ],
@@ -239,10 +230,9 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
   Widget _buildAnswer() {
     return SelectableText(
       widget.item.answer,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-        color: AppColors.darkGrey,
-        height: 1.5,
-      ),
+      style: Theme.of(
+        context,
+      ).textTheme.bodyMedium?.copyWith(color: AppColors.darkGrey, height: 1.5),
     );
   }
 
@@ -271,11 +261,7 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
               shape: BoxShape.circle,
               color: Colors.black.withOpacity(0.7),
             ),
-            child: const Icon(
-              Icons.play_arrow,
-              color: Colors.white,
-              size: 32,
-            ),
+            child: const Icon(Icons.play_arrow, color: Colors.white, size: 32),
           ),
         ],
       ),
@@ -304,7 +290,7 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.attach_file,
                   color: AppColors.primary,
                   size: 20,
@@ -319,7 +305,7 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
                     ),
                   ),
                 ),
-                Icon(
+                const Icon(
                   Icons.download,
                   color: AppColors.mediumGrey,
                   size: 16,
@@ -340,9 +326,9 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
           children: [
             Text(
               'Esta resposta foi útil?',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.mediumGrey,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
             ),
             const Spacer(),
             _buildHelpfulButtons(),
@@ -351,30 +337,22 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
         const SizedBox(height: 8),
         Row(
           children: [
-            Icon(
-              Icons.visibility,
-              size: 14,
-              color: AppColors.mediumGrey,
-            ),
+            const Icon(Icons.visibility, size: 14, color: AppColors.mediumGrey),
             const SizedBox(width: 4),
             Text(
               '${widget.item.viewCount} visualizações',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.mediumGrey,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
             ),
             const SizedBox(width: 16),
-            Icon(
-              Icons.schedule,
-              size: 14,
-              color: AppColors.mediumGrey,
-            ),
+            const Icon(Icons.schedule, size: 14, color: AppColors.mediumGrey),
             const SizedBox(width: 4),
             Text(
               _getLastUpdatedText(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.mediumGrey,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.mediumGrey),
             ),
             const Spacer(),
             if (widget.onFeedback != null)
@@ -390,21 +368,23 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
 
   Widget _buildHelpfulButtons() {
     final totalVotes = widget.item.helpfulCount + widget.item.notHelpfulCount;
-    final helpfulPercentage = totalVotes > 0 
-        ? (widget.item.helpfulCount / totalVotes * 100).round() 
+    final helpfulPercentage = totalVotes > 0
+        ? (widget.item.helpfulCount / totalVotes * 100).round()
         : 0;
 
     return Row(
       children: [
         InkWell(
-          onTap: widget.onHelpfulVote != null ? () => widget.onHelpfulVote!(true) : null,
+          onTap: widget.onHelpfulVote != null
+              ? () => widget.onHelpfulVote!(true)
+              : null,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.thumb_up_outlined,
                   size: 16,
                   color: AppColors.success,
@@ -423,14 +403,16 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
         ),
         const SizedBox(width: 8),
         InkWell(
-          onTap: widget.onHelpfulVote != null ? () => widget.onHelpfulVote!(false) : null,
+          onTap: widget.onHelpfulVote != null
+              ? () => widget.onHelpfulVote!(false)
+              : null,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.thumb_down_outlined,
                   size: 16,
                   color: AppColors.error,
@@ -492,7 +474,7 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.arrow_forward,
                       size: 14,
                       color: AppColors.primary,
@@ -540,16 +522,15 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
 
 /// Compact FAQ item for search results
 class CompactFaqItem extends StatelessWidget {
-  final FaqItem item;
-  final VoidCallback onTap;
-  final String? highlightText;
-
   const CompactFaqItem({
     Key? key,
     required this.item,
     required this.onTap,
     this.highlightText,
   }) : super(key: key);
+  final FaqItem item;
+  final VoidCallback onTap;
+  final String? highlightText;
 
   @override
   Widget build(BuildContext context) {
@@ -572,22 +553,24 @@ class CompactFaqItem extends StatelessWidget {
                     _buildHighlightedText(
                       item.question,
                       Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ) ?? const TextStyle(),
+                            fontWeight: FontWeight.w600,
+                          ) ??
+                          const TextStyle(),
                     ),
                     const SizedBox(height: 4),
                     _buildHighlightedText(
-                      item.answer.length > 100 
+                      item.answer.length > 100
                           ? '${item.answer.substring(0, 100)}...'
                           : item.answer,
                       Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.mediumGrey,
-                      ) ?? const TextStyle(),
+                            color: AppColors.mediumGrey,
+                          ) ??
+                          const TextStyle(),
                     ),
                   ],
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.chevron_right,
                 color: AppColors.mediumGrey,
                 size: 20,
@@ -627,11 +610,7 @@ class CompactFaqItem extends StatelessWidget {
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 16,
-      ),
+      child: Icon(icon, color: color, size: 16),
     );
   }
 
@@ -643,37 +622,33 @@ class CompactFaqItem extends StatelessWidget {
     final spans = <TextSpan>[];
     final lowerText = text.toLowerCase();
     final lowerHighlight = highlightText!.toLowerCase();
-    
+
     int start = 0;
     int index = lowerText.indexOf(lowerHighlight);
-    
+
     while (index != -1) {
       if (index > start) {
-        spans.add(TextSpan(
-          text: text.substring(start, index),
-          style: style,
-        ));
+        spans.add(TextSpan(text: text.substring(start, index), style: style));
       }
-      
-      spans.add(TextSpan(
-        text: text.substring(index, index + highlightText!.length),
-        style: style.copyWith(
-          backgroundColor: AppColors.sgPrimary.withOpacity(0.3),
-          fontWeight: FontWeight.bold,
+
+      spans.add(
+        TextSpan(
+          text: text.substring(index, index + highlightText!.length),
+          style: style.copyWith(
+            backgroundColor: AppColors.sgPrimary.withOpacity(0.3),
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ));
-      
+      );
+
       start = index + highlightText!.length;
       index = lowerText.indexOf(lowerHighlight, start);
     }
-    
+
     if (start < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(start),
-        style: style,
-      ));
+      spans.add(TextSpan(text: text.substring(start), style: style));
     }
-    
+
     return RichText(
       text: TextSpan(children: spans),
       maxLines: 2,
@@ -684,26 +659,31 @@ class CompactFaqItem extends StatelessWidget {
 
 /// FAQ category filter chips
 class FaqCategoryChips extends StatelessWidget {
-  final FaqCategory? selectedCategory;
-  final Map<FaqCategory, int> categoryCounts;
-  final Function(FaqCategory?) onCategorySelected;
-
   const FaqCategoryChips({
     Key? key,
     this.selectedCategory,
     required this.categoryCounts,
     required this.onCategorySelected,
   }) : super(key: key);
+  final FaqCategory? selectedCategory;
+  final Map<FaqCategory, int> categoryCounts;
+  final Function(FaqCategory?) onCategorySelected;
 
   @override
   Widget build(BuildContext context) {
     final categories = [
-      {'category': null, 'label': 'Todas', 'count': categoryCounts.values.fold(0, (a, b) => a + b)},
-      ...FaqCategory.values.map((category) => {
-        'category': category,
-        'label': _getCategoryLabel(category),
-        'count': categoryCounts[category] ?? 0,
-      }),
+      {
+        'category': null,
+        'label': 'Todas',
+        'count': categoryCounts.values.fold(0, (a, b) => a + b),
+      },
+      ...FaqCategory.values.map(
+        (category) => {
+          'category': category,
+          'label': _getCategoryLabel(category),
+          'count': categoryCounts[category] ?? 0,
+        },
+      ),
     ];
 
     return SizedBox(
@@ -715,8 +695,8 @@ class FaqCategoryChips extends StatelessWidget {
         itemBuilder: (context, index) {
           final categoryData = categories[index];
           final category = categoryData['category'] as FaqCategory?;
-          final label = categoryData['label'] as String;
-          final count = categoryData['count'] as int;
+          final label = categoryData['label']! as String;
+          final count = categoryData['count']! as int;
           final isSelected = selectedCategory == category;
 
           return Container(

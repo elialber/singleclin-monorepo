@@ -1,40 +1,32 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// SingleClin Logo Widget
 /// Draws the medical cross logo for the SingleClin brand
 class SingleClinLogo extends StatelessWidget {
-  final double size;
-  final Color color;
-  final double strokeWidth;
-
   const SingleClinLogo({
     Key? key,
     this.size = 60.0,
     this.color = AppColors.primary,
     this.strokeWidth = 4.0,
   }) : super(key: key);
+  final double size;
+  final Color color;
+  final double strokeWidth;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size(size, size),
-      painter: _SingleClinLogoPainter(
-        color: color,
-        strokeWidth: strokeWidth,
-      ),
+      painter: _SingleClinLogoPainter(color: color, strokeWidth: strokeWidth),
     );
   }
 }
 
 class _SingleClinLogoPainter extends CustomPainter {
+  _SingleClinLogoPainter({required this.color, required this.strokeWidth});
   final Color color;
   final double strokeWidth;
-
-  _SingleClinLogoPainter({
-    required this.color,
-    required this.strokeWidth,
-  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -48,22 +40,14 @@ class _SingleClinLogoPainter extends CustomPainter {
 
     // Draw horizontal bar of the cross
     final horizontalRect = RRect.fromRectAndRadius(
-      Rect.fromCenter(
-        center: center,
-        width: crossSize,
-        height: thickness,
-      ),
+      Rect.fromCenter(center: center, width: crossSize, height: thickness),
       Radius.circular(thickness * 0.1),
     );
     canvas.drawRRect(horizontalRect, paint);
 
     // Draw vertical bar of the cross
     final verticalRect = RRect.fromRectAndRadius(
-      Rect.fromCenter(
-        center: center,
-        width: thickness,
-        height: crossSize,
-      ),
+      Rect.fromCenter(center: center, width: thickness, height: crossSize),
       Radius.circular(thickness * 0.1),
     );
     canvas.drawRRect(verticalRect, paint);

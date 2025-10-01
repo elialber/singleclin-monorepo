@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/buy_credits_controller.dart';
-import '../widgets/credit_package_card.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/credits/controllers/buy_credits_controller.dart';
+import 'package:singleclin_mobile/features/credits/widgets/credit_package_card.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class BuyCreditsScreen extends StatelessWidget {
   const BuyCreditsScreen({super.key});
@@ -12,10 +12,7 @@ class BuyCreditsScreen extends StatelessWidget {
     final controller = Get.put(BuyCreditsController());
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Comprar Créditos SG'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Comprar Créditos SG'), elevation: 0),
       body: Obx(() {
         if (controller.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -27,20 +24,16 @@ class BuyCreditsScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: AppColors.sgGradient,
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
                 ),
               ),
               child: const Column(
                 children: [
-                  Icon(
-                    Icons.add_card,
-                    color: Colors.white,
-                    size: 48,
-                  ),
+                  Icon(Icons.add_card, color: Colors.white, size: 48),
                   SizedBox(height: 12),
                   Text(
                     'Escolha o Pacote Ideal',
@@ -53,10 +46,7 @@ class BuyCreditsScreen extends StatelessWidget {
                   SizedBox(height: 8),
                   Text(
                     'Créditos extras para seus procedimentos',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ],
               ),
@@ -142,7 +132,7 @@ class BuyCreditsScreen extends StatelessWidget {
                             ],
                             Text(
                               controller.finalPriceDisplay,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.sgPrimary,
@@ -160,7 +150,9 @@ class BuyCreditsScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: controller.canPurchase && !controller.isProcessingPurchase
+                        onPressed:
+                            controller.canPurchase &&
+                                !controller.isProcessingPurchase
                             ? controller.purchaseCredits
                             : null,
                         style: ElevatedButton.styleFrom(
@@ -170,7 +162,9 @@ class BuyCreditsScreen extends StatelessWidget {
                           ),
                         ),
                         child: controller.isProcessingPurchase
-                            ? const CircularProgressIndicator(color: Colors.white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
                             : Text(
                                 'Comprar ${controller.selectedPackage!.credits} Créditos SG',
                                 style: const TextStyle(

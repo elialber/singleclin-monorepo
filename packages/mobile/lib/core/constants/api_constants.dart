@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// API configuration constants
 class ApiConstants {
   // Private constructor to prevent instantiation

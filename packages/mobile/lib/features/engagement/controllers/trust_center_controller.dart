@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/trust_certification.dart';
-import '../../../core/services/api_service.dart';
+import 'package:singleclin_mobile/features/engagement/models/trust_certification.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
 
 /// Controller for trust center and transparency features
 class TrustCenterController extends GetxController {
@@ -11,19 +11,20 @@ class TrustCenterController extends GetxController {
   // Observable state
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
-  
+
   final RxList<TrustCertification> certifications = <TrustCertification>[].obs;
   final Rx<PrivacyPolicy?> currentPrivacyPolicy = Rx<PrivacyPolicy?>(null);
   final RxList<PrivacyPolicy> privacyPolicyHistory = <PrivacyPolicy>[].obs;
   final Rx<LgpdCompliance?> lgpdCompliance = Rx<LgpdCompliance?>(null);
   final RxList<SecurityAudit> securityAudits = <SecurityAudit>[].obs;
   final Rx<TrustMetrics?> trustMetrics = Rx<TrustMetrics?>(null);
-  
+
   // Terms and policies
   final RxMap<String, String> termsOfUse = <String, String>{}.obs;
   final RxMap<String, String> cookiePolicy = <String, String>{}.obs;
-  final RxList<Map<String, dynamic>> regulatoryContacts = <Map<String, dynamic>>[].obs;
-  
+  final RxList<Map<String, dynamic>> regulatoryContacts =
+      <Map<String, dynamic>>[].obs;
+
   // Content display state
   final RxString selectedCertificationId = ''.obs;
   final RxInt selectedPolicySection = 0.obs;
@@ -54,10 +55,11 @@ class TrustCenterController extends GetxController {
       error.value = '';
 
       final response = await _apiService.get('/trust/certifications');
-      
-      final List<TrustCertification> certs = (response.data['certifications'] as List)
-          .map((json) => TrustCertification.fromJson(json))
-          .toList();
+
+      final List<TrustCertification> certs =
+          (response.data['certifications'] as List)
+              .map((json) => TrustCertification.fromJson(json))
+              .toList();
 
       certifications.assignAll(certs);
     } catch (e) {
@@ -71,9 +73,11 @@ class TrustCenterController extends GetxController {
   Future<void> loadPrivacyPolicy() async {
     try {
       final response = await _apiService.get('/trust/privacy-policy');
-      
-      currentPrivacyPolicy.value = PrivacyPolicy.fromJson(response.data['current']);
-      
+
+      currentPrivacyPolicy.value = PrivacyPolicy.fromJson(
+        response.data['current'],
+      );
+
       final List<PrivacyPolicy> history = (response.data['history'] as List)
           .map((json) => PrivacyPolicy.fromJson(json))
           .toList();
@@ -97,7 +101,7 @@ class TrustCenterController extends GetxController {
   Future<void> loadSecurityAudits() async {
     try {
       final response = await _apiService.get('/trust/security-audits');
-      
+
       final List<SecurityAudit> audits = (response.data['audits'] as List)
           .map((json) => SecurityAudit.fromJson(json))
           .toList();
@@ -122,9 +126,13 @@ class TrustCenterController extends GetxController {
   Future<void> loadTermsAndPolicies() async {
     try {
       final response = await _apiService.get('/trust/terms-and-policies');
-      
-      termsOfUse.assignAll(Map<String, String>.from(response.data['termsOfUse'] ?? {}));
-      cookiePolicy.assignAll(Map<String, String>.from(response.data['cookiePolicy'] ?? {}));
+
+      termsOfUse.assignAll(
+        Map<String, String>.from(response.data['termsOfUse'] ?? {}),
+      );
+      cookiePolicy.assignAll(
+        Map<String, String>.from(response.data['cookiePolicy'] ?? {}),
+      );
     } catch (e) {
       print('Error loading terms and policies: $e');
     }
@@ -134,10 +142,9 @@ class TrustCenterController extends GetxController {
   Future<void> loadRegulatoryContacts() async {
     try {
       final response = await _apiService.get('/trust/regulatory-contacts');
-      
-      final List<Map<String, dynamic>> contacts = List<Map<String, dynamic>>.from(
-        response.data['contacts'] ?? []
-      );
+
+      final List<Map<String, dynamic>> contacts =
+          List<Map<String, dynamic>>.from(response.data['contacts'] ?? []);
       regulatoryContacts.assignAll(contacts);
     } catch (e) {
       print('Error loading regulatory contacts: $e');
@@ -148,7 +155,7 @@ class TrustCenterController extends GetxController {
   Future<void> verifyCertificate(String certificateId) async {
     try {
       final cert = certifications.firstWhere((c) => c.id == certificateId);
-      
+
       if (cert.verificationUrl.isNotEmpty) {
         await launchUrl(Uri.parse(cert.verificationUrl));
       } else {
@@ -174,7 +181,7 @@ class TrustCenterController extends GetxController {
     try {
       final cert = certifications.firstWhere((c) => c.id == certificateId);
       selectedCertificationId.value = certificateId;
-      
+
       if (cert.certificateUrl.isNotEmpty) {
         await launchUrl(Uri.parse(cert.certificateUrl));
       }
@@ -205,19 +212,22 @@ class TrustCenterController extends GetxController {
             ElevatedButton(
               onPressed: () => Get.back(result: true),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Excluir', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Excluir',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
       );
 
-      if (confirmed == true) {
+      if (confirmed ?? false) {
         await _apiService.post('/user/request-deletion');
-        
+
         Get.snackbar(
           'Solicitação Enviada',
           'Sua solicitação de exclusão de dados foi registrada. '
-          'Você receberá uma confirmação em até 30 dias.',
+              'Você receberá uma confirmação em até 30 dias.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white,
@@ -237,7 +247,7 @@ class TrustCenterController extends GetxController {
   Future<void> requestDataExport() async {
     try {
       await _apiService.post('/user/request-data-export');
-      
+
       Get.snackbar(
         'Exportação Solicitada',
         'Seus dados serão processados e enviados por email em até 7 dias úteis',
@@ -257,10 +267,13 @@ class TrustCenterController extends GetxController {
   /// Report security concern
   Future<void> reportSecurityConcern(String concern) async {
     try {
-      await _apiService.post('/trust/report-security-concern', data: {
-        'concern': concern,
-        'timestamp': DateTime.now().toIso8601String(),
-      });
+      await _apiService.post(
+        '/trust/report-security-concern',
+        data: {
+          'concern': concern,
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
 
       Get.snackbar(
         'Relatório Enviado',
@@ -281,15 +294,15 @@ class TrustCenterController extends GetxController {
   /// Contact data protection officer
   Future<void> contactDPO(String subject, String message) async {
     try {
-      await _apiService.post('/trust/contact-dpo', data: {
-        'subject': subject,
-        'message': message,
-      });
+      await _apiService.post(
+        '/trust/contact-dpo',
+        data: {'subject': subject, 'message': message},
+      );
 
       Get.snackbar(
         'Mensagem Enviada',
         'Sua mensagem foi enviada para nosso Encarregado de Dados. '
-        'Responderemos em até 5 dias úteis.',
+            'Responderemos em até 5 dias úteis.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
@@ -376,7 +389,9 @@ class TrustCenterController extends GetxController {
 
   /// Get active certifications
   List<TrustCertification> get activeCertifications {
-    return certifications.where((cert) => cert.status == CertificationStatus.active).toList();
+    return certifications
+        .where((cert) => cert.status == CertificationStatus.active)
+        .toList();
   }
 
   /// Get expiring certifications
@@ -417,16 +432,21 @@ class TrustCenterController extends GetxController {
   double get lgpdCompliancePercentage {
     final compliance = lgpdCompliance.value;
     if (compliance == null) return 0.0;
-    
+
     final total = compliance.requirements.length;
-    final compliant = compliance.requirements.where((r) => r.isCompliant).length;
-    
+    final compliant = compliance.requirements
+        .where((r) => r.isCompliant)
+        .length;
+
     return total > 0 ? compliant / total : 0.0;
   }
 
   /// Get user rights that can be exercised
   List<UserRight> get exercisableRights {
-    return lgpdCompliance.value?.userRights.where((r) => r.isAvailable).toList() ?? [];
+    return lgpdCompliance.value?.userRights
+            .where((r) => r.isAvailable)
+            .toList() ??
+        [];
   }
 
   /// Get emergency contacts
@@ -439,6 +459,7 @@ class TrustCenterController extends GetxController {
   };
 
   /// Refresh all trust data
+  @override
   Future<void> refresh() async {
     isLoading.value = true;
     await loadTrustData();
@@ -459,10 +480,13 @@ class TrustCenterController extends GetxController {
   /// Accept updated terms
   Future<void> acceptUpdatedTerms() async {
     try {
-      await _apiService.post('/user/accept-terms', data: {
-        'version': currentPrivacyPolicy.value?.version,
-        'acceptedAt': DateTime.now().toIso8601String(),
-      });
+      await _apiService.post(
+        '/user/accept-terms',
+        data: {
+          'version': currentPrivacyPolicy.value?.version,
+          'acceptedAt': DateTime.now().toIso8601String(),
+        },
+      );
 
       Get.snackbar(
         'Termos Aceitos',

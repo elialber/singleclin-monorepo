@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/documents_controller.dart';
-import '../widgets/document_viewer.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/controllers/documents_controller.dart';
+import 'package:singleclin_mobile/features/profile/widgets/document_viewer.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Documents Screen
 /// Secure document management with upload and LGPD compliance
 class DocumentsScreen extends GetView<DocumentsController> {
-  const DocumentsScreen({Key? key}) : super(key: key);
+  const DocumentsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +51,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
         children: [
           _buildStatsHeader(),
           _buildFilterTabs(),
-          Expanded(
-            child: _buildDocumentsList(),
-          ),
+          Expanded(child: _buildDocumentsList()),
         ],
       ),
       floatingActionButton: _buildUploadFAB(),
@@ -64,19 +62,14 @@ class DocumentsScreen extends GetView<DocumentsController> {
   Widget _buildStatsHeader() {
     return Obx(() {
       if (controller.isLoading) return const SizedBox.shrink();
-      
+
       final stats = controller.statistics;
-      
+
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.primary.withOpacity(0.05),
-          border: Border(
-            bottom: BorderSide(
-              color: AppColors.divider,
-              width: 1,
-            ),
-          ),
+          border: const Border(bottom: BorderSide(color: AppColors.divider)),
         ),
         child: Row(
           children: [
@@ -104,7 +97,12 @@ class DocumentsScreen extends GetView<DocumentsController> {
     });
   }
 
-  Widget _buildStatItem(String label, String value, Color color, IconData icon) {
+  Widget _buildStatItem(
+    String label,
+    String value,
+    Color color,
+    IconData icon,
+  ) {
     return Expanded(
       child: Column(
         children: [
@@ -126,7 +124,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11,
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
@@ -143,25 +141,29 @@ class DocumentsScreen extends GetView<DocumentsController> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Obx(() => Row(
-          children: [
-            _buildFilterChip('Todos', DocumentType.other),
-            const SizedBox(width: 8),
-            ...DocumentType.values.where((type) => type != DocumentType.other).map(
-              (type) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _buildFilterChip(type.label, type),
-              ),
-            ),
-          ],
-        )),
+        child: Obx(
+          () => Row(
+            children: [
+              _buildFilterChip('Todos', DocumentType.other),
+              const SizedBox(width: 8),
+              ...DocumentType.values
+                  .where((type) => type != DocumentType.other)
+                  .map(
+                    (type) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _buildFilterChip(type.label, type),
+                    ),
+                  ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildFilterChip(String label, DocumentType type) {
     final isSelected = controller.selectedFilter == type;
-    
+
     return FilterChip(
       label: Text(label),
       selected: isSelected,
@@ -186,7 +188,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
       }
 
       final documents = controller.filteredDocuments;
-      
+
       if (documents.isEmpty) {
         return _buildEmptyState();
       }
@@ -202,7 +204,8 @@ class DocumentsScreen extends GetView<DocumentsController> {
               child: DocumentViewer(
                 document: documents[index],
                 onTap: () => controller.viewDocument(documents[index].id),
-                onDownload: () => controller.downloadDocument(documents[index].id),
+                onDownload: () =>
+                    controller.downloadDocument(documents[index].id),
                 onShare: () => controller.shareDocument(documents[index].id),
                 onDelete: () => controller.deleteDocument(documents[index].id),
               ),
@@ -223,11 +226,11 @@ class DocumentsScreen extends GetView<DocumentsController> {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.lightGrey,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.folder_outlined,
                 size: 48,
                 color: AppColors.mediumGrey,
@@ -246,10 +249,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
             const SizedBox(height: 8),
             const Text(
               'Seus documentos médicos aparecerão aqui. Mantenha tudo organizado e seguro.',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -319,10 +319,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
           children: [
             const Text(
               'Adicionar Documento',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
             _buildUploadOption(
@@ -361,11 +358,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
               ),
               child: const Row(
                 children: [
-                  Icon(
-                    Icons.security,
-                    color: AppColors.info,
-                    size: 16,
-                  ),
+                  Icon(Icons.security, color: AppColors.info, size: 16),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -404,17 +397,11 @@ class DocumentsScreen extends GetView<DocumentsController> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(
-          fontSize: 12,
-          color: AppColors.textSecondary,
-        ),
+        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
       ),
       onTap: onTap,
       contentPadding: EdgeInsets.zero,
@@ -435,8 +422,10 @@ class DocumentsScreen extends GetView<DocumentsController> {
 
   /// Show search dialog
   void _showSearchDialog() {
-    final searchController = TextEditingController(text: controller.searchQuery);
-    
+    final searchController = TextEditingController(
+      text: controller.searchQuery,
+    );
+
     Get.dialog(
       AlertDialog(
         title: const Text('Pesquisar Documentos'),
@@ -457,10 +446,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
             },
             child: const Text('Limpar'),
           ),
-          ElevatedButton(
-            onPressed: () => Get.back(),
-            child: const Text('OK'),
-          ),
+          ElevatedButton(onPressed: Get.back, child: const Text('OK')),
         ],
       ),
     );
@@ -469,7 +455,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
   /// Show statistics dialog
   void _showStatisticsDialog() {
     final stats = controller.statistics;
-    
+
     Get.dialog(
       AlertDialog(
         title: const Text('Estatísticas'),
@@ -477,26 +463,31 @@ class DocumentsScreen extends GetView<DocumentsController> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatRow('Total de documentos', stats['totalDocuments'].toString()),
-            _buildStatRow('Documentos recentes', stats['recentDocuments'].toString()),
-            _buildStatRow('Documentos compartilhados', stats['sharedDocuments'].toString()),
+            _buildStatRow(
+              'Total de documentos',
+              stats['totalDocuments'].toString(),
+            ),
+            _buildStatRow(
+              'Documentos recentes',
+              stats['recentDocuments'].toString(),
+            ),
+            _buildStatRow(
+              'Documentos compartilhados',
+              stats['sharedDocuments'].toString(),
+            ),
             _buildStatRow('Espaço utilizado', _formatBytes(stats['totalSize'])),
             const SizedBox(height: 16),
             const Text(
               'Tipos de documento:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            ...stats['documentsByType'].entries.map((entry) => 
-              _buildStatRow('  ${entry.key}', entry.value.toString())
+            ...stats['documentsByType'].entries.map(
+              (entry) =>
+                  _buildStatRow('  ${entry.key}', entry.value.toString()),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
-        ],
+        actions: [TextButton(onPressed: Get.back, child: const Text('Fechar'))],
       ),
     );
   }
@@ -508,10 +499,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -529,7 +517,9 @@ class DocumentsScreen extends GetView<DocumentsController> {
             children: [
               Text('Como usar seus documentos:'),
               SizedBox(height: 12),
-              Text('📁 Upload: Adicione documentos usando câmera, galeria ou arquivos'),
+              Text(
+                '📁 Upload: Adicione documentos usando câmera, galeria ou arquivos',
+              ),
               SizedBox(height: 8),
               Text('🔒 Segurança: Todos os arquivos são criptografados'),
               SizedBox(height: 8),
@@ -542,10 +532,7 @@ class DocumentsScreen extends GetView<DocumentsController> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Entendi'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Entendi')),
         ],
       ),
     );
@@ -555,7 +542,8 @@ class DocumentsScreen extends GetView<DocumentsController> {
   String _formatBytes(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (bytes < 1024 * 1024 * 1024)
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 }

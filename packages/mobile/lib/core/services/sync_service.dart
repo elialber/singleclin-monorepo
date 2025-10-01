@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import '../models/cache_entity.dart';
-import 'cache_service.dart';
-import 'network_service.dart';
-import 'hive_box_manager.dart';
+import 'package:singleclin_mobile/core/models/cache_entity.dart';
+import 'package:singleclin_mobile/core/services/cache_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+import 'package:singleclin_mobile/core/services/hive_box_manager.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -12,6 +12,15 @@ import 'dart:math';
 /// Coordinates data synchronization between local cache and backend APIs.
 /// Handles conflict resolution, retry logic, and background sync operations.
 class SyncService extends GetxService {
+  SyncService({
+    required CacheService cacheService,
+    required NetworkService networkService,
+    required HiveBoxManager boxManager,
+    required Dio dio,
+  }) : _cacheService = cacheService,
+       _networkService = networkService,
+       _boxManager = boxManager,
+       _dio = dio;
   final CacheService _cacheService;
   final NetworkService _networkService;
   final HiveBoxManager _boxManager;
@@ -32,16 +41,6 @@ class SyncService extends GetxService {
   static const Duration _retryInterval = Duration(minutes: 5);
   static const int _maxRetryAttempts = 3;
   static const int _batchSize = 10;
-
-  SyncService({
-    required CacheService cacheService,
-    required NetworkService networkService,
-    required HiveBoxManager boxManager,
-    required Dio dio,
-  })  : _cacheService = cacheService,
-        _networkService = networkService,
-        _boxManager = boxManager,
-        _dio = dio;
 
   @override
   Future<void> onInit() async {
@@ -82,20 +81,20 @@ class SyncService extends GetxService {
       return SyncResult.alreadyInProgress();
     }
 
-    if (!await _networkService.isConnected && !force) {
+    if (!_networkService.isConnected && !force) {
       return SyncResult.noConnection();
     }
 
-    return await _performFullSync();
+    return _performFullSync();
   }
 
   /// Sync specific data type
   Future<SyncResult> syncDataType(BoxType boxType, {bool force = false}) async {
-    if (!await _networkService.isConnected && !force) {
+    if (!_networkService.isConnected && !force) {
       return SyncResult.noConnection();
     }
 
-    return await _syncBoxType(boxType);
+    return _syncBoxType(boxType);
   }
 
   /// Add operation to pending queue
@@ -105,10 +104,12 @@ class SyncService extends GetxService {
       await queueBox.put(operation.id, operation.toJson());
       _pendingOperationsCount.value = queueBox.length;
 
-      print('➕ Added pending operation: ${operation.operation.name} for ${operation.entityKey}');
+      print(
+        '➕ Added pending operation: ${operation.operation.name} for ${operation.entityKey}',
+      );
 
       // Try to process immediately if online
-      if (await _networkService.isConnected) {
+      if (_networkService.isConnected) {
         _scheduleSync(immediate: true);
       }
     } catch (e) {
@@ -168,14 +169,15 @@ class SyncService extends GetxService {
       await _updateSyncMetadata();
 
       stopwatch.stop();
-      print('✅ Full sync completed in ${stopwatch.elapsed.inSeconds}s: $syncedItems items, $errors errors');
+      print(
+        '✅ Full sync completed in ${stopwatch.elapsed.inSeconds}s: $syncedItems items, $errors errors',
+      );
 
       return SyncResult.success(
         syncedCount: syncedItems,
         errorCount: errors,
         duration: stopwatch.elapsed,
       );
-
     } catch (e) {
       print('❌ Full sync failed: $e');
       _syncErrors.add('Full sync: $e');
@@ -218,7 +220,6 @@ class SyncService extends GetxService {
       }
 
       return SyncResult.success(syncedCount: syncedCount);
-
     } catch (e) {
       print('❌ Failed to sync ${boxType.name}: $e');
       return SyncResult.error('${boxType.name}: $e');
@@ -269,7 +270,9 @@ class SyncService extends GetxService {
             } else {
               // Max retries reached, remove from queue
               await queueBox.delete(operation.id);
-              print('⚠️ Operation ${operation.id} exceeded max retries, removing from queue');
+              print(
+                '⚠️ Operation ${operation.id} exceeded max retries, removing from queue',
+              );
             }
             errors++;
           }
@@ -278,11 +281,7 @@ class SyncService extends GetxService {
 
       _pendingOperationsCount.value = queueBox.length;
 
-      return SyncResult.success(
-        syncedCount: processed,
-        errorCount: errors,
-      );
-
+      return SyncResult.success(syncedCount: processed, errorCount: errors);
     } catch (e) {
       print('❌ Failed to process pending operations: $e');
       return SyncResult.error(e.toString());
@@ -319,7 +318,10 @@ class SyncService extends GetxService {
 
   Future<void> _processUpdateOperation(PendingOperation operation) async {
     final endpoint = _getEndpointForBoxType(operation.boxType);
-    final response = await _dio.put('$endpoint/${operation.entityKey}', data: operation.data);
+    final response = await _dio.put(
+      '$endpoint/${operation.entityKey}',
+      data: operation.data,
+    );
 
     if (response.statusCode == 200) {
       print('✅ Updated ${operation.entityKey} on server');
@@ -402,7 +404,8 @@ class SyncService extends GetxService {
 
   void _setupBackgroundSync() {
     _backgroundSyncTimer = Timer.periodic(_backgroundSyncInterval, (timer) {
-      if (Get.find<NetworkService>().isConnected.value && !_syncInProgress.value) {
+      if (Get.find<NetworkService>().isConnected.value &&
+          !_syncInProgress.value) {
         _scheduleSync(background: true);
       }
     });
@@ -410,7 +413,7 @@ class SyncService extends GetxService {
 
   void _scheduleSync({bool immediate = false, bool background = false}) {
     if (immediate) {
-      Future.microtask(() => syncAll());
+      Future.microtask(syncAll);
     } else {
       // Schedule for next available slot
       Future.delayed(Duration(seconds: background ? 30 : 5), () {
@@ -456,12 +459,6 @@ class SyncService extends GetxService {
 
 /// Result of a synchronization operation
 class SyncResult {
-  final bool success;
-  final int syncedCount;
-  final int errorCount;
-  final String? errorMessage;
-  final Duration? duration;
-
   SyncResult({
     required this.success,
     this.syncedCount = 0,
@@ -484,11 +481,7 @@ class SyncResult {
   }
 
   factory SyncResult.error(String message) {
-    return SyncResult(
-      success: false,
-      errorMessage: message,
-      errorCount: 1,
-    );
+    return SyncResult(success: false, errorMessage: message, errorCount: 1);
   }
 
   factory SyncResult.noConnection() {
@@ -499,11 +492,13 @@ class SyncResult {
   }
 
   factory SyncResult.alreadyInProgress() {
-    return SyncResult(
-      success: false,
-      errorMessage: 'Sync already in progress',
-    );
+    return SyncResult(success: false, errorMessage: 'Sync already in progress');
   }
+  final bool success;
+  final int syncedCount;
+  final int errorCount;
+  final String? errorMessage;
+  final Duration? duration;
 
   @override
   String toString() {

@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/health_record.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/models/health_record.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Health Timeline Widget
 /// Displays a health record in timeline format
 class HealthTimeline extends StatelessWidget {
-  final HealthRecord record;
-  final VoidCallback? onTap;
-  final VoidCallback? onEdit;
-  final VoidCallback? onArchive;
-  final VoidCallback? onDelete;
-
   const HealthTimeline({
     Key? key,
     required this.record,
@@ -19,17 +13,22 @@ class HealthTimeline extends StatelessWidget {
     this.onArchive,
     this.onDelete,
   }) : super(key: key);
+  final HealthRecord record;
+  final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onArchive;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
     final recordType = HealthRecordType.fromString(record.type);
-    final typeColor = Color(int.parse(recordType.color.substring(1), radix: 16) + 0xFF000000);
-    
+    final typeColor = Color(
+      int.parse(recordType.color.substring(1), radix: 16) + 0xFF000000,
+    );
+
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -41,7 +40,8 @@ class HealthTimeline extends StatelessWidget {
               _buildHeader(recordType, typeColor),
               const SizedBox(height: 12),
               _buildContent(),
-              if (record.hasAttachments || record.recommendations.isNotEmpty) ...[
+              if (record.hasAttachments ||
+                  record.recommendations.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 _buildMetadata(),
               ],
@@ -97,7 +97,7 @@ class HealthTimeline extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
+                  const Text(
                     '•',
                     style: TextStyle(
                       color: AppColors.textSecondary,
@@ -228,11 +228,7 @@ class HealthTimeline extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.attach_file,
-                  size: 14,
-                  color: AppColors.info,
-                ),
+                const Icon(Icons.attach_file, size: 14, color: AppColors.info),
                 const SizedBox(width: 4),
                 Text(
                   '${record.totalAttachments} anexo${record.totalAttachments > 1 ? 's' : ''}',
@@ -253,18 +249,18 @@ class HealthTimeline extends StatelessWidget {
               color: AppColors.success.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.lightbulb_outline,
                   size: 14,
                   color: AppColors.success,
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: 4),
                 Text(
                   'Recomendações',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.success,
                     fontWeight: FontWeight.w600,
@@ -278,7 +274,7 @@ class HealthTimeline extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: record.isFollowUpDue 
+              color: record.isFollowUpDue
                   ? AppColors.warning.withOpacity(0.1)
                   : AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
@@ -287,16 +283,22 @@ class HealthTimeline extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  record.isFollowUpDue ? Icons.notification_important : Icons.event,
+                  record.isFollowUpDue
+                      ? Icons.notification_important
+                      : Icons.event,
                   size: 14,
-                  color: record.isFollowUpDue ? AppColors.warning : AppColors.primary,
+                  color: record.isFollowUpDue
+                      ? AppColors.warning
+                      : AppColors.primary,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   record.isFollowUpDue ? 'Retorno vencido' : 'Retorno agendado',
                   style: TextStyle(
                     fontSize: 11,
-                    color: record.isFollowUpDue ? AppColors.warning : AppColors.primary,
+                    color: record.isFollowUpDue
+                        ? AppColors.warning
+                        : AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -304,21 +306,23 @@ class HealthTimeline extends StatelessWidget {
             ),
           ),
         ],
-        ...record.tags.map((tag) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.lightGrey,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            tag,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
+        ...record.tags.map(
+          (tag) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.lightGrey,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              tag,
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-        )),
+        ),
       ],
     );
   }

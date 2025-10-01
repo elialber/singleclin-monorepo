@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class CreditBalanceCard extends StatefulWidget {
-  final int balance;
-  final int lockedBalance;
-  final bool isLowBalance;
-  final VoidCallback? onTap;
-
   const CreditBalanceCard({
     super.key,
     required this.balance,
@@ -15,12 +10,16 @@ class CreditBalanceCard extends StatefulWidget {
     this.isLowBalance = false,
     this.onTap,
   });
+  final int balance;
+  final int lockedBalance;
+  final bool isLowBalance;
+  final VoidCallback? onTap;
 
   @override
   State<CreditBalanceCard> createState() => _CreditBalanceCardState();
 }
 
-class _CreditBalanceCardState extends State<CreditBalanceCard> 
+class _CreditBalanceCardState extends State<CreditBalanceCard>
     with TickerProviderStateMixin {
   late AnimationController _sparkleController;
   late AnimationController _pulseController;
@@ -31,52 +30,44 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
   @override
   void initState() {
     super.initState();
-    
+
     // Sparkle animation for golden effect
     _sparkleController = AnimationController(
       duration: const Duration(seconds: 3),
       vsync: this,
     );
-    _sparkleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _sparkleController,
-      curve: Curves.easeInOut,
-    ));
-    
+    _sparkleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _sparkleController, curve: Curves.easeInOut),
+    );
+
     // Pulse animation for low balance warning
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
-    
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
     // Shimmer animation for golden shine
     _shimmerController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    
+
     _startAnimations();
   }
 
   void _startAnimations() {
     // Continuous sparkle animation
     _sparkleController.repeat(reverse: true);
-    
+
     // Shimmer every 5 seconds
-    _shimmerController.repeat(reverse: false);
+    _shimmerController.repeat();
     Future.delayed(const Duration(seconds: 5), () {
-      if (mounted) _shimmerController.repeat(reverse: false);
+      if (mounted) _shimmerController.repeat();
     });
-    
+
     // Pulse animation only for low balance
     if (widget.isLowBalance) {
       _pulseController.repeat(reverse: true);
@@ -86,7 +77,7 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
   @override
   void didUpdateWidget(CreditBalanceCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Start/stop pulse animation based on low balance status
     if (widget.isLowBalance != oldWidget.isLowBalance) {
       if (widget.isLowBalance) {
@@ -108,7 +99,7 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
   @override
   Widget build(BuildContext context) {
     final availableBalance = widget.balance - widget.lockedBalance;
-    
+
     return AnimatedBuilder(
       animation: Listenable.merge([_pulseAnimation, _sparkleAnimation]),
       builder: (context, child) {
@@ -124,14 +115,12 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                   BoxShadow(
                     color: AppColors.sgPrimary.withOpacity(0.3),
                     blurRadius: 20,
-                    spreadRadius: 0,
                     offset: const Offset(0, 8),
                   ),
                   if (widget.isLowBalance)
                     BoxShadow(
                       color: Colors.red.withOpacity(0.3),
                       blurRadius: 15,
-                      spreadRadius: 0,
                       offset: const Offset(0, 4),
                     ),
                 ],
@@ -147,14 +136,8 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: widget.isLowBalance
-                            ? [
-                                Colors.red.shade400,
-                                Colors.red.shade600,
-                              ]
-                            : [
-                                AppColors.sgPrimary,
-                                AppColors.sgSecondary,
-                              ],
+                            ? [Colors.red.shade400, Colors.red.shade600]
+                            : [AppColors.sgPrimary, AppColors.sgSecondary],
                       ),
                     ),
                     child: Column(
@@ -169,7 +152,7 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                                 color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.account_balance_wallet,
                                 color: Colors.white,
                                 size: 24,
@@ -218,9 +201,9 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                               ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Main balance display
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -248,9 +231,9 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 4),
-                        
+
                         Text(
                           'Disponível para uso',
                           style: TextStyle(
@@ -258,7 +241,7 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                             fontSize: 14,
                           ),
                         ),
-                        
+
                         if (widget.lockedBalance > 0) ...[
                           const SizedBox(height: 12),
                           Container(
@@ -293,7 +276,7 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                       ],
                     ),
                   ),
-                  
+
                   // Animated shimmer overlay
                   Positioned.fill(
                     child: AnimatedBuilder(
@@ -307,18 +290,14 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               gradient: LinearGradient(
-                                begin: Alignment(-1.0, -0.3),
-                                end: Alignment(1.0, 0.3),
+                                begin: const Alignment(-1.0, -0.3),
+                                end: const Alignment(1.0, 0.3),
                                 colors: const [
                                   Colors.transparent,
                                   Colors.white24,
                                   Colors.transparent,
                                 ],
-                                stops: [
-                                  0.0,
-                                  _shimmerController.value,
-                                  1.0,
-                                ],
+                                stops: [0.0, _shimmerController.value, 1.0],
                               ),
                             ),
                           ),
@@ -326,7 +305,7 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                       },
                     ),
                   ),
-                  
+
                   // Sparkle effects
                   Positioned.fill(
                     child: AnimatedBuilder(
@@ -340,7 +319,7 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
                       },
                     ),
                   ),
-                  
+
                   // Tap indicator
                   if (widget.onTap != null)
                     Positioned(
@@ -363,16 +342,15 @@ class _CreditBalanceCardState extends State<CreditBalanceCard>
 }
 
 class SparklePainter extends CustomPainter {
-  final double animationValue;
-  
   SparklePainter({required this.animationValue});
-  
+  final double animationValue;
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.white.withOpacity(0.6)
       ..style = PaintingStyle.fill;
-    
+
     // Create sparkle positions
     final sparkles = [
       Offset(size.width * 0.8, size.height * 0.3),
@@ -381,38 +359,49 @@ class SparklePainter extends CustomPainter {
       Offset(size.width * 0.1, size.height * 0.2),
       Offset(size.width * 0.6, size.height * 0.1),
     ];
-    
+
     for (int i = 0; i < sparkles.length; i++) {
       final opacity = (animationValue + (i * 0.2)) % 1.0;
       final sparkleSize = 2.0 + (opacity * 3.0);
-      
+
       paint.color = Colors.white.withOpacity(opacity * 0.8);
-      
+
       // Draw sparkle as a small star
       _drawStar(canvas, sparkles[i], sparkleSize, paint);
     }
   }
-  
+
   void _drawStar(Canvas canvas, Offset center, double size, Paint paint) {
     final path = Path();
-    const angles = [0.0, 0.628, 1.257, 1.885, 2.513, 3.141, 3.769, 4.398, 5.026, 5.654];
-    
+    const angles = [
+      0.0,
+      0.628,
+      1.257,
+      1.885,
+      2.513,
+      3.141,
+      3.769,
+      4.398,
+      5.026,
+      5.654,
+    ];
+
     for (int i = 0; i < angles.length; i++) {
       final radius = i.isEven ? size : size * 0.5;
       final x = center.dx + radius * 0.5 * (i.isEven ? 1 : 0.6);
       final y = center.dy + radius * 0.5 * (i.isEven ? 1 : 0.6);
-      
+
       if (i == 0) {
         path.moveTo(x, y);
       } else {
         path.lineTo(x, y);
       }
     }
-    
+
     path.close();
     canvas.drawPath(path, paint);
   }
-  
+
   @override
   bool shouldRepaint(SparklePainter oldDelegate) {
     return oldDelegate.animationValue != animationValue;

@@ -1,24 +1,28 @@
 import 'package:get/get.dart';
-import '../models/clinic_service.dart';
-import '../../../core/services/api_service.dart';
+import 'package:singleclin_mobile/features/clinic_services/models/clinic_service.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
 
 class ClinicServicesApi {
   static final ApiService _apiService = Get.find<ApiService>();
-  
+
   static Future<List<ClinicService>> getClinicServices(String clinicId) async {
     try {
       print('DEBUG: Making API call to get services for clinic: $clinicId');
       final response = await _apiService.get('/clinic/$clinicId/services');
-      
+
       print('DEBUG: API response: $response');
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
-        final services = data.map((json) => ClinicService.fromJson(json)).toList();
+        final services = data
+            .map((json) => ClinicService.fromJson(json))
+            .toList();
         print('DEBUG: Converted ${services.length} services from API');
         return services;
       } else {
-        throw Exception('Failed to load clinic services: ${response.statusCode}');
+        throw Exception(
+          'Failed to load clinic services: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('DEBUG: API error: $e');
@@ -32,16 +36,21 @@ class ClinicServicesApi {
     required DateTime appointmentDate,
   }) async {
     try {
-      final response = await _apiService.post('/Appointments/schedule', data: {
-        'ClinicId': clinicId,
-        'ServiceId': serviceId,
-        'ScheduledDate': appointmentDate.toIso8601String(),
-      });
+      final response = await _apiService.post(
+        '/Appointments/schedule',
+        data: {
+          'ClinicId': clinicId,
+          'ServiceId': serviceId,
+          'ScheduledDate': appointmentDate.toIso8601String(),
+        },
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return response.data['data'] ?? response.data;
       } else {
-        throw Exception('Failed to schedule appointment: ${response.statusCode}');
+        throw Exception(
+          'Failed to schedule appointment: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error scheduling appointment: $e');
@@ -52,14 +61,17 @@ class ClinicServicesApi {
     required String confirmationToken,
   }) async {
     try {
-      final response = await _apiService.post('/Appointments/confirm', data: {
-        'confirmationToken': confirmationToken,
-      });
+      final response = await _apiService.post(
+        '/Appointments/confirm',
+        data: {'confirmationToken': confirmationToken},
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return response.data['data'] ?? response.data;
       } else {
-        throw Exception('Failed to confirm appointment: ${response.statusCode}');
+        throw Exception(
+          'Failed to confirm appointment: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error confirming appointment: $e');
@@ -79,5 +91,4 @@ class ClinicServicesApi {
       throw Exception('Error fetching user credits: $e');
     }
   }
-
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/dashboard_controller.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../shared/widgets/custom_bottom_nav.dart';
-import '../../../shared/widgets/sg_credit_widget.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
+import 'package:singleclin_mobile/features/dashboard/controllers/dashboard_controller.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
+import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_strings.dart';
 
 class DashboardScreen extends GetView<DashboardController> {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class DashboardScreen extends GetView<DashboardController> {
           ),
         ],
       ),
-      body: Obx(() => _buildBody()),
+      body: Obx(_buildBody),
       bottomNavigationBar: const CustomBottomNav(
         currentIndex: 0,
         onTap: _onBottomNavTap,
@@ -81,11 +81,7 @@ class DashboardScreen extends GetView<DashboardController> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: AppColors.error,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               'Ops! Algo deu errado',
@@ -156,18 +152,14 @@ class DashboardScreen extends GetView<DashboardController> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary, width: 1),
+        border: Border.all(color: AppColors.primary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.schedule,
-                color: AppColors.primary,
-                size: 20,
-              ),
+              const Icon(Icons.schedule, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
               Text(
                 AppStrings.nextAppointment,
@@ -195,7 +187,7 @@ class DashboardScreen extends GetView<DashboardController> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.access_time,
                 size: 16,
                 color: AppColors.mediumGrey,
@@ -209,7 +201,8 @@ class DashboardScreen extends GetView<DashboardController> {
               ),
               const Spacer(),
               TextButton(
-                onPressed: () => controller.navigateToAppointment(appointment.id),
+                onPressed: () =>
+                    controller.navigateToAppointment(appointment.id),
                 child: const Text('Ver Detalhes'),
               ),
             ],
@@ -229,11 +222,11 @@ class DashboardScreen extends GetView<DashboardController> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: TextField(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: AppStrings.searchHint,
-              prefixIcon: const Icon(Icons.search, color: AppColors.mediumGrey),
+              prefixIcon: Icon(Icons.search, color: AppColors.mediumGrey),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 16,
               ),
@@ -258,10 +251,7 @@ class DashboardScreen extends GetView<DashboardController> {
                     color: AppColors.lightGrey,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    search,
-                    style: Get.textTheme.bodySmall,
-                  ),
+                  child: Text(search, style: Get.textTheme.bodySmall),
                 ),
               );
             }).toList(),
@@ -318,16 +308,14 @@ class DashboardScreen extends GetView<DashboardController> {
           itemBuilder: (context, index) {
             final category = categories[index];
             return GestureDetector(
-              onTap: () => controller.navigateToCategory(category['name'] as String),
+              onTap: () =>
+                  controller.navigateToCategory(category['name'] as String),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: (category['color'] as Color).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: category['color'] as Color,
-                    width: 1,
-                  ),
+                  border: Border.all(color: category['color'] as Color),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -392,7 +380,9 @@ class DashboardScreen extends GetView<DashboardController> {
               return Container(
                 width: 160,
                 margin: EdgeInsets.only(
-                  right: index < controller.recommendedServices.length - 1 ? 12 : 0,
+                  right: index < controller.recommendedServices.length - 1
+                      ? 12
+                      : 0,
                 ),
                 child: _buildServiceCard(service),
               );
@@ -434,9 +424,7 @@ class DashboardScreen extends GetView<DashboardController> {
           itemBuilder: (context, index) {
             final clinic = controller.nearbyClinic[index];
             return Container(
-              margin: EdgeInsets.only(
-                bottom: index < 2 ? 12 : 0,
-              ),
+              margin: EdgeInsets.only(bottom: index < 2 ? 12 : 0),
               child: _buildClinicCard(clinic),
             );
           },
@@ -450,20 +438,16 @@ class DashboardScreen extends GetView<DashboardController> {
       onTap: () => controller.navigateToService(service.id),
       child: Card(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               flex: 3,
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.lightGrey,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                 ),
                 child: const Center(
                   child: Icon(
@@ -512,9 +496,7 @@ class DashboardScreen extends GetView<DashboardController> {
       onTap: () => controller.navigateToClinic(clinic.id),
       child: Card(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -597,7 +579,7 @@ class DashboardScreen extends GetView<DashboardController> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final appointmentDay = DateTime(date.year, date.month, date.day);
-    
+
     if (appointmentDay == today) {
       return 'Hoje, ${_formatTime(date)}';
     } else if (appointmentDay == today.add(const Duration(days: 1))) {

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../../routes/app_routes.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class BottomNavController extends GetxController {
   final RxInt _currentIndex = 0.obs;

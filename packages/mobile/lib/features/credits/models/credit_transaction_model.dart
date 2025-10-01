@@ -1,11 +1,4 @@
-enum TransactionType {
-  earned,
-  spent,
-  refunded,
-  bonus,
-  subscription,
-  purchase
-}
+enum TransactionType { earned, spent, refunded, bonus, subscription, purchase }
 
 enum TransactionSource {
   monthlySubscription,
@@ -14,22 +7,10 @@ enum TransactionSource {
   appointmentBooking,
   appointmentCancel,
   bonus,
-  refund
+  refund,
 }
 
 class CreditTransactionModel {
-  final String id;
-  final String userId;
-  final int amount;
-  final int balanceAfter;
-  final TransactionType type;
-  final TransactionSource source;
-  final String description;
-  final String? relatedEntityId; // ID do agendamento, referral, etc.
-  final String? relatedEntityType; // 'appointment', 'referral', etc.
-  final Map<String, dynamic>? metadata;
-  final DateTime createdAt;
-
   CreditTransactionModel({
     required this.id,
     required this.userId,
@@ -65,6 +46,17 @@ class CreditTransactionModel {
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
+  final String id;
+  final String userId;
+  final int amount;
+  final int balanceAfter;
+  final TransactionType type;
+  final TransactionSource source;
+  final String description;
+  final String? relatedEntityId; // ID do agendamento, referral, etc.
+  final String? relatedEntityType; // 'appointment', 'referral', etc.
+  final Map<String, dynamic>? metadata;
+  final DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -120,29 +112,19 @@ class CreditTransactionModel {
 
   bool get isPositive {
     return type == TransactionType.earned ||
-           type == TransactionType.refunded ||
-           type == TransactionType.bonus ||
-           type == TransactionType.subscription ||
-           type == TransactionType.purchase;
+        type == TransactionType.refunded ||
+        type == TransactionType.bonus ||
+        type == TransactionType.subscription ||
+        type == TransactionType.purchase;
   }
 
   String get amountDisplay {
-    String prefix = isPositive ? '+' : '-';
+    final String prefix = isPositive ? '+' : '-';
     return '$prefix$amount SG';
   }
 }
 
 class SubscriptionPlan {
-  final String id;
-  final String name;
-  final String description;
-  final int monthlyCredits;
-  final double monthlyPrice;
-  final List<String> features;
-  final bool isPopular;
-  final bool isActive;
-  final int sortOrder;
-
   SubscriptionPlan({
     required this.id,
     required this.name,
@@ -163,12 +145,22 @@ class SubscriptionPlan {
       monthlyCredits: json['monthlyCredits'] ?? 0,
       monthlyPrice: (json['monthlyPrice'] ?? 0.0).toDouble(),
       features: json['features'] != null
-          ? List<String>.from(json['features']) : [],
+          ? List<String>.from(json['features'])
+          : [],
       isPopular: json['isPopular'] ?? false,
       isActive: json['isActive'] ?? true,
       sortOrder: json['sortOrder'] ?? 0,
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final int monthlyCredits;
+  final double monthlyPrice;
+  final List<String> features;
+  final bool isPopular;
+  final bool isActive;
+  final int sortOrder;
 
   Map<String, dynamic> toJson() {
     return {
@@ -194,14 +186,6 @@ class SubscriptionPlan {
 }
 
 class CreditPurchaseOption {
-  final String id;
-  final String name;
-  final int credits;
-  final double price;
-  final double discount;
-  final bool isPopular;
-  final bool isActive;
-
   CreditPurchaseOption({
     required this.id,
     required this.name,
@@ -223,6 +207,13 @@ class CreditPurchaseOption {
       isActive: json['isActive'] ?? true,
     );
   }
+  final String id;
+  final String name;
+  final int credits;
+  final double price;
+  final double discount;
+  final bool isPopular;
+  final bool isActive;
 
   Map<String, dynamic> toJson() {
     return {
@@ -258,15 +249,6 @@ class CreditPurchaseOption {
 }
 
 class ReferralProgram {
-  final String id;
-  final String userId;
-  final String referralCode;
-  final int bonusCredits;
-  final int totalReferrals;
-  final int totalCreditsEarned;
-  final List<ReferralRecord> referrals;
-  final DateTime createdAt;
-
   ReferralProgram({
     required this.id,
     required this.userId,
@@ -288,11 +270,20 @@ class ReferralProgram {
       totalCreditsEarned: json['totalCreditsEarned'] ?? 0,
       referrals: json['referrals'] != null
           ? List<ReferralRecord>.from(
-              json['referrals'].map((x) => ReferralRecord.fromJson(x)))
+              json['referrals'].map((x) => ReferralRecord.fromJson(x)),
+            )
           : [],
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
+  final String id;
+  final String userId;
+  final String referralCode;
+  final int bonusCredits;
+  final int totalReferrals;
+  final int totalCreditsEarned;
+  final List<ReferralRecord> referrals;
+  final DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -313,14 +304,6 @@ class ReferralProgram {
 }
 
 class ReferralRecord {
-  final String id;
-  final String referralProgramId;
-  final String referredUserId;
-  final String? referredUserName;
-  final int creditsEarned;
-  final bool isActive;
-  final DateTime referredAt;
-
   ReferralRecord({
     required this.id,
     required this.referralProgramId,
@@ -342,6 +325,13 @@ class ReferralRecord {
       referredAt: DateTime.parse(json['referredAt']),
     );
   }
+  final String id;
+  final String referralProgramId;
+  final String referredUserId;
+  final String? referredUserName;
+  final int creditsEarned;
+  final bool isActive;
+  final DateTime referredAt;
 
   Map<String, dynamic> toJson() {
     return {

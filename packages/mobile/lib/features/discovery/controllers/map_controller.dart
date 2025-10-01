@@ -7,20 +7,21 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../core/services/location_service.dart';
-import '../../../core/constants/app_colors.dart';
-import '../models/clinic.dart';
-import '../models/filter_options.dart';
-import 'discovery_controller.dart';
+import 'package:singleclin_mobile/core/services/location_service.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
 
 /// Map controller managing Google Maps integration and marker management
 class MapController extends GetxController {
   final LocationService _locationService = Get.find<LocationService>();
-  final DiscoveryController _discoveryController = Get.find<DiscoveryController>();
+  final DiscoveryController _discoveryController =
+      Get.find<DiscoveryController>();
 
   // Map controller
   Completer<GoogleMapController>? _mapController;
-  
+
   // Observables
   final _isMapReady = false.obs;
   final _currentZoomLevel = 14.0.obs;
@@ -64,7 +65,7 @@ class MapController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeMap();
-    
+
     // Listen to clinic updates from discovery controller
     ever(_discoveryController.filteredClinics, _updateMapMarkers);
     ever(_discoveryController.userLocation, _updateUserLocation);
@@ -78,10 +79,7 @@ class MapController extends GetxController {
 
   /// Initialize map with custom styles and markers
   Future<void> _initializeMap() async {
-    await Future.wait([
-      _loadMapStyle(),
-      _createCustomMarkers(),
-    ]);
+    await Future.wait([_loadMapStyle(), _createCustomMarkers()]);
   }
 
   /// Load custom map style
@@ -108,7 +106,7 @@ class MapController extends GetxController {
   }
 
   /// Map ready callback
-  void onMapCreated(GoogleMapController controller) async {
+  Future<void> onMapCreated(GoogleMapController controller) async {
     if (_mapController?.isCompleted == false) {
       _mapController!.complete(controller);
     }
@@ -144,7 +142,7 @@ class MapController extends GetxController {
   }
 
   /// Update markers when clinics change
-  void _updateMapMarkers(List<Clinic> clinics) async {
+  Future<void> _updateMapMarkers(List<Clinic> clinics) async {
     if (!_isMapReady.value) return;
 
     _markers.clear();
@@ -168,7 +166,7 @@ class MapController extends GetxController {
   /// Create clustered markers for dense areas
   Future<void> _createClusteredMarkers(List<Clinic> clinics) async {
     final clusters = _createClusters(clinics);
-    
+
     for (final cluster in clusters) {
       if (cluster.clinics.length == 1) {
         // Single clinic marker
@@ -205,10 +203,10 @@ class MapController extends GetxController {
   /// Handle marker tap
   void _onMarkerTap(Clinic clinic) {
     _selectedClinic.value = clinic;
-    
+
     // Update marker appearance
     _updateMapMarkers(_discoveryController.filteredClinics);
-    
+
     // Animate camera to marker
     animateToLocation(
       LatLng(clinic.latitude, clinic.longitude),
@@ -236,7 +234,7 @@ class MapController extends GetxController {
       northeast: LatLng(maxLat, maxLng),
     );
 
-    animateToLatLngBounds(bounds, EdgeInsets.all(100));
+    animateToLatLngBounds(bounds, const EdgeInsets.all(100));
   }
 
   /// Animate camera to specific location
@@ -252,12 +250,13 @@ class MapController extends GetxController {
   }
 
   /// Animate camera to bounds
-  Future<void> animateToLatLngBounds(LatLngBounds bounds, EdgeInsets padding) async {
+  Future<void> animateToLatLngBounds(
+    LatLngBounds bounds,
+    EdgeInsets padding,
+  ) async {
     final controller = await _mapController?.future;
     if (controller != null) {
-      await controller.animateCamera(
-        CameraUpdate.newLatLngBounds(bounds, 100),
-      );
+      await controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
     }
   }
 
@@ -301,7 +300,10 @@ class MapController extends GetxController {
   /// Zoom in
   Future<void> zoomIn() async {
     if (_currentZoomLevel.value < _maxZoom) {
-      _currentZoomLevel.value = (_currentZoomLevel.value + 1).clamp(_minZoom, _maxZoom);
+      _currentZoomLevel.value = (_currentZoomLevel.value + 1).clamp(
+        _minZoom,
+        _maxZoom,
+      );
       final controller = await _mapController?.future;
       await controller?.animateCamera(
         CameraUpdate.zoomTo(_currentZoomLevel.value),
@@ -312,7 +314,10 @@ class MapController extends GetxController {
   /// Zoom out
   Future<void> zoomOut() async {
     if (_currentZoomLevel.value > _minZoom) {
-      _currentZoomLevel.value = (_currentZoomLevel.value - 1).clamp(_minZoom, _maxZoom);
+      _currentZoomLevel.value = (_currentZoomLevel.value - 1).clamp(
+        _minZoom,
+        _maxZoom,
+      );
       final controller = await _mapController?.future;
       await controller?.animateCamera(
         CameraUpdate.zoomTo(_currentZoomLevel.value),
@@ -323,7 +328,7 @@ class MapController extends GetxController {
   /// Camera move callback
   void onCameraMove(CameraPosition position) {
     _currentZoomLevel.value = position.zoom;
-    
+
     // Stop following user if camera moved manually
     if (_isFollowingUser.value) {
       _isFollowingUser.value = false;
@@ -360,7 +365,6 @@ class MapController extends GetxController {
     _clinicMarkerIcon = await _createCustomIcon(
       color: AppColors.primary,
       size: 120,
-      text: null,
     );
   }
 
@@ -368,23 +372,17 @@ class MapController extends GetxController {
     _selectedClinicMarkerIcon = await _createCustomIcon(
       color: AppColors.sgPrimary,
       size: 140,
-      text: null,
     );
   }
 
   Future<void> _createUserLocationIcon() async {
-    _userLocationIcon = await _createCustomIcon(
-      color: Colors.blue,
-      size: 80,
-      text: null,
-    );
+    _userLocationIcon = await _createCustomIcon(color: Colors.blue, size: 80);
   }
 
   Future<void> _createClusterMarkerIcon() async {
     _clusterMarkerIcon = await _createCustomIcon(
       color: AppColors.primaryDark,
       size: 100,
-      text: null,
     );
   }
 
@@ -444,10 +442,7 @@ class MapController extends GetxController {
       textPainter.layout();
       textPainter.paint(
         canvas,
-        Offset(
-          (size - textPainter.width) / 2,
-          (size - textPainter.height) / 2,
-        ),
+        Offset((size - textPainter.width) / 2, (size - textPainter.height) / 2),
       );
     }
 
@@ -514,13 +509,12 @@ class MapController extends GetxController {
 
 /// Cluster marker model
 class ClusterMarker {
-  final String id;
-  final List<Clinic> clinics;
-  LatLng center;
-
   ClusterMarker({
     required this.id,
     required this.clinics,
     required this.center,
   });
+  final String id;
+  final List<Clinic> clinics;
+  LatLng center;
 }

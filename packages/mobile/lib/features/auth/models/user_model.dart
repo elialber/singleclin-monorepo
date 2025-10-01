@@ -1,20 +1,4 @@
 class UserModel {
-  final String id;
-  final String email;
-  final String fullName;
-  final String? phone;
-  final String? profileImageUrl;
-  final DateTime? birthDate;
-  final String? address;
-  final String? emergencyContact;
-  final int sgCredits;
-  final DateTime? creditsRenewDate;
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final UserSubscription? subscription;
-  final List<String>? preferences;
-
   UserModel({
     required this.id,
     required this.email,
@@ -40,21 +24,41 @@ class UserModel {
       fullName: json['fullName'] ?? '',
       phone: json['phone'],
       profileImageUrl: json['profileImageUrl'],
-      birthDate: json['birthDate'] != null ? DateTime.parse(json['birthDate']) : null,
+      birthDate: json['birthDate'] != null
+          ? DateTime.parse(json['birthDate'])
+          : null,
       address: json['address'],
       emergencyContact: json['emergencyContact'],
       sgCredits: json['sgCredits'] ?? 0,
-      creditsRenewDate: json['creditsRenewDate'] != null 
-          ? DateTime.parse(json['creditsRenewDate']) : null,
+      creditsRenewDate: json['creditsRenewDate'] != null
+          ? DateTime.parse(json['creditsRenewDate'])
+          : null,
       isActive: json['isActive'] ?? true,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      subscription: json['subscription'] != null 
-          ? UserSubscription.fromJson(json['subscription']) : null,
-      preferences: json['preferences'] != null 
-          ? List<String>.from(json['preferences']) : null,
+      subscription: json['subscription'] != null
+          ? UserSubscription.fromJson(json['subscription'])
+          : null,
+      preferences: json['preferences'] != null
+          ? List<String>.from(json['preferences'])
+          : null,
     );
   }
+  final String id;
+  final String email;
+  final String fullName;
+  final String? phone;
+  final String? profileImageUrl;
+  final DateTime? birthDate;
+  final String? address;
+  final String? emergencyContact;
+  final int sgCredits;
+  final DateTime? creditsRenewDate;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final UserSubscription? subscription;
+  final List<String>? preferences;
 
   Map<String, dynamic> toJson() {
     return {
@@ -114,16 +118,6 @@ class UserModel {
 }
 
 class UserSubscription {
-  final String id;
-  final String planId;
-  final String planName;
-  final int monthlyCredits;
-  final double monthlyPrice;
-  final DateTime startDate;
-  final DateTime? endDate;
-  final bool isActive;
-  final String status;
-
   UserSubscription({
     required this.id,
     required this.planId,
@@ -149,6 +143,15 @@ class UserSubscription {
       status: json['status'] ?? '',
     );
   }
+  final String id;
+  final String planId;
+  final String planName;
+  final int monthlyCredits;
+  final double monthlyPrice;
+  final DateTime startDate;
+  final DateTime? endDate;
+  final bool isActive;
+  final String status;
 
   Map<String, dynamic> toJson() {
     return {

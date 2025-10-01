@@ -235,15 +235,15 @@ class _HomeScreenState extends State<HomeScreen>
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AppColors.singleclinSecondaryGradient.map((color) => 
-            color.withValues(alpha: 0.8)).toList(),
+          colors: AppColors.singleclinSecondaryGradient
+              .map((color) => color.withValues(alpha: 0.8))
+              .toList(),
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.singleclinPrimary.withValues(alpha: 0.2),
-          width: 1,
         ),
       ),
       child: Column(
@@ -310,9 +310,7 @@ class _HomeScreenState extends State<HomeScreen>
         ],
       ),
       child: ElevatedButton.icon(
-        onPressed: hasActivePlan
-            ? () => Get.toNamed('/qr-code')
-            : null,
+        onPressed: hasActivePlan ? () => Get.toNamed('/qr-code') : null,
         icon: Icon(
           Icons.qr_code_2,
           size: 32,

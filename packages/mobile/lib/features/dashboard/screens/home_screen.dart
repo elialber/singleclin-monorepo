@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/singleclin_logo.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/singleclin_logo.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -22,10 +22,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SingleClinLogo(
-              size: 100,
-              color: AppColors.primary,
-            ),
+            SingleClinLogo(size: 100),
             SizedBox(height: 24),
             Text(
               'Bem-vindo ao SingleClin!',
@@ -38,10 +35,7 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 16),
             Text(
               'Sua plataforma de cuidados estéticos',
-              style: TextStyle(
-                fontSize: 16,
-                color: AppColors.mediumGrey,
-              ),
+              style: TextStyle(fontSize: 16, color: AppColors.mediumGrey),
             ),
           ],
         ),

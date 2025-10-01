@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';\nimport 'package:get/get.dart';
-import '../models/appointment.dart';
-import '../models/appointment_status.dart';
-import '../models/cancellation_policy.dart';
+import 'package:singleclin_mobile/features/appointments/models/appointment.dart';
+import 'package:singleclin_mobile/features/appointments/models/appointment_status.dart';
+import 'package:singleclin_mobile/features/appointments/models/cancellation_policy.dart';
 
 /// Appointments Controller
 /// Manages appointment list, filtering, and operations
@@ -286,8 +286,6 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
         sgCreditsUsed: 2.5,
         sgCreditsEarned: 0.5,
         preInstructions: 'Evitar produtos com ácidos 48h antes do procedimento.',
-        canCancel: true,
-        canReschedule: true,
         isConfirmed: true,
         createdAt: now.subtract(const Duration(days: 3)),
         updatedAt: now.subtract(const Duration(hours: 2)),
@@ -310,8 +308,6 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
         sgCreditsUsed: 3.0,
         sgCreditsEarned: 0.3,
         requiresConsent: true,
-        canCancel: true,
-        canReschedule: true,
         createdAt: now.subtract(const Duration(days: 1)),
         updatedAt: now.subtract(const Duration(hours: 1)),
       ),

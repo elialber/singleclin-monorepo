@@ -3,12 +3,8 @@ import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ReviewsSection extends StatefulWidget {
+  const ReviewsSection({Key? key, required this.clinic}) : super(key: key);
   final Clinic clinic;
-
-  const ReviewsSection({
-    Key? key,
-    required this.clinic,
-  }) : super(key: key);
 
   @override
   State<ReviewsSection> createState() => _ReviewsSectionState();
@@ -24,7 +20,8 @@ class _ReviewsSectionState extends State<ReviewsSection> {
       userName: 'Maria Silva',
       userAvatar: 'https://via.placeholder.com/40x40?text=MS',
       rating: 5,
-      comment: 'Excelente atendimento! Médicos muito qualificados e ambiente limpo.',
+      comment:
+          'Excelente atendimento! Médicos muito qualificados e ambiente limpo.',
       date: DateTime.now().subtract(const Duration(days: 2)),
       helpful: 12,
     ),
@@ -59,8 +56,8 @@ class _ReviewsSectionState extends State<ReviewsSection> {
 
   @override
   Widget build(BuildContext context) {
-    final reviewsToShow = _showAllReviews 
-        ? _mockReviews 
+    final reviewsToShow = _showAllReviews
+        ? _mockReviews
         : _mockReviews.take(2).toList();
 
     return Column(
@@ -84,34 +81,28 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                 const SizedBox(height: 4),
                 Text(
                   '${_mockReviews.length} avaliações',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
             // Add Review Button
             InkWell(
-              onTap: () => _showAddReviewDialog(),
+              onTap: _showAddReviewDialog,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.primary.withOpacity(0.3),
-                  ),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.edit,
-                      color: AppColors.primary,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
+                    Icon(Icons.edit, color: AppColors.primary, size: 16),
+                    SizedBox(width: 4),
                     Text(
                       'Avaliar',
                       style: TextStyle(
@@ -126,21 +117,17 @@ class _ReviewsSectionState extends State<ReviewsSection> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Rating Summary
         _buildRatingSummary(),
-        
+
         const SizedBox(height: 20),
-        
+
         // Reviews List
-        Column(
-          children: reviewsToShow.map((review) => 
-            _buildReviewItem(review)
-          ).toList(),
-        ),
-        
+        Column(children: reviewsToShow.map(_buildReviewItem).toList()),
+
         // Show More/Less Button
         if (_mockReviews.length > 2) ...[
           const SizedBox(height: 16),
@@ -152,7 +139,10 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey[300]!),
                   borderRadius: BorderRadius.circular(20),
@@ -196,10 +186,11 @@ class _ReviewsSectionState extends State<ReviewsSection> {
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: List.generate(5, (index) => 
-                  Icon(
-                    index < widget.clinic.rating.floor() 
-                        ? Icons.star 
+                children: List.generate(
+                  5,
+                  (index) => Icon(
+                    index < widget.clinic.rating.floor()
+                        ? Icons.star
                         : Icons.star_border,
                     color: Colors.amber[600],
                     size: 16,
@@ -209,40 +200,30 @@ class _ReviewsSectionState extends State<ReviewsSection> {
               const SizedBox(height: 4),
               Text(
                 '${_mockReviews.length} avaliações',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
-          
+
           const SizedBox(width: 24),
-          
+
           // Rating Distribution
           Expanded(
             child: Column(
               children: List.generate(5, (index) {
                 final starCount = 5 - index;
                 final percentage = _calculateRatingPercentage(starCount);
-                
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Row(
                     children: [
                       Text(
                         '$starCount',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                       const SizedBox(width: 4),
-                      Icon(
-                        Icons.star,
-                        color: Colors.amber[600],
-                        size: 12,
-                      ),
+                      Icon(Icons.star, color: Colors.amber[600], size: 12),
                       const SizedBox(width: 8),
                       Expanded(
                         child: LinearProgressIndicator(
@@ -256,10 +237,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                       const SizedBox(width: 8),
                       Text(
                         '${percentage.toInt()}%',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -293,7 +271,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                 backgroundImage: NetworkImage(review.userAvatar),
                 backgroundColor: Colors.grey[300],
                 onBackgroundImageError: (_, __) {},
-                child: review.userAvatar.isEmpty 
+                child: review.userAvatar.isEmpty
                     ? Text(
                         review.userName.substring(0, 1).toUpperCase(),
                         style: const TextStyle(
@@ -303,9 +281,9 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                       )
                     : null,
               ),
-              
+
               const SizedBox(width: 12),
-              
+
               // User Name and Date
               Expanded(
                 child: Column(
@@ -321,20 +299,18 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                     ),
                     Text(
                       _formatDate(review.date),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
                 ),
               ),
-              
+
               // Rating Stars
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: List.generate(5, (index) => 
-                  Icon(
+                children: List.generate(
+                  5,
+                  (index) => Icon(
                     index < review.rating ? Icons.star : Icons.star_border,
                     color: Colors.amber[600],
                     size: 16,
@@ -343,9 +319,9 @@ class _ReviewsSectionState extends State<ReviewsSection> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Comment
           Text(
             review.comment,
@@ -355,9 +331,9 @@ class _ReviewsSectionState extends State<ReviewsSection> {
               height: 1.4,
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Helpful Button
           InkWell(
             onTap: () => _toggleHelpful(review),
@@ -372,10 +348,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                 const SizedBox(width: 4),
                 Text(
                   'Útil (${review.helpful})',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -393,7 +366,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date).inDays;
-    
+
     if (difference == 0) {
       return 'Hoje';
     } else if (difference == 1) {
@@ -428,9 +401,8 @@ class _ReviewsSectionState extends State<ReviewsSection> {
 }
 
 class _AddReviewDialog extends StatefulWidget {
-  final Clinic clinic;
-
   const _AddReviewDialog({required this.clinic});
+  final Clinic clinic;
 
   @override
   State<_AddReviewDialog> createState() => _AddReviewDialogState();
@@ -443,9 +415,7 @@ class _AddReviewDialogState extends State<_AddReviewDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -453,20 +423,18 @@ class _AddReviewDialogState extends State<_AddReviewDialog> {
           children: [
             Text(
               'Avaliar ${widget.clinic.name}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Rating Stars
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) => 
-                GestureDetector(
+              children: List.generate(
+                5,
+                (index) => GestureDetector(
                   onTap: () => setState(() => _rating = index + 1),
                   child: Icon(
                     index < _rating ? Icons.star : Icons.star_border,
@@ -476,9 +444,9 @@ class _AddReviewDialogState extends State<_AddReviewDialog> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Comment Field
             TextField(
               controller: _commentController,
@@ -489,9 +457,9 @@ class _AddReviewDialogState extends State<_AddReviewDialog> {
               maxLines: 4,
               textCapitalization: TextCapitalization.sentences,
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Action Buttons
             Row(
               children: [
@@ -533,14 +501,6 @@ class _AddReviewDialogState extends State<_AddReviewDialog> {
 }
 
 class Review {
-  final String id;
-  final String userName;
-  final String userAvatar;
-  final int rating;
-  final String comment;
-  final DateTime date;
-  final int helpful;
-
   Review({
     required this.id,
     required this.userName,
@@ -550,4 +510,11 @@ class Review {
     required this.date,
     required this.helpful,
   });
+  final String id;
+  final String userName;
+  final String userAvatar;
+  final int rating;
+  final String comment;
+  final DateTime date;
+  final int helpful;
 }

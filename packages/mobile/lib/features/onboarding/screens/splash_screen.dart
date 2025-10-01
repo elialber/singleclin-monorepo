@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/constants/app_colors.dart';
-import '../controllers/onboarding_controller.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/onboarding/controllers/onboarding_controller.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -40,21 +40,19 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     );
 
-    _logoScaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _logoAnimationController,
-      curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
-    ));
+    _logoScaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoAnimationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
+      ),
+    );
 
-    _logoOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _logoAnimationController,
-      curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
-    ));
+    _logoOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoAnimationController,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+      ),
+    );
 
     // Text animations
     _textAnimationController = AnimationController(
@@ -62,41 +60,37 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     );
 
-    _textSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _textAnimationController,
-      curve: Curves.easeOutBack,
-    ));
+    _textSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _textAnimationController,
+            curve: Curves.easeOutBack,
+          ),
+        );
 
-    _textOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _textAnimationController,
-      curve: Curves.easeIn,
-    ));
+    _textOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _textAnimationController, curve: Curves.easeIn),
+    );
   }
 
   Future<void> _startSplashSequence() async {
     // Start logo animation
     await _logoAnimationController.forward();
-    
+
     // Wait a bit, then start text animation
     await Future.delayed(const Duration(milliseconds: 200));
     await _textAnimationController.forward();
-    
+
     // Wait for minimum splash time
     await Future.delayed(const Duration(milliseconds: 1000));
-    
+
     // Navigate to next screen
     _navigateToNextScreen();
   }
 
   void _navigateToNextScreen() {
     final controller = Get.find<OnboardingController>();
-    
+
     if (controller.shouldShowOnboarding()) {
       Get.offNamed('/onboarding');
     } else {
@@ -126,9 +120,9 @@ class _SplashScreenState extends State<SplashScreen>
                   );
                 },
               ),
-              
+
               const SizedBox(height: 48),
-              
+
               // Text section
               AnimatedBuilder(
                 animation: _textAnimationController,
@@ -142,9 +136,9 @@ class _SplashScreenState extends State<SplashScreen>
                   );
                 },
               ),
-              
+
               const SizedBox(height: 80),
-              
+
               // Loading indicator
               const SizedBox(
                 width: 32,
@@ -228,7 +222,7 @@ class _SplashScreenState extends State<SplashScreen>
 
 /// Alternative splash screen with more sophisticated animations
 class AnimatedSplashScreen extends StatefulWidget {
-  const AnimatedSplashScreen({Key? key}) : super(key: key);
+  const AnimatedSplashScreen({super.key});
 
   @override
   State<AnimatedSplashScreen> createState() => _AnimatedSplashScreenState();
@@ -239,7 +233,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
   late AnimationController _mainController;
   late AnimationController _particleController;
   late List<Animation<Offset>> _particleAnimations;
-  
+
   @override
   void initState() {
     super.initState();
@@ -274,34 +268,36 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
           0.3 * (index % 2 == 0 ? 1 : -1),
           0.3 * (index < 4 ? -1 : 1),
         ),
-      ).animate(CurvedAnimation(
-        parent: _particleController,
-        curve: Interval(
-          0.2 + (index * 0.1),
-          0.8 + (index * 0.1),
-          curve: Curves.easeOutBack,
+      ).animate(
+        CurvedAnimation(
+          parent: _particleController,
+          curve: Interval(
+            0.2 + (index * 0.1),
+            0.8 + (index * 0.1),
+            curve: Curves.easeOutBack,
+          ),
         ),
-      ));
+      );
     });
   }
 
   Future<void> _startAnimationSequence() async {
     // Start particle animation
     _particleController.forward();
-    
+
     // Wait a bit, then start main animation
     await Future.delayed(const Duration(milliseconds: 500));
     await _mainController.forward();
-    
+
     // Wait for completion
     await Future.delayed(const Duration(milliseconds: 1500));
-    
+
     _navigateToNextScreen();
   }
 
   void _navigateToNextScreen() {
     final controller = Get.find<OnboardingController>();
-    
+
     if (controller.shouldShowOnboarding()) {
       Get.offNamed('/onboarding');
     } else {
@@ -317,10 +313,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primary,
-              AppColors.primaryDark,
-            ],
+            colors: [AppColors.primary, AppColors.primaryDark],
           ),
         ),
         child: SafeArea(
@@ -350,7 +343,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                     },
                   );
                 }),
-                
+
                 // Main content
                 AnimatedBuilder(
                   animation: _mainController,
@@ -361,38 +354,66 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                         // Logo with scale and rotation
                         Transform.scale(
                           scale: Tween<double>(begin: 0.3, end: 1.0)
-                              .animate(CurvedAnimation(
-                                parent: _mainController,
-                                curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
-                              )).value,
+                              .animate(
+                                CurvedAnimation(
+                                  parent: _mainController,
+                                  curve: const Interval(
+                                    0.0,
+                                    0.6,
+                                    curve: Curves.elasticOut,
+                                  ),
+                                ),
+                              )
+                              .value,
                           child: Transform.rotate(
                             angle: Tween<double>(begin: 0.5, end: 0.0)
-                                .animate(CurvedAnimation(
-                                  parent: _mainController,
-                                  curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-                                )).value,
+                                .animate(
+                                  CurvedAnimation(
+                                    parent: _mainController,
+                                    curve: const Interval(
+                                      0.0,
+                                      0.4,
+                                      curve: Curves.easeOut,
+                                    ),
+                                  ),
+                                )
+                                .value,
                             child: _buildAnimatedLogo(),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 48),
-                        
+
                         // Text with slide animation
                         Transform.translate(
                           offset: Offset(
                             0,
                             Tween<double>(begin: 50, end: 0)
-                                .animate(CurvedAnimation(
-                                  parent: _mainController,
-                                  curve: const Interval(0.4, 0.8, curve: Curves.easeOut),
-                                )).value,
+                                .animate(
+                                  CurvedAnimation(
+                                    parent: _mainController,
+                                    curve: const Interval(
+                                      0.4,
+                                      0.8,
+                                      curve: Curves.easeOut,
+                                    ),
+                                  ),
+                                )
+                                .value,
                           ),
                           child: Opacity(
                             opacity: Tween<double>(begin: 0.0, end: 1.0)
-                                .animate(CurvedAnimation(
-                                  parent: _mainController,
-                                  curve: const Interval(0.4, 0.8, curve: Curves.easeIn),
-                                )).value,
+                                .animate(
+                                  CurvedAnimation(
+                                    parent: _mainController,
+                                    curve: const Interval(
+                                      0.4,
+                                      0.8,
+                                      curve: Curves.easeIn,
+                                    ),
+                                  ),
+                                )
+                                .value,
                             child: _buildTextSection(),
                           ),
                         ),

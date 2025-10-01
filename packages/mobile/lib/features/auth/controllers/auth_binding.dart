@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import 'auth_controller.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 
 class AuthBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthController>(() => AuthController());
+    Get.lazyPut<AuthController>(AuthController.new);
   }
 }

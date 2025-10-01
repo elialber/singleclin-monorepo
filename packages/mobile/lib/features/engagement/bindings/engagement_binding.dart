@@ -1,24 +1,24 @@
 import 'package:get/get.dart';
-import '../controllers/reviews_controller.dart';
-import '../controllers/write_review_controller.dart';
-import '../controllers/support_controller.dart';
-import '../controllers/faq_controller.dart';
-import '../controllers/community_controller.dart';
-import '../controllers/feedback_controller.dart';
-import '../controllers/trust_center_controller.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/reviews_controller.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/write_review_controller.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/support_controller.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/faq_controller.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/community_controller.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/feedback_controller.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/trust_center_controller.dart';
 
 /// Binding for all engagement module controllers
 class EngagementBinding extends Bindings {
   @override
   void dependencies() {
     // Core engagement controllers
-    Get.lazyPut(() => ReviewsController());
-    Get.lazyPut(() => WriteReviewController());
-    Get.lazyPut(() => SupportController());
-    Get.lazyPut(() => FaqController());
-    Get.lazyPut(() => CommunityController());
-    Get.lazyPut(() => FeedbackController());
-    Get.lazyPut(() => TrustCenterController());
+    Get.lazyPut(ReviewsController.new);
+    Get.lazyPut(WriteReviewController.new);
+    Get.lazyPut(SupportController.new);
+    Get.lazyPut(FaqController.new);
+    Get.lazyPut(CommunityController.new);
+    Get.lazyPut(FeedbackController.new);
+    Get.lazyPut(TrustCenterController.new);
   }
 }
 
@@ -27,48 +27,48 @@ class EngagementBinding extends Bindings {
 class ReviewsBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => ReviewsController());
+    Get.lazyPut(ReviewsController.new);
   }
 }
 
 class WriteReviewBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => WriteReviewController());
+    Get.lazyPut(WriteReviewController.new);
   }
 }
 
 class SupportBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => SupportController());
+    Get.lazyPut(SupportController.new);
   }
 }
 
 class FaqBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => FaqController());
+    Get.lazyPut(FaqController.new);
   }
 }
 
 class CommunityBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => CommunityController());
+    Get.lazyPut(CommunityController.new);
   }
 }
 
 class FeedbackBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => FeedbackController());
+    Get.lazyPut(FeedbackController.new);
   }
 }
 
 class TrustCenterBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => TrustCenterController());
+    Get.lazyPut(TrustCenterController.new);
   }
 }

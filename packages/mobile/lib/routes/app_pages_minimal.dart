@@ -1,27 +1,27 @@
 import 'package:get/get.dart';
 
 // Only core working screens
-import '../features/onboarding/screens/splash_screen.dart';
-import '../features/onboarding/screens/onboarding_screen.dart';
-import '../features/auth/screens/login_screen.dart';
-import '../features/auth/screens/register_screen.dart';
-import '../features/auth/screens/forgot_password_screen.dart';
+import 'package:singleclin_mobile/features/onboarding/screens/splash_screen.dart';
+import 'package:singleclin_mobile/features/onboarding/screens/onboarding_screen.dart';
+import 'package:singleclin_mobile/features/auth/screens/login_screen.dart';
+import 'package:singleclin_mobile/features/auth/screens/register_screen.dart';
+import 'package:singleclin_mobile/features/auth/screens/forgot_password_screen.dart';
 
 // Dashboard screens
-import '../features/dashboard/screens/dashboard_screen.dart';
-import '../features/dashboard/screens/home_screen.dart';
+import 'package:singleclin_mobile/features/dashboard/screens/dashboard_screen.dart';
+import 'package:singleclin_mobile/features/dashboard/screens/home_screen.dart';
 
 // Only working appointment screens
-import '../features/appointments/screens/appointments_screen.dart';
-import '../features/appointments/screens/appointment_details_screen.dart';
+import 'package:singleclin_mobile/features/appointments/screens/appointments_screen.dart';
+import 'package:singleclin_mobile/features/appointments/screens/appointment_details_screen.dart';
 
 // Working bindings only
-import '../features/onboarding/controllers/onboarding_binding.dart';
-import '../features/auth/controllers/auth_binding.dart';
-import '../features/dashboard/controllers/dashboard_binding.dart';
-import '../features/appointments/bindings/appointments_binding.dart';
+import 'package:singleclin_mobile/features/onboarding/controllers/onboarding_binding.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_binding.dart';
+import 'package:singleclin_mobile/features/dashboard/controllers/dashboard_binding.dart';
+import 'package:singleclin_mobile/features/appointments/bindings/appointments_binding.dart';
 
-import 'app_routes.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class AppPagesMinimal {
   static final routes = [

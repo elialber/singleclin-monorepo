@@ -1,24 +1,23 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import '../services/network_service.dart';
-import '../services/cache_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+import 'package:singleclin_mobile/core/services/cache_service.dart';
 
 /// Base repository providing offline-first functionality
 ///
 /// This abstract class implements the Repository Pattern with transparent
 /// caching, automatic sync, and offline support.
 abstract class BaseRepository<T> {
-  final CacheService _cacheService;
-  final NetworkService _networkService;
-  final Dio _dio;
-
   BaseRepository({
     required CacheService cacheService,
     required NetworkService networkService,
     required Dio dio,
-  })  : _cacheService = cacheService,
-        _networkService = networkService,
-        _dio = dio;
+  }) : _cacheService = cacheService,
+       _networkService = networkService,
+       _dio = dio;
+  final CacheService _cacheService;
+  final NetworkService _networkService;
+  final Dio _dio;
 
   /// Box name for Hive storage - must be implemented by subclasses
   String get boxName;
@@ -39,19 +38,22 @@ abstract class BaseRepository<T> {
   String getCacheKey(String identifier) => '${boxName}_$identifier';
 
   /// Get data with offline-first strategy
-  Future<T?> get(String id, {
+  Future<T?> get(
+    String id, {
     bool forceRefresh = false,
     bool offlineOnly = false,
   }) async {
     final cacheKey = getCacheKey(id);
 
     // If offline only or no network, try cache first
-    if (offlineOnly || !await _networkService.isConnected) {
+    if (offlineOnly || !_networkService.isConnected) {
       final cached = await _getCachedData(cacheKey);
       if (cached != null) return cached;
 
       if (!isOfflineCapable) {
-        throw NetworkException('No internet connection and data not available offline');
+        throw NetworkException(
+          'No internet connection and data not available offline',
+        );
       }
       return null;
     }
@@ -94,12 +96,14 @@ abstract class BaseRepository<T> {
     final cacheKey = _buildListCacheKey(filters, limit, offset);
 
     // Offline strategy
-    if (offlineOnly || !await _networkService.isConnected) {
+    if (offlineOnly || !_networkService.isConnected) {
       final cached = await _getCachedList(cacheKey);
       if (cached.isNotEmpty) return cached;
 
       if (!isOfflineCapable) {
-        throw NetworkException('No internet connection and data not available offline');
+        throw NetworkException(
+          'No internet connection and data not available offline',
+        );
       }
       return [];
     }
@@ -133,7 +137,7 @@ abstract class BaseRepository<T> {
 
   /// Create/Update with offline queue support
   Future<T?> save(T object, String? id) async {
-    if (!await _networkService.isConnected) {
+    if (!_networkService.isConnected) {
       // Queue for later sync
       await _queueOperation('save', object, id);
       // Return optimistic result and cache locally
@@ -158,7 +162,7 @@ abstract class BaseRepository<T> {
 
   /// Delete with offline queue support
   Future<bool> delete(String id) async {
-    if (!await _networkService.isConnected) {
+    if (!_networkService.isConnected) {
       // Queue for later sync and remove from cache
       await _queueOperation('delete', null, id);
       await _removeCachedData(getCacheKey(id));
@@ -174,13 +178,13 @@ abstract class BaseRepository<T> {
     } catch (e) {
       // Queue for retry but don't remove from cache yet
       await _queueOperation('delete', null, id);
-      throw e;
+      rethrow;
     }
   }
 
   /// Force sync all cached data with server
   Future<void> syncAll() async {
-    if (!await _networkService.isConnected) return;
+    if (!_networkService.isConnected) return;
 
     try {
       await _processPendingOperations();
@@ -214,7 +218,7 @@ abstract class BaseRepository<T> {
 
   Future<List<T>> _getCachedList(String cacheKey) async {
     final data = await _cacheService.getList(boxName, cacheKey);
-    return data.map((item) => fromMap(item)).toList();
+    return data.map(fromMap).toList();
   }
 
   Future<void> _cacheData(String cacheKey, T data) async {
@@ -222,7 +226,7 @@ abstract class BaseRepository<T> {
   }
 
   Future<void> _cacheList(String cacheKey, List<T> data) async {
-    final mapped = data.map((item) => toMap(item)).toList();
+    final mapped = data.map(toMap).toList();
     await _cacheService.putList(boxName, cacheKey, mapped);
   }
 
@@ -238,7 +242,11 @@ abstract class BaseRepository<T> {
     return age > cacheTtlMinutes;
   }
 
-  String _buildListCacheKey(Map<String, dynamic>? filters, int? limit, int? offset) {
+  String _buildListCacheKey(
+    Map<String, dynamic>? filters,
+    int? limit,
+    int? offset,
+  ) {
     final filtersStr = filters != null ? jsonEncode(filters) : '';
     return 'list_${filtersStr}_${limit ?? 'all'}_${offset ?? 0}';
   }
@@ -261,7 +269,7 @@ abstract class BaseRepository<T> {
     Map<String, dynamic>? filters,
     int? limit,
     int? offset,
-    String cacheKey
+    String cacheKey,
   ) {
     Future.microtask(() async {
       try {
@@ -323,8 +331,8 @@ abstract class BaseRepository<T> {
 
 /// Exception thrown when network operations fail
 class NetworkException implements Exception {
-  final String message;
   NetworkException(this.message);
+  final String message;
 
   @override
   String toString() => 'NetworkException: $message';
@@ -332,8 +340,8 @@ class NetworkException implements Exception {
 
 /// Exception thrown when cache operations fail
 class CacheException implements Exception {
-  final String message;
   CacheException(this.message);
+  final String message;
 
   @override
   String toString() => 'CacheException: $message';

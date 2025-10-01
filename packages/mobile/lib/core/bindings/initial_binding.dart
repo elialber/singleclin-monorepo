@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../../features/auth/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 
 /// Initial binding for dependency injection
 /// This binding is loaded when the app starts

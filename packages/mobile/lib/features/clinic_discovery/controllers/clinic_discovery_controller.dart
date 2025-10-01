@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
-import '../models/clinic.dart';
-import '../services/clinic_discovery_service.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/services/clinic_discovery_service.dart';
 
 class ClinicDiscoveryController extends GetxController {
   final ClinicDiscoveryService _clinicService = ClinicDiscoveryService();
@@ -17,7 +17,7 @@ class ClinicDiscoveryController extends GetxController {
 
   // Search controller
   final searchController = TextEditingController();
-  
+
   // User location
   Position? _currentPosition;
 
@@ -43,19 +43,16 @@ class ClinicDiscoveryController extends GetxController {
 
   Future<void> _initializeData() async {
     _isLoading.value = true;
-    
+
     try {
       // Get user location and load clinics in parallel
-      await Future.wait([
-        _getCurrentLocation(),
-        _loadClinics(),
-      ]);
-      
+      await Future.wait([_getCurrentLocation(), _loadClinics()]);
+
       // Update clinics with distance if location is available
       if (_currentPosition != null) {
         await _updateClinicsWithDistance();
       }
-      
+
       _extractSpecializations();
       _filterClinics();
     } catch (e) {
@@ -68,7 +65,7 @@ class ClinicDiscoveryController extends GetxController {
 
   Future<void> _getCurrentLocation() async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         print('Location services are disabled.');
         return;
@@ -112,12 +109,14 @@ class ClinicDiscoveryController extends GetxController {
 
     final updatedClinics = await Future.wait(
       _clinics.map((clinic) async {
-        final distance = Geolocator.distanceBetween(
-          _currentPosition!.latitude,
-          _currentPosition!.longitude,
-          clinic.coordinates.latitude,
-          clinic.coordinates.longitude,
-        ) / 1000; // Convert to kilometers
+        final distance =
+            Geolocator.distanceBetween(
+              _currentPosition!.latitude,
+              _currentPosition!.longitude,
+              clinic.coordinates.latitude,
+              clinic.coordinates.longitude,
+            ) /
+            1000; // Convert to kilometers
 
         return Clinic(
           id: clinic.id,
@@ -157,7 +156,7 @@ class ClinicDiscoveryController extends GetxController {
 
     // Debug: Print extracted categories for verification
     print('🏷️ Extracted service categories for quick filters:');
-    for (String category in sortedSpecializations) {
+    for (final String category in sortedSpecializations) {
       print('  - $category');
     }
     print('📊 Total categories found: ${sortedSpecializations.length}');
@@ -194,28 +193,35 @@ class ClinicDiscoveryController extends GetxController {
 
     print('🔍 Filtrando clínicas...');
     print('📝 Query de busca: "$query"');
-    print('🏷️ Filtros de categoria ativos: ${_selectedSpecializations.toList()}');
+    print(
+      '🏷️ Filtros de categoria ativos: ${_selectedSpecializations.toList()}',
+    );
     print('🏥 Total de clínicas: ${_clinics.length}');
 
-    List<Clinic> filtered = _clinics.where((clinic) {
+    final List<Clinic> filtered = _clinics.where((clinic) {
       // Text search filter
-      bool matchesSearch = query.isEmpty ||
+      final bool matchesSearch =
+          query.isEmpty ||
           clinic.name.toLowerCase().contains(query) ||
           clinic.address.toLowerCase().contains(query) ||
-          clinic.specializations.any((spec) =>
-              spec.toLowerCase().contains(query)) ||
-          clinic.services.any((service) =>
-              (service['name'] ?? '').toLowerCase().contains(query));
+          clinic.specializations.any(
+            (spec) => spec.toLowerCase().contains(query),
+          ) ||
+          clinic.services.any(
+            (service) => (service['name'] ?? '').toLowerCase().contains(query),
+          );
 
       // Specialization filter
-      bool matchesSpecialization = _selectedSpecializations.isEmpty ||
-          clinic.specializations.any((spec) =>
-              _selectedSpecializations.contains(spec));
+      final bool matchesSpecialization =
+          _selectedSpecializations.isEmpty ||
+          clinic.specializations.any(_selectedSpecializations.contains);
 
-      bool passes = matchesSearch && matchesSpecialization;
+      final bool passes = matchesSearch && matchesSpecialization;
 
       if (_selectedSpecializations.isNotEmpty) {
-        print('  📍 ${clinic.name}: categorias = ${clinic.specializations}, passa filtro = $passes');
+        print(
+          '  📍 ${clinic.name}: categorias = ${clinic.specializations}, passa filtro = $passes',
+        );
       }
 
       return passes;
@@ -226,12 +232,12 @@ class ClinicDiscoveryController extends GetxController {
       // Prioritize available clinics
       if (a.isAvailable && !b.isAvailable) return -1;
       if (!a.isAvailable && b.isAvailable) return 1;
-      
+
       // Then by distance if location is available
       if (_currentPosition != null) {
         return a.distance.compareTo(b.distance);
       }
-      
+
       // Finally by rating
       return b.rating.compareTo(a.rating);
     });
@@ -240,7 +246,9 @@ class ClinicDiscoveryController extends GetxController {
 
     print('✅ Filtragem concluída: ${filtered.length} clínicas encontradas');
     if (_selectedSpecializations.isNotEmpty) {
-      print('📊 Clínicas filtradas por categoria: ${filtered.map((c) => c.name).toList()}');
+      print(
+        '📊 Clínicas filtradas por categoria: ${filtered.map((c) => c.name).toList()}',
+      );
     }
   }
 
@@ -275,13 +283,14 @@ class ClinicDiscoveryController extends GetxController {
 
   Future<void> requestLocationPermission() async {
     try {
-      LocationPermission permission = await Geolocator.requestPermission();
+      final LocationPermission permission =
+          await Geolocator.requestPermission();
       if (permission == LocationPermission.whileInUse ||
           permission == LocationPermission.always) {
         await _getCurrentLocation();
         await _updateClinicsWithDistance();
         _filterClinics();
-        
+
         Get.snackbar(
           'Localização',
           'Clínicas ordenadas por proximidade',
@@ -301,7 +310,6 @@ class ClinicDiscoveryController extends GetxController {
       message,
       backgroundColor: Colors.red,
       colorText: Colors.white,
-      duration: const Duration(seconds: 3),
     );
   }
 

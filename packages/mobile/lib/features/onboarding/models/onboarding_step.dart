@@ -1,11 +1,4 @@
 class OnboardingStep {
-  final int id;
-  final String title;
-  final String description;
-  final String imageAsset;
-  final String? lottieAsset;
-  final Map<String, dynamic>? customData;
-
   const OnboardingStep({
     required this.id,
     required this.title,
@@ -25,6 +18,12 @@ class OnboardingStep {
       customData: json['customData'],
     );
   }
+  final int id;
+  final String title;
+  final String description;
+  final String imageAsset;
+  final String? lottieAsset;
+  final Map<String, dynamic>? customData;
 
   Map<String, dynamic> toJson() {
     return {
@@ -68,13 +67,7 @@ class OnboardingStep {
 
   @override
   int get hashCode {
-    return Object.hash(
-      id,
-      title,
-      description,
-      imageAsset,
-      lottieAsset,
-    );
+    return Object.hash(id, title, description, imageAsset, lottieAsset);
   }
 
   @override

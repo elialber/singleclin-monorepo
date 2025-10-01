@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import '../constants/app_constants.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
 
 class LocationService extends GetxService {
   // Observable properties
@@ -16,8 +16,10 @@ class LocationService extends GetxService {
   bool get hasPermission => _hasPermission.value;
   bool get isLoading => _isLoading.value;
 
-  double get currentLatitude => _currentPosition.value?.latitude ?? AppConstants.defaultLatitude;
-  double get currentLongitude => _currentPosition.value?.longitude ?? AppConstants.defaultLongitude;
+  double get currentLatitude =>
+      _currentPosition.value?.latitude ?? AppConstants.defaultLatitude;
+  double get currentLongitude =>
+      _currentPosition.value?.longitude ?? AppConstants.defaultLongitude;
 
   @override
   void onInit() {
@@ -29,9 +31,9 @@ class LocationService extends GetxService {
   Future<void> _checkLocationServices() async {
     try {
       _isLoading.value = true;
-      
+
       // Verificar se o GPS está habilitado
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       _isLocationEnabled.value = serviceEnabled;
 
       if (!serviceEnabled) {
@@ -39,10 +41,10 @@ class LocationService extends GetxService {
       }
 
       // Verificar permissões
-      LocationPermission permission = await Geolocator.checkPermission();
-      _hasPermission.value = permission == LocationPermission.always ||
-                            permission == LocationPermission.whileInUse;
-
+      final LocationPermission permission = await Geolocator.checkPermission();
+      _hasPermission.value =
+          permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
     } catch (e) {
       print('Erro ao verificar serviços de localização: $e');
     } finally {
@@ -68,7 +70,7 @@ class LocationService extends GetxService {
 
       // Verificar permissões
       LocationPermission permission = await Geolocator.checkPermission();
-      
+
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
@@ -79,11 +81,11 @@ class LocationService extends GetxService {
         return false;
       }
 
-      _hasPermission.value = permission == LocationPermission.always ||
-                            permission == LocationPermission.whileInUse;
+      _hasPermission.value =
+          permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
 
       return _hasPermission.value;
-
     } catch (e) {
       print('Erro ao solicitar permissões: $e');
       return false;
@@ -106,14 +108,13 @@ class LocationService extends GetxService {
       }
 
       // Obter posição atual
-      Position position = await Geolocator.getCurrentPosition(
+      final Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
         timeLimit: const Duration(seconds: 10),
       );
 
       _currentPosition.value = position;
       return position;
-
     } catch (e) {
       print('Erro ao obter localização atual: $e');
       return null;
@@ -140,11 +141,12 @@ class LocationService extends GetxService {
     required double endLongitude,
   }) {
     return Geolocator.distanceBetween(
-      startLatitude,
-      startLongitude,
-      endLatitude,
-      endLongitude,
-    ) / 1000; // Converter para km
+          startLatitude,
+          startLongitude,
+          endLatitude,
+          endLongitude,
+        ) /
+        1000; // Converter para km
   }
 
   /// Calcular distância da posição atual
@@ -168,13 +170,13 @@ class LocationService extends GetxService {
     required double longitude,
   }) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      final List<Placemark> placemarks = await placemarkFromCoordinates(
         latitude,
         longitude,
       );
 
       if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
+        final Placemark place = placemarks[0];
         return '${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}';
       }
     } catch (e) {
@@ -186,10 +188,10 @@ class LocationService extends GetxService {
   /// Obter coordenadas a partir do endereço (geocoding)
   Future<Position?> getCoordinatesFromAddress(String address) async {
     try {
-      List<Location> locations = await locationFromAddress(address);
-      
+      final List<Location> locations = await locationFromAddress(address);
+
       if (locations.isNotEmpty) {
-        Location location = locations[0];
+        final Location location = locations[0];
         return Position(
           latitude: location.latitude,
           longitude: location.longitude,
@@ -217,7 +219,7 @@ class LocationService extends GetxService {
   }) {
     if (_currentPosition.value == null) return false;
 
-    double distance = calculateDistanceFromCurrent(
+    final double distance = calculateDistanceFromCurrent(
       latitude: latitude,
       longitude: longitude,
     );
@@ -227,8 +229,8 @@ class LocationService extends GetxService {
 
   /// Obter localização usando endereço padrão se necessário
   Future<Position> getLocationOrDefault() async {
-    Position? position = await getCurrentPosition();
-    
+    final Position? position = await getCurrentPosition();
+
     if (position != null) {
       return position;
     } else {
@@ -250,12 +252,11 @@ class LocationService extends GetxService {
 
   /// Abrir configurações de localização
   Future<bool> openLocationSettings() async {
-    return await Geolocator.openLocationSettings();
+    return Geolocator.openLocationSettings();
   }
 
   /// Abrir configurações do app
   Future<bool> openAppSettings() async {
-    return await Geolocator.openAppSettings();
+    return Geolocator.openAppSettings();
   }
 }
-

@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import '../models/cache_entity.dart';
-import 'cache_service.dart';
-import 'network_service.dart';
-import '../../data/repositories/clinic_repository.dart';
-import '../../features/discovery/models/clinic_model.dart';
+import 'package:singleclin_mobile/core/models/cache_entity.dart';
+import 'package:singleclin_mobile/core/services/cache_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+import 'package:singleclin_mobile/data/repositories/clinic_repository.dart';
+import 'package:singleclin_mobile/features/discovery/models/clinic_model.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -13,6 +13,13 @@ import 'dart:math';
 /// fuzzy matching, location-based filtering, and search result caching
 /// for optimal offline experience.
 class OfflineSearchService extends GetxService {
+  OfflineSearchService({
+    required CacheService cacheService,
+    required NetworkService networkService,
+    required ClinicRepository clinicRepository,
+  }) : _cacheService = cacheService,
+       _networkService = networkService,
+       _clinicRepository = clinicRepository;
   final CacheService _cacheService;
   final NetworkService _networkService;
   final ClinicRepository _clinicRepository;
@@ -35,14 +42,6 @@ class OfflineSearchService extends GetxService {
 
   Timer? _indexUpdateTimer;
 
-  OfflineSearchService({
-    required CacheService cacheService,
-    required NetworkService networkService,
-    required ClinicRepository clinicRepository,
-  })  : _cacheService = cacheService,
-        _networkService = networkService,
-        _clinicRepository = clinicRepository;
-
   // Getters
   bool get isIndexing => _isIndexing.value;
   bool get searchInProgress => _searchInProgress.value;
@@ -63,7 +62,9 @@ class OfflineSearchService extends GetxService {
       // Setup automatic index updates
       _setupIndexMaintenance();
 
-      print('✅ OfflineSearchService initialized with $indexedClinicsCount clinics indexed');
+      print(
+        '✅ OfflineSearchService initialized with $indexedClinicsCount clinics indexed',
+      );
     } catch (e) {
       print('❌ Failed to initialize OfflineSearchService: $e');
       rethrow;
@@ -110,7 +111,7 @@ class OfflineSearchService extends GetxService {
       if (cachedResult != null && cachedResult.isValid) {
         print('💾 Using cached search results for: "$query"');
         return OfflineSearchResult.fromCache(
-          results: cachedResult.results.map((r) => ClinicModel.fromJson(r)).toList(),
+          results: cachedResult.results.map(ClinicModel.fromJson).toList(),
           totalResults: cachedResult.totalResults,
           isFromCache: true,
           searchDuration: Duration.zero,
@@ -132,7 +133,6 @@ class OfflineSearchService extends GetxService {
       }
 
       return searchResult;
-
     } catch (e) {
       print('❌ Search failed: $e');
       return OfflineSearchResult.error('Erro na busca: $e');
@@ -189,7 +189,6 @@ class OfflineSearchService extends GetxService {
         ..sort((a, b) => b.value.compareTo(a.value));
 
       return popularSearches.take(limit).map((e) => e.key).toList();
-
     } catch (e) {
       print('⚠️ Failed to get popular searches: $e');
       return [];
@@ -224,7 +223,6 @@ class OfflineSearchService extends GetxService {
       await _saveSearchIndexes();
 
       print('✅ Search index rebuilt with ${clinics.length} clinics');
-
     } catch (e) {
       print('❌ Failed to rebuild search index: $e');
       rethrow;
@@ -277,7 +275,6 @@ class OfflineSearchService extends GetxService {
       analytics.topSearchQueries = analytics.topSearchQueries.take(10).toList();
 
       return analytics;
-
     } catch (e) {
       print('❌ Error generating search analytics: $e');
       analytics.hasError = true;
@@ -288,7 +285,9 @@ class OfflineSearchService extends GetxService {
 
   // Private implementation
 
-  Future<OfflineSearchResult> _performOfflineSearch(ClinicSearchParams params) async {
+  Future<OfflineSearchResult> _performOfflineSearch(
+    ClinicSearchParams params,
+  ) async {
     final stopwatch = Stopwatch()..start();
 
     try {
@@ -302,7 +301,10 @@ class OfflineSearchService extends GetxService {
 
       // Text search
       if (params.query.isNotEmpty) {
-        filteredClinics = await _performTextSearch(filteredClinics, params.query);
+        filteredClinics = await _performTextSearch(
+          filteredClinics,
+          params.query,
+        );
       }
 
       // Location filter
@@ -317,7 +319,10 @@ class OfflineSearchService extends GetxService {
 
       // Specialty filter
       if (params.specialties != null && params.specialties!.isNotEmpty) {
-        filteredClinics = _filterBySpecialties(filteredClinics, params.specialties!);
+        filteredClinics = _filterBySpecialties(
+          filteredClinics,
+          params.specialties!,
+        );
       }
 
       // Rating filter
@@ -344,14 +349,15 @@ class OfflineSearchService extends GetxService {
         searchDuration: stopwatch.elapsed,
         isFromCache: false,
       );
-
     } catch (e) {
       stopwatch.stop();
       throw Exception('Offline search failed: $e');
     }
   }
 
-  Future<OfflineSearchResult> _performHybridSearch(ClinicSearchParams params) async {
+  Future<OfflineSearchResult> _performHybridSearch(
+    ClinicSearchParams params,
+  ) async {
     try {
       // Try network search first
       final networkResults = await _clinicRepository.searchByText(
@@ -366,7 +372,7 @@ class OfflineSearchService extends GetxService {
         return OfflineSearchResult.success(
           results: networkResults,
           totalResults: networkResults.length,
-          searchDuration: Duration(milliseconds: 500), // Estimate
+          searchDuration: const Duration(milliseconds: 500), // Estimate
           isFromCache: false,
         );
       }
@@ -375,11 +381,18 @@ class OfflineSearchService extends GetxService {
     }
 
     // Fallback to offline search
-    return await _performOfflineSearch(params);
+    return _performOfflineSearch(params);
   }
 
-  Future<List<ClinicModel>> _performTextSearch(List<ClinicModel> clinics, String query) async {
-    final queryTerms = query.toLowerCase().split(' ').where((term) => term.isNotEmpty).toList();
+  Future<List<ClinicModel>> _performTextSearch(
+    List<ClinicModel> clinics,
+    String query,
+  ) async {
+    final queryTerms = query
+        .toLowerCase()
+        .split(' ')
+        .where((term) => term.isNotEmpty)
+        .toList();
 
     if (queryTerms.isEmpty) return clinics;
 
@@ -404,7 +417,9 @@ class OfflineSearchService extends GetxService {
     final clinicName = clinic.name.toLowerCase();
     final clinicDescription = clinic.description.toLowerCase();
     final clinicAddress = clinic.address.toLowerCase();
-    final clinicSpecialties = clinic.specialties.map((s) => s.toLowerCase()).join(' ');
+    final clinicSpecialties = clinic.specialties
+        .map((s) => s.toLowerCase())
+        .join(' ');
 
     for (final term in queryTerms) {
       // Exact matches get higher scores
@@ -488,14 +503,23 @@ class OfflineSearchService extends GetxService {
     }).toList();
   }
 
-  List<ClinicModel> _filterBySpecialties(List<ClinicModel> clinics, List<String> specialties) {
+  List<ClinicModel> _filterBySpecialties(
+    List<ClinicModel> clinics,
+    List<String> specialties,
+  ) {
     return clinics.where((clinic) {
-      return specialties.any((specialty) =>
-        clinic.specialties.any((s) => s.toLowerCase().contains(specialty.toLowerCase())));
+      return specialties.any(
+        (specialty) => clinic.specialties.any(
+          (s) => s.toLowerCase().contains(specialty.toLowerCase()),
+        ),
+      );
     }).toList();
   }
 
-  List<ClinicModel> _filterByRating(List<ClinicModel> clinics, double minRating) {
+  List<ClinicModel> _filterByRating(
+    List<ClinicModel> clinics,
+    double minRating,
+  ) {
     return clinics.where((clinic) => clinic.rating >= minRating).toList();
   }
 
@@ -510,8 +534,11 @@ class OfflineSearchService extends GetxService {
         break;
       case ClinicSearchSort.distance:
         if (params.latitude != null && params.longitude != null) {
-          clinics.sort((a, b) => a.distanceFrom(params.latitude!, params.longitude!)
-              .compareTo(b.distanceFrom(params.latitude!, params.longitude!)));
+          clinics.sort(
+            (a, b) => a
+                .distanceFrom(params.latitude!, params.longitude!)
+                .compareTo(b.distanceFrom(params.latitude!, params.longitude!)),
+          );
         }
         break;
       case ClinicSearchSort.rating:
@@ -570,7 +597,9 @@ class OfflineSearchService extends GetxService {
   }
 
   String _generateSearchCacheKey(ClinicSearchParams params) {
-    return '${params.query}_${params.latitude}_${params.longitude}_${params.radiusKm}_${params.specialties?.join(',')}_${params.minRating}_${params.acceptsInsurance}_${params.sortBy.name}_${params.limit}'.hashCode.toString();
+    return '${params.query}_${params.latitude}_${params.longitude}_${params.radiusKm}_${params.specialties?.join(',')}_${params.minRating}_${params.acceptsInsurance}_${params.sortBy.name}_${params.limit}'
+        .hashCode
+        .toString();
   }
 
   Future<void> _cacheSearchResult(
@@ -628,19 +657,6 @@ class OfflineSearchService extends GetxService {
 
 /// Search parameters container
 class ClinicSearchParams {
-  final String query;
-  final double? latitude;
-  final double? longitude;
-  final double radiusKm;
-  final List<String>? specialties;
-  final List<String>? services;
-  final PriceRange? priceRange;
-  final double? minRating;
-  final bool acceptsInsurance;
-  final ClinicSearchSort sortBy;
-  final int limit;
-  final bool offlineOnly;
-
   ClinicSearchParams({
     required this.query,
     this.latitude,
@@ -655,14 +671,25 @@ class ClinicSearchParams {
     this.limit = 20,
     this.offlineOnly = false,
   });
+  final String query;
+  final double? latitude;
+  final double? longitude;
+  final double radiusKm;
+  final List<String>? specialties;
+  final List<String>? services;
+  final PriceRange? priceRange;
+  final double? minRating;
+  final bool acceptsInsurance;
+  final ClinicSearchSort sortBy;
+  final int limit;
+  final bool offlineOnly;
 }
 
 /// Search result with scoring
 class ScoredSearchResult {
+  ScoredSearchResult(this.clinic, this.score);
   final ClinicModel clinic;
   final double score;
-
-  ScoredSearchResult(this.clinic, this.score);
 }
 
 /// Search index for full-text search
@@ -672,13 +699,6 @@ class SearchIndex {
 
 /// Search result container
 class OfflineSearchResult {
-  final bool success;
-  final List<ClinicModel> results;
-  final int totalResults;
-  final Duration searchDuration;
-  final bool isFromCache;
-  final String? errorMessage;
-
   OfflineSearchResult({
     required this.success,
     this.results = const [],
@@ -719,11 +739,14 @@ class OfflineSearchResult {
   }
 
   factory OfflineSearchResult.error(String message) {
-    return OfflineSearchResult(
-      success: false,
-      errorMessage: message,
-    );
+    return OfflineSearchResult(success: false, errorMessage: message);
   }
+  final bool success;
+  final List<ClinicModel> results;
+  final int totalResults;
+  final Duration searchDuration;
+  final bool isFromCache;
+  final String? errorMessage;
 }
 
 /// Search analytics data
@@ -738,17 +761,11 @@ class SearchAnalytics {
 }
 
 /// Search sort options
-enum ClinicSearchSort {
-  relevance,
-  distance,
-  rating,
-  name,
-}
+enum ClinicSearchSort { relevance, distance, rating, name }
 
 /// Price range filter
 class PriceRange {
+  PriceRange(this.min, this.max);
   final double min;
   final double max;
-
-  PriceRange(this.min, this.max);
 }

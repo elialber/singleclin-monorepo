@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/reviews_controller.dart';
-import '../widgets/review_card.dart';
-import '../widgets/rating_stars.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/reviews_controller.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/review_card.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/rating_stars.dart';
 
 class ReviewsScreen extends StatelessWidget {
   const ReviewsScreen({super.key});
@@ -73,7 +73,10 @@ class ReviewsScreen extends StatelessWidget {
 
               // Filter Chips
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -85,8 +88,8 @@ class ReviewsScreen extends StatelessWidget {
                         backgroundColor: Colors.grey[200],
                         selectedColor: const Color(0xFF005156),
                         labelStyle: TextStyle(
-                          color: controller.selectedRating == 0 
-                              ? Colors.white 
+                          color: controller.selectedRating == 0
+                              ? Colors.white
                               : Colors.black,
                         ),
                       ),
@@ -99,21 +102,25 @@ class ReviewsScreen extends StatelessWidget {
                             label: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.star, size: 16, 
-                                    color: controller.selectedRating == rating 
-                                        ? Colors.white 
-                                        : Colors.amber),
+                                Icon(
+                                  Icons.star,
+                                  size: 16,
+                                  color: controller.selectedRating == rating
+                                      ? Colors.white
+                                      : Colors.amber,
+                                ),
                                 const SizedBox(width: 4),
                                 Text('$rating'),
                               ],
                             ),
                             selected: controller.selectedRating == rating,
-                            onSelected: (_) => controller.filterByRating(rating),
+                            onSelected: (_) =>
+                                controller.filterByRating(rating),
                             backgroundColor: Colors.grey[200],
                             selectedColor: const Color(0xFF005156),
                             labelStyle: TextStyle(
-                              color: controller.selectedRating == rating 
-                                  ? Colors.white 
+                              color: controller.selectedRating == rating
+                                  ? Colors.white
                                   : Colors.black,
                             ),
                           ),
@@ -129,47 +136,52 @@ class ReviewsScreen extends StatelessWidget {
                 child: controller.isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : controller.filteredReviews.isEmpty
-                        ? const Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.star_border, 
-                                    size: 64, color: Colors.grey),
-                                SizedBox(height: 16),
-                                Text(
-                                  'Nenhuma avaliação encontrada',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Seja o primeiro a avaliar!',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ],
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.star_border,
+                              size: 64,
+                              color: Colors.grey,
                             ),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: controller.loadReviews,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: controller.filteredReviews.length,
-                              itemBuilder: (context, index) {
-                                final review = controller.filteredReviews[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: ReviewCard(
-                                    review: review,
-                                    onLike: () => controller.likeReview(review.id),
-                                    onDislike: () => controller.dislikeReview(review.id),
-                                    onReport: () => _showReportDialog(context, review.id),
-                                  ),
-                                );
-                              },
+                            SizedBox(height: 16),
+                            Text(
+                              'Nenhuma avaliação encontrada',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Seja o primeiro a avaliar!',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: controller.loadReviews,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: controller.filteredReviews.length,
+                          itemBuilder: (context, index) {
+                            final review = controller.filteredReviews[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: ReviewCard(
+                                review: review,
+                                onLike: () => controller.likeReview(review.id),
+                                onDislike: () =>
+                                    controller.dislikeReview(review.id),
+                                onReport: () =>
+                                    _showReportDialog(context, review.id),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
               ),
             ],
           ),
@@ -186,10 +198,7 @@ class ReviewsScreen extends StatelessWidget {
           'Esta avaliação contém conteúdo inadequado ou viola nossas diretrizes?',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Cancelar')),
           TextButton(
             onPressed: () {
               Get.back();

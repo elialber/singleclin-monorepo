@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/community_controller.dart';
-import '../widgets/community_post_card.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/community_controller.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/community_post_card.dart';
 
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key});
@@ -76,7 +76,10 @@ class CommunityScreen extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () => _showCreatePostDialog(Get.context!, controller),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(20),
@@ -91,7 +94,8 @@ class CommunityScreen extends StatelessWidget {
               const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.photo_camera, color: Color(0xFF005156)),
-                onPressed: () => _showCreatePostDialog(Get.context!, controller),
+                onPressed: () =>
+                    _showCreatePostDialog(Get.context!, controller),
               ),
             ],
           ),
@@ -111,8 +115,8 @@ class CommunityScreen extends StatelessWidget {
                   backgroundColor: Colors.grey[200],
                   selectedColor: const Color(0xFF005156),
                   labelStyle: TextStyle(
-                    color: controller.selectedFilter == 'recent' 
-                        ? Colors.white 
+                    color: controller.selectedFilter == 'recent'
+                        ? Colors.white
                         : Colors.black,
                   ),
                 ),
@@ -124,8 +128,8 @@ class CommunityScreen extends StatelessWidget {
                   backgroundColor: Colors.grey[200],
                   selectedColor: const Color(0xFF005156),
                   labelStyle: TextStyle(
-                    color: controller.selectedFilter == 'popular' 
-                        ? Colors.white 
+                    color: controller.selectedFilter == 'popular'
+                        ? Colors.white
                         : Colors.black,
                   ),
                 ),
@@ -137,8 +141,8 @@ class CommunityScreen extends StatelessWidget {
                   backgroundColor: Colors.grey[200],
                   selectedColor: const Color(0xFF005156),
                   labelStyle: TextStyle(
-                    color: controller.selectedFilter == 'following' 
-                        ? Colors.white 
+                    color: controller.selectedFilter == 'following'
+                        ? Colors.white
                         : Colors.black,
                   ),
                 ),
@@ -154,47 +158,48 @@ class CommunityScreen extends StatelessWidget {
           child: controller.isLoading
               ? const Center(child: CircularProgressIndicator())
               : controller.filteredPosts.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.forum, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text(
-                            'Nenhum post encontrado',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Seja o primeiro a compartilhar!',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.forum, size: 64, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text(
+                        'Nenhum post encontrado',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
                       ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: controller.loadPosts,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: controller.filteredPosts.length,
-                        itemBuilder: (context, index) {
-                          final post = controller.filteredPosts[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: CommunityPostCard(
-                              post: post,
-                              onLike: () => controller.likePost(post.id),
-                              onComment: () => _showCommentsDialog(Get.context!, post.id, controller),
-                              onShare: () => controller.sharePost(post.id),
-                              onReport: () => controller.reportPost(post.id),
-                            ),
-                          );
-                        },
+                      SizedBox(height: 8),
+                      Text(
+                        'Seja o primeiro a compartilhar!',
+                        style: TextStyle(color: Colors.grey),
                       ),
-                    ),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: controller.loadPosts,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: controller.filteredPosts.length,
+                    itemBuilder: (context, index) {
+                      final post = controller.filteredPosts[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: CommunityPostCard(
+                          post: post,
+                          onLike: () => controller.likePost(post.id),
+                          onComment: () => _showCommentsDialog(
+                            Get.context!,
+                            post.id,
+                            controller,
+                          ),
+                          onShare: () => controller.sharePost(post.id),
+                          onReport: () => controller.reportPost(post.id),
+                        ),
+                      );
+                    },
+                  ),
+                ),
         ),
       ],
     );
@@ -315,7 +320,9 @@ class CommunityScreen extends StatelessWidget {
                               ),
                               title: Text(
                                 group.name,
-                                style: const TextStyle(fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,34 +407,55 @@ class CommunityScreen extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(Icons.calendar_today, size: 12, color: Colors.grey),
+                                    const Icon(
+                                      Icons.calendar_today,
+                                      size: 12,
+                                      color: Colors.grey,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       _formatEventDate(event.date),
-                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(Icons.people, size: 12, color: Colors.grey),
+                                    const Icon(
+                                      Icons.people,
+                                      size: 12,
+                                      color: Colors.grey,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       '${event.attendeeCount} participantes',
-                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ],
                                 ),
                                 const Spacer(),
                                 ElevatedButton(
-                                  onPressed: () => controller.joinEvent(event.id),
+                                  onPressed: () =>
+                                      controller.joinEvent(event.id),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF005156),
                                     foregroundColor: Colors.white,
-                                    minimumSize: const Size(double.infinity, 28),
+                                    minimumSize: const Size(
+                                      double.infinity,
+                                      28,
+                                    ),
                                   ),
-                                  child: const Text('Participar', style: TextStyle(fontSize: 12)),
+                                  child: const Text(
+                                    'Participar',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
                                 ),
                               ],
                             ),
@@ -514,7 +542,9 @@ class CommunityScreen extends StatelessWidget {
                               ),
                               title: Text(
                                 event.title,
-                                style: const TextStyle(fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -523,7 +553,11 @@ class CommunityScreen extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Row(
                                     children: [
-                                      const Icon(Icons.people, size: 12, color: Colors.grey),
+                                      const Icon(
+                                        Icons.people,
+                                        size: 12,
+                                        color: Colors.grey,
+                                      ),
                                       const SizedBox(width: 4),
                                       Text(
                                         '${event.attendeeCount} participantes',
@@ -537,11 +571,17 @@ class CommunityScreen extends StatelessWidget {
                                 ],
                               ),
                               trailing: event.isJoined
-                                  ? const Icon(Icons.check_circle, color: Colors.green)
+                                  ? const Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                    )
                                   : ElevatedButton(
-                                      onPressed: () => controller.joinEvent(event.id),
+                                      onPressed: () =>
+                                          controller.joinEvent(event.id),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF005156),
+                                        backgroundColor: const Color(
+                                          0xFF005156,
+                                        ),
                                         foregroundColor: Colors.white,
                                         minimumSize: const Size(80, 32),
                                       ),
@@ -560,7 +600,10 @@ class CommunityScreen extends StatelessWidget {
     );
   }
 
-  void _showCreatePostDialog(BuildContext context, CommunityController controller) {
+  void _showCreatePostDialog(
+    BuildContext context,
+    CommunityController controller,
+  ) {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -572,10 +615,7 @@ class CommunityScreen extends StatelessWidget {
             children: [
               const Text(
                 'Criar Post',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -602,7 +642,7 @@ class CommunityScreen extends StatelessWidget {
                   ),
                   const Spacer(),
                   TextButton(
-                    onPressed: () => Get.back(),
+                    onPressed: Get.back,
                     child: const Text('Cancelar'),
                   ),
                   ElevatedButton(
@@ -625,7 +665,11 @@ class CommunityScreen extends StatelessWidget {
     );
   }
 
-  void _showCommentsDialog(BuildContext context, String postId, CommunityController controller) {
+  void _showCommentsDialog(
+    BuildContext context,
+    String postId,
+    CommunityController controller,
+  ) {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -637,21 +681,18 @@ class CommunityScreen extends StatelessWidget {
             children: [
               const Text(
                 'Comentários',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const Divider(),
               Expanded(
                 child: ListView.builder(
                   itemCount: controller.getCommentsForPost(postId).length,
                   itemBuilder: (context, index) {
-                    final comment = controller.getCommentsForPost(postId)[index];
+                    final comment = controller.getCommentsForPost(
+                      postId,
+                    )[index];
                     return ListTile(
-                      leading: const CircleAvatar(
-                        child: Icon(Icons.person),
-                      ),
+                      leading: const CircleAvatar(child: Icon(Icons.person)),
                       title: Text(comment.authorName),
                       subtitle: Text(comment.content),
                       trailing: Text(_formatCommentDate(comment.createdAt)),
@@ -700,10 +741,7 @@ class CommunityScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Fechar')),
           ElevatedButton(
             onPressed: () {
               controller.joinGroup(group.id);
@@ -731,10 +769,7 @@ class CommunityScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Fechar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Fechar')),
           if (!event.isJoined)
             ElevatedButton(
               onPressed: () {
@@ -755,7 +790,7 @@ class CommunityScreen extends StatelessWidget {
   String _formatCommentDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d';
     } else if (difference.inHours > 0) {
@@ -770,8 +805,21 @@ class CommunityScreen extends StatelessWidget {
   }
 
   String _getMonthAbbreviation(int month) {
-    const months = ['', 'JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 
-                   'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    const months = [
+      '',
+      'JAN',
+      'FEV',
+      'MAR',
+      'ABR',
+      'MAI',
+      'JUN',
+      'JUL',
+      'AGO',
+      'SET',
+      'OUT',
+      'NOV',
+      'DEZ',
+    ];
     return months[month];
   }
 }

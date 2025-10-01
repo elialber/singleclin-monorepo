@@ -2,24 +2,6 @@ import 'package:equatable/equatable.dart';
 
 /// Support ticket model for customer support system
 class SupportTicket extends Equatable {
-  final String id;
-  final String userId;
-  final String title;
-  final String description;
-  final TicketCategory category;
-  final TicketPriority priority;
-  final TicketStatus status;
-  final List<TicketMessage> messages;
-  final List<String> attachments;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  final DateTime? resolvedAt;
-  final String? assignedAgentId;
-  final String? assignedAgentName;
-  final double? satisfactionRating;
-  final String? satisfactionComment;
-  final List<String> tags;
-
   const SupportTicket({
     required this.id,
     required this.userId,
@@ -78,6 +60,23 @@ class SupportTicket extends Equatable {
       tags: List<String>.from(json['tags'] as List),
     );
   }
+  final String id;
+  final String userId;
+  final String title;
+  final String description;
+  final TicketCategory category;
+  final TicketPriority priority;
+  final TicketStatus status;
+  final List<TicketMessage> messages;
+  final List<String> attachments;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final DateTime? resolvedAt;
+  final String? assignedAgentId;
+  final String? assignedAgentName;
+  final double? satisfactionRating;
+  final String? satisfactionComment;
+  final List<String> tags;
 
   Map<String, dynamic> toJson() {
     return {
@@ -143,39 +142,28 @@ class SupportTicket extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        title,
-        description,
-        category,
-        priority,
-        status,
-        messages,
-        attachments,
-        createdAt,
-        updatedAt,
-        resolvedAt,
-        assignedAgentId,
-        assignedAgentName,
-        satisfactionRating,
-        satisfactionComment,
-        tags,
-      ];
+    id,
+    userId,
+    title,
+    description,
+    category,
+    priority,
+    status,
+    messages,
+    attachments,
+    createdAt,
+    updatedAt,
+    resolvedAt,
+    assignedAgentId,
+    assignedAgentName,
+    satisfactionRating,
+    satisfactionComment,
+    tags,
+  ];
 }
 
 /// Ticket message for chat conversations
 class TicketMessage extends Equatable {
-  final String id;
-  final String ticketId;
-  final String senderId;
-  final String senderName;
-  final String senderRole; // 'user' or 'agent'
-  final String message;
-  final List<String> attachments;
-  final DateTime createdAt;
-  final MessageType type;
-  final bool isRead;
-
   const TicketMessage({
     required this.id,
     required this.ticketId,
@@ -206,6 +194,16 @@ class TicketMessage extends Equatable {
       isRead: json['isRead'] as bool,
     );
   }
+  final String id;
+  final String ticketId;
+  final String senderId;
+  final String senderName;
+  final String senderRole; // 'user' or 'agent'
+  final String message;
+  final List<String> attachments;
+  final DateTime createdAt;
+  final MessageType type;
+  final bool isRead;
 
   Map<String, dynamic> toJson() {
     return {
@@ -250,17 +248,17 @@ class TicketMessage extends Equatable {
 
   @override
   List<Object> get props => [
-        id,
-        ticketId,
-        senderId,
-        senderName,
-        senderRole,
-        message,
-        attachments,
-        createdAt,
-        type,
-        isRead,
-      ];
+    id,
+    ticketId,
+    senderId,
+    senderName,
+    senderRole,
+    message,
+    attachments,
+    createdAt,
+    type,
+    isRead,
+  ];
 }
 
 /// Ticket categories
@@ -272,16 +270,11 @@ enum TicketCategory {
   credits,
   account,
   clinic,
-  emergency
+  emergency,
 }
 
 /// Ticket priorities
-enum TicketPriority {
-  low,
-  medium,
-  high,
-  urgent
-}
+enum TicketPriority { low, medium, high, urgent }
 
 /// Ticket status
 enum TicketStatus {
@@ -290,31 +283,14 @@ enum TicketStatus {
   waitingForCustomer,
   resolved,
   closed,
-  escalated
+  escalated,
 }
 
 /// Message types
-enum MessageType {
-  text,
-  image,
-  file,
-  system,
-  autoReply
-}
+enum MessageType { text, image, file, system, autoReply }
 
 /// Chat session for live support
 class ChatSession extends Equatable {
-  final String id;
-  final String userId;
-  final String? agentId;
-  final String? agentName;
-  final ChatStatus status;
-  final List<ChatMessage> messages;
-  final DateTime createdAt;
-  final DateTime? endedAt;
-  final int queuePosition;
-  final String topic;
-
   const ChatSession({
     required this.id,
     required this.userId,
@@ -349,6 +325,16 @@ class ChatSession extends Equatable {
       topic: json['topic'] as String,
     );
   }
+  final String id;
+  final String userId;
+  final String? agentId;
+  final String? agentName;
+  final ChatStatus status;
+  final List<ChatMessage> messages;
+  final DateTime createdAt;
+  final DateTime? endedAt;
+  final int queuePosition;
+  final String topic;
 
   Map<String, dynamic> toJson() {
     return {
@@ -367,29 +353,21 @@ class ChatSession extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        agentId,
-        agentName,
-        status,
-        messages,
-        createdAt,
-        endedAt,
-        queuePosition,
-        topic,
-      ];
+    id,
+    userId,
+    agentId,
+    agentName,
+    status,
+    messages,
+    createdAt,
+    endedAt,
+    queuePosition,
+    topic,
+  ];
 }
 
 /// Chat message
 class ChatMessage extends Equatable {
-  final String id;
-  final String sessionId;
-  final String senderId;
-  final String senderType; // 'user', 'agent', 'system'
-  final String message;
-  final DateTime timestamp;
-  final bool isRead;
-
   const ChatMessage({
     required this.id,
     required this.sessionId,
@@ -411,6 +389,13 @@ class ChatMessage extends Equatable {
       isRead: json['isRead'] as bool,
     );
   }
+  final String id;
+  final String sessionId;
+  final String senderId;
+  final String senderType; // 'user', 'agent', 'system'
+  final String message;
+  final DateTime timestamp;
+  final bool isRead;
 
   Map<String, dynamic> toJson() {
     return {
@@ -426,20 +411,15 @@ class ChatMessage extends Equatable {
 
   @override
   List<Object> get props => [
-        id,
-        sessionId,
-        senderId,
-        senderType,
-        message,
-        timestamp,
-        isRead,
-      ];
+    id,
+    sessionId,
+    senderId,
+    senderType,
+    message,
+    timestamp,
+    isRead,
+  ];
 }
 
 /// Chat status
-enum ChatStatus {
-  waiting,
-  active,
-  ended,
-  abandoned
-}
+enum ChatStatus { waiting, active, ended, abandoned }

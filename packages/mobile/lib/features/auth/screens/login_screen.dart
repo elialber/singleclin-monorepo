@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/auth_controller.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/singleclin_logo.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/singleclin_logo.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthController _authController = Get.find<AuthController>();
-  
+
   bool _obscurePassword = true;
   bool _showEmailLogin = false;
 
@@ -60,12 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-                  child: const Center(
-                    child: SingleClinLogo(
-                      size: 80,
-                      color: AppColors.primary,
-                    ),
-                  ),
+                  child: const Center(child: SingleClinLogo(size: 80)),
                 ),
                 const SizedBox(height: 32),
                 const Text(
@@ -79,13 +74,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 const Text(
                   'Entre em sua conta',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
                 const SizedBox(height: 40),
-                
+
                 // Email/Password Login Form
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
@@ -93,10 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: AnimatedOpacity(
                     opacity: _showEmailLogin ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 300),
-                    child: _showEmailLogin ? _buildEmailLoginForm() : const SizedBox(),
+                    child: _showEmailLogin
+                        ? _buildEmailLoginForm()
+                        : const SizedBox(),
                   ),
                 ),
-                
+
                 // Toggle Button for Email Login
                 if (!_showEmailLogin) ...[
                   SizedBox(
@@ -108,7 +102,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           _showEmailLogin = true;
                         });
                       },
-                      icon: const Icon(Icons.email_outlined, color: Colors.white),
+                      icon: const Icon(
+                        Icons.email_outlined,
+                        color: Colors.white,
+                      ),
                       label: const Text('Entrar com Email'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -121,16 +118,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                 ],
-                
+
                 // Social Login Buttons
                 if (!_showEmailLogin) ...[
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        _authController.loginWithGoogle();
-                      },
+                      onPressed: _authController.loginWithGoogle,
                       icon: const Icon(Icons.login, color: AppColors.primary),
                       label: const Text('Entrar com Google'),
                       style: ElevatedButton.styleFrom(
@@ -147,9 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        _authController.loginWithApple();
-                      },
+                      onPressed: _authController.loginWithApple,
                       icon: const Icon(Icons.apple, color: Colors.white),
                       label: const Text('Entrar com Apple'),
                       style: ElevatedButton.styleFrom(
@@ -162,9 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ],
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Register Link
                 TextButton(
                   onPressed: () => Get.toNamed('/register'),
@@ -173,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(color: Colors.white70),
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
               ],
             ),
@@ -219,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            
+
             // Email Field
             TextFormField(
               controller: _emailController,
@@ -228,7 +221,10 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: InputDecoration(
                 labelText: 'Email',
                 labelStyle: const TextStyle(color: Colors.white70),
-                prefixIcon: const Icon(Icons.email_outlined, color: Colors.white70),
+                prefixIcon: const Icon(
+                  Icons.email_outlined,
+                  color: Colors.white70,
+                ),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.1),
                 border: OutlineInputBorder(
@@ -258,9 +254,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 return null;
               },
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Password Field
             TextFormField(
               controller: _passwordController,
@@ -269,7 +265,10 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: InputDecoration(
                 labelText: 'Senha',
                 labelStyle: const TextStyle(color: Colors.white70),
-                prefixIcon: const Icon(Icons.lock_outlined, color: Colors.white70),
+                prefixIcon: const Icon(
+                  Icons.lock_outlined,
+                  color: Colors.white70,
+                ),
                 suffixIcon: IconButton(
                   onPressed: () {
                     setState(() {
@@ -310,9 +309,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 return null;
               },
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             // Forgot Password Link
             Align(
               alignment: Alignment.centerRight,
@@ -334,70 +333,85 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Login Button
-            Obx(() => SizedBox(
-              width: double.infinity,
-              height: 80,
-              child: ElevatedButton(
-                onPressed: _authController.isLoading ? null : _handleEmailLogin,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
-                  elevation: 8,
-                  shadowColor: AppColors.primary.withOpacity(0.3),
-                  padding: const EdgeInsets.symmetric(vertical: 28),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: _authController.isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Text(
-                        'Entrar',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-              ),
-            )),
-            
-            // Error Message
-            Obx(() => _authController.error.isNotEmpty
-                ? Container(
-                    margin: const EdgeInsets.only(top: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red, width: 1),
+            Obx(
+              () => SizedBox(
+                width: double.infinity,
+                height: 80,
+                child: ElevatedButton(
+                  onPressed: _authController.isLoading
+                      ? null
+                      : _handleEmailLogin,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+                    elevation: 8,
+                    shadowColor: AppColors.primary.withOpacity(0.3),
+                    padding: const EdgeInsets.symmetric(vertical: 28),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.error_outline, color: Colors.red, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _authController.error,
-                            style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                  child: _authController.isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                      : const Text(
+                          'Entrar',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
                           ),
                         ),
-                      ],
-                    ),
-                  )
-                : const SizedBox()),
+                ),
+              ),
+            ),
+
+            // Error Message
+            Obx(
+              () => _authController.error.isNotEmpty
+                  ? Container(
+                      margin: const EdgeInsets.only(top: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _authController.error,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : const SizedBox(),
+            ),
           ],
         ),
       ),
@@ -407,12 +421,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleEmailLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
       _authController.clearError();
-      
+
       final success = await _authController.loginWithEmail(
         _emailController.text.trim(),
         _passwordController.text,
       );
-      
+
       if (success) {
         Get.snackbar(
           'Sucesso',

@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
-import '../models/cache_entity.dart';
-import 'network_service.dart';
-import 'cache_service.dart';
-import '../../data/repositories/user_repository.dart';
-import '../../data/repositories/credit_repository.dart';
-import '../../data/repositories/clinic_repository.dart';
+import 'package:singleclin_mobile/core/models/cache_entity.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+import 'package:singleclin_mobile/core/services/cache_service.dart';
+import 'package:singleclin_mobile/data/repositories/user_repository.dart';
+import 'package:singleclin_mobile/data/repositories/credit_repository.dart';
+import 'package:singleclin_mobile/data/repositories/clinic_repository.dart';
 import 'dart:async';
 
 /// Critical Data Cache Manager
@@ -13,6 +13,17 @@ import 'dart:async';
 /// Ensures profile, credits, transaction history, and frequently used clinics
 /// are always available offline.
 class CriticalDataCache extends GetxService {
+  CriticalDataCache({
+    required NetworkService networkService,
+    required CacheService cacheService,
+    required UserRepository userRepository,
+    required CreditRepository creditRepository,
+    required ClinicRepository clinicRepository,
+  }) : _networkService = networkService,
+       _cacheService = cacheService,
+       _userRepository = userRepository,
+       _creditRepository = creditRepository,
+       _clinicRepository = clinicRepository;
   final NetworkService _networkService;
   final CacheService _cacheService;
   final UserRepository _userRepository;
@@ -30,18 +41,6 @@ class CriticalDataCache extends GetxService {
   static const Duration _criticalDataTtl = Duration(hours: 24);
 
   Timer? _preloadTimer;
-
-  CriticalDataCache({
-    required NetworkService networkService,
-    required CacheService cacheService,
-    required UserRepository userRepository,
-    required CreditRepository creditRepository,
-    required ClinicRepository clinicRepository,
-  })  : _networkService = networkService,
-        _cacheService = cacheService,
-        _userRepository = userRepository,
-        _creditRepository = creditRepository,
-        _clinicRepository = clinicRepository;
 
   // Getters
   bool get isPreloading => _isPreloading.value;
@@ -93,7 +92,7 @@ class CriticalDataCache extends GetxService {
       return PreloadResult.noConnection();
     }
 
-    return await _performPreload(userTriggered: userTriggered);
+    return _performPreload(userTriggered: userTriggered);
   }
 
   /// Check if critical data is available offline
@@ -106,26 +105,30 @@ class CriticalDataCache extends GetxService {
       availability.hasProfile = profile != null;
 
       // Check wallet balance
-      final balance = await _creditRepository.getWalletBalance(forceRefresh: false);
+      final balance = await _creditRepository.getWalletBalance();
       availability.hasWalletBalance = balance != null;
 
       // Check transaction history
-      final transactions = await _creditRepository.getRecentTransactions(offlineOnly: true);
+      final transactions = await _creditRepository.getRecentTransactions(
+        offlineOnly: true,
+      );
       availability.hasTransactionHistory = transactions.isNotEmpty;
 
       // Check clinic data
-      final clinics = await _clinicRepository.getMany(limit: 10, offlineOnly: true);
+      final clinics = await _clinicRepository.getMany(
+        limit: 10,
+        offlineOnly: true,
+      );
       availability.hasClinicData = clinics.isNotEmpty;
 
       // Check favorites
-      final favorites = await _clinicRepository.getFavorites(offlineOnly: true);
+      final favorites = await _clinicRepository.getFavorites();
       availability.hasFavorites = favorites.isNotEmpty;
 
       // Calculate overall score
       availability.calculateOverallScore();
 
       return availability;
-
     } catch (e) {
       print('❌ Error checking critical data availability: $e');
       return CriticalDataAvailability(); // Returns all false
@@ -145,7 +148,6 @@ class CriticalDataCache extends GetxService {
 
       _criticalDataStatus['profile'] = true;
       _updatePreloadProgress(0.2);
-
     } catch (e) {
       print('❌ Failed to preload user data: $e');
       _criticalDataStatus['profile'] = false;
@@ -173,7 +175,6 @@ class CriticalDataCache extends GetxService {
 
       _criticalDataStatus['credits'] = true;
       _updatePreloadProgress(0.5);
-
     } catch (e) {
       print('❌ Failed to preload credit data: $e');
       _criticalDataStatus['credits'] = false;
@@ -197,7 +198,6 @@ class CriticalDataCache extends GetxService {
 
       _criticalDataStatus['clinics'] = true;
       _updatePreloadProgress(0.8);
-
     } catch (e) {
       print('❌ Failed to preload clinic data: $e');
       _criticalDataStatus['clinics'] = false;
@@ -222,7 +222,6 @@ class CriticalDataCache extends GetxService {
 
       _criticalDataStatus['location_data'] = true;
       _updatePreloadProgress(1.0);
-
     } catch (e) {
       print('❌ Failed to preload location data: $e');
       _criticalDataStatus['location_data'] = false;
@@ -244,23 +243,23 @@ class CriticalDataCache extends GetxService {
       report.clinicDataHealth = _calculateDataHealth(clinicCacheInfo);
 
       // Overall health score
-      report.overallHealthScore = (
-        report.userDataHealth +
-        report.creditDataHealth +
-        report.clinicDataHealth
-      ) / 3;
+      report.overallHealthScore =
+          (report.userDataHealth +
+              report.creditDataHealth +
+              report.clinicDataHealth) /
+          3;
 
       // Check data freshness
       report.lastPreloadTime = lastPreloadTime;
       report.isDataFresh = _isDataFresh();
 
       // Storage usage
-      report.totalCacheSize = userCacheInfo['size'] +
-                             creditCacheInfo['size'] +
-                             clinicCacheInfo['size'];
+      report.totalCacheSize =
+          userCacheInfo['size'] +
+          creditCacheInfo['size'] +
+          clinicCacheInfo['size'];
 
       return report;
-
     } catch (e) {
       print('❌ Error generating cache health report: $e');
       report.hasErrors = true;
@@ -284,7 +283,6 @@ class CriticalDataCache extends GetxService {
       // (Implementation depends on specific compression needs)
 
       print('✅ Cache optimization completed');
-
     } catch (e) {
       print('❌ Cache optimization failed: $e');
     }
@@ -292,7 +290,7 @@ class CriticalDataCache extends GetxService {
 
   /// Force refresh all critical data
   Future<PreloadResult> refreshAllCriticalData() async {
-    return await preloadCriticalData(force: true, userTriggered: true);
+    return preloadCriticalData(force: true, userTriggered: true);
   }
 
   // Private implementation
@@ -326,17 +324,17 @@ class CriticalDataCache extends GetxService {
       await _saveCacheMetadata();
 
       stopwatch.stop();
-      print('✅ Critical data preload completed in ${stopwatch.elapsed.inSeconds}s');
+      print(
+        '✅ Critical data preload completed in ${stopwatch.elapsed.inSeconds}s',
+      );
 
       return PreloadResult.success(
         duration: stopwatch.elapsed,
         itemsPreloaded: _criticalDataStatus.length,
       );
-
     } catch (e) {
       print('❌ Critical data preload failed: $e');
       return PreloadResult.error(e.toString());
-
     } finally {
       _isPreloading.value = false;
     }
@@ -398,7 +396,10 @@ class CriticalDataCache extends GetxService {
 
   Future<void> _loadCacheMetadata() async {
     try {
-      final metadata = await _cacheService.get('critical_cache', 'last_preload');
+      final metadata = await _cacheService.get(
+        'critical_cache',
+        'last_preload',
+      );
       if (metadata != null) {
         _lastPreloadTime.value = DateTime.parse(metadata['timestamp']);
       }
@@ -427,11 +428,6 @@ class CriticalDataCache extends GetxService {
 
 /// Result of preload operation
 class PreloadResult {
-  final bool success;
-  final int itemsPreloaded;
-  final String? errorMessage;
-  final Duration? duration;
-
   PreloadResult({
     required this.success,
     this.itemsPreloaded = 0,
@@ -439,10 +435,7 @@ class PreloadResult {
     this.duration,
   });
 
-  factory PreloadResult.success({
-    int itemsPreloaded = 0,
-    Duration? duration,
-  }) {
+  factory PreloadResult.success({int itemsPreloaded = 0, Duration? duration}) {
     return PreloadResult(
       success: true,
       itemsPreloaded: itemsPreloaded,
@@ -451,10 +444,7 @@ class PreloadResult {
   }
 
   factory PreloadResult.error(String message) {
-    return PreloadResult(
-      success: false,
-      errorMessage: message,
-    );
+    return PreloadResult(success: false, errorMessage: message);
   }
 
   factory PreloadResult.noConnection() {
@@ -470,6 +460,10 @@ class PreloadResult {
       errorMessage: 'Preload already in progress',
     );
   }
+  final bool success;
+  final int itemsPreloaded;
+  final String? errorMessage;
+  final Duration? duration;
 }
 
 /// Critical data availability status

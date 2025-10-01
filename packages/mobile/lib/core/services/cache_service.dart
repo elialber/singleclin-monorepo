@@ -47,7 +47,11 @@ class CacheService extends GetxService {
   }
 
   /// Store single item in cache
-  Future<void> put(String boxName, String key, Map<String, dynamic> data) async {
+  Future<void> put(
+    String boxName,
+    String key,
+    Map<String, dynamic> data,
+  ) async {
     try {
       final box = await _getBox(boxName);
 
@@ -56,7 +60,6 @@ class CacheService extends GetxService {
 
       // Store metadata (timestamp, size, etc.)
       await _storeMetadata(boxName, key, data);
-
     } catch (e) {
       print('❌ Cache put failed for $boxName:$key - $e');
       throw CacheException('Failed to cache data: $e');
@@ -82,7 +85,11 @@ class CacheService extends GetxService {
   }
 
   /// Store list of items in cache
-  Future<void> putList(String boxName, String key, List<Map<String, dynamic>> data) async {
+  Future<void> putList(
+    String boxName,
+    String key,
+    List<Map<String, dynamic>> data,
+  ) async {
     try {
       final box = await _getBox(boxName);
 
@@ -92,7 +99,6 @@ class CacheService extends GetxService {
 
       // Store metadata
       await _storeListMetadata(boxName, key, data.length);
-
     } catch (e) {
       print('❌ Cache putList failed for $boxName:$key - $e');
       throw CacheException('Failed to cache list: $e');
@@ -128,7 +134,6 @@ class CacheService extends GetxService {
 
       // Clean up metadata
       await _deleteMetadata(boxName, key);
-
     } catch (e) {
       print('❌ Cache delete failed for $boxName:$key - $e');
     }
@@ -202,9 +207,12 @@ class CacheService extends GetxService {
   }
 
   /// Clean up expired cache items
-  Future<void> cleanupExpired({int maxAgeMinutes = 1440}) async { // Default 24 hours
+  Future<void> cleanupExpired({int maxAgeMinutes = 1440}) async {
+    // Default 24 hours
     try {
-      final cutoffTime = DateTime.now().subtract(Duration(minutes: maxAgeMinutes));
+      final cutoffTime = DateTime.now().subtract(
+        Duration(minutes: maxAgeMinutes),
+      );
       final keysToDelete = <String>[];
 
       // Check all metadata entries for expired items
@@ -238,7 +246,10 @@ class CacheService extends GetxService {
   }
 
   /// Queue operations for offline sync
-  Future<void> putToQueue(String queueName, Map<String, dynamic> operation) async {
+  Future<void> putToQueue(
+    String queueName,
+    Map<String, dynamic> operation,
+  ) async {
     try {
       final queueKey = '${queueName}_${DateTime.now().millisecondsSinceEpoch}';
       await _queueBox.put(queueKey, operation);
@@ -272,7 +283,10 @@ class CacheService extends GetxService {
   }
 
   /// Remove specific operation from queue
-  Future<void> removeFromQueue(String queueName, Map<String, dynamic> operation) async {
+  Future<void> removeFromQueue(
+    String queueName,
+    Map<String, dynamic> operation,
+  ) async {
     try {
       final queueKey = operation['_queueKey'];
       if (queueKey != null) {
@@ -305,18 +319,26 @@ class CacheService extends GetxService {
   }
 
   // Private helper methods
-  Future<void> _storeMetadata(String boxName, String key, Map<String, dynamic> data) async {
+  Future<void> _storeMetadata(
+    String boxName,
+    String key,
+    Map<String, dynamic> data,
+  ) async {
     final now = DateTime.now();
-    final metadataKey = '${boxName}_${key}';
+    final metadataKey = '${boxName}_$key';
 
     await _metadataBox.put('${metadataKey}_timestamp', now.toIso8601String());
     await _metadataBox.put('${metadataKey}_size', jsonEncode(data).length);
     await _metadataBox.put('${metadataKey}_accessed', now.toIso8601String());
   }
 
-  Future<void> _storeListMetadata(String boxName, String key, int itemCount) async {
+  Future<void> _storeListMetadata(
+    String boxName,
+    String key,
+    int itemCount,
+  ) async {
     final now = DateTime.now();
-    final metadataKey = '${boxName}_${key}';
+    final metadataKey = '${boxName}_$key';
 
     await _metadataBox.put('${metadataKey}_timestamp', now.toIso8601String());
     await _metadataBox.put('${metadataKey}_count', itemCount);
@@ -329,7 +351,7 @@ class CacheService extends GetxService {
   }
 
   Future<void> _deleteMetadata(String boxName, String key) async {
-    final metadataKey = '${boxName}_${key}';
+    final metadataKey = '${boxName}_$key';
     await _metadataBox.delete('${metadataKey}_timestamp');
     await _metadataBox.delete('${metadataKey}_size');
     await _metadataBox.delete('${metadataKey}_count');
@@ -355,7 +377,8 @@ class CacheService extends GetxService {
     DateTime? latest;
 
     for (final key in _metadataBox.keys) {
-      if (key.toString().startsWith(boxName) && key.toString().endsWith('_accessed')) {
+      if (key.toString().startsWith(boxName) &&
+          key.toString().endsWith('_accessed')) {
         final timestamp = DateTime.parse(_metadataBox.get(key));
         if (latest == null || timestamp.isAfter(latest)) {
           latest = timestamp;
@@ -380,8 +403,8 @@ class CacheService extends GetxService {
 
 /// Exception thrown when cache operations fail
 class CacheException implements Exception {
-  final String message;
   CacheException(this.message);
+  final String message;
 
   @override
   String toString() => 'CacheException: $message';

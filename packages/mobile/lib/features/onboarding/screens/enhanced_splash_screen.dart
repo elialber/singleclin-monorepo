@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/singleclin_logo.dart';
-import '../controllers/onboarding_controller.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/singleclin_logo.dart';
+import 'package:singleclin_mobile/features/onboarding/controllers/onboarding_controller.dart';
 
 class EnhancedSplashScreen extends StatefulWidget {
   const EnhancedSplashScreen({super.key});
@@ -17,7 +17,7 @@ class _EnhancedSplashScreenState extends State<EnhancedSplashScreen>
   late AnimationController _logoController;
   late AnimationController _textController;
   late AnimationController _progressController;
-  
+
   late Animation<double> _logoScale;
   late Animation<double> _logoOpacity;
   late Animation<double> _textOpacity;
@@ -36,12 +36,12 @@ class _EnhancedSplashScreenState extends State<EnhancedSplashScreen>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    
+
     _textController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     _progressController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -50,47 +50,49 @@ class _EnhancedSplashScreenState extends State<EnhancedSplashScreen>
     _logoScale = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
     );
-    
-    _logoOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeIn),
-    );
-    
-    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeIn),
-    );
-    
+
+    _logoOpacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _logoController, curve: Curves.easeIn));
+
+    _textOpacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
+
     _textSlide = Tween<Offset>(
       begin: const Offset(0, 0.5),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
-    
+
     _progressValue = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _progressController, curve: Curves.easeInOut),
     );
   }
 
-  void _startSplashSequence() async {
+  Future<void> _startSplashSequence() async {
     // Start logo animation
     await Future.delayed(const Duration(milliseconds: 500));
     _logoController.forward();
-    
+
     // Start text animation
     await Future.delayed(const Duration(milliseconds: 800));
     _textController.forward();
-    
+
     // Start progress animation
     await Future.delayed(const Duration(milliseconds: 500));
     _progressController.forward();
-    
+
     // Initialize app services while animations play
     _initializeApp();
   }
 
-  void _initializeApp() async {
+  Future<void> _initializeApp() async {
     try {
       // Simulate app initialization
       await Future.delayed(const Duration(milliseconds: 2500));
-      
+
       // For now, always navigate to login screen
       // TODO: Implement proper onboarding logic later
       Get.offNamed('/login');
@@ -118,17 +120,14 @@ class _EnhancedSplashScreenState extends State<EnhancedSplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primary,
-              AppColors.primaryDark,
-            ],
+            colors: [AppColors.primary, AppColors.primaryDark],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
               const Spacer(flex: 2),
-              
+
               // Animated Logo
               AnimatedBuilder(
                 animation: Listenable.merge([_logoController]),
@@ -151,20 +150,15 @@ class _EnhancedSplashScreenState extends State<EnhancedSplashScreen>
                             ),
                           ],
                         ),
-                        child: const Center(
-                          child: SingleClinLogo(
-                            size: 80,
-                            color: AppColors.primary,
-                          ),
-                        ),
+                        child: const Center(child: SingleClinLogo(size: 80)),
                       ),
                     ),
                   );
                 },
               ),
-              
+
               const SizedBox(height: 30),
-              
+
               // Animated Text
               AnimatedBuilder(
                 animation: _textController,
@@ -199,9 +193,9 @@ class _EnhancedSplashScreenState extends State<EnhancedSplashScreen>
                   );
                 },
               ),
-              
+
               const Spacer(flex: 2),
-              
+
               // Animated Progress Indicator
               AnimatedBuilder(
                 animation: _progressController,
@@ -232,7 +226,7 @@ class _EnhancedSplashScreenState extends State<EnhancedSplashScreen>
                   );
                 },
               ),
-              
+
               const SizedBox(height: 60),
             ],
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// SingleClin Mobile Theme
 /// Custom Material Design 3 theme matching web-admin design
@@ -10,20 +10,15 @@ class AppTheme {
 
   // Font family
   static const String fontFamily = 'Inter';
-  
+
   // Light Color Scheme
   static const ColorScheme _lightColorScheme = ColorScheme.light(
-    brightness: Brightness.light,
     primary: AppColors.primary,
-    onPrimary: AppColors.white,
     secondary: AppColors.primaryLight,
     onSecondary: AppColors.white,
     tertiary: AppColors.sgPrimary,
     onTertiary: AppColors.black,
     error: AppColors.error,
-    onError: AppColors.white,
-    surface: AppColors.white,
-    onSurface: AppColors.black,
     surfaceContainerHighest: AppColors.lightGrey,
     outline: AppColors.mediumGrey,
   );
@@ -78,7 +73,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.lightGrey,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: AppColors.mediumGrey),
@@ -126,7 +124,6 @@ class AppTheme {
         secondary: AppColors.primaryLight,
         surface: AppColors.darkGrey,
         error: AppColors.error,
-        onSurface: AppColors.white,
       ),
 
       // App Bar Theme

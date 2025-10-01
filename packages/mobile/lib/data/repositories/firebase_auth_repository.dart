@@ -5,7 +5,8 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:singleclin_mobile/core/errors/auth_exceptions.dart' as local_auth;
+import 'package:singleclin_mobile/core/errors/auth_exceptions.dart'
+    as local_auth;
 import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 import 'package:singleclin_mobile/domain/repositories/auth_repository.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -74,7 +75,7 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<UserEntity> signInWithGoogle() async {
     try {
       // Check if authentication is supported
-      if (!await _googleSignIn.supportsAuthenticate()) {
+      if (!_googleSignIn.supportsAuthenticate()) {
         throw const local_auth.GoogleSignInException(
           'Google sign in is not supported on this platform',
           'not-supported',
@@ -85,8 +86,7 @@ class FirebaseAuthRepository implements AuthRepository {
       final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -94,9 +94,8 @@ class FirebaseAuthRepository implements AuthRepository {
       );
 
       // Sign in to Firebase with the Google credential
-      final UserCredential firebaseResult = await _firebaseAuth.signInWithCredential(
-        credential,
-      );
+      final UserCredential firebaseResult = await _firebaseAuth
+          .signInWithCredential(credential);
 
       if (firebaseResult.user == null) {
         throw const local_auth.GoogleSignInException(

@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/clinic.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ClinicCard extends StatelessWidget {
+  const ClinicCard({Key? key, required this.clinic, this.onTap})
+    : super(key: key);
   final Clinic clinic;
   final VoidCallback? onTap;
-
-  const ClinicCard({
-    Key? key,
-    required this.clinic,
-    this.onTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +29,7 @@ class ClinicCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImageSection(),
-            _buildContentSection(context),
-          ],
+          children: [_buildImageSection(), _buildContentSection(context)],
         ),
       ),
     );
@@ -67,7 +60,9 @@ class ClinicCard extends StatelessWidget {
                     height: 120,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) {
-                        print('✅ Image loaded successfully: ${clinic.imageUrl}');
+                        print(
+                          '✅ Image loaded successfully: ${clinic.imageUrl}',
+                        );
                         return child;
                       }
                       print('⏳ Loading image: ${clinic.imageUrl}');
@@ -89,14 +84,13 @@ class ClinicCard extends StatelessWidget {
           // Gradient overlay for better text readability
           Container(
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withOpacity(0.3),
-                ],
+                colors: [Colors.transparent, Colors.black.withOpacity(0.3)],
               ),
             ),
           ),
@@ -113,11 +107,7 @@ class ClinicCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.location_on,
-                    size: 12,
-                    color: Colors.grey[600],
-                  ),
+                  Icon(Icons.location_on, size: 12, color: Colors.grey[600]),
                   const SizedBox(width: 2),
                   Text(
                     '${clinic.distance.toStringAsFixed(1)} km',
@@ -186,10 +176,7 @@ class ClinicCard extends StatelessWidget {
           // Address
           Text(
             clinic.address,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -207,11 +194,7 @@ class ClinicCard extends StatelessWidget {
   Widget _buildRating() {
     return Row(
       children: [
-        Icon(
-          Icons.star,
-          size: 16,
-          color: Colors.amber[600],
-        ),
+        Icon(Icons.star, size: 16, color: Colors.amber[600]),
         const SizedBox(width: 2),
         Text(
           clinic.rating.toStringAsFixed(1),
@@ -224,10 +207,7 @@ class ClinicCard extends StatelessWidget {
         const SizedBox(width: 2),
         Text(
           '(${clinic.reviewCount})',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
         ),
       ],
     );
@@ -247,10 +227,7 @@ class ClinicCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: AppColors.primary.withOpacity(0.3),
-              width: 1,
-            ),
+            border: Border.all(color: AppColors.primary.withOpacity(0.3)),
           ),
           child: Text(
             specialization,
@@ -275,17 +252,11 @@ class ClinicCard extends StatelessWidget {
             icon: const Icon(Icons.phone, size: 16),
             label: const Text(
               'Contato',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
             style: OutlinedButton.styleFrom(
               foregroundColor: Theme.of(context).primaryColor,
-              side: BorderSide(
-                color: Theme.of(context).primaryColor,
-                width: 1,
-              ),
+              side: BorderSide(color: Theme.of(context).primaryColor),
               padding: const EdgeInsets.symmetric(vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -301,10 +272,7 @@ class ClinicCard extends StatelessWidget {
             icon: const Icon(Icons.schedule, size: 16),
             label: const Text(
               'Agendar',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).primaryColor,
@@ -346,39 +314,27 @@ class ClinicCard extends StatelessWidget {
           children: [
             Text(
               'Contatar ${clinic.name}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.phone),
               title: const Text('Ligar'),
               subtitle: Text(clinic.contact.phone),
-              onTap: () {
-                // Implement phone call
-                Get.back();
-              },
+              onTap: Get.back,
             ),
             if (clinic.contact.whatsapp != null)
               ListTile(
                 leading: const Icon(Icons.message),
                 title: const Text('WhatsApp'),
                 subtitle: Text(clinic.contact.whatsapp!),
-                onTap: () {
-                  // Implement WhatsApp
-                  Get.back();
-                },
+                onTap: Get.back,
               ),
             ListTile(
               leading: const Icon(Icons.email),
               title: const Text('Email'),
               subtitle: Text(clinic.contact.email),
-              onTap: () {
-                // Implement email
-                Get.back();
-              },
+              onTap: Get.back,
             ),
           ],
         ),
@@ -395,11 +351,7 @@ class ClinicCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.local_hospital,
-            size: 40,
-            color: Colors.grey[600],
-          ),
+          Icon(Icons.local_hospital, size: 40, color: Colors.grey[600]),
           const SizedBox(height: 8),
           Text(
             'Imagem indisponível',

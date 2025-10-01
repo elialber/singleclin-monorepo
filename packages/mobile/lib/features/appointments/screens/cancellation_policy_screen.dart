@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/cancellation_controller.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/appointments/controllers/cancellation_controller.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Cancellation Policy Screen
 /// Shows cancellation policy with refund calculator
 class CancellationPolicyScreen extends GetView<CancellationController> {
-  const CancellationPolicyScreen({Key? key}) : super(key: key);
+  const CancellationPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: 'Cancelar Agendamento',
-      ),
+      appBar: const CustomAppBar(title: 'Cancelar Agendamento'),
       body: Obx(() {
         if (controller.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -24,9 +22,7 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
         final calculation = controller.calculation;
 
         if (appointment == null) {
-          return const Center(
-            child: Text('Agendamento não encontrado'),
-          );
+          return const Center(child: Text('Agendamento não encontrado'));
         }
 
         return SingleChildScrollView(
@@ -168,26 +164,22 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
             ),
           ),
           const SizedBox(height: 16),
-          Obx(() => SwitchListTile(
-            title: const Text(
-              'Cancelamento por Emergência',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
+          Obx(
+            () => SwitchListTile(
+              title: const Text(
+                'Cancelamento por Emergência',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
-            ),
-            subtitle: const Text(
-              'Emergências médicas podem ter reembolso total',
-              style: TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
+              subtitle: const Text(
+                'Emergências médicas podem ter reembolso total',
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
+              value: controller.isEmergency,
+              onChanged: controller.updateEmergencyStatus,
+              activeThumbColor: AppColors.warning,
+              contentPadding: EdgeInsets.zero,
             ),
-            value: controller.isEmergency,
-            onChanged: controller.updateEmergencyStatus,
-            activeColor: AppColors.warning,
-            contentPadding: EdgeInsets.zero,
-          )),
+          ),
         ],
       ),
     );
@@ -224,20 +216,24 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
           Obx(() {
             final reasons = controller.availableReasons;
             return Column(
-              children: reasons.map((reason) => RadioListTile<CancellationReason>(
-                title: Text(
-                  reason.label,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                value: reason,
-                groupValue: controller.selectedReason,
-                onChanged: controller.updateSelectedReason,
-                activeColor: AppColors.primary,
-                contentPadding: EdgeInsets.zero,
-              )).toList(),
+              children: reasons
+                  .map(
+                    (reason) => RadioListTile<CancellationReason>(
+                      title: Text(
+                        reason.label,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      value: reason,
+                      groupValue: controller.selectedReason,
+                      onChanged: controller.updateSelectedReason,
+                      activeColor: AppColors.primary,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  )
+                  .toList(),
             );
           }),
           Obx(() {
@@ -264,18 +260,17 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
 
   /// Build refund calculation
   Widget _buildRefundCalculation(calculation) {
-    final color = Color(int.parse(calculation.refundColor.substring(1), radix: 16) + 0xFF000000);
-    
+    final color = Color(
+      int.parse(calculation.refundColor.substring(1), radix: 16) + 0xFF000000,
+    );
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: color.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,14 +278,18 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
           Row(
             children: [
               Icon(
-                calculation.canCancel ? Icons.info_outline : Icons.warning_outlined,
+                calculation.canCancel
+                    ? Icons.info_outline
+                    : Icons.warning_outlined,
                 color: color,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  calculation.canCancel ? 'Resumo do Reembolso' : 'Cancelamento Não Permitido',
+                  calculation.canCancel
+                      ? 'Resumo do Reembolso'
+                      : 'Cancelamento Não Permitido',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -350,7 +349,12 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
     );
   }
 
-  Widget _buildCalculationRow(String label, String value, {Color? valueColor, bool isHighlight = false}) {
+  Widget _buildCalculationRow(
+    String label,
+    String value, {
+    Color? valueColor,
+    bool isHighlight = false,
+  }) {
     return Row(
       children: [
         Expanded(
@@ -413,7 +417,11 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
           ),
           const SizedBox(height: 8),
           _buildPolicyItem('48h antes', '100% de reembolso', AppColors.success),
-          _buildPolicyItem('24h antes', '80% de reembolso', AppColors.successLight),
+          _buildPolicyItem(
+            '24h antes',
+            '80% de reembolso',
+            AppColors.successLight,
+          ),
           _buildPolicyItem('12h antes', '50% de reembolso', AppColors.warning),
           _buildPolicyItem('Menos de 12h', 'Sem reembolso', AppColors.error),
           const SizedBox(height: 12),
@@ -438,10 +446,7 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
           Container(
             width: 8,
             height: 8,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -492,15 +497,15 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
                       color: AppColors.warning.withOpacity(0.3),
                     ),
                   ),
-                  child: Row(
+                  child: const Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.warning_outlined,
                         color: AppColors.warning,
                         size: 20,
                       ),
-                      const SizedBox(width: 8),
-                      const Expanded(
+                      SizedBox(width: 8),
+                      Expanded(
                         child: Text(
                           'Reembolso parcial ou sem reembolso',
                           style: TextStyle(
@@ -518,7 +523,7 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () => Get.back(),
+                      onPressed: Get.back,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -528,7 +533,8 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: (canCancel && isFormValid && !controller.isProcessing)
+                      onPressed:
+                          (canCancel && isFormValid && !controller.isProcessing)
                           ? controller.processCancellation
                           : null,
                       style: ElevatedButton.styleFrom(
@@ -542,7 +548,9 @@ class CancellationPolicyScreen extends GetView<CancellationController> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation(Colors.white),
+                                valueColor: AlwaysStoppedAnimation(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : const Text('Cancelar Agendamento'),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/auth_controller.dart';
-import '../../routes/app_routes.dart';
-import '../../shared/widgets/custom_bottom_nav.dart';
-import '../../shared/controllers/bottom_nav_controller.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
+import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// User profile screen
 class ProfileScreen extends StatelessWidget {
@@ -21,7 +21,7 @@ class ProfileScreen extends StatelessWidget {
         foregroundColor: AppColors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
+          onPressed: Get.back,
         ),
       ),
       body: SingleChildScrollView(
@@ -29,61 +29,70 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             // Profile header
-            Obx(() => Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: authController.currentUser?.photoUrl != null
-                          ? NetworkImage(authController.currentUser!.photoUrl!)
-                          : null,
-                      backgroundColor: AppColors.primary,
-                      child: authController.currentUser?.photoUrl == null
-                          ? const Icon(
-                              Icons.person,
-                              size: 50,
-                              color: AppColors.white,
-                            )
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      authController.currentUser?.displayName ?? 'Usuário',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+            Obx(
+              () => Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage:
+                            authController.currentUser?.photoUrl != null
+                            ? NetworkImage(
+                                authController.currentUser!.photoUrl!,
+                              )
+                            : null,
+                        backgroundColor: AppColors.primary,
+                        child: authController.currentUser?.photoUrl == null
+                            ? const Icon(
+                                Icons.person,
+                                size: 50,
+                                color: AppColors.white,
+                              )
+                            : null,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      authController.currentUser?.email ?? 'Não informado',
-                      style: const TextStyle(color: AppColors.textSecondary),
-                    ),
-                    if (authController.currentUser?.isEmailVerified == false) ...[
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade100,
-                          borderRadius: BorderRadius.circular(12),
+                      const SizedBox(height: 16),
+                      Text(
+                        authController.currentUser?.displayName ?? 'Usuário',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
-                        child: Text(
-                          'Email não verificado',
-                          style: TextStyle(
-                            color: Colors.orange.shade700,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        authController.currentUser?.email ?? 'Não informado',
+                        style: const TextStyle(color: AppColors.textSecondary),
+                      ),
+                      if (authController.currentUser?.isEmailVerified ==
+                          false) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Email não verificado',
+                            style: TextStyle(
+                              color: Colors.orange.shade700,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            )),
+            ),
             const SizedBox(height: 16),
 
             // Current plan and credits
@@ -91,7 +100,10 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.card_membership, color: AppColors.primary),
+                    leading: const Icon(
+                      Icons.card_membership,
+                      color: AppColors.primary,
+                    ),
                     title: const Text('Plano Atual'),
                     subtitle: const Text('Premium'),
                     trailing: TextButton(
@@ -101,11 +113,17 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.account_balance_wallet, color: Colors.green),
+                    leading: const Icon(
+                      Icons.account_balance_wallet,
+                      color: Colors.green,
+                    ),
                     title: const Text('Créditos Disponíveis'),
                     subtitle: const Text('Seus créditos para consultas'),
                     trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.green.shade100,
                         borderRadius: BorderRadius.circular(16),
@@ -157,20 +175,24 @@ class ProfileScreen extends StatelessWidget {
             // Logout button
             SizedBox(
               width: double.infinity,
-              child: Obx(() => OutlinedButton.icon(
-                onPressed: authController.isLoading
-                    ? null
-                    : () => _showLogoutDialog(context, authController),
-                icon: authController.isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.logout),
-                label: Text(authController.isLoading ? 'Saindo...' : 'Sair'),
-                style: OutlinedButton.styleFrom(foregroundColor: AppColors.error),
-              )),
+              child: Obx(
+                () => OutlinedButton.icon(
+                  onPressed: authController.isLoading
+                      ? null
+                      : () => _showLogoutDialog(context, authController),
+                  icon: authController.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.logout),
+                  label: Text(authController.isLoading ? 'Saindo...' : 'Sair'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -189,10 +211,7 @@ class ProfileScreen extends StatelessWidget {
         title: const Text('Confirmar Logout'),
         content: const Text('Tem certeza que deseja sair da sua conta?'),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
               Get.back(); // Close dialog

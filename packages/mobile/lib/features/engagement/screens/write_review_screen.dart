@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/write_review_controller.dart';
-import '../widgets/rating_stars.dart';
+import 'package:singleclin_mobile/features/engagement/controllers/write_review_controller.dart';
+import 'package:singleclin_mobile/features/engagement/widgets/rating_stars.dart';
 
 class WriteReviewScreen extends StatelessWidget {
   const WriteReviewScreen({super.key});
@@ -55,9 +55,9 @@ class WriteReviewScreen extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: controller.canProceed
-                            ? (controller.currentStep == 3 
-                                ? controller.submitReview 
-                                : controller.nextStep)
+                            ? (controller.currentStep == 3
+                                  ? controller.submitReview
+                                  : controller.nextStep)
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF005156),
@@ -74,8 +74,8 @@ class WriteReviewScreen extends StatelessWidget {
                                 ),
                               )
                             : Text(
-                                controller.currentStep == 3 
-                                    ? 'Publicar Avaliação' 
+                                controller.currentStep == 3
+                                    ? 'Publicar Avaliação'
                                     : 'Continuar',
                               ),
                       ),
@@ -224,7 +224,7 @@ class WriteReviewScreen extends StatelessWidget {
           style: TextStyle(color: Colors.grey),
         ),
         const SizedBox(height: 24),
-        
+
         // Photos grid
         if (controller.selectedPhotos.isNotEmpty)
           GridView.builder(
@@ -272,9 +272,9 @@ class WriteReviewScreen extends StatelessWidget {
               );
             },
           ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Add photo buttons
         if (controller.selectedPhotos.length < 3)
           Row(
@@ -327,7 +327,7 @@ class WriteReviewScreen extends StatelessWidget {
           style: TextStyle(color: Colors.grey),
         ),
         const SizedBox(height: 24),
-        
+
         // Review summary card
         Container(
           padding: const EdgeInsets.all(16),
@@ -351,7 +351,7 @@ class WriteReviewScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               if (controller.commentController.text.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
@@ -359,23 +359,20 @@ class WriteReviewScreen extends StatelessWidget {
                   style: const TextStyle(fontSize: 16),
                 ),
               ],
-              
+
               if (controller.selectedPhotos.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
                   '${controller.selectedPhotos.length} foto(s) anexada(s)',
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ],
             ],
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Terms agreement
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -387,7 +384,8 @@ class WriteReviewScreen extends StatelessWidget {
             ),
             Expanded(
               child: GestureDetector(
-                onTap: () => controller.setAgreeToTerms(!controller.agreeToTerms),
+                onTap: () =>
+                    controller.setAgreeToTerms(!controller.agreeToTerms),
                 child: const Text(
                   'Concordo com os termos de uso e confirmo que esta avaliação é baseada na minha experiência real.',
                   style: TextStyle(fontSize: 14),

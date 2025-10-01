@@ -2,22 +2,6 @@ import 'package:equatable/equatable.dart';
 
 /// Trust certification model for credibility and transparency
 class TrustCertification extends Equatable {
-  final String id;
-  final String name;
-  final String description;
-  final CertificationType type;
-  final String issuingAuthority;
-  final String certificateNumber;
-  final DateTime issuedDate;
-  final DateTime? expiryDate;
-  final CertificationStatus status;
-  final String logoUrl;
-  final String certificateUrl;
-  final String verificationUrl;
-  final List<String> benefits;
-  final int trustScore;
-  final Map<String, dynamic> metadata;
-
   const TrustCertification({
     required this.id,
     required this.name,
@@ -63,6 +47,21 @@ class TrustCertification extends Equatable {
       metadata: Map<String, dynamic>.from(json['metadata'] as Map),
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final CertificationType type;
+  final String issuingAuthority;
+  final String certificateNumber;
+  final DateTime issuedDate;
+  final DateTime? expiryDate;
+  final CertificationStatus status;
+  final String logoUrl;
+  final String certificateUrl;
+  final String verificationUrl;
+  final List<String> benefits;
+  final int trustScore;
+  final Map<String, dynamic> metadata;
 
   Map<String, dynamic> toJson() {
     return {
@@ -133,37 +132,26 @@ class TrustCertification extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        type,
-        issuingAuthority,
-        certificateNumber,
-        issuedDate,
-        expiryDate,
-        status,
-        logoUrl,
-        certificateUrl,
-        verificationUrl,
-        benefits,
-        trustScore,
-        metadata,
-      ];
+    id,
+    name,
+    description,
+    type,
+    issuingAuthority,
+    certificateNumber,
+    issuedDate,
+    expiryDate,
+    status,
+    logoUrl,
+    certificateUrl,
+    verificationUrl,
+    benefits,
+    trustScore,
+    metadata,
+  ];
 }
 
 /// Privacy policy model
 class PrivacyPolicy extends Equatable {
-  final String id;
-  final String version;
-  final DateTime effectiveDate;
-  final String title;
-  final String content;
-  final List<PolicySection> sections;
-  final bool isCurrentVersion;
-  final String? previousVersionId;
-  final List<String> changes;
-  final String language;
-
   const PrivacyPolicy({
     required this.id,
     required this.version,
@@ -193,6 +181,16 @@ class PrivacyPolicy extends Equatable {
       language: json['language'] as String,
     );
   }
+  final String id;
+  final String version;
+  final DateTime effectiveDate;
+  final String title;
+  final String content;
+  final List<PolicySection> sections;
+  final bool isCurrentVersion;
+  final String? previousVersionId;
+  final List<String> changes;
+  final String language;
 
   Map<String, dynamic> toJson() {
     return {
@@ -211,27 +209,21 @@ class PrivacyPolicy extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        version,
-        effectiveDate,
-        title,
-        content,
-        sections,
-        isCurrentVersion,
-        previousVersionId,
-        changes,
-        language,
-      ];
+    id,
+    version,
+    effectiveDate,
+    title,
+    content,
+    sections,
+    isCurrentVersion,
+    previousVersionId,
+    changes,
+    language,
+  ];
 }
 
 /// Policy section for structured content
 class PolicySection extends Equatable {
-  final String id;
-  final String title;
-  final String content;
-  final int order;
-  final List<PolicySubsection> subsections;
-
   const PolicySection({
     required this.id,
     required this.title,
@@ -246,11 +238,18 @@ class PolicySection extends Equatable {
       title: json['title'] as String,
       content: json['content'] as String,
       order: json['order'] as int,
-      subsections: (json['subsections'] as List<dynamic>?)
-          ?.map((s) => PolicySubsection.fromJson(s as Map<String, dynamic>))
-          .toList() ?? [],
+      subsections:
+          (json['subsections'] as List<dynamic>?)
+              ?.map((s) => PolicySubsection.fromJson(s as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
+  final String id;
+  final String title;
+  final String content;
+  final int order;
+  final List<PolicySubsection> subsections;
 
   Map<String, dynamic> toJson() {
     return {
@@ -268,11 +267,6 @@ class PolicySection extends Equatable {
 
 /// Policy subsection
 class PolicySubsection extends Equatable {
-  final String id;
-  final String title;
-  final String content;
-  final int order;
-
   const PolicySubsection({
     required this.id,
     required this.title,
@@ -288,14 +282,13 @@ class PolicySubsection extends Equatable {
       order: json['order'] as int,
     );
   }
+  final String id;
+  final String title;
+  final String content;
+  final int order;
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'content': content,
-      'order': order,
-    };
+    return {'id': id, 'title': title, 'content': content, 'order': order};
   }
 
   @override
@@ -304,15 +297,6 @@ class PolicySubsection extends Equatable {
 
 /// LGPD compliance status
 class LgpdCompliance extends Equatable {
-  final bool isCompliant;
-  final DateTime lastAuditDate;
-  final DateTime? nextAuditDate;
-  final String complianceScore;
-  final List<ComplianceItem> requirements;
-  final List<DataProcessingActivity> dataActivities;
-  final ContactInfo dpoContact;
-  final List<UserRight> userRights;
-
   const LgpdCompliance({
     required this.isCompliant,
     required this.lastAuditDate,
@@ -336,14 +320,26 @@ class LgpdCompliance extends Equatable {
           .map((r) => ComplianceItem.fromJson(r as Map<String, dynamic>))
           .toList(),
       dataActivities: (json['dataActivities'] as List<dynamic>)
-          .map((a) => DataProcessingActivity.fromJson(a as Map<String, dynamic>))
+          .map(
+            (a) => DataProcessingActivity.fromJson(a as Map<String, dynamic>),
+          )
           .toList(),
-      dpoContact: ContactInfo.fromJson(json['dpoContact'] as Map<String, dynamic>),
+      dpoContact: ContactInfo.fromJson(
+        json['dpoContact'] as Map<String, dynamic>,
+      ),
       userRights: (json['userRights'] as List<dynamic>)
           .map((r) => UserRight.fromJson(r as Map<String, dynamic>))
           .toList(),
     );
   }
+  final bool isCompliant;
+  final DateTime lastAuditDate;
+  final DateTime? nextAuditDate;
+  final String complianceScore;
+  final List<ComplianceItem> requirements;
+  final List<DataProcessingActivity> dataActivities;
+  final ContactInfo dpoContact;
+  final List<UserRight> userRights;
 
   Map<String, dynamic> toJson() {
     return {
@@ -360,26 +356,19 @@ class LgpdCompliance extends Equatable {
 
   @override
   List<Object?> get props => [
-        isCompliant,
-        lastAuditDate,
-        nextAuditDate,
-        complianceScore,
-        requirements,
-        dataActivities,
-        dpoContact,
-        userRights,
-      ];
+    isCompliant,
+    lastAuditDate,
+    nextAuditDate,
+    complianceScore,
+    requirements,
+    dataActivities,
+    dpoContact,
+    userRights,
+  ];
 }
 
 /// Compliance item
 class ComplianceItem extends Equatable {
-  final String id;
-  final String requirement;
-  final bool isCompliant;
-  final String status;
-  final DateTime? lastChecked;
-  final String? evidence;
-
   const ComplianceItem({
     required this.id,
     required this.requirement,
@@ -401,6 +390,12 @@ class ComplianceItem extends Equatable {
       evidence: json['evidence'] as String?,
     );
   }
+  final String id;
+  final String requirement;
+  final bool isCompliant;
+  final String status;
+  final DateTime? lastChecked;
+  final String? evidence;
 
   Map<String, dynamic> toJson() {
     return {
@@ -414,19 +409,18 @@ class ComplianceItem extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, requirement, isCompliant, status, lastChecked, evidence];
+  List<Object?> get props => [
+    id,
+    requirement,
+    isCompliant,
+    status,
+    lastChecked,
+    evidence,
+  ];
 }
 
 /// Data processing activity
 class DataProcessingActivity extends Equatable {
-  final String id;
-  final String purpose;
-  final List<String> dataTypes;
-  final String legalBasis;
-  final String retention;
-  final List<String> recipients;
-  final bool isTransferredAbroad;
-
   const DataProcessingActivity({
     required this.id,
     required this.purpose,
@@ -448,6 +442,13 @@ class DataProcessingActivity extends Equatable {
       isTransferredAbroad: json['isTransferredAbroad'] as bool,
     );
   }
+  final String id;
+  final String purpose;
+  final List<String> dataTypes;
+  final String legalBasis;
+  final String retention;
+  final List<String> recipients;
+  final bool isTransferredAbroad;
 
   Map<String, dynamic> toJson() {
     return {
@@ -462,17 +463,19 @@ class DataProcessingActivity extends Equatable {
   }
 
   @override
-  List<Object> get props => [id, purpose, dataTypes, legalBasis, retention, recipients, isTransferredAbroad];
+  List<Object> get props => [
+    id,
+    purpose,
+    dataTypes,
+    legalBasis,
+    retention,
+    recipients,
+    isTransferredAbroad,
+  ];
 }
 
 /// Contact information
 class ContactInfo extends Equatable {
-  final String name;
-  final String email;
-  final String phone;
-  final String address;
-  final String role;
-
   const ContactInfo({
     required this.name,
     required this.email,
@@ -490,6 +493,11 @@ class ContactInfo extends Equatable {
       role: json['role'] as String,
     );
   }
+  final String name;
+  final String email;
+  final String phone;
+  final String address;
+  final String role;
 
   Map<String, dynamic> toJson() {
     return {
@@ -507,12 +515,6 @@ class ContactInfo extends Equatable {
 
 /// User right under LGPD
 class UserRight extends Equatable {
-  final String id;
-  final String right;
-  final String description;
-  final String howToExercise;
-  final bool isAvailable;
-
   const UserRight({
     required this.id,
     required this.right,
@@ -530,6 +532,11 @@ class UserRight extends Equatable {
       isAvailable: json['isAvailable'] as bool,
     );
   }
+  final String id;
+  final String right;
+  final String description;
+  final String howToExercise;
+  final bool isAvailable;
 
   Map<String, dynamic> toJson() {
     return {
@@ -542,20 +549,17 @@ class UserRight extends Equatable {
   }
 
   @override
-  List<Object> get props => [id, right, description, howToExercise, isAvailable];
+  List<Object> get props => [
+    id,
+    right,
+    description,
+    howToExercise,
+    isAvailable,
+  ];
 }
 
 /// Security audit report
 class SecurityAudit extends Equatable {
-  final String id;
-  final DateTime auditDate;
-  final String auditor;
-  final String overallScore;
-  final List<SecurityFinding> findings;
-  final List<SecurityRecommendation> recommendations;
-  final DateTime? nextAuditDate;
-  final bool isPublic;
-
   const SecurityAudit({
     required this.id,
     required this.auditDate,
@@ -577,7 +581,9 @@ class SecurityAudit extends Equatable {
           .map((f) => SecurityFinding.fromJson(f as Map<String, dynamic>))
           .toList(),
       recommendations: (json['recommendations'] as List<dynamic>)
-          .map((r) => SecurityRecommendation.fromJson(r as Map<String, dynamic>))
+          .map(
+            (r) => SecurityRecommendation.fromJson(r as Map<String, dynamic>),
+          )
           .toList(),
       nextAuditDate: json['nextAuditDate'] != null
           ? DateTime.parse(json['nextAuditDate'] as String)
@@ -585,6 +591,14 @@ class SecurityAudit extends Equatable {
       isPublic: json['isPublic'] as bool,
     );
   }
+  final String id;
+  final DateTime auditDate;
+  final String auditor;
+  final String overallScore;
+  final List<SecurityFinding> findings;
+  final List<SecurityRecommendation> recommendations;
+  final DateTime? nextAuditDate;
+  final bool isPublic;
 
   Map<String, dynamic> toJson() {
     return {
@@ -600,16 +614,20 @@ class SecurityAudit extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, auditDate, auditor, overallScore, findings, recommendations, nextAuditDate, isPublic];
+  List<Object?> get props => [
+    id,
+    auditDate,
+    auditor,
+    overallScore,
+    findings,
+    recommendations,
+    nextAuditDate,
+    isPublic,
+  ];
 }
 
 /// Security finding
 class SecurityFinding extends Equatable {
-  final String category;
-  final String finding;
-  final String severity;
-  final bool isResolved;
-
   const SecurityFinding({
     required this.category,
     required this.finding,
@@ -625,6 +643,10 @@ class SecurityFinding extends Equatable {
       isResolved: json['isResolved'] as bool,
     );
   }
+  final String category;
+  final String finding;
+  final String severity;
+  final bool isResolved;
 
   Map<String, dynamic> toJson() {
     return {
@@ -641,10 +663,6 @@ class SecurityFinding extends Equatable {
 
 /// Security recommendation
 class SecurityRecommendation extends Equatable {
-  final String recommendation;
-  final String priority;
-  final bool isImplemented;
-
   const SecurityRecommendation({
     required this.recommendation,
     required this.priority,
@@ -658,6 +676,9 @@ class SecurityRecommendation extends Equatable {
       isImplemented: json['isImplemented'] as bool,
     );
   }
+  final String recommendation;
+  final String priority;
+  final bool isImplemented;
 
   Map<String, dynamic> toJson() {
     return {
@@ -673,15 +694,6 @@ class SecurityRecommendation extends Equatable {
 
 /// Trust metrics
 class TrustMetrics extends Equatable {
-  final int overallTrustScore;
-  final Map<String, int> categoryScores;
-  final List<TrustCertification> certifications;
-  final DateTime lastUpdated;
-  final int userReviews;
-  final double avgRating;
-  final int resolvedComplaints;
-  final int totalComplaints;
-
   const TrustMetrics({
     required this.overallTrustScore,
     required this.categoryScores,
@@ -707,6 +719,14 @@ class TrustMetrics extends Equatable {
       totalComplaints: json['totalComplaints'] as int,
     );
   }
+  final int overallTrustScore;
+  final Map<String, int> categoryScores;
+  final List<TrustCertification> certifications;
+  final DateTime lastUpdated;
+  final int userReviews;
+  final double avgRating;
+  final int resolvedComplaints;
+  final int totalComplaints;
 
   Map<String, dynamic> toJson() {
     return {
@@ -723,15 +743,15 @@ class TrustMetrics extends Equatable {
 
   @override
   List<Object> get props => [
-        overallTrustScore,
-        categoryScores,
-        certifications,
-        lastUpdated,
-        userReviews,
-        avgRating,
-        resolvedComplaints,
-        totalComplaints,
-      ];
+    overallTrustScore,
+    categoryScores,
+    certifications,
+    lastUpdated,
+    userReviews,
+    avgRating,
+    resolvedComplaints,
+    totalComplaints,
+  ];
 }
 
 /// Enums for trust system
@@ -743,13 +763,7 @@ enum CertificationType {
   regulatory,
   industry,
   compliance,
-  audit
+  audit,
 }
 
-enum CertificationStatus {
-  active,
-  expired,
-  suspended,
-  revoked,
-  pending
-}
+enum CertificationStatus { active, expired, suspended, revoked, pending }

@@ -1,27 +1,6 @@
-enum PackageType {
-  starter,
-  popular,
-  value,
-  premium
-}
+enum PackageType { starter, popular, value, premium }
 
 class CreditPackage {
-  final String id;
-  final String name;
-  final String description;
-  final int credits;
-  final double price;
-  final double originalPrice;
-  final double discount;
-  final bool isPopular;
-  final bool isActive;
-  final bool isPromo;
-  final DateTime? promoEndDate;
-  final String? promoDescription;
-  final PackageType type;
-  final Map<String, dynamic>? bonusFeatures;
-  final String? iconUrl;
-
   CreditPackage({
     required this.id,
     required this.name,
@@ -64,6 +43,21 @@ class CreditPackage {
       iconUrl: json['iconUrl'],
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final int credits;
+  final double price;
+  final double originalPrice;
+  final double discount;
+  final bool isPopular;
+  final bool isActive;
+  final bool isPromo;
+  final DateTime? promoEndDate;
+  final String? promoDescription;
+  final PackageType type;
+  final Map<String, dynamic>? bonusFeatures;
+  final String? iconUrl;
 
   Map<String, dynamic> toJson() {
     return {
@@ -140,7 +134,7 @@ class CreditPackage {
 
   String get promoTimeRemainingDisplay {
     if (!isPromoValid) return '';
-    
+
     final remaining = promoEndDate!.difference(DateTime.now());
     if (remaining.inDays > 0) {
       return '${remaining.inDays} dias restantes';
@@ -153,16 +147,6 @@ class CreditPackage {
 }
 
 class PaymentMethod {
-  final String id;
-  final String type; // 'credit_card', 'pix', 'apple_pay', 'google_pay'
-  final String displayName;
-  final String? last4; // for cards
-  final String? brand; // visa, mastercard, etc
-  final bool isDefault;
-  final bool isActive;
-  final DateTime? expiryDate;
-  final DateTime createdAt;
-
   PaymentMethod({
     required this.id,
     required this.type,
@@ -190,6 +174,15 @@ class PaymentMethod {
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
+  final String id;
+  final String type; // 'credit_card', 'pix', 'apple_pay', 'google_pay'
+  final String displayName;
+  final String? last4; // for cards
+  final String? brand; // visa, mastercard, etc
+  final bool isDefault;
+  final bool isActive;
+  final DateTime? expiryDate;
+  final DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {

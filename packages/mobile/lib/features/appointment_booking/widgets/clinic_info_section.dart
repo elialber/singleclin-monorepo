@@ -3,12 +3,8 @@ import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ClinicInfoSection extends StatelessWidget {
+  const ClinicInfoSection({Key? key, required this.clinic}) : super(key: key);
   final Clinic clinic;
-
-  const ClinicInfoSection({
-    Key? key,
-    required this.clinic,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +29,10 @@ class ClinicInfoSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    clinic.specializations.isNotEmpty 
+                    clinic.specializations.isNotEmpty
                         ? clinic.specializations.join(' • ')
                         : 'Clínica Geral',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -51,8 +44,9 @@ class ClinicInfoSection extends StatelessWidget {
                 color: clinic.isAvailable ? Colors.green[50] : Colors.red[50],
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: clinic.isAvailable ? Colors.green[200]! : Colors.red[200]!,
-                  width: 1,
+                  color: clinic.isAvailable
+                      ? Colors.green[200]!
+                      : Colors.red[200]!,
                 ),
               ),
               child: Row(
@@ -72,7 +66,9 @@ class ClinicInfoSection extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: clinic.isAvailable ? Colors.green[700] : Colors.red[700],
+                      color: clinic.isAvailable
+                          ? Colors.green[700]
+                          : Colors.red[700],
                     ),
                   ),
                 ],
@@ -80,20 +76,16 @@ class ClinicInfoSection extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Ratings and Stats Row
         Row(
           children: [
             // Rating
             Row(
               children: [
-                Icon(
-                  Icons.star,
-                  color: Colors.amber[600],
-                  size: 20,
-                ),
+                Icon(Icons.star, color: Colors.amber[600], size: 20),
                 const SizedBox(width: 4),
                 Text(
                   clinic.rating.toStringAsFixed(1),
@@ -106,29 +98,22 @@ class ClinicInfoSection extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '(${_formatReviewCount(120)})', // Mock review count
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
-            
+
             const SizedBox(width: 16),
-            
+
             // Separator
-            Container(
-              width: 1,
-              height: 16,
-              color: Colors.grey[300],
-            ),
-            
+            Container(width: 1, height: 16, color: Colors.grey[300]),
+
             const SizedBox(width: 16),
-            
+
             // Booking Stats
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.calendar_today,
                   color: AppColors.primary,
                   size: 16,
@@ -136,23 +121,20 @@ class ClinicInfoSection extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${_formatBookingCount(89)} agendamentos',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Description
-        if (clinic.description?.isNotEmpty == true) ...[
-          Text(
+        if (clinic.description?.isNotEmpty ?? false) ...[
+          const Text(
             'Sobre a clínica',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
@@ -169,7 +151,7 @@ class ClinicInfoSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
         ],
-        
+
         // Hours and Contact Info
         Container(
           padding: const EdgeInsets.all(16),
@@ -183,7 +165,7 @@ class ClinicInfoSection extends StatelessWidget {
               // Operating Hours
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.access_time,
                     color: AppColors.primary,
                     size: 20,
@@ -214,18 +196,14 @@ class ClinicInfoSection extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Contact Phone
               if (clinic.contact.phone.isNotEmpty) ...[
                 Row(
                   children: [
-                    Icon(
-                      Icons.phone,
-                      color: AppColors.primary,
-                      size: 20,
-                    ),
+                    const Icon(Icons.phone, color: AppColors.primary, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -261,7 +239,7 @@ class ClinicInfoSection extends StatelessWidget {
                           color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.call,
                           color: AppColors.primary,
                           size: 18,
@@ -270,14 +248,14 @@ class ClinicInfoSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
               ],
-              
+
               // Address
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.location_on,
                     color: AppColors.primary,
                     size: 20,
@@ -317,7 +295,7 @@ class ClinicInfoSection extends StatelessWidget {
                         color: AppColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.directions,
                         color: AppColors.primary,
                         size: 18,

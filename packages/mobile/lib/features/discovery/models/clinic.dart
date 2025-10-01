@@ -1,36 +1,8 @@
 import 'package:flutter/material.dart';\nimport 'package:equatable/equatable.dart';
-import 'service.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
 
 /// Represents a clinic/healthcare facility in the SingleClin platform
 class Clinic extends Equatable {
-  final String id;
-  final String name;
-  final String description;
-  final String address;
-  final String city;
-  final String state;
-  final String zipCode;
-  final double latitude;
-  final double longitude;
-  final String phone;
-  final String email;
-  final String? website;
-  final List<String> images;
-  final String? logoUrl;
-  final double rating;
-  final int reviewCount;
-  final List<String> categories;
-  final List<Service> services;
-  final bool isVerified;
-  final bool isActive;
-  final bool acceptsSG;
-  final ClinicSchedule schedule;
-  final List<String> amenities;
-  final String? specialtyDescription;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final bool isFavorite;
-  final double? distanceKm;
 
   const Clinic({
     required this.id,
@@ -62,6 +34,70 @@ class Clinic extends Equatable {
     this.isFavorite = false,
     this.distanceKm,
   });
+
+  /// Create from JSON
+  factory Clinic.fromJson(Map<String, dynamic> json) {
+    return Clinic(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String? ?? '',
+      address: json['address'] as String,
+      city: json['city'] as String,
+      state: json['state'] as String,
+      zipCode: json['zipCode'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      phone: json['phone'] as String,
+      email: json['email'] as String,
+      website: json['website'] as String?,
+      images: List<String>.from(json['images'] as List? ?? []),
+      logoUrl: json['logoUrl'] as String?,
+      rating: (json['rating'] as num).toDouble(),
+      reviewCount: json['reviewCount'] as int,
+      categories: List<String>.from(json['categories'] as List? ?? []),
+      services: (json['services'] as List? ?? [])
+          .map((s) => Service.fromJson(s as Map<String, dynamic>))
+          .toList(),
+      isVerified: json['isVerified'] as bool? ?? false,
+      isActive: json['isActive'] as bool? ?? true,
+      acceptsSG: json['acceptsSG'] as bool? ?? true,
+      schedule: ClinicSchedule.fromJson(json['schedule'] as Map<String, dynamic>),
+      amenities: List<String>.from(json['amenities'] as List? ?? []),
+      specialtyDescription: json['specialtyDescription'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      distanceKm: json['distanceKm'] as double?,
+    );
+  }
+  final String id;
+  final String name;
+  final String description;
+  final String address;
+  final String city;
+  final String state;
+  final String zipCode;
+  final double latitude;
+  final double longitude;
+  final String phone;
+  final String email;
+  final String? website;
+  final List<String> images;
+  final String? logoUrl;
+  final double rating;
+  final int reviewCount;
+  final List<String> categories;
+  final List<Service> services;
+  final bool isVerified;
+  final bool isActive;
+  final bool acceptsSG;
+  final ClinicSchedule schedule;
+  final List<String> amenities;
+  final String? specialtyDescription;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool isFavorite;
+  final double? distanceKm;
 
   /// Full address formatted for display
   String get fullAddress => '$address, $city - $state, $zipCode';
@@ -177,42 +213,6 @@ class Clinic extends Equatable {
     );
   }
 
-  /// Create from JSON
-  factory Clinic.fromJson(Map<String, dynamic> json) {
-    return Clinic(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String? ?? '',
-      address: json['address'] as String,
-      city: json['city'] as String,
-      state: json['state'] as String,
-      zipCode: json['zipCode'] as String,
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
-      phone: json['phone'] as String,
-      email: json['email'] as String,
-      website: json['website'] as String?,
-      images: List<String>.from(json['images'] as List? ?? []),
-      logoUrl: json['logoUrl'] as String?,
-      rating: (json['rating'] as num).toDouble(),
-      reviewCount: json['reviewCount'] as int,
-      categories: List<String>.from(json['categories'] as List? ?? []),
-      services: (json['services'] as List? ?? [])
-          .map((s) => Service.fromJson(s as Map<String, dynamic>))
-          .toList(),
-      isVerified: json['isVerified'] as bool? ?? false,
-      isActive: json['isActive'] as bool? ?? true,
-      acceptsSG: json['acceptsSG'] as bool? ?? true,
-      schedule: ClinicSchedule.fromJson(json['schedule'] as Map<String, dynamic>),
-      amenities: List<String>.from(json['amenities'] as List? ?? []),
-      specialtyDescription: json['specialtyDescription'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      isFavorite: json['isFavorite'] as bool? ?? false,
-      distanceKm: json['distanceKm'] as double?,
-    );
-  }
-
   /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -282,15 +282,30 @@ class Clinic extends Equatable {
 
 /// Represents clinic operating schedule
 class ClinicSchedule extends Equatable {
-  final Map<String, DaySchedule> weekSchedule;
-  final List<String> holidays;
-  final String? specialNotes;
 
   const ClinicSchedule({
     required this.weekSchedule,
     this.holidays = const [],
     this.specialNotes,
   });
+
+  factory ClinicSchedule.fromJson(Map<String, dynamic> json) {
+    final weekScheduleData = json['weekSchedule'] as Map<String, dynamic>? ?? {};
+    final weekSchedule = <String, DaySchedule>{};
+    
+    for (final entry in weekScheduleData.entries) {
+      weekSchedule[entry.key] = DaySchedule.fromJson(entry.value);
+    }
+    
+    return ClinicSchedule(
+      weekSchedule: weekSchedule,
+      holidays: List<String>.from(json['holidays'] as List? ?? []),
+      specialNotes: json['specialNotes'] as String?,
+    );
+  }
+  final Map<String, DaySchedule> weekSchedule;
+  final List<String> holidays;
+  final String? specialNotes;
 
   /// Check if clinic is open now
   bool isOpenNow() {
@@ -315,7 +330,7 @@ class ClinicSchedule extends Equatable {
       final weekday = _getWeekdayKey(checkDate.weekday);
       final daySchedule = weekSchedule[weekday];
       
-      if (daySchedule?.isOpen == true) {
+      if (daySchedule?.isOpen ?? false) {
         if (i == 0) return 'Abre às ${daySchedule!.openTime.format()}';
         if (i == 1) return 'Abre amanhã às ${daySchedule!.openTime.format()}';
         return 'Abre ${_getWeekdayName(checkDate.weekday)} às ${daySchedule!.openTime.format()}';
@@ -351,21 +366,6 @@ class ClinicSchedule extends Equatable {
     }
   }
 
-  factory ClinicSchedule.fromJson(Map<String, dynamic> json) {
-    final weekScheduleData = json['weekSchedule'] as Map<String, dynamic>? ?? {};
-    final weekSchedule = <String, DaySchedule>{};
-    
-    for (final entry in weekScheduleData.entries) {
-      weekSchedule[entry.key] = DaySchedule.fromJson(entry.value);
-    }
-    
-    return ClinicSchedule(
-      weekSchedule: weekSchedule,
-      holidays: List<String>.from(json['holidays'] as List? ?? []),
-      specialNotes: json['specialNotes'] as String?,
-    );
-  }
-
   Map<String, dynamic> toJson() {
     final weekScheduleData = <String, dynamic>{};
     for (final entry in weekSchedule.entries) {
@@ -385,11 +385,6 @@ class ClinicSchedule extends Equatable {
 
 /// Represents a single day schedule
 class DaySchedule extends Equatable {
-  final bool isOpen;
-  final TimeOfDay openTime;
-  final TimeOfDay closeTime;
-  final TimeOfDay? lunchBreakStart;
-  final TimeOfDay? lunchBreakEnd;
 
   const DaySchedule({
     required this.isOpen,
@@ -398,27 +393,6 @@ class DaySchedule extends Equatable {
     this.lunchBreakStart,
     this.lunchBreakEnd,
   });
-
-  /// Check if open at specific time
-  bool isOpenAt(TimeOfDay time) {
-    if (!isOpen) return false;
-    
-    final timeMinutes = time.hour * 60 + time.minute;
-    final openMinutes = openTime.hour * 60 + openTime.minute;
-    final closeMinutes = closeTime.hour * 60 + closeTime.minute;
-    
-    // Check if within lunch break
-    if (lunchBreakStart != null && lunchBreakEnd != null) {
-      final lunchStartMinutes = lunchBreakStart!.hour * 60 + lunchBreakStart!.minute;
-      final lunchEndMinutes = lunchBreakEnd!.hour * 60 + lunchBreakEnd!.minute;
-      
-      if (timeMinutes >= lunchStartMinutes && timeMinutes <= lunchEndMinutes) {
-        return false;
-      }
-    }
-    
-    return timeMinutes >= openMinutes && timeMinutes <= closeMinutes;
-  }
 
   factory DaySchedule.fromJson(Map<String, dynamic> json) {
     return DaySchedule(
@@ -444,6 +418,32 @@ class DaySchedule extends Equatable {
             )
           : null,
     );
+  }
+  final bool isOpen;
+  final TimeOfDay openTime;
+  final TimeOfDay closeTime;
+  final TimeOfDay? lunchBreakStart;
+  final TimeOfDay? lunchBreakEnd;
+
+  /// Check if open at specific time
+  bool isOpenAt(TimeOfDay time) {
+    if (!isOpen) return false;
+    
+    final timeMinutes = time.hour * 60 + time.minute;
+    final openMinutes = openTime.hour * 60 + openTime.minute;
+    final closeMinutes = closeTime.hour * 60 + closeTime.minute;
+    
+    // Check if within lunch break
+    if (lunchBreakStart != null && lunchBreakEnd != null) {
+      final lunchStartMinutes = lunchBreakStart!.hour * 60 + lunchBreakStart!.minute;
+      final lunchEndMinutes = lunchBreakEnd!.hour * 60 + lunchBreakEnd!.minute;
+      
+      if (timeMinutes >= lunchStartMinutes && timeMinutes <= lunchEndMinutes) {
+        return false;
+      }
+    }
+    
+    return timeMinutes >= openMinutes && timeMinutes <= closeMinutes;
   }
 
   Map<String, dynamic> toJson() {

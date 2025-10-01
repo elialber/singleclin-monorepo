@@ -2,10 +2,10 @@ import 'package:get/get.dart';
 import 'package:singleclin_mobile/data/services/auth_service.dart';
 import 'package:singleclin_mobile/data/services/user_api_service.dart';
 import 'package:singleclin_mobile/domain/entities/user_entity.dart';
-import '../../../core/services/storage_service.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../data/models/user_model.dart';
-import '../../../routes/app_routes.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
+import 'package:singleclin_mobile/data/models/user_model.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
@@ -266,7 +266,6 @@ class AuthController extends GetxController {
 
       // Navigate to login
       Get.offAllNamed(AppRoutes.login);
-
     } catch (e) {
       _error.value = 'Erro no logout: $e';
     } finally {
@@ -387,8 +386,12 @@ class AuthController extends GetxController {
       if (_isAuthenticated.value) {
         // First try to get JWT token from storage (from sync endpoint)
         final jwtToken = await _storageService.getString(AppConstants.tokenKey);
-        print('DEBUG: Checking for JWT token in storage with key: ${AppConstants.tokenKey}');
-        print('DEBUG: JWT token found: ${jwtToken != null ? "YES (length: ${jwtToken!.length})" : "NO"}');
+        print(
+          'DEBUG: Checking for JWT token in storage with key: ${AppConstants.tokenKey}',
+        );
+        print(
+          'DEBUG: JWT token found: ${jwtToken != null ? "YES (length: ${jwtToken.length})" : "NO"}',
+        );
 
         if (jwtToken != null && jwtToken.isNotEmpty) {
           print('DEBUG: Using JWT token from sync endpoint');
@@ -397,7 +400,7 @@ class AuthController extends GetxController {
 
         // Fallback to Firebase token
         print('DEBUG: No JWT token found, using Firebase token');
-        return await _authService.getIdToken(forceRefresh: false);
+        return await _authService.getIdToken();
       }
       return null;
     } catch (e) {

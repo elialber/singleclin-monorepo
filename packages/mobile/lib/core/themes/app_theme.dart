@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
@@ -11,16 +11,12 @@ class AppTheme {
         primaryContainer: AppColors.primaryLight,
         secondary: AppColors.primaryLight,
         tertiary: AppColors.primaryDark,
-        surface: AppColors.surface,
-        surfaceVariant: AppColors.surfaceVariant,
-        background: AppColors.background,
+        surfaceContainerHighest: AppColors.surfaceVariant,
         error: AppColors.error,
-        onPrimary: AppColors.onPrimary,
         onSurface: AppColors.onSurface,
         onSurfaceVariant: AppColors.onSurfaceVariant,
-        onBackground: AppColors.onSurface,
       ),
-      
+
       // AppBar Theme
       appBarTheme: const AppBarTheme(
         elevation: 0,
@@ -35,7 +31,7 @@ class AppTheme {
         iconTheme: IconThemeData(color: AppColors.white),
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
-      
+
       // Bottom Navigation Theme
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.white,
@@ -45,7 +41,7 @@ class AppTheme {
         elevation: 8,
         showUnselectedLabels: true,
       ),
-      
+
       // Card Theme
       cardTheme: const CardThemeData(
         elevation: 2,
@@ -54,7 +50,7 @@ class AppTheme {
         ),
         color: AppColors.white,
       ),
-      
+
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -75,9 +71,12 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.error),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
-      
+
       // Button Themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -88,13 +87,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
-      
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -103,30 +99,24 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
-      
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
-      
+
       // FloatingActionButton Theme
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
       ),
-      
+
       // Chip Theme
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.lightGrey.withOpacity(0.3),
@@ -136,7 +126,7 @@ class AppTheme {
         secondaryLabelStyle: const TextStyle(color: AppColors.primary),
         brightness: Brightness.light,
       ),
-      
+
       // Dialog Theme
       dialogTheme: const DialogThemeData(
         shape: RoundedRectangleBorder(
@@ -144,7 +134,7 @@ class AppTheme {
         ),
         elevation: 8,
       ),
-      
+
       // BottomSheet Theme
       bottomSheetTheme: const BottomSheetThemeData(
         shape: RoundedRectangleBorder(
@@ -152,10 +142,10 @@ class AppTheme {
         ),
         elevation: 8,
       ),
-      
+
       // Text Themes
       textTheme: _textTheme,
-      
+
       // Divider Theme
       dividerTheme: const DividerThemeData(
         color: AppColors.lightGrey,
@@ -164,7 +154,7 @@ class AppTheme {
       ),
     );
   }
-  
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
@@ -175,13 +165,10 @@ class AppTheme {
         secondary: AppColors.primaryLight,
         tertiary: AppColors.primaryDark,
         surface: Color(0xFF1C1B1F),
-        surfaceVariant: Color(0xFF49454F),
-        background: Color(0xFF1C1B1F),
+        surfaceContainerHighest: Color(0xFF49454F),
         error: AppColors.error,
-        onPrimary: AppColors.black,
         onSurface: Color(0xFFE6E1E5),
         onSurfaceVariant: Color(0xFFCAC4D0),
-        onBackground: Color(0xFFE6E1E5),
       ),
       textTheme: _textTheme.apply(
         bodyColor: Colors.white,
@@ -189,7 +176,7 @@ class AppTheme {
       ),
     );
   }
-  
+
   static const TextTheme _textTheme = TextTheme(
     // Displays
     displayLarge: TextStyle(
@@ -210,7 +197,7 @@ class AppTheme {
       letterSpacing: 0,
       height: 1.22,
     ),
-    
+
     // Headlines
     headlineLarge: TextStyle(
       fontSize: 32,
@@ -230,7 +217,7 @@ class AppTheme {
       letterSpacing: 0,
       height: 1.33,
     ),
-    
+
     // Titles
     titleLarge: TextStyle(
       fontSize: 22,
@@ -250,7 +237,7 @@ class AppTheme {
       letterSpacing: 0.1,
       height: 1.43,
     ),
-    
+
     // Body
     bodyLarge: TextStyle(
       fontSize: 16,
@@ -270,7 +257,7 @@ class AppTheme {
       letterSpacing: 0.4,
       height: 1.33,
     ),
-    
+
     // Labels
     labelLarge: TextStyle(
       fontSize: 14,

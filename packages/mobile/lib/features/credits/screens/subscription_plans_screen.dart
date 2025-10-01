@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
-import '../../../shared/widgets/custom_bottom_nav.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_strings.dart';
 
 class SubscriptionPlansScreen extends StatelessWidget {
-  const SubscriptionPlansScreen({Key? key}) : super(key: key);
+  const SubscriptionPlansScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         title: 'Planos de Assinatura',
         showBackButton: false,
       ),
@@ -65,7 +65,7 @@ class SubscriptionPlansScreen extends StatelessWidget {
     final plans = [
       {
         'name': 'Básico',
-        'price': 'R\$ 199',
+        'price': r'R$ 199',
         'credits': 50,
         'description': 'Ideal para quem está começando',
         'features': [
@@ -79,7 +79,7 @@ class SubscriptionPlansScreen extends StatelessWidget {
       },
       {
         'name': 'Premium',
-        'price': 'R\$ 349',
+        'price': r'R$ 349',
         'credits': 100,
         'description': 'Nosso plano mais popular',
         'features': [
@@ -94,7 +94,7 @@ class SubscriptionPlansScreen extends StatelessWidget {
       },
       {
         'name': 'VIP',
-        'price': 'R\$ 599',
+        'price': r'R$ 599',
         'credits': 200,
         'description': 'Para quem quer o melhor',
         'features': [
@@ -110,9 +110,7 @@ class SubscriptionPlansScreen extends StatelessWidget {
       },
     ];
 
-    return Column(
-      children: plans.map((plan) => _buildPlanCard(plan)).toList(),
-    );
+    return Column(children: plans.map(_buildPlanCard).toList());
   }
 
   Widget _buildPlanCard(Map<String, dynamic> plan) {
@@ -187,7 +185,10 @@ class SubscriptionPlansScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: (plan['color'] as Color).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -213,10 +214,7 @@ class SubscriptionPlansScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
-                            feature,
-                            style: Get.textTheme.bodyMedium,
-                          ),
+                          child: Text(feature, style: Get.textTheme.bodyMedium),
                         ),
                       ],
                     ),
@@ -228,8 +226,12 @@ class SubscriptionPlansScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () => _selectPlan(plan),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isPopular ? AppColors.primary : AppColors.lightGrey,
-                      foregroundColor: isPopular ? AppColors.white : AppColors.darkGrey,
+                      backgroundColor: isPopular
+                          ? AppColors.primary
+                          : AppColors.lightGrey,
+                      foregroundColor: isPopular
+                          ? AppColors.white
+                          : AppColors.darkGrey,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -251,7 +253,10 @@ class SubscriptionPlansScreen extends StatelessWidget {
               top: -1,
               right: 20,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(12),
@@ -322,11 +327,7 @@ class SubscriptionPlansScreen extends StatelessWidget {
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              color: AppColors.primary,
-              size: 24,
-            ),
+            child: Icon(icon, color: AppColors.primary, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -362,10 +363,7 @@ class SubscriptionPlansScreen extends StatelessWidget {
           'Você deseja assinar o plano ${plan['name']} por ${plan['price']}/mês?',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
               Get.back();

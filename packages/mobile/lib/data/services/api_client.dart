@@ -1,8 +1,8 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:io';
-
 import 'package:singleclin_mobile/core/constants/api_constants.dart';
 import 'package:singleclin_mobile/data/interceptors/auth_interceptor.dart';
 import 'package:singleclin_mobile/data/interceptors/logging_interceptor.dart';
@@ -71,10 +71,12 @@ class ApiClient {
 
     // Configure HTTPS adapter for development
     if (!kReleaseMode) {
-      (_dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
-        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-        return client;
-      };
+      (_dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
+          (HttpClient client) {
+            client.badCertificateCallback =
+                (X509Certificate cert, String host, int port) => true;
+            return client;
+          };
     }
   }
 
