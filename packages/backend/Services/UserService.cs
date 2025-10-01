@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data;
@@ -6,7 +9,6 @@ using SingleClin.API.DTOs.Common;
 using SingleClin.API.DTOs.EmailTemplate;
 using SingleClin.API.DTOs.Plan;
 using SingleClin.API.DTOs.User;
-using System.Linq.Expressions;
 
 namespace SingleClin.API.Services;
 
@@ -23,6 +25,8 @@ public class UserService : IUserService
     private readonly IFirebaseAuthService _firebaseAuthService;
     private readonly IAzureCommunicationService _azureCommunicationService;
     private readonly IUserDeletionService _userDeletionService;
+    private readonly IDomainUserSyncService _domainUserSyncService;
+    private readonly IFirebaseUserProvisioningQueue _firebaseUserProvisioningQueue;
 
     public UserService(
         UserManager<ApplicationUser> userManager,
@@ -32,7 +36,9 @@ public class UserService : IUserService
         IEmailTemplateService emailService,
         IFirebaseAuthService firebaseAuthService,
         IAzureCommunicationService azureCommunicationService,
-        IUserDeletionService userDeletionService)
+        IUserDeletionService userDeletionService,
+        IDomainUserSyncService domainUserSyncService,
+        IFirebaseUserProvisioningQueue firebaseUserProvisioningQueue)
     {
         _userManager = userManager;
         _context = context;
@@ -42,6 +48,8 @@ public class UserService : IUserService
         _firebaseAuthService = firebaseAuthService;
         _azureCommunicationService = azureCommunicationService;
         _userDeletionService = userDeletionService;
+        _domainUserSyncService = domainUserSyncService;
+        _firebaseUserProvisioningQueue = firebaseUserProvisioningQueue;
     }
 
     public async Task<UserListResponseDto> GetUsersAsync(UserFilterDto filter)
@@ -137,32 +145,7 @@ public class UserService : IUserService
             return null;
         }
 
-        // Ensure user also exists in AppDbContext (users table)
-        var appUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == id);
-        if (appUser == null)
-        {
-            _logger.LogInformation("Creating User in AppDbContext for ApplicationUser {UserId}", id);
-
-            appUser = new User
-            {
-                Id = Guid.NewGuid(),
-                ApplicationUserId = id,
-                Email = user.Email!,
-                FullName = user.FullName,
-                FirstName = ExtractFirstName(user.FullName),
-                LastName = ExtractLastName(user.FullName),
-                Role = (Data.Models.Enums.UserRole)(int)user.Role,
-                IsActive = user.IsActive,
-                PhoneNumber = user.PhoneNumber,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _appDbContext.Users.Add(appUser);
-            await _appDbContext.SaveChangesAsync();
-
-            _logger.LogInformation("User created in AppDbContext with ID {AppUserId}", appUser.Id);
-        }
+        await _domainUserSyncService.EnsureUserAsync(user);
 
         return MapToDto(user);
     }
@@ -183,79 +166,75 @@ public class UserService : IUserService
 
     public async Task<(bool Success, UserResponseDto? User, IEnumerable<string> Errors)> CreateUserAsync(CreateUserDto dto)
     {
-        var user = new ApplicationUser
+        try
         {
-            UserName = dto.Email,
-            Email = dto.Email,
-            FullName = $"{dto.FirstName} {dto.LastName}",
-            PhoneNumber = dto.PhoneNumber,
-            Role = Enum.Parse<Data.Enums.UserRole>(dto.Role),
-            ClinicId = dto.ClinicId,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
+            ApplicationUser? createdUser = null;
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
 
-        var result = await _userManager.CreateAsync(user, dto.Password);
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
 
-        if (!result.Succeeded)
-        {
-            return (false, null, result.Errors.Select(e => e.Description));
-        }
+                var user = new ApplicationUser
+                {
+                    UserName = dto.Email,
+                    Email = dto.Email,
+                    FullName = $"{dto.FirstName} {dto.LastName}",
+                    PhoneNumber = dto.PhoneNumber,
+                    Role = Enum.Parse<Data.Enums.UserRole>(dto.Role),
+                    ClinicId = dto.ClinicId,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
 
-        // Create user in Firebase
-        _logger.LogInformation("=== FIREBASE USER CREATION START ===");
-        _logger.LogInformation("Firebase IsConfigured: {IsConfigured}", _firebaseAuthService.IsConfigured);
-        _logger.LogInformation("Email: {Email}, FullName: {FullName}", dto.Email, user.FullName);
+                var result = await _userManager.CreateAsync(user, dto.Password);
+                if (!result.Succeeded)
+                {
+                    throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
 
-        if (_firebaseAuthService.IsConfigured)
-        {
-            _logger.LogInformation("Firebase is configured. Attempting to create user...");
+                await _userManager.AddClaimAsync(user, new Claim("role", user.Role.ToString()));
+                if (user.ClinicId.HasValue)
+                {
+                    await _userManager.AddClaimAsync(user, new Claim("clinicId", user.ClinicId.Value.ToString()));
+                }
+
+                await transaction.CommitAsync();
+                createdUser = user;
+            });
+
+            if (createdUser == null)
+            {
+                return (false, null, new[] { "Failed to create user" });
+            }
+
+            await _domainUserSyncService.EnsureUserAsync(createdUser);
+
+            await _firebaseUserProvisioningQueue.EnqueueAsync(createdUser.Id, createdUser.Email!, dto.Password, createdUser.FullName);
+
+            // Send email verification
             try
             {
-                var firebaseUser = await _firebaseAuthService.CreateUserAsync(
-                    dto.Email,
-                    dto.Password,
-                    user.FullName,
-                    false // Email not verified yet
-                );
-
-                if (firebaseUser != null)
-                {
-                    // Update user with Firebase UID
-                    user.FirebaseUid = firebaseUser.Uid;
-                    await _userManager.UpdateAsync(user);
-                    _logger.LogInformation("✅ SUCCESS: Created user in Firebase - Email: {Email}, UID: {FirebaseUid}",
-                        dto.Email, firebaseUser.Uid);
-                }
-                else
-                {
-                    _logger.LogError("❌ FAILED: CreateUserAsync returned null for email: {Email}", dto.Email);
-                }
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(createdUser);
+                // TODO: Implement email sending
+                _logger.LogInformation("Email verification token generated for user {UserId}", createdUser.Id);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ EXCEPTION: Error creating user in Firebase for email: {Email}", dto.Email);
+                _logger.LogError(ex, "Failed to send verification email for user {UserId}", createdUser.Id);
             }
-        }
-        else
-        {
-            _logger.LogError("❌ Firebase NOT configured! Cannot create user in Firebase for: {Email}", dto.Email);
-        }
-        _logger.LogInformation("=== FIREBASE USER CREATION END ===");
 
-        // Send email verification
-        try
+            return (true, MapToDto(createdUser), Enumerable.Empty<string>());
+        }
+        catch (InvalidOperationException ex)
         {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            // TODO: Implement email sending
-            _logger.LogInformation("Email verification token generated for user {UserId}", user.Id);
+            return (false, null, new[] { ex.Message });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send verification email for user {UserId}", user.Id);
+            _logger.LogError(ex, "Error creating user {Email}", dto.Email);
+            return (false, null, new[] { "An error occurred while creating the user" });
         }
-
-        return (true, MapToDto(user), Enumerable.Empty<string>());
     }
 
     public async Task<(bool Success, UserResponseDto? User, IEnumerable<string> Errors)> UpdateUserAsync(Guid id, UpdateUserDto dto)
@@ -304,6 +283,8 @@ public class UserService : IUserService
             return (false, null, result.Errors.Select(e => e.Description));
         }
 
+        await _domainUserSyncService.EnsureUserAsync(user);
+
         return (true, MapToDto(user), Enumerable.Empty<string>());
     }
 
@@ -329,6 +310,9 @@ public class UserService : IUserService
         {
             return (false, null, result.Errors.Select(e => e.Description));
         }
+
+        await _userManager.UpdateSecurityStampAsync(user);
+        await _domainUserSyncService.EnsureUserAsync(user);
 
         return (true, MapToDto(user), Enumerable.Empty<string>());
     }
@@ -431,32 +415,9 @@ public class UserService : IUserService
             }
 
             // Find or create corresponding User in AppDbContext
-            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
-            if (user == null)
-            {
-                _logger.LogInformation("Creating new User in AppDbContext for ApplicationUser {UserId}", userId);
+            await _domainUserSyncService.EnsureUserAsync(applicationUser);
 
-                user = new User
-                {
-                    Id = Guid.NewGuid(), // Explicitly set ID
-                    ApplicationUserId = userId,
-                    Email = applicationUser.Email!,
-                    FullName = applicationUser.FullName,
-                    Role = (Data.Models.Enums.UserRole)(int)applicationUser.Role,
-                    IsActive = applicationUser.IsActive,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-
-                _appDbContext.Users.Add(user);
-                await _appDbContext.SaveChangesAsync();
-
-                _logger.LogInformation("User created in AppDbContext with ID {UserId}", user.Id);
-            }
-            else
-            {
-                _logger.LogInformation("Found existing User in AppDbContext with ID {UserId} for ApplicationUser {ApplicationUserId}", user.Id, userId);
-            }
+            var user = await _appDbContext.Users.FirstAsync(u => u.ApplicationUserId == userId);
 
             // Create UserPlan
             _logger.LogInformation("Creating UserPlan for User {UserId} and Plan {PlanId}", user.Id, plan.Id);
@@ -545,18 +506,24 @@ public class UserService : IUserService
         {
             _logger.LogInformation("Getting user plans for ApplicationUserId {UserId}", userId);
 
-            // Find user in AppDbContext using ApplicationUserId
+            // Ensure domain representation exists
+            var applicationUser = await _userManager.FindByIdAsync(userId.ToString());
+            if (applicationUser == null)
+            {
+                _logger.LogWarning("ApplicationUser {UserId} not found while retrieving plans", userId);
+                return Array.Empty<UserPlanResponseDto>();
+            }
+
+            await _domainUserSyncService.EnsureUserAsync(applicationUser);
+
             var user = await _appDbContext.Users
                 .FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
 
             if (user == null)
             {
-                _logger.LogWarning("User with ApplicationUserId {UserId} not found in AppDbContext", userId);
+                _logger.LogWarning("Domain user missing for ApplicationUserId {UserId}", userId);
                 return Array.Empty<UserPlanResponseDto>();
             }
-
-            _logger.LogInformation("Found User in AppDbContext: Id={UserId}, ApplicationUserId={ApplicationUserId}",
-                user.Id, user.ApplicationUserId);
 
             // Get active, non-expired user plans
             var userPlans = await _appDbContext.UserPlans

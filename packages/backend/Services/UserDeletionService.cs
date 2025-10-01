@@ -16,6 +16,7 @@ public class UserDeletionService : IUserDeletionService
     private readonly ApplicationDbContext _applicationDbContext;
     private readonly AppDbContext _appDbContext;
     private readonly ILogger<UserDeletionService> _logger;
+    private readonly IDomainUserSyncService _domainUserSyncService;
 
     public UserDeletionService(
         UserManager<ApplicationUser> userManager,
@@ -23,7 +24,8 @@ public class UserDeletionService : IUserDeletionService
         IFirebaseAuthService firebaseAuthService,
         ApplicationDbContext applicationDbContext,
         AppDbContext appDbContext,
-        ILogger<UserDeletionService> logger)
+        ILogger<UserDeletionService> logger,
+        IDomainUserSyncService domainUserSyncService)
     {
         _userManager = userManager;
         _refreshTokenService = refreshTokenService;
@@ -31,6 +33,7 @@ public class UserDeletionService : IUserDeletionService
         _applicationDbContext = applicationDbContext;
         _appDbContext = appDbContext;
         _logger = logger;
+        _domainUserSyncService = domainUserSyncService;
     }
 
     public async Task<(bool Success, IEnumerable<string> Errors)> DeleteUserAsync(Guid userId)
@@ -68,13 +71,7 @@ public class UserDeletionService : IUserDeletionService
         await _refreshTokenService.RevokeAllUserTokensAsync(userId);
 
         // Remove domain representation if present.
-        var domainUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.ApplicationUserId == userId);
-        if (domainUser != null)
-        {
-            _appDbContext.Users.Remove(domainUser);
-            await _appDbContext.SaveChangesAsync();
-            _logger.LogInformation("Domain user entry removed for ApplicationUserId={UserId}", userId);
-        }
+        await _domainUserSyncService.RemoveUserAsync(userId);
 
         var identityResult = await _userManager.DeleteAsync(user);
         if (!identityResult.Succeeded)

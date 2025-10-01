@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data;
@@ -20,10 +22,13 @@ public class AuthService : IAuthService
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly IFirebaseAuthService _firebaseAuthService;
     private readonly ApplicationDbContext _context;
+    private readonly AppDbContext _appDbContext;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthService> _logger;
     private readonly IAzureCommunicationService _emailService;
     private readonly IEmailTemplateService _emailTemplateService;
+    private readonly IDomainUserSyncService _domainUserSyncService;
+    private readonly IFirebaseUserProvisioningQueue _firebaseUserProvisioningQueue;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
@@ -32,10 +37,13 @@ public class AuthService : IAuthService
         IRefreshTokenService refreshTokenService,
         IFirebaseAuthService firebaseAuthService,
         ApplicationDbContext context,
+        AppDbContext appDbContext,
         IConfiguration configuration,
         ILogger<AuthService> logger,
         IAzureCommunicationService emailService,
-        IEmailTemplateService emailTemplateService)
+        IEmailTemplateService emailTemplateService,
+        IDomainUserSyncService domainUserSyncService,
+        IFirebaseUserProvisioningQueue firebaseUserProvisioningQueue)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -43,144 +51,90 @@ public class AuthService : IAuthService
         _refreshTokenService = refreshTokenService;
         _firebaseAuthService = firebaseAuthService;
         _context = context;
+        _appDbContext = appDbContext;
         _configuration = configuration;
         _logger = logger;
         _emailService = emailService;
         _emailTemplateService = emailTemplateService;
+        _domainUserSyncService = domainUserSyncService;
+        _firebaseUserProvisioningQueue = firebaseUserProvisioningQueue;
     }
 
     public async Task<(bool Success, AuthResponseDto? Response, string? Error)> RegisterAsync(RegisterDto registerDto, string? ipAddress = null)
     {
         try
         {
-            // Validate clinic name requirement
             if (!registerDto.IsValid())
             {
                 return (false, null, "Clinic name is required for clinic users");
             }
 
-            // Check if email already exists
-            var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
-            if (existingUser != null)
+            if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
             {
                 return (false, null, "Email already registered");
             }
 
-            // Create new user
-            var user = new ApplicationUser
-            {
-                UserName = registerDto.Email,
-                Email = registerDto.Email,
-                FullName = registerDto.FullName,
-                Role = registerDto.Role,
-                EmailConfirmed = false, // Will be set to true in production after email verification
-                CreatedAt = DateTime.UtcNow
-            };
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            ApplicationUser? createdUser = null;
 
-            // Handle clinic creation for clinic users
-            if (registerDto.Role == Data.Enums.UserRole.ClinicOrigin || registerDto.Role == Data.Enums.UserRole.ClinicPartner)
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                var clinic = new Clinic
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                var user = new ApplicationUser
                 {
-                    Name = registerDto.ClinicName!,
+                    UserName = registerDto.Email,
                     Email = registerDto.Email,
-                    Type = registerDto.Role == Data.Enums.UserRole.ClinicOrigin ? ClinicType.Origin : ClinicType.Partner,
-                    CreatedAt = DateTime.UtcNow
+                    FullName = registerDto.FullName,
+                    Role = registerDto.Role,
+                    EmailConfirmed = false,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
                 };
 
-                _context.Clinics.Add(clinic);
-                await _context.SaveChangesAsync(); // Save to get the clinic ID
-
-                user.ClinicId = clinic.Id;
-            }
-
-            // Create user with password
-            var result = await _userManager.CreateAsync(user, registerDto.Password);
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                _logger.LogWarning("User registration failed for {Email}: {Errors}", registerDto.Email, errors);
-                return (false, null, errors);
-            }
-
-            // Create user in Firebase
-            _logger.LogInformation("=== FIREBASE USER CREATION START ===");
-            _logger.LogInformation("Firebase IsConfigured: {IsConfigured}", _firebaseAuthService.IsConfigured);
-            _logger.LogInformation("Email: {Email}, FullName: {FullName}", registerDto.Email, registerDto.FullName);
-
-            if (_firebaseAuthService.IsConfigured)
-            {
-                _logger.LogInformation("Firebase is configured. Attempting to create user...");
-                try
+                var createResult = await _userManager.CreateAsync(user, registerDto.Password);
+                if (!createResult.Succeeded)
                 {
-                    var firebaseUser = await _firebaseAuthService.CreateUserAsync(
-                        registerDto.Email,
-                        registerDto.Password,
-                        registerDto.FullName,
-                        false // Email not verified yet
-                    );
-
-                    if (firebaseUser != null)
-                    {
-                        // Update user with Firebase UID
-                        user.FirebaseUid = firebaseUser.Uid;
-                        await _userManager.UpdateAsync(user);
-                        _logger.LogInformation("✅ SUCCESS: Created user in Firebase - Email: {Email}, UID: {FirebaseUid}",
-                            registerDto.Email, firebaseUser.Uid);
-                    }
-                    else
-                    {
-                        _logger.LogError("❌ FAILED: CreateUserAsync returned null for email: {Email}", registerDto.Email);
-
-                        // Rollback local user creation if Firebase fails
-                        await _userManager.DeleteAsync(user);
-                        if (user.ClinicId.HasValue)
-                        {
-                            var clinic = await _context.Clinics.FindAsync(user.ClinicId.Value);
-                            if (clinic != null)
-                            {
-                                _context.Clinics.Remove(clinic);
-                                await _context.SaveChangesAsync();
-                            }
-                        }
-
-                        return (false, null, "Failed to create user in Firebase. Registration cancelled.");
-                    }
+                    throw new InvalidOperationException(string.Join(", ", createResult.Errors.Select(e => e.Description)));
                 }
-                catch (Exception ex)
+
+                if (registerDto.Role == Data.Enums.UserRole.ClinicOrigin || registerDto.Role == Data.Enums.UserRole.ClinicPartner)
                 {
-                    _logger.LogError(ex, "❌ EXCEPTION: Error creating user in Firebase for email: {Email}", registerDto.Email);
-
-                    // Rollback local user creation if Firebase fails
-                    await _userManager.DeleteAsync(user);
-                    if (user.ClinicId.HasValue)
+                    var clinic = new Clinic
                     {
-                        var clinic = await _context.Clinics.FindAsync(user.ClinicId.Value);
-                        if (clinic != null)
-                        {
-                            _context.Clinics.Remove(clinic);
-                            await _context.SaveChangesAsync();
-                        }
-                    }
+                        Name = registerDto.ClinicName!,
+                        Email = registerDto.Email,
+                        Type = registerDto.Role == Data.Enums.UserRole.ClinicOrigin ? ClinicType.Origin : ClinicType.Partner,
+                        CreatedAt = DateTime.UtcNow
+                    };
 
-                    return (false, null, "Failed to create user in Firebase due to an error. Registration cancelled.");
+                    _context.Clinics.Add(clinic);
+                    await _context.SaveChangesAsync();
+
+                    user.ClinicId = clinic.Id;
+                    await _userManager.UpdateAsync(user);
                 }
-            }
-            else
-            {
-                _logger.LogWarning("⚠️ Firebase NOT configured! User will be created locally without Firebase integration for: {Email}", registerDto.Email);
-                // Continue with local-only registration if Firebase is not configured
-            }
-            _logger.LogInformation("=== FIREBASE USER CREATION END ===");
 
-            // Add role claim
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", user.Role.ToString()));
+                await _userManager.AddClaimAsync(user, new Claim("role", user.Role.ToString()));
+                if (user.ClinicId.HasValue)
+                {
+                    await _userManager.AddClaimAsync(user, new Claim("clinicId", user.ClinicId.Value.ToString()));
+                }
 
-            // Add clinic claim if applicable
-            if (user.ClinicId.HasValue)
+                await transaction.CommitAsync();
+                createdUser = user;
+            });
+
+            if (createdUser == null)
             {
-                await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("clinicId", user.ClinicId.Value.ToString()));
+                return (false, null, "Failed to create user");
             }
+
+            await _domainUserSyncService.EnsureUserAsync(createdUser);
+
+            await _firebaseUserProvisioningQueue.EnqueueAsync(createdUser.Id, createdUser.Email!, registerDto.Password, createdUser.FullName);
+
+            var user = createdUser;
 
             // Send confirmation email after successful user creation
             try
@@ -228,6 +182,11 @@ public class AuthService : IAuthService
                 ClinicId = user.ClinicId,
                 IsFirstLogin = true
             }, null);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "User registration failed for {Email}", registerDto.Email);
+            return (false, null, ex.Message);
         }
         catch (Exception ex)
         {
@@ -773,152 +732,82 @@ public class AuthService : IAuthService
             _logger.LogInformation("Syncing Firebase user with backend: {Email}, FirebaseUid: {FirebaseUid}", syncUserDto.Email, syncUserDto.FirebaseUid);
 
             // Check if user already exists by Firebase UID
-            var existingUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.FirebaseUid == syncUserDto.FirebaseUid);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.FirebaseUid == syncUserDto.FirebaseUid);
 
-            if (existingUser != null)
+            if (user == null)
             {
-                // Update existing user
-                existingUser.Email = syncUserDto.Email;
-                existingUser.UserName = syncUserDto.Email;
-                if (!string.IsNullOrEmpty(syncUserDto.DisplayName))
-                    existingUser.FullName = syncUserDto.DisplayName;
-                if (syncUserDto.IsEmailVerified.HasValue)
-                    existingUser.EmailConfirmed = syncUserDto.IsEmailVerified.Value;
-                existingUser.UpdatedAt = DateTime.UtcNow;
+                user = await _userManager.FindByEmailAsync(syncUserDto.Email);
+            }
 
-                await _context.SaveChangesAsync();
-
-                // Note: Domain User entity creation is handled separately in AppDbContext
-
-                _logger.LogInformation("Updated existing user: {UserId}, Email: {Email}", existingUser.Id, existingUser.Email);
-
-                // Generate tokens
-                var accessToken = _jwtService.GenerateAccessToken(existingUser);
-                var refreshToken = _jwtService.GenerateRefreshToken();
-                var expiresIn = Convert.ToInt32(_configuration["JWT:AccessTokenExpirationInMinutes"] ?? "120") * 60;
-
-                // Create and store refresh token
-                var refreshTokenEntity = await _refreshTokenService.CreateRefreshTokenAsync(
-                    existingUser.Id,
-                    ipAddress,
-                    "Mobile App",
-                    Convert.ToInt32(_configuration["JWT:RefreshTokenExpiresInDays"] ?? "7")
-                );
-
-                return (true, new AuthResponseDto
+            if (user == null)
+            {
+                user = new ApplicationUser
                 {
-                    UserId = existingUser.Id,
-                    Email = existingUser.Email!,
-                    FullName = existingUser.FullName ?? "",
-                    Role = existingUser.Role,
-                    ClinicId = existingUser.ClinicId,
-                    AccessToken = accessToken,
-                    RefreshToken = refreshTokenEntity.Token,
-                    ExpiresIn = expiresIn,
-                    IsEmailVerified = existingUser.EmailConfirmed,
-                    IsFirstLogin = false
-                }, null);
-            }
+                    UserName = syncUserDto.Email,
+                    Email = syncUserDto.Email,
+                    FullName = syncUserDto.DisplayName ?? syncUserDto.Email,
+                    FirebaseUid = syncUserDto.FirebaseUid,
+                    Role = Data.Enums.UserRole.Patient,
+                    EmailConfirmed = syncUserDto.IsEmailVerified ?? false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsActive = true
+                };
 
-            // Check if user exists by email (for migration scenarios)
-            var existingEmailUser = await _userManager.FindByEmailAsync(syncUserDto.Email);
-            if (existingEmailUser != null)
-            {
-                // Link Firebase UID to existing user
-                existingEmailUser.FirebaseUid = syncUserDto.FirebaseUid;
-                if (!string.IsNullOrEmpty(syncUserDto.DisplayName))
-                    existingEmailUser.FullName = syncUserDto.DisplayName;
-                if (syncUserDto.IsEmailVerified.HasValue)
-                    existingEmailUser.EmailConfirmed = syncUserDto.IsEmailVerified.Value;
-                existingEmailUser.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                // Note: Domain User entity creation is handled separately in AppDbContext
-
-                _logger.LogInformation("Linked Firebase UID to existing user: {UserId}, Email: {Email}", existingEmailUser.Id, existingEmailUser.Email);
-
-                // Generate tokens
-                var accessToken = _jwtService.GenerateAccessToken(existingEmailUser);
-                var refreshToken = _jwtService.GenerateRefreshToken();
-                var expiresIn = Convert.ToInt32(_configuration["JWT:AccessTokenExpirationInMinutes"] ?? "120") * 60;
-
-                // Create and store refresh token
-                var refreshTokenEntity = await _refreshTokenService.CreateRefreshTokenAsync(
-                    existingEmailUser.Id,
-                    ipAddress,
-                    "Mobile App",
-                    Convert.ToInt32(_configuration["JWT:RefreshTokenExpiresInDays"] ?? "7")
-                );
-
-                return (true, new AuthResponseDto
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
                 {
-                    UserId = existingEmailUser.Id,
-                    Email = existingEmailUser.Email!,
-                    FullName = existingEmailUser.FullName ?? "",
-                    Role = existingEmailUser.Role,
-                    ClinicId = existingEmailUser.ClinicId,
-                    AccessToken = accessToken,
-                    RefreshToken = refreshTokenEntity.Token,
-                    ExpiresIn = expiresIn,
-                    IsEmailVerified = existingEmailUser.EmailConfirmed,
-                    IsFirstLogin = false
-                }, null);
+                    var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    _logger.LogError("Failed to create ApplicationUser during sync: {Errors}", errors);
+                    return (false, null, errors);
+                }
+
+                await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", user.Role.ToString()));
             }
 
-            // Create new user for Firebase
-            var newUser = new ApplicationUser
+            user.FirebaseUid = syncUserDto.FirebaseUid;
+            user.Email = syncUserDto.Email;
+            user.UserName = syncUserDto.Email;
+            if (!string.IsNullOrWhiteSpace(syncUserDto.DisplayName))
             {
-                UserName = syncUserDto.Email,
-                Email = syncUserDto.Email,
-                FullName = syncUserDto.DisplayName ?? "Firebase User",
-                FirebaseUid = syncUserDto.FirebaseUid,
-                Role = Data.Enums.UserRole.Patient, // Default role for Firebase users
-                EmailConfirmed = syncUserDto.IsEmailVerified ?? false,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+                user.FullName = syncUserDto.DisplayName;
+            }
+            if (syncUserDto.IsEmailVerified.HasValue)
+            {
+                user.EmailConfirmed = syncUserDto.IsEmailVerified.Value;
+            }
+            user.UpdatedAt = DateTime.UtcNow;
 
-            // Create user without password (Firebase handles authentication)
-            var result = await _userManager.CreateAsync(newUser);
-            if (!result.Succeeded)
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                _logger.LogError("Failed to create new Firebase user: {Errors}", errors);
-                return (false, null, $"Failed to create user: {errors}");
+                var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                return (false, null, errors);
             }
 
-            _logger.LogInformation("Created new Firebase user: {UserId}, Email: {Email}", newUser.Id, newUser.Email);
+            await _userManager.UpdateSecurityStampAsync(user);
+            await _refreshTokenService.RevokeAllUserTokensAsync(user.Id);
+            await _domainUserSyncService.EnsureUserAsync(user);
 
-            // Note: Domain User entity creation is handled separately in AppDbContext
-            _logger.LogInformation("Created new Firebase ApplicationUser: {UserId}, Email: {Email}", newUser.Id, newUser.Email);
-
-            // Generate tokens
-            var newAccessToken = _jwtService.GenerateAccessToken(newUser);
-            var newRefreshToken = _jwtService.GenerateRefreshToken();
-            var newExpiresIn = Convert.ToInt32(_configuration["JWT:AccessTokenExpirationInMinutes"] ?? "120") * 60;
-
-            // Create and store refresh token
-            var newRefreshTokenEntity = await _refreshTokenService.CreateRefreshTokenAsync(
-                newUser.Id,
+            var accessToken = _jwtService.GenerateAccessToken(user);
+            var refreshTokenEntity = await _refreshTokenService.CreateRefreshTokenAsync(
+                user.Id,
                 ipAddress,
                 "Mobile App",
-                Convert.ToInt32(_configuration["JWT:RefreshTokenExpiresInDays"] ?? "7")
-            );
+                Convert.ToInt32(_configuration["JWT:RefreshTokenExpiresInDays"] ?? "7"));
 
             return (true, new AuthResponseDto
             {
-                UserId = newUser.Id,
-                Email = newUser.Email!,
-                FullName = newUser.FullName ?? "",
-                Role = newUser.Role,
-                ClinicId = newUser.ClinicId,
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshTokenEntity.Token,
-                ExpiresIn = newExpiresIn,
-                IsEmailVerified = newUser.EmailConfirmed,
-                IsFirstLogin = true
+                UserId = user.Id,
+                Email = user.Email!,
+                FullName = user.FullName ?? string.Empty,
+                Role = user.Role,
+                ClinicId = user.ClinicId,
+                AccessToken = accessToken,
+                RefreshToken = refreshTokenEntity.Token,
+                ExpiresIn = Convert.ToInt32(_configuration["JWT:AccessTokenExpirationInMinutes"] ?? "120") * 60,
+                IsEmailVerified = user.EmailConfirmed,
+                IsFirstLogin = false
             }, null);
         }
         catch (Exception ex)

@@ -58,7 +58,7 @@
   3. Implementar limpeza/revogação dos refresh tokens já emitidos indevidamente (job ou script de
      migração).
 
-### Exclusão de usuário sem sincronizar com Firebase
+### Exclusão de usuário sem sincronizar com Firebase - ✅
 
 - **Impacto**: usuários “removidos” localmente continuam com acesso ativo via Firebase.
 - **Evidência**: ausência de chamada a `FirebaseAuthService.DeleteUserAsync` em

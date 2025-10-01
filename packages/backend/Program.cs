@@ -38,6 +38,7 @@ public class Program
         builder.Configuration.AddAzureKeyVault(builder.Environment);
 
         // Add services to the container.
+        builder.Services.AddDataProtection();
         builder.Services.AddControllers();
 
         // Add FluentValidation
@@ -234,6 +235,8 @@ public class Program
         builder.Services.AddScoped<BalanceCheckJob>();
         builder.Services.AddScoped<FirebaseRefreshTokenCleanupJob>();
         builder.Services.AddScoped<FirebaseUserReconciliationJob>();
+        builder.Services.AddScoped<FirebaseUserProvisioningJob>();
+        builder.Services.AddScoped<DomainUserReconciliationJob>();
 
         // Add Report Service
         builder.Services.AddScoped<IReportService, ReportService>();
@@ -242,6 +245,8 @@ public class Program
         builder.Services.AddScoped<IExportService, ExportService>();
 
         // Add User Service
+        builder.Services.AddScoped<IDomainUserSyncService, DomainUserSyncService>();
+        builder.Services.AddScoped<IFirebaseUserProvisioningQueue, FirebaseUserProvisioningQueue>();
         builder.Services.AddScoped<IUserDeletionService, UserDeletionService>();
         builder.Services.AddScoped<IUserService, UserService>();
 
@@ -672,6 +677,12 @@ public class Program
             Cron.Daily(),
             TimeZoneInfo.Utc);
 
+        recurringJobManager.AddOrUpdate<DomainUserReconciliationJob>(
+            "domain-user-reconciliation",
+            job => job.ExecuteAsync(),
+            Cron.Daily(),
+            TimeZoneInfo.Utc);
+
         // Perform an immediate cleanup on startup to remove legacy duplicate tokens
         using (var cleanupScope = app.Services.CreateScope())
         {
@@ -684,6 +695,12 @@ public class Program
         {
             var reconciliationJob = reconciliationScope.ServiceProvider.GetRequiredService<FirebaseUserReconciliationJob>();
             await reconciliationJob.ExecuteAsync();
+        }
+
+        using (var domainReconciliationScope = app.Services.CreateScope())
+        {
+            var domainJob = domainReconciliationScope.ServiceProvider.GetRequiredService<DomainUserReconciliationJob>();
+            await domainJob.ExecuteAsync();
         }
 
         await app.RunAsync();
