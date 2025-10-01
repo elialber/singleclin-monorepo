@@ -41,7 +41,7 @@
   2. Revogar/forçar reset de todas as contas criadas com senha enviada por e-mail.
   3. Atualizar templates de e-mail e testes automatizados para refletir o novo fluxo.
 
-### Middleware Firebase gerando refresh tokens por requisição - 🚧
+### Middleware Firebase gerando refresh tokens por requisição - ✅
 
 - **Impacto**: criação descontrolada de refresh tokens a cada request autenticado com
   `X-Firebase-Token`, abrindo espaço para DoS e inconsistência de sessões.

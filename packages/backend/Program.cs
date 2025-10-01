@@ -233,6 +233,7 @@ public class Program
         // Register background jobs
         builder.Services.AddScoped<BalanceCheckJob>();
         builder.Services.AddScoped<FirebaseRefreshTokenCleanupJob>();
+        builder.Services.AddScoped<FirebaseUserReconciliationJob>();
 
         // Add Report Service
         builder.Services.AddScoped<IReportService, ReportService>();
@@ -241,6 +242,7 @@ public class Program
         builder.Services.AddScoped<IExportService, ExportService>();
 
         // Add User Service
+        builder.Services.AddScoped<IUserDeletionService, UserDeletionService>();
         builder.Services.AddScoped<IUserService, UserService>();
 
         // Add Appointment services
@@ -664,11 +666,24 @@ public class Program
             Cron.Daily(),
             TimeZoneInfo.Utc);
 
+        recurringJobManager.AddOrUpdate<FirebaseUserReconciliationJob>(
+            "firebase-user-reconciliation",
+            job => job.ExecuteAsync(),
+            Cron.Daily(),
+            TimeZoneInfo.Utc);
+
         // Perform an immediate cleanup on startup to remove legacy duplicate tokens
         using (var cleanupScope = app.Services.CreateScope())
         {
             var cleanupJob = cleanupScope.ServiceProvider.GetRequiredService<FirebaseRefreshTokenCleanupJob>();
             await cleanupJob.ExecuteAsync();
+        }
+
+        // Execute reconciliation once on startup to quarantine orphans immediately
+        using (var reconciliationScope = app.Services.CreateScope())
+        {
+            var reconciliationJob = reconciliationScope.ServiceProvider.GetRequiredService<FirebaseUserReconciliationJob>();
+            await reconciliationJob.ExecuteAsync();
         }
 
         await app.RunAsync();

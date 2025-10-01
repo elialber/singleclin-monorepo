@@ -22,6 +22,7 @@ public class UserService : IUserService
     private readonly IEmailTemplateService _emailService;
     private readonly IFirebaseAuthService _firebaseAuthService;
     private readonly IAzureCommunicationService _azureCommunicationService;
+    private readonly IUserDeletionService _userDeletionService;
 
     public UserService(
         UserManager<ApplicationUser> userManager,
@@ -30,7 +31,8 @@ public class UserService : IUserService
         ILogger<UserService> logger,
         IEmailTemplateService emailService,
         IFirebaseAuthService firebaseAuthService,
-        IAzureCommunicationService azureCommunicationService)
+        IAzureCommunicationService azureCommunicationService,
+        IUserDeletionService userDeletionService)
     {
         _userManager = userManager;
         _context = context;
@@ -39,6 +41,7 @@ public class UserService : IUserService
         _emailService = emailService;
         _firebaseAuthService = firebaseAuthService;
         _azureCommunicationService = azureCommunicationService;
+        _userDeletionService = userDeletionService;
     }
 
     public async Task<UserListResponseDto> GetUsersAsync(UserFilterDto filter)
@@ -306,20 +309,7 @@ public class UserService : IUserService
 
     public async Task<(bool Success, IEnumerable<string> Errors)> DeleteUserAsync(Guid id)
     {
-        var user = await _userManager.FindByIdAsync(id.ToString());
-        if (user == null)
-        {
-            return (false, new[] { "User not found" });
-        }
-
-        var result = await _userManager.DeleteAsync(user);
-
-        if (!result.Succeeded)
-        {
-            return (false, result.Errors.Select(e => e.Description));
-        }
-
-        return (true, Enumerable.Empty<string>());
+        return await _userDeletionService.DeleteUserAsync(id);
     }
 
     public async Task<(bool Success, UserResponseDto? User, IEnumerable<string> Errors)> ToggleUserStatusAsync(Guid id, bool isActive)

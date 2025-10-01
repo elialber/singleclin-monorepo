@@ -5440,6 +5440,17 @@
             Executes the cleanup routine.
             </summary>
         </member>
+        <member name="T:SingleClin.API.Jobs.FirebaseUserReconciliationJob">
+            <summary>
+            Performs reconciliation between the local user store and Firebase Authentication.
+            Removes or quarantines orphan Firebase accounts and flags local inconsistencies.
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Jobs.FirebaseUserReconciliationJob.ExecuteAsync">
+            <summary>
+            Executes reconciliation, disabling/removing orphan Firebase accounts and reporting divergences.
+            </summary>
+        </member>
         <member name="T:SingleClin.API.Middleware.ClinicRateLimitingMiddleware">
             <summary>
             Rate limiting middleware for clinic QR Code validation endpoints
@@ -7087,6 +7098,18 @@
             <param name="reason">Refund reason</param>
             <returns>Success status and updated transaction</returns>
         </member>
+        <member name="T:SingleClin.API.Services.IUserDeletionService">
+            <summary>
+            Coordinates the removal of a user across Firebase Authentication and the local database.
+            </summary>
+        </member>
+        <member name="M:SingleClin.API.Services.IUserDeletionService.DeleteUserAsync(System.Guid)">
+            <summary>
+            Deletes a user ensuring consistency between Firebase and the local database.
+            </summary>
+            <param name="userId">Application user identifier.</param>
+            <returns>Operation status with potential error descriptions.</returns>
+        </member>
         <member name="T:SingleClin.API.Services.IUserService">
             <summary>
             Interface for user management service
@@ -7485,6 +7508,11 @@
         <member name="T:SingleClin.API.Services.TransactionService">
             <summary>
             Service for transaction business logic operations
+            </summary>
+        </member>
+        <member name="T:SingleClin.API.Services.UserDeletionService">
+            <summary>
+            Saga-style orchestrator that guarantees user deletion happens in Firebase before the local removal.
             </summary>
         </member>
         <member name="T:SingleClin.API.Services.UserService">
