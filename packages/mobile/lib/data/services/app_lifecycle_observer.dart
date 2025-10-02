@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
@@ -34,7 +36,7 @@ class AppLifecycleObserver with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         // App is in foreground and active
-        _tokenRefreshService.resume();
+        unawaited(_tokenRefreshService.resume(forceRefresh: true));
         break;
 
       case AppLifecycleState.paused:
@@ -49,7 +51,8 @@ class AppLifecycleObserver with WidgetsBindingObserver {
 
       case AppLifecycleState.inactive:
         // App is transitioning between states (e.g., incoming call)
-        // Keep token refresh running but could optimize further if needed
+        // Pause timers to avoid unnecessary work while the app is not active
+        _tokenRefreshService.pause();
         break;
 
       case AppLifecycleState.hidden:

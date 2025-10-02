@@ -28,6 +28,7 @@ class TokenRefreshService {
   bool _isActive = false;
   Timer? _refreshTimer;
   StreamSubscription<UserEntity?>? _authStateSubscription;
+  StreamSubscription<User?>? _idTokenSubscription;
   UserEntity? _currentUser;
   _TokenRefreshMetadata _metadata = const _TokenRefreshMetadata();
   String? _metadataKey;
@@ -80,6 +81,7 @@ class TokenRefreshService {
     _cancelScheduledRefresh();
 
     if (!_isActive) {
+      _stopFirebaseTokenListener();
       return;
     }
 
@@ -92,6 +94,7 @@ class TokenRefreshService {
       if (previousKey != null) {
         await _storageService.remove(previousKey);
       }
+      _stopFirebaseTokenListener();
       return;
     }
 
@@ -102,6 +105,7 @@ class TokenRefreshService {
       return;
     }
 
+    _startFirebaseTokenListener();
     await _scheduleRefresh();
 
     if (kDebugMode) {
@@ -408,19 +412,33 @@ class TokenRefreshService {
       return;
     }
     _cancelScheduledRefresh();
+    _stopFirebaseTokenListener();
     if (kDebugMode) {
       print('⏸️ TokenRefreshService: Pausado (app em background)');
     }
   }
 
   /// Resume the token refresh timers.
-  Future<void> resume() async {
+  Future<void> resume({bool forceRefresh = false}) async {
     if (!_isActive || _currentUser == null) {
       return;
     }
+    _startFirebaseTokenListener();
+
+    if (forceRefresh) {
+      final outcome = await _executeRefreshAttempt();
+      if (kDebugMode) {
+        print('▶️ TokenRefreshService: Retomado com refresh imediato (success=${outcome.success}, retryable=${outcome.retryable})');
+      }
+      if (!outcome.success && !outcome.retryable) {
+        return;
+      }
+      return;
+    }
+
     await _scheduleRefresh();
     if (kDebugMode) {
-      print('▶️ TokenRefreshService: Retomado (app em foreground)');
+      print('▶️ TokenRefreshService: Retomado (agendamento restaurado)');
     }
   }
 
@@ -477,6 +495,7 @@ class TokenRefreshService {
   void dispose() {
     _isActive = false;
     _cancelScheduledRefresh();
+    _stopFirebaseTokenListener();
     _authStateSubscription?.cancel();
     _authStateSubscription = null;
     _currentUser = null;
@@ -503,6 +522,67 @@ class TokenRefreshService {
   }
 
   String _metadataKeyFor(String userId) => '$_metadataKeyPrefix$userId';
+
+  void _startFirebaseTokenListener() {
+    if (_idTokenSubscription != null || !_isActive) {
+      return;
+    }
+
+    _idTokenSubscription = _firebaseAuth.idTokenChanges().listen(
+      (User? firebaseUser) async {
+        if (!_isActive || firebaseUser == null) {
+          return;
+        }
+
+        if (kDebugMode) {
+          print('🔁 TokenRefreshService: Firebase idTokenChanges recebido');
+        }
+
+        try {
+          final token = await firebaseUser.getIdToken();
+          final validation = await _validateSessionWithBackend(token);
+
+          if (validation.success) {
+            final now = DateTime.now();
+            _metadata = _metadata.copyWith(
+              lastSuccessAt: now,
+              retryCount: 0,
+              nextAttemptAt: now.add(_refreshInterval),
+            );
+            await _saveMetadata();
+            await _scheduleRefresh();
+            return;
+          }
+
+          if (validation.retryable) {
+            if (kDebugMode) {
+              print('⚠️ TokenRefreshService: Validação via idTokenChanges pediu retry');
+            }
+            await _scheduleRefresh();
+            return;
+          }
+
+          await _handleHardFailure(validation.message);
+        } catch (error, stackTrace) {
+          if (kDebugMode) {
+            print('⚠️ TokenRefreshService: Erro ao tratar idTokenChanges -> $error');
+            debugPrintStack(stackTrace: stackTrace);
+          }
+        }
+      },
+      onError: (Object error) {
+        if (kDebugMode) {
+          print('⚠️ TokenRefreshService: Stream idTokenChanges erro -> $error');
+        }
+      },
+      cancelOnError: false,
+    );
+  }
+
+  void _stopFirebaseTokenListener() {
+    _idTokenSubscription?.cancel();
+    _idTokenSubscription = null;
+  }
 }
 
 class _TokenRefreshMetadata {
