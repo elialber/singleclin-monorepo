@@ -1,17 +1,21 @@
 # 🎯 Plano de Execução SingleClin - Sistema de Entrega Estruturado
 
-> **Objetivo**: Entregar um sistema funcional e testado, vencendo a procrastinação através de tarefas pequenas e feedback imediato.
+> **Objetivo**: Entregar um sistema funcional e testado, vencendo a procrastinação através de
+> tarefas pequenas e feedback imediato.
 
 ## 📊 Visão Geral e Métricas de Sucesso
 
 ### Progresso Geral
+
 - [x] **FASE 1**: Base Sólida Backend-Frontend ✅ (25%) **COMPLETA!**
 - [ ] **FASE 2**: Mobile Funcionando 100% ✅ (50%)
 - [ ] **FASE 3**: Layout que Não Envergonha ✅ (75%)
 - [ ] **FASE 4**: Deploy e Sustentabilidade ✅ (100%)
 
 ### Métricas de Sucesso por Fase
-- **Fase 1**: ✅ **53 testes de API passando** + **6 testes E2E automatizados** + Web-admin funcionando **SUPERADO!**
+
+- **Fase 1**: ✅ **53 testes de API passando** + **6 testes E2E automatizados** + Web-admin
+  funcionando **SUPERADO!**
 - **Fase 2**: ✅ 0% de dados mock no mobile + Cache funcionando
 - **Fase 3**: ✅ App responsivo em 3 tamanhos de tela + Performance aceitável
 - **Fase 4**: ✅ Deploy automático + App funcionando em produção
@@ -23,6 +27,7 @@
 > **Anti-Procrastinação**: Execute isso ANTES de ler o resto. Momentum é tudo!
 
 ### ⚡ Script Imediato de Início ✅ **EXECUTADO!**
+
 ```bash
 # 1. Verificar se backend está rodando (2 min) ✅
 cd packages/backend
@@ -37,6 +42,7 @@ dotnet run &
 ```
 
 ### 🎯 Primeiro Teste ✅ **COMPLETO!**
+
 - [x] Criar `packages/backend-tests/Controllers/HealthControllerTests.cs` ✅
 - [x] Testar endpoint `/api/health/info` e outros ✅
 - [x] Ver teste VERDE (4/4 passaram!) ✅
@@ -47,11 +53,13 @@ dotnet run &
 ---
 
 ## 📅 FASE 1: Base Sólida Backend-Frontend (Dias 1-4)
+
 > **Filosofia**: Se a base não estiver sólida, o resto desmorona
 
 ### 🔧 Dia 1: Configuração de Testes ✅ **COMPLETO!**
 
 #### 1.1 Setup Inicial de Testes ✅ **EXECUTADO!**
+
 - [x] ✅ **Dependências já configuradas!** (xUnit + FluentAssertions + Moq)
   - [x] Projeto `SingleClin.API.Tests.csproj` já existia ✅
   - [x] Script `"test": "dotnet test"` funcionando ✅
@@ -67,6 +75,7 @@ dotnet run &
   - **Resultado**: Funcionou perfeitamente! ✅
 
 #### 1.2 Testes de Endpoints Críticos ✅ **EXECUTADO!**
+
 - [x] ✅ **Teste de autenticação**
   - [x] `AuthControllerTests.cs` criado ✅
   - [x] Testado atributos e estrutura do AuthController ✅
@@ -89,6 +98,7 @@ dotnet run &
 ### 🔧 Dia 2: Validação Web-Admin ✅ **COMPLETO E AUTOMATIZADO!**
 
 #### ✅ **Web-admin Iniciado com Sucesso!**
+
 - [x] ✅ **Servidor rodando em http://localhost:3000**
 - [x] ✅ **Vite build funcionando perfeitamente**
 - [x] ✅ **Pronto para testes manuais**
@@ -96,6 +106,7 @@ dotnet run &
 - **Status**: Base sólida confirmada! ✅
 
 #### 2.1 ✅ **Testes Automatizados E2E (Substituiu Testes Manuais)**
+
 - [x] ✅ **Aplicação carrega com sucesso**
   - [x] Página de login do SingleClin renderizada ✅
   - [x] Nenhum erro crítico de JavaScript ✅
@@ -131,6 +142,7 @@ dotnet run &
   - **Tempo**: Automatizado (antes: 5 min)
 
 #### ✅ **RESULTADO DA AUTOMAÇÃO**
+
 - **6/6 testes E2E passando com Playwright** ✅
 - **Todos os testes manuais substituídos por automação** ✅
 - **Arquivo**: `packages/web-admin/tests/e2e/web-admin-validation.spec.ts` ✅
@@ -139,6 +151,7 @@ dotnet run &
 - **Ganho**: 65 minutos economizados em cada execução! 🚀
 
 #### 2.2 Correções Críticas Encontradas
+
 - [ ] Listar bugs encontrados nos testes manuais
 - [ ] Priorizar por criticidade (crash > dados errados > visual)
 - [ ] Corrigir 1 bug por vez
@@ -148,6 +161,7 @@ dotnet run &
 ### 🔧 Dia 3-4: CI Básico e Documentação
 
 #### 3.1 Integração Contínua Simples
+
 - [x] ✅ **Criar `.github/workflows/test.yml`**
   - [x] Workflow com PostgreSQL service ✅
   - [x] Backend tests + Frontend build + E2E tests ✅
@@ -160,6 +174,7 @@ dotnet run &
 - **Tempo**: 25 minutos (5 min abaixo do esperado!)
 
 #### 3.2 Documentação Mínima
+
 - [x] ✅ **Atualizar README com comandos para rodar**
   - [x] Quick start completo ✅
   - [x] Comandos para backend, frontend e mobile ✅
@@ -175,11 +190,13 @@ dotnet run &
 ---
 
 ## 📱 FASE 2: Mobile Funcionando 100% (Dias 5-7)
+
 > **Ordem Correta**: Integração ANTES de Cache!
 
 ### 🔧 Dia 5: Integração Mobile-Backend
 
 #### 2.1 Preparação da Integração
+
 - [ ] Verificar configuração da API base URL
   - [ ] Confirmar endpoint no `packages/mobile/lib/data/`
   - [ ] Testar conectividade básica
@@ -191,6 +208,7 @@ dotnet run &
   - **Tempo**: 15 minutos
 
 #### 2.2 Substituir Mock Data (1 tela por vez)
+
 - [ ] Tela de Autenticação
   - [ ] Remover mock de login
   - [ ] Integrar com Firebase Auth + Backend
@@ -213,6 +231,7 @@ dotnet run &
 ### 🔧 Dia 6: Cache Simples e Efetivo
 
 #### 2.3 Implementar Cache com Dio
+
 - [ ] Instalar `dio_cache_interceptor`
   - [ ] Adicionar ao `pubspec.yaml`
   - [ ] Configurar no client Dio
@@ -234,12 +253,14 @@ dotnet run &
 ### 🔧 Dia 7: Monitoramento e Tratamento de Erros
 
 #### 2.4 Firebase Crashlytics
+
 - [ ] Configurar Crashlytics no projeto
 - [ ] Testar com crash forçado
 - [ ] Verificar relatório no console
 - **Tempo**: 20 minutos
 
 #### 2.5 Tratamento de Erros Robusto
+
 - [ ] States de loading em todas as telas
 - [ ] Messages de erro user-friendly
 - [ ] Retry automático para falhas de rede
@@ -248,11 +269,13 @@ dotnet run &
 ---
 
 ## 🎨 FASE 3: Layout que Não Envergonha (Dias 8-10)
+
 > **Foco**: Consertar o quebrado, não criar o perfeito
 
 ### 🔧 Dia 8: Auditoria e Correções Básicas
 
 #### 3.1 Teste de Responsividade Manual
+
 - [ ] Testar em 3 tamanhos:
   - [ ] Phone small (320px width) - iPhone SE
   - [ ] Phone normal (375px width) - iPhone 12
@@ -266,6 +289,7 @@ dotnet run &
   - **Tempo**: 10 minutos
 
 #### 3.2 Correções Prioritárias
+
 - [ ] Corrigir overflow horizontal
 - [ ] Garantir touch targets de 44px mínimo
 - [ ] Corrigir textos cortados
@@ -275,12 +299,14 @@ dotnet run &
 ### 🔧 Dia 9: Consistência Visual
 
 #### 3.3 Aplicar Design System Básico
+
 - [ ] Usar espaçamentos consistentes (8px, 16px, 24px)
 - [ ] Aplicar cores do tema em todos os componentes
 - [ ] Padronizar bordas e sombras
 - **Tempo**: 20 minutos por tela
 
 #### 3.4 Loading States e Feedback
+
 - [ ] Shimmer/skeleton loading em listas
 - [ ] Loading spinners em botões
 - [ ] States vazios (empty states) básicos
@@ -289,12 +315,14 @@ dotnet run &
 ### 🔧 Dia 10: Performance Essencial
 
 #### 3.5 Otimizações de Imagem
+
 - [ ] Usar `cached_network_image` em todas as imagens
 - [ ] Implementar lazy loading básico
 - [ ] Comprimir imagens grandes
 - **Tempo**: 20 minutos
 
 #### 3.6 Teste de Performance
+
 - [ ] Abrir app em device físico antigo (se possível)
 - [ ] Testar scrolling suave em listas grandes
 - [ ] Verificar tempo de carregamento de telas
@@ -304,11 +332,13 @@ dotnet run &
 ---
 
 ## 🚀 FASE 4: Deploy e Sustentabilidade (Dias 11-12)
+
 > **Objetivo**: Botar no ar e dormir tranquilo
 
 ### 🔧 Dia 11: Pipeline de Build
 
 #### 4.1 Build Android Automatizado
+
 - [ ] Configurar build.gradle para release
 - [ ] Criar script para gerar APK/AAB
 - [ ] Testar build local
@@ -321,6 +351,7 @@ dotnet run &
   - **Tempo**: 15 minutos
 
 #### 4.2 Build iOS (se necessário)
+
 - [ ] Configurar certificados
 - [ ] Testar build local
 - **Tempo**: 30 minutos
@@ -329,6 +360,7 @@ dotnet run &
 ### 🔧 Dia 12: Deploy e Documentação
 
 #### 4.3 Deploy Backend
+
 - [ ] Escolher provedor (Heroku/Railway/DigitalOcean)
 - [ ] Configurar variáveis de ambiente
 - [ ] Deploy e teste básico
@@ -336,12 +368,14 @@ dotnet run &
 - **Escape hatch**: Usar ambiente local para demonstração
 
 #### 4.4 Documentação Automática
+
 - [ ] Configurar Swagger no backend
 - [ ] Gerar documentação da API
 - [ ] Atualizar README principal
 - **Tempo**: 20 minutos
 
 #### 4.5 Documentação Final
+
 - [ ] README com instruções completas de setup
 - [ ] Documento de "Como fazer deploy"
 - [ ] Listar funcionalidades implementadas
@@ -352,23 +386,28 @@ dotnet run &
 ## 🛡️ Estratégias Anti-Procrastinação
 
 ### ⏱️ Regra dos 25 Minutos
+
 - **Máximo 25 minutos por tarefa**
 - Se passar, quebrar em sub-tarefas menores
 - Fazer pausas de 5 minutos entre tarefas
 
 ### 🎯 Feedback Imediato
+
 A cada hora você DEVE ter:
+
 - ✅ 1 coisa funcionando que não funcionava antes
 - ✅ 1 commit novo
 - ✅ Sensação tangível de progresso
 
 ### 🚪 Escape Hatches (Válvulas de Escape)
+
 - **Se teste de API falhar**: Use mock temporário
 - **Se integração mobile travar**: Deixe 1-2 telas com mock
 - **Se layout quebrar muito**: "Funciona no meu device" é ok
 - **Se deploy complicar**: APK manual é suficiente para v1.0
 
 ### 🏃‍♂️ Momentum Building
+
 1. **Sempre começar pelo mais fácil**
 2. **Primeiro fazer funcionar, depois otimizar**
 3. **Commit pequenos e frequentes**
@@ -379,6 +418,7 @@ A cada hora você DEVE ter:
 ## 📝 Scripts de Validação
 
 ### Testar Backend
+
 ```bash
 cd packages/backend
 npm test
@@ -387,6 +427,7 @@ curl http://localhost:5000/health
 ```
 
 ### Testar Web-Admin
+
 ```bash
 cd packages/web-admin
 npm run dev
@@ -395,6 +436,7 @@ npm run dev
 ```
 
 ### Testar Mobile
+
 ```bash
 cd packages/mobile
 flutter pub get
@@ -403,6 +445,7 @@ flutter run
 ```
 
 ### Build Completo
+
 ```bash
 # Backend
 cd packages/backend && npm run build
@@ -419,6 +462,7 @@ cd packages/mobile && flutter build apk
 ## 📊 Checklist Final de Produção
 
 ### Antes do Deploy
+
 - [ ] Todos os testes de backend passando
 - [ ] Web-admin faz login e mostra dados
 - [ ] Mobile conecta ao backend real
@@ -427,6 +471,7 @@ cd packages/mobile && flutter build apk
 - [ ] Build de produção funciona
 
 ### Pós-Deploy
+
 - [ ] Backend acessível publicamente
 - [ ] APIs respondendo corretamente
 - [ ] Mobile aponta para backend de produção
@@ -438,9 +483,11 @@ cd packages/mobile && flutter build apk
 ## 🎉 **CONQUISTAS REALIZADAS - CELEBRE!** 🚀
 
 ### ✅ **FASE 1 COMPLETA - BASE SÓLIDA ESTABELECIDA!**
+
 **Data de Conclusão**: 16/09/2025
 
 #### 🏆 **Conquistas Superadas:**
+
 - ✅ **53 testes backend passando** (Meta: 5+ testes) - **SUPERADO 10x!** 🎯
 - ✅ **Web-admin rodando perfeitamente** em http://localhost:3000 🌐
 - ✅ **Backend .NET funcionando** em http://localhost:5010 ⚙️
@@ -448,12 +495,14 @@ cd packages/mobile && flutter build apk
 - ✅ **Endpoints críticos validados** (Auth, User, Clinic) 🔐
 
 #### 📈 **Progresso em Números:**
+
 - **Testes Criados**: 14 novos testes
 - **Tempo Gasto**: ~2 horas (Meta: 4 dias) - **50% mais rápido!** ⚡
 - **Escape Hatches Aplicados**: 3 (funcionaram perfeitamente!) 🚪
 - **Cobertura**: AuthController, UserController, ClinicController, HealthController ✅
 
 #### 🎯 **Próximas Metas:**
+
 - **FASE 2**: Mobile 100% funcional (0% mock data)
 - **FASE 3**: Layout responsivo
 - **FASE 4**: Deploy em produção
@@ -470,6 +519,5 @@ cd packages/mobile && flutter build apk
 
 ---
 
-> **Lembre-se**: Perfeito é inimigo do bom. Entregue funcional primeiro, otimize depois.
-> **Mantra**: "Fazer → Funcionar → Melhorar"
-> **Comprovado**: **A estratégia anti-procrastinação FUNCIONOU!** 🏆
+> **Lembre-se**: Perfeito é inimigo do bom. Entregue funcional primeiro, otimize depois. **Mantra**:
+> "Fazer → Funcionar → Melhorar" **Comprovado**: **A estratégia anti-procrastinação FUNCIONOU!** 🏆

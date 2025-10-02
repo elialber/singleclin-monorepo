@@ -1,6 +1,7 @@
 # SingleClin - Guia de Deploy Azure
 
-Este guia detalha como fazer o deploy da aplicação SingleClin no Azure usando Container Apps de forma econômica e segura.
+Este guia detalha como fazer o deploy da aplicação SingleClin no Azure usando Container Apps de
+forma econômica e segura.
 
 ## 📋 Pré-requisitos
 
@@ -69,6 +70,7 @@ nano scripts/deploy-container-apps.sh
 ```
 
 Este script irá criar:
+
 - Resource Group
 - Container Registry
 - Key Vault com secrets básicos
@@ -250,6 +252,7 @@ az containerapp logs show \
 ### Atualizações Automáticas
 
 Commits na branch `main` acionam automaticamente:
+
 1. Build das imagens
 2. Testes automatizados
 3. Deploy para produção
@@ -331,4 +334,5 @@ az containerapp revision restart \
 
 ---
 
-**⚠️ Importante**: Mantenha suas credenciais seguras e nunca commite secrets no código. Use sempre o Key Vault para armazenar informações sensíveis.
+**⚠️ Importante**: Mantenha suas credenciais seguras e nunca commite secrets no código. Use sempre o
+Key Vault para armazenar informações sensíveis.

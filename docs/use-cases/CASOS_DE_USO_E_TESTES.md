@@ -1,6 +1,7 @@
 # SingleClin - Casos de Uso e Caderno de Testes
 
 ## Sumário
+
 1. [Visão Geral do Sistema](#visão-geral-do-sistema)
 2. [Casos de Uso](#casos-de-uso)
    - [Web Admin](#casos-de-uso---web-admin)
@@ -19,12 +20,14 @@
 ## Visão Geral do Sistema
 
 O SingleClin é um sistema de gestão de saúde baseado em créditos que permite:
+
 - Pacientes compram planos de tratamento em uma clínica principal
 - Utilizam créditos em qualquer clínica parceira da rede
 - Gestão completa através de portal web administrativo
 - Aplicativo móvel para pacientes e clínicas
 
 ### Arquitetura
+
 - **Frontend Web Admin**: React + TypeScript + Material-UI
 - **Backend API**: .NET 9 + PostgreSQL + Redis + Firebase
 - **Mobile App**: Flutter + GetX + Firebase Auth
@@ -36,9 +39,10 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 ### Casos de Uso - Web Admin
 
 #### UC001: Autenticação de Administrador
-**Ator**: Administrador do Sistema
-**Pré-condições**: Usuário cadastrado com perfil de administrador
+
+**Ator**: Administrador do Sistema **Pré-condições**: Usuário cadastrado com perfil de administrador
 **Fluxo Principal**:
+
 1. Administrador acessa a página de login
 2. Informa email e senha
 3. Sistema valida credenciais no Firebase
@@ -46,6 +50,7 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 5. Sistema redireciona para dashboard
 
 **Fluxo Alternativo - Login com Google**:
+
 1. Administrador clica em "Entrar com Google"
 2. Sistema abre popup de autenticação Google
 3. Usuário autoriza acesso
@@ -54,9 +59,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 **Pós-condições**: Usuário autenticado com acesso ao dashboard
 
 #### UC002: Gestão de Clínicas
-**Ator**: Administrador
-**Pré-condições**: Autenticado no sistema
-**Fluxo Principal**:
+
+**Ator**: Administrador **Pré-condições**: Autenticado no sistema **Fluxo Principal**:
+
 1. Administrador acessa menu "Clínicas"
 2. Sistema exibe lista de clínicas cadastradas
 3. Administrador pode:
@@ -67,9 +72,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
    - Definir tipo (Origin/Partner)
 
 #### UC003: Gestão de Planos
-**Ator**: Administrador
-**Pré-condições**: Autenticado no sistema
-**Fluxo Principal**:
+
+**Ator**: Administrador **Pré-condições**: Autenticado no sistema **Fluxo Principal**:
+
 1. Administrador acessa menu "Planos"
 2. Sistema exibe lista de planos
 3. Administrador pode:
@@ -79,9 +84,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
    - Ativar/desativar plano
 
 #### UC004: Visualização de Dashboard
-**Ator**: Administrador
-**Pré-condições**: Autenticado no sistema
-**Fluxo Principal**:
+
+**Ator**: Administrador **Pré-condições**: Autenticado no sistema **Fluxo Principal**:
+
 1. Sistema exibe métricas principais:
    - Total de pacientes
    - Total de transações
@@ -93,9 +98,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
    - Top 10 clínicas
 
 #### UC005: Gestão de Transações
-**Ator**: Administrador
-**Pré-condições**: Autenticado no sistema
-**Fluxo Principal**:
+
+**Ator**: Administrador **Pré-condições**: Autenticado no sistema **Fluxo Principal**:
+
 1. Administrador acessa menu "Transações"
 2. Sistema exibe lista de transações
 3. Administrador pode:
@@ -105,9 +110,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
    - Exportar relatório
 
 #### UC006: Relatórios Gerenciais
-**Ator**: Administrador
-**Pré-condições**: Autenticado no sistema
-**Fluxo Principal**:
+
+**Ator**: Administrador **Pré-condições**: Autenticado no sistema **Fluxo Principal**:
+
 1. Administrador acessa menu "Relatórios"
 2. Seleciona tipo de relatório:
    - Utilização de planos
@@ -120,9 +125,10 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 ### Casos de Uso - Backend API
 
 #### UC007: Autenticação via Firebase
-**Ator**: Sistema Frontend (Web/Mobile)
-**Pré-condições**: Token Firebase válido
-**Fluxo Principal**:
+
+**Ator**: Sistema Frontend (Web/Mobile) **Pré-condições**: Token Firebase válido **Fluxo
+Principal**:
+
 1. Frontend envia token Firebase
 2. Backend valida token com Firebase Admin SDK
 3. Backend busca/cria usuário no banco local
@@ -130,9 +136,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 5. Backend retorna tokens de acesso e refresh
 
 #### UC008: Validação de QR Code
-**Ator**: Aplicativo da Clínica
-**Pré-condições**: QR Code válido gerado
-**Fluxo Principal**:
+
+**Ator**: Aplicativo da Clínica **Pré-condições**: QR Code válido gerado **Fluxo Principal**:
+
 1. Clínica escaneia QR Code
 2. Backend valida:
    - Token JWT no QR Code
@@ -143,9 +149,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 5. Backend retorna confirmação
 
 #### UC009: Geração de QR Code
-**Ator**: Aplicativo do Paciente
-**Pré-condições**: Paciente com plano ativo
-**Fluxo Principal**:
+
+**Ator**: Aplicativo do Paciente **Pré-condições**: Paciente com plano ativo **Fluxo Principal**:
+
 1. Paciente solicita QR Code
 2. Backend verifica saldo de créditos
 3. Backend gera JWT temporário
@@ -153,9 +159,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 5. Backend retorna QR Code
 
 #### UC010: Gestão de Créditos
-**Ator**: Sistema
-**Pré-condições**: Transação validada
-**Fluxo Principal**:
+
+**Ator**: Sistema **Pré-condições**: Transação validada **Fluxo Principal**:
+
 1. Sistema identifica plano do paciente
 2. Sistema verifica saldo disponível
 3. Sistema debita créditos
@@ -165,9 +171,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 ### Casos de Uso - Mobile App
 
 #### UC011: Login de Paciente
-**Ator**: Paciente
-**Pré-condições**: App instalado
-**Fluxo Principal**:
+
+**Ator**: Paciente **Pré-condições**: App instalado **Fluxo Principal**:
+
 1. Paciente abre o app
 2. Informa email e senha
 3. App autentica via Firebase
@@ -175,15 +181,16 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 5. App exibe tela inicial
 
 **Fluxo Alternativo - Biometria**:
+
 1. App verifica biometria disponível
 2. Paciente autoriza com biometria
 3. App recupera credenciais salvas
 4. App realiza login automático
 
 #### UC012: Visualização de Planos
-**Ator**: Paciente
-**Pré-condições**: Autenticado no app
-**Fluxo Principal**:
+
+**Ator**: Paciente **Pré-condições**: Autenticado no app **Fluxo Principal**:
+
 1. Paciente acessa "Meus Planos"
 2. App exibe planos ativos
 3. Para cada plano, mostra:
@@ -193,9 +200,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
    - Histórico de uso
 
 #### UC013: Geração de QR Code para Atendimento
-**Ator**: Paciente
-**Pré-condições**: Plano ativo com créditos
-**Fluxo Principal**:
+
+**Ator**: Paciente **Pré-condições**: Plano ativo com créditos **Fluxo Principal**:
+
 1. Paciente seleciona plano
 2. Toca em "Gerar QR Code"
 3. App solicita ao backend
@@ -203,9 +210,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 5. QR Code expira em 30 minutos
 
 #### UC014: Scanner de QR Code (Clínica)
-**Ator**: Funcionário da Clínica
-**Pré-condições**: Login com perfil de clínica
-**Fluxo Principal**:
+
+**Ator**: Funcionário da Clínica **Pré-condições**: Login com perfil de clínica **Fluxo Principal**:
+
 1. Funcionário acessa scanner
 2. Aponta câmera para QR Code
 3. App lê e valida QR Code
@@ -214,9 +221,9 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 6. App registra transação
 
 #### UC015: Histórico de Atendimentos
-**Ator**: Paciente/Clínica
-**Pré-condições**: Autenticado
-**Fluxo Principal**:
+
+**Ator**: Paciente/Clínica **Pré-condições**: Autenticado **Fluxo Principal**:
+
 1. Usuário acessa "Histórico"
 2. App exibe lista de atendimentos
 3. Para cada atendimento:
@@ -234,6 +241,7 @@ O SingleClin é um sistema de gestão de saúde baseado em créditos que permite
 #### Backend (.NET)
 
 **TU001: AuthService - Validação de Token Firebase**
+
 ```csharp
 [Test]
 public async Task ValidateFirebaseToken_ValidToken_ReturnsUser()
@@ -241,10 +249,10 @@ public async Task ValidateFirebaseToken_ValidToken_ReturnsUser()
     // Arrange
     var mockToken = "valid.firebase.token";
     var expectedUid = "firebase123";
-    
+
     // Act
     var result = await _authService.ValidateFirebaseTokenAsync(mockToken);
-    
+
     // Assert
     Assert.IsNotNull(result);
     Assert.AreEqual(expectedUid, result.FirebaseUid);
@@ -252,6 +260,7 @@ public async Task ValidateFirebaseToken_ValidToken_ReturnsUser()
 ```
 
 **TU002: QRCodeService - Geração de Token**
+
 ```csharp
 [Test]
 public void GenerateQRToken_ValidUser_ReturnsValidJWT()
@@ -259,10 +268,10 @@ public void GenerateQRToken_ValidUser_ReturnsValidJWT()
     // Arrange
     var userId = "user123";
     var planId = "plan456";
-    
+
     // Act
     var token = _qrCodeService.GenerateToken(userId, planId);
-    
+
     // Assert
     Assert.IsNotNull(token);
     Assert.IsTrue(token.Length > 0);
@@ -271,6 +280,7 @@ public void GenerateQRToken_ValidUser_ReturnsValidJWT()
 ```
 
 **TU003: PlanService - Débito de Créditos**
+
 ```csharp
 [Test]
 public async Task DebitCredits_SufficientBalance_Success()
@@ -279,10 +289,10 @@ public async Task DebitCredits_SufficientBalance_Success()
     var userPlanId = "userplan123";
     var creditsToDebit = 5;
     var initialBalance = 10;
-    
+
     // Act
     var result = await _planService.DebitCreditsAsync(userPlanId, creditsToDebit);
-    
+
     // Assert
     Assert.IsTrue(result.Success);
     Assert.AreEqual(initialBalance - creditsToDebit, result.RemainingCredits);
@@ -292,16 +302,17 @@ public async Task DebitCredits_SufficientBalance_Success()
 #### Frontend (React)
 
 **TU004: AuthService - Login com Email**
+
 ```typescript
 describe('AuthService', () => {
   it('deve fazer login com email e senha', async () => {
     // Arrange
     const email = 'test@example.com';
     const password = 'Test123@';
-    
+
     // Act
     const result = await authService.login(email, password);
-    
+
     // Assert
     expect(result).toBeDefined();
     expect(result.accessToken).toBeTruthy();
@@ -311,15 +322,16 @@ describe('AuthService', () => {
 ```
 
 **TU005: Dashboard - Formatação de Valores**
+
 ```typescript
 describe('Dashboard Utils', () => {
   it('deve formatar valores monetários corretamente', () => {
     // Arrange
     const value = 1234.56;
-    
+
     // Act
     const formatted = formatCurrency(value);
-    
+
     // Assert
     expect(formatted).toBe('R$ 1.234,56');
   });
@@ -329,16 +341,17 @@ describe('Dashboard Utils', () => {
 #### Mobile (Flutter)
 
 **TU006: AuthController - Validação de Login**
+
 ```dart
 test('deve validar credenciais de login', () async {
   // Arrange
   final controller = AuthController();
   const email = 'test@example.com';
   const password = 'Test123@';
-  
+
   // Act
   final result = await controller.login(email, password);
-  
+
   // Assert
   expect(result, isTrue);
   expect(controller.user.value, isNotNull);
@@ -349,21 +362,23 @@ test('deve validar credenciais de login', () async {
 ### Testes de Integração
 
 #### TI001: Fluxo de Autenticação Completo
+
 **Objetivo**: Validar integração Firebase + Backend + Frontend
+
 ```javascript
 describe('Fluxo de Autenticação', () => {
   it('deve autenticar usuário do Firebase ao Dashboard', async () => {
     // 1. Login no Firebase
     const firebaseUser = await signInWithEmail('test@example.com', 'Test123@');
-    
+
     // 2. Obter token Firebase
     const idToken = await firebaseUser.getIdToken();
-    
+
     // 3. Autenticar no backend
     const response = await api.post('/auth/login/firebase', {
       firebaseToken: idToken
     });
-    
+
     // 4. Validar resposta
     expect(response.status).toBe(200);
     expect(response.data.accessToken).toBeDefined();
@@ -373,26 +388,28 @@ describe('Fluxo de Autenticação', () => {
 ```
 
 #### TI002: Fluxo de QR Code
+
 **Objetivo**: Validar geração e validação de QR Code
+
 ```csharp
 [Test]
 public async Task QRCodeFlow_GenerateAndValidate_Success()
 {
     // 1. Gerar QR Code
-    var generateRequest = new QRCodeGenerateRequest 
-    { 
+    var generateRequest = new QRCodeGenerateRequest
+    {
         UserId = "user123",
-        PlanId = "plan456" 
+        PlanId = "plan456"
     };
     var qrCode = await _qrCodeService.GenerateAsync(generateRequest);
-    
+
     // 2. Validar QR Code
-    var validateRequest = new QRCodeValidateRequest 
-    { 
-        Token = qrCode.Token 
+    var validateRequest = new QRCodeValidateRequest
+    {
+        Token = qrCode.Token
     };
     var validation = await _qrCodeService.ValidateAsync(validateRequest);
-    
+
     // 3. Verificar transação criada
     Assert.IsTrue(validation.Success);
     Assert.IsNotNull(validation.TransactionId);
@@ -402,6 +419,7 @@ public async Task QRCodeFlow_GenerateAndValidate_Success()
 ### Testes E2E
 
 #### TE001: Jornada Completa do Administrador
+
 ```javascript
 describe('E2E - Admin Journey', () => {
   beforeEach(() => {
@@ -413,20 +431,20 @@ describe('E2E - Admin Journey', () => {
     cy.get('[data-testid="email-input"]').type('admin@singleclin.com');
     cy.get('[data-testid="password-input"]').type('Admin123@');
     cy.get('[data-testid="login-button"]').click();
-    
+
     // Aguardar dashboard
     cy.url().should('include', '/dashboard');
-    
+
     // Navegar para planos
     cy.get('[data-testid="menu-plans"]').click();
-    
+
     // Criar novo plano
     cy.get('[data-testid="add-plan-button"]').click();
     cy.get('[data-testid="plan-name"]').type('Plano Teste E2E');
     cy.get('[data-testid="plan-credits"]').type('50');
     cy.get('[data-testid="plan-price"]').type('299.90');
     cy.get('[data-testid="save-plan-button"]').click();
-    
+
     // Verificar plano criado
     cy.contains('Plano Teste E2E').should('exist');
   });
@@ -434,6 +452,7 @@ describe('E2E - Admin Journey', () => {
 ```
 
 #### TE002: Jornada do Paciente - Mobile
+
 ```dart
 testWidgets('Jornada completa do paciente', (WidgetTester tester) async {
   // Login
@@ -442,14 +461,14 @@ testWidgets('Jornada completa do paciente', (WidgetTester tester) async {
   await tester.enterText(find.byKey(Key('password_field')), 'Test123@');
   await tester.tap(find.byKey(Key('login_button')));
   await tester.pumpAndSettle();
-  
+
   // Verificar tela inicial
   expect(find.text('Meus Planos'), findsOneWidget);
-  
+
   // Gerar QR Code
   await tester.tap(find.byKey(Key('generate_qr_button')));
   await tester.pumpAndSettle();
-  
+
   // Verificar QR Code exibido
   expect(find.byType(QrImage), findsOneWidget);
 });
@@ -458,8 +477,9 @@ testWidgets('Jornada completa do paciente', (WidgetTester tester) async {
 ### Testes de Sistema Integrado
 
 #### TSI001: Fluxo Completo de Atendimento
-**Cenário**: Paciente usa créditos em clínica parceira
-**Atores**: Paciente (Mobile), Clínica (Mobile), Admin (Web)
+
+**Cenário**: Paciente usa créditos em clínica parceira **Atores**: Paciente (Mobile), Clínica
+(Mobile), Admin (Web)
 
 ```gherkin
 Feature: Atendimento com Créditos
@@ -503,6 +523,7 @@ Feature: Atendimento com Créditos
 ```
 
 #### TSI002: Tratamento de Erros - QR Code Expirado
+
 ```gherkin
 Scenario: QR Code expirado
   Given um QR Code foi gerado há 35 minutos
@@ -512,6 +533,7 @@ Scenario: QR Code expirado
 ```
 
 #### TSI003: Concorrência - Uso Simultâneo
+
 ```gherkin
 Scenario: Tentativa de uso simultâneo do mesmo QR Code
   Given um QR Code válido foi gerado
@@ -528,6 +550,7 @@ Scenario: Tentativa de uso simultâneo do mesmo QR Code
 ### Segurança
 
 #### SEC001: Tentativa de Reutilização de QR Code
+
 - **Objetivo**: Validar que QR Codes não podem ser reutilizados
 - **Passos**:
   1. Gerar QR Code válido
@@ -536,6 +559,7 @@ Scenario: Tentativa de uso simultâneo do mesmo QR Code
 - **Resultado Esperado**: Sistema bloqueia segunda tentativa
 
 #### SEC002: Acesso não Autorizado a APIs
+
 - **Objetivo**: Validar autenticação JWT
 - **Passos**:
   1. Tentar acessar endpoints sem token
@@ -546,31 +570,35 @@ Scenario: Tentativa de uso simultâneo do mesmo QR Code
 ### Performance
 
 #### PERF001: Carga no Dashboard
+
 - **Objetivo**: Validar performance com volume de dados
-- **Cenário**: 
+- **Cenário**:
   - 10.000 pacientes
   - 100.000 transações
   - 50 clínicas ativas
 - **Critério**: Dashboard carrega em < 3 segundos
 
 #### PERF002: Geração de QR Code sob Carga
+
 - **Objetivo**: Validar geração simultânea
 - **Cenário**: 100 requisições simultâneas
-- **Critério**: 
+- **Critério**:
   - Tempo de resposta < 500ms
   - Taxa de sucesso > 99%
 
 ### Resiliência
 
 #### RES001: Falha do Redis
+
 - **Objetivo**: Validar comportamento sem cache
 - **Cenário**: Redis indisponível
-- **Resultado Esperado**: 
+- **Resultado Esperado**:
   - Sistema continua operacional
   - Log de erro gerado
   - Performance degradada aceitável
 
 #### RES002: Indisponibilidade do Firebase
+
 - **Objetivo**: Validar fallback de autenticação
 - **Cenário**: Firebase Auth fora do ar
 - **Resultado Esperado**:
@@ -581,22 +609,23 @@ Scenario: Tentativa de uso simultâneo do mesmo QR Code
 
 ## Matriz de Rastreabilidade
 
-| Requisito | Caso de Uso | Teste Unitário | Teste Integração | Teste E2E |
-|-----------|-------------|----------------|------------------|-----------|
-| Autenticação Firebase | UC001, UC007, UC011 | TU001, TU004, TU006 | TI001 | TE001, TE002 |
-| Gestão de Planos | UC003, UC012 | TU003 | - | TE001 |
-| QR Code | UC008, UC009, UC013, UC014 | TU002 | TI002 | TSI001 |
-| Dashboard | UC004 | TU005 | - | TE001 |
-| Transações | UC005, UC010 | TU003 | TI002 | TSI001 |
-| Segurança | Todos | - | - | SEC001, SEC002 |
-| Performance | UC004, UC009 | - | - | PERF001, PERF002 |
-| Resiliência | UC007, UC008 | - | - | RES001, RES002 |
+| Requisito             | Caso de Uso                | Teste Unitário      | Teste Integração | Teste E2E        |
+| --------------------- | -------------------------- | ------------------- | ---------------- | ---------------- |
+| Autenticação Firebase | UC001, UC007, UC011        | TU001, TU004, TU006 | TI001            | TE001, TE002     |
+| Gestão de Planos      | UC003, UC012               | TU003               | -                | TE001            |
+| QR Code               | UC008, UC009, UC013, UC014 | TU002               | TI002            | TSI001           |
+| Dashboard             | UC004                      | TU005               | -                | TE001            |
+| Transações            | UC005, UC010               | TU003               | TI002            | TSI001           |
+| Segurança             | Todos                      | -                   | -                | SEC001, SEC002   |
+| Performance           | UC004, UC009               | -                   | -                | PERF001, PERF002 |
+| Resiliência           | UC007, UC008               | -                   | -                | RES001, RES002   |
 
 ---
 
 ## Checklist de Validação
 
 ### Pré-Produção
+
 - [ ] Todos os testes unitários passando (cobertura > 80%)
 - [ ] Testes de integração executados com sucesso
 - [ ] Testes E2E em ambiente de staging
@@ -606,6 +635,7 @@ Scenario: Tentativa de uso simultâneo do mesmo QR Code
 - [ ] Documentação atualizada
 
 ### Smoke Tests Pós-Deploy
+
 1. [ ] Login via email/senha (Web Admin)
 2. [ ] Login via Google (Web Admin)
 3. [ ] Visualização do Dashboard
@@ -615,6 +645,7 @@ Scenario: Tentativa de uso simultâneo do mesmo QR Code
 7. [ ] Consulta de histórico
 
 ### Monitoramento Contínuo
+
 - Uptime da API > 99.9%
 - Tempo de resposta médio < 200ms
 - Taxa de erro < 0.1%
@@ -628,9 +659,12 @@ Scenario: Tentativa de uso simultâneo do mesmo QR Code
 
 ## Conclusão
 
-Este documento estabelece uma base sólida para garantir a qualidade do sistema SingleClin através de casos de uso bem definidos e uma estratégia de testes abrangente. A execução sistemática destes testes, combinada com monitoramento contínuo, assegurará a confiabilidade e segurança da plataforma.
+Este documento estabelece uma base sólida para garantir a qualidade do sistema SingleClin através de
+casos de uso bem definidos e uma estratégia de testes abrangente. A execução sistemática destes
+testes, combinada com monitoramento contínuo, assegurará a confiabilidade e segurança da plataforma.
 
 ### Próximos Passos
+
 1. Implementar automação dos testes
 2. Configurar pipeline CI/CD com gates de qualidade
 3. Estabelecer métricas de cobertura mínima

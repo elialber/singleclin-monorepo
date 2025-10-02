@@ -3,6 +3,7 @@
 ## Backend Implementation Requirements
 
 ### 1. User Model Extensions
+
 ```csharp
 // Add to User.cs model
 public string FullName => $"{FirstName} {LastName}".Trim();
@@ -13,6 +14,7 @@ public virtual Clinic? Clinic { get; set; }
 ```
 
 ### 2. DTOs Structure
+
 ```csharp
 // UserResponseDto.cs
 public class UserResponseDto
@@ -66,6 +68,7 @@ public class UserFilterDto : PagedRequestDto
 ```
 
 ### 3. UserController Implementation
+
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
@@ -73,42 +76,42 @@ public class UserFilterDto : PagedRequestDto
 public class UsersController : BaseController
 {
     private readonly IUserService _userService;
-    
+
     [HttpGet]
     [AuthorizeRole(UserRole.Administrator, UserRole.ClinicOrigin)]
     public async Task<IActionResult> GetUsers([FromQuery] UserFilterDto filter)
     {
         // Implementation with search, filtering, pagination
     }
-    
+
     [HttpGet("{id}")]
     [AuthorizeRole(UserRole.Administrator, UserRole.ClinicOrigin)]
     public async Task<IActionResult> GetUser(string id)
     {
         // Get single user with validation
     }
-    
+
     [HttpPost]
     [AuthorizeRole(UserRole.Administrator)]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
     {
         // Create user with password hashing, role validation
     }
-    
+
     [HttpPut("{id}")]
     [AuthorizeRole(UserRole.Administrator, UserRole.ClinicOrigin)]
     public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto dto)
     {
         // Update user with authorization checks
     }
-    
+
     [HttpDelete("{id}")]
     [AuthorizeRole(UserRole.Administrator)]
     public async Task<IActionResult> DeleteUser(string id)
     {
         // Soft delete implementation
     }
-    
+
     [HttpPost("{id}/reset-password")]
     [AuthorizeRole(UserRole.Administrator)]
     public async Task<IActionResult> ResetPassword(string id)
@@ -119,6 +122,7 @@ public class UsersController : BaseController
 ```
 
 ### 4. Service Layer Implementation
+
 ```csharp
 public interface IUserService
 {
@@ -135,6 +139,7 @@ public interface IUserService
 ## API Contract Alignment
 
 ### Response Format Standardization
+
 ```typescript
 // Align backend response with frontend expectations
 interface ApiResponse<T> {
@@ -153,11 +158,13 @@ interface PagedResponse<T> {
 ```
 
 ### Search Implementation
+
 - Backend should search across: firstName, lastName, email, phoneNumber
 - Use case-insensitive contains search
 - Phone number search should ignore formatting
 
 ### Role-Based Access Control
+
 - Administrator: Full CRUD on all users
 - ClinicOrigin: Read/Update users in their clinic, no delete
 - ClinicPartner: Read-only access to their clinic users
@@ -166,6 +173,7 @@ interface PagedResponse<T> {
 ## UI/UX Improvements
 
 ### 1. Enhanced User Experience
+
 - **Bulk Operations**: Add checkboxes for bulk status changes, role updates
 - **Advanced Filtering**: Add date range filters for createdAt
 - **Export Functionality**: CSV/Excel export with current filters
@@ -173,6 +181,7 @@ interface PagedResponse<T> {
 - **User Import**: Bulk user creation via CSV upload
 
 ### 2. Visual Enhancements
+
 - **User Avatars**: Display user initials or photo in list
 - **Status Indicators**: Visual timeline for last activity
 - **Role Icons**: Add icons for each role type
@@ -180,12 +189,14 @@ interface PagedResponse<T> {
 - **Empty States**: Better messaging and actions for empty lists
 
 ### 3. Performance Optimizations
+
 - **Virtual Scrolling**: For large user lists
 - **Debounced Search**: Already implemented, optimize delay
 - **Cached Filters**: Remember user's last filter preferences
 - **Optimistic Updates**: Immediate UI feedback on actions
 
 ### 4. Additional Features
+
 - **Activity Log**: Show user's recent actions
 - **Login History**: Last login time and location
 - **Session Management**: Force logout capability
@@ -195,6 +206,7 @@ interface PagedResponse<T> {
 ## Mobile App Integration
 
 ### 1. User Profile Management
+
 ```dart
 // Add to mobile app
 class UserProfileService {
@@ -206,11 +218,13 @@ class UserProfileService {
 ```
 
 ### 2. Clinic Staff Features
+
 - View clinic users (read-only)
 - Search patients by name/phone
 - Quick patient info access during scanning
 
 ### 3. Synchronization
+
 - Cache user data locally
 - Sync profile changes when online
 - Handle offline profile updates
@@ -218,6 +232,7 @@ class UserProfileService {
 ## Architectural Improvements
 
 ### 1. Missing Features
+
 - **Audit Trail**: Track all user modifications
 - **Email Verification**: Implement verification flow
 - **Password Policy**: Enforce strong passwords
@@ -226,18 +241,21 @@ class UserProfileService {
 - **API Rate Limiting**: Per-user rate limits
 
 ### 2. Security Enhancements
+
 - **Data Encryption**: Encrypt sensitive user data
 - **GDPR Compliance**: Data export/deletion rights
 - **Security Headers**: Implement OWASP recommendations
 - **Input Sanitization**: Prevent XSS/SQL injection
 
 ### 3. Performance Optimizations
+
 - **Database Indexing**: On email, role, clinicId
 - **Query Optimization**: Eager load clinic data
 - **Response Caching**: Cache user lists with ETags
 - **Background Jobs**: Async email sending
 
 ### 4. Monitoring & Analytics
+
 - **User Metrics**: Active users, role distribution
 - **Usage Analytics**: Feature adoption tracking
 - **Error Tracking**: User-specific error rates
@@ -246,6 +264,7 @@ class UserProfileService {
 ## Implementation Priority
 
 ### Phase 1 (Critical - Week 1)
+
 1. Create UserController with basic CRUD
 2. Implement UserService with business logic
 3. Add database migrations for missing fields
@@ -253,6 +272,7 @@ class UserProfileService {
 5. Implement authentication/authorization
 
 ### Phase 2 (Important - Week 2)
+
 1. Add search and filtering
 2. Implement password reset flow
 3. Add email verification
@@ -260,6 +280,7 @@ class UserProfileService {
 5. Add audit logging
 
 ### Phase 3 (Enhancement - Week 3)
+
 1. Implement bulk operations
 2. Add export functionality
 3. Enhance UI/UX features
@@ -267,6 +288,7 @@ class UserProfileService {
 5. Implement caching
 
 ### Phase 4 (Mobile - Week 4)
+
 1. Add profile API endpoints
 2. Implement mobile profile screen
 3. Add clinic staff features
@@ -276,24 +298,28 @@ class UserProfileService {
 ## Testing Strategy
 
 ### Unit Tests
+
 - UserService business logic
 - Validation rules
 - Search algorithms
 - Permission checks
 
 ### Integration Tests
+
 - API endpoint responses
 - Database operations
 - Email sending
 - Authentication flow
 
 ### E2E Tests
+
 - User creation workflow
 - Search and filter
 - Role-based access
 - Password reset flow
 
 ### Performance Tests
+
 - Large dataset handling
 - Concurrent user updates
 - Search performance

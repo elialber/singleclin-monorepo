@@ -2,7 +2,8 @@
 
 ## 📋 Visão Geral
 
-Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX, incluindo múltiplas imagens, integração com mapas, validações robustas e máscaras de input.
+Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX, incluindo múltiplas
+imagens, integração com mapas, validações robustas e máscaras de input.
 
 ---
 
@@ -21,6 +22,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 ## 🏗️ Arquitetura do Stepper
 
 ### **Steps do Stepper**
+
 ```
 ┌─────────────────┬─────────────────┬─────────────────┬─────────────────┐
 │   STEP 1        │   STEP 2        │   STEP 3        │   STEP 4        │
@@ -30,39 +32,47 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 ```
 
 ### **Estados do Stepper**
+
 - `DRAFT` - Salvamento automático dos steps
 - `VALIDATING` - Validação em andamento
 - `COMPLETED` - Step concluído
 - `ERROR` - Erro no step atual
 
 ### **Definição Técnica**
-**STEPPER** = Componente de navegação sequencial que guia o usuário através de múltiplos steps/etapas em um processo linear. Cada step representa uma seção lógica do formulário com validação independente.
+
+**STEPPER** = Componente de navegação sequencial que guia o usuário através de múltiplos
+steps/etapas em um processo linear. Cada step representa uma seção lógica do formulário com
+validação independente.
 
 ---
 
 ## 📐 Detalhamento das Etapas
 
 ### **🏢 Step 1: Informações Básicas**
+
 **Objetivo**: Capturar dados fundamentais da clínica
 
 #### **Campos e Validações**
 
-**1. Nome da Clínica*** (obrigatório)
+**1. Nome da Clínica\*** (obrigatório)
+
 - **Máscara**: Nenhuma
-- **Validação**: 
+- **Validação**:
   - Mínimo 3 caracteres, máximo 200
   - Apenas letras, números, espaços e acentos
   - Verificar duplicatas no backend
   - Regex: `/^[a-zA-ZÀ-ÿ0-9\s\-\.]{3,200}$/`
 - **Mensagens**: "Nome deve ter entre 3 e 200 caracteres" | "Este nome já está em uso"
 
-**2. Tipo de Clínica*** (obrigatório)
+**2. Tipo de Clínica\*** (obrigatório)
+
 - **Componente**: Select/Dropdown
 - **Opções**: Regular (0), Origem (1), Parceira (2), Administrativa (3)
 - **Validação**: Deve ser um dos valores válidos do enum
 - **Tooltip**: Explicar diferenças entre tipos
 
 **3. CNPJ** (opcional)
+
 - **Máscara**: `XX.XXX.XXX/XXXX-XX`
 - **Validação**:
   - Formato correto (14 dígitos)
@@ -72,6 +82,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Mensagens**: "CNPJ inválido" | "Este CNPJ já está cadastrado"
 
 **4. Telefone** (opcional)
+
 - **Máscara**: `(XX) XXXXX-XXXX` ou `(XX) XXXX-XXXX`
 - **Validação**:
   - Formato brasileiro válido
@@ -81,6 +92,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Mensagens**: "Telefone deve ter formato válido: (XX) XXXXX-XXXX"
 
 **5. Email** (opcional)
+
 - **Máscara**: Nenhuma
 - **Validação**:
   - Formato de email válido
@@ -88,23 +100,27 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
   - Regex: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`
 - **Mensagens**: "Email deve ter formato válido"
 
-**6. Status Ativo*** (obrigatório)
+**6. Status Ativo\*** (obrigatório)
+
 - **Componente**: Toggle/Switch
 - **Default**: `true`
 - **Validação**: Booleano obrigatório
 
 #### **UI/UX Features**
+
 - Auto-complete para nomes similares
 - Tooltip explicativo para cada tipo de clínica
 - Validação em tempo real
 - Indicadores visuais de progresso
 
 ### **🗺️ Step 2: Endereço e Localização**
+
 **Objetivo**: Capturar localização precisa com mapa interativo
 
 #### **Campos e Validações**
 
 **1. CEP** (obrigatório)
+
 - **Máscara**: `XXXXX-XXX`
 - **Validação**:
   - Formato brasileiro (8 dígitos)
@@ -113,7 +129,8 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
   - Deve existir nos correios
 - **Mensagens**: "CEP deve ter formato XXXXX-XXX" | "CEP não encontrado"
 
-**2. Endereço/Logradouro*** (obrigatório)
+**2. Endereço/Logradouro\*** (obrigatório)
+
 - **Máscara**: Nenhuma
 - **Validação**:
   - Mínimo 5 caracteres, máximo 255
@@ -123,6 +140,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Mensagens**: "Endereço deve ter entre 5 e 255 caracteres"
 
 **3. Número** (obrigatório)
+
 - **Máscara**: Nenhuma
 - **Validação**:
   - Números e letras (ex: "123A", "S/N")
@@ -131,6 +149,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Mensagens**: "Número é obrigatório" | "Máximo 10 caracteres"
 
 **4. Complemento** (opcional)
+
 - **Máscara**: Nenhuma
 - **Validação**:
   - Máximo 100 caracteres
@@ -138,7 +157,8 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
   - Regex: `/^[a-zA-ZÀ-ÿ0-9\s\-\.\,\/]{0,100}$/`
 - **Mensagens**: "Máximo 100 caracteres"
 
-**5. Bairro*** (obrigatório)
+**5. Bairro\*** (obrigatório)
+
 - **Máscara**: Nenhuma
 - **Validação**:
   - Mínimo 2 caracteres, máximo 100
@@ -147,7 +167,8 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
   - Regex: `/^[a-zA-ZÀ-ÿ\s\-\.]{2,100}$/`
 - **Mensagens**: "Bairro deve ter entre 2 e 100 caracteres"
 
-**6. Cidade*** (obrigatório)
+**6. Cidade\*** (obrigatório)
+
 - **Máscara**: Nenhuma
 - **Validação**:
   - Mínimo 2 caracteres, máximo 100
@@ -156,7 +177,8 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
   - Regex: `/^[a-zA-ZÀ-ÿ\s\-\.]{2,100}$/`
 - **Mensagens**: "Cidade deve ter entre 2 e 100 caracteres"
 
-**7. Estado/UF*** (obrigatório)
+**7. Estado/UF\*** (obrigatório)
+
 - **Componente**: Select/Dropdown
 - **Validação**:
   - Deve ser uma UF válida (AC, AL, AP, ..., TO)
@@ -164,7 +186,8 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
   - Lista fixa dos 26 estados + DF
 - **Mensagens**: "Estado é obrigatório"
 
-**8. Coordenadas GPS*** (auto-preenchidas)
+**8. Coordenadas GPS\*** (auto-preenchidas)
+
 - **Latitude**: -90 a +90 (6 casas decimais)
 - **Longitude**: -180 a +180 (6 casas decimais)
 - **Validação**:
@@ -174,6 +197,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Auto-preenchimento**: Geocoding via Google Maps API
 
 #### **Mapa Interativo**
+
 - **Integração Google Maps/Leaflet**
 - Marcador arrastável para ajuste fino
 - Geocoding reverso (endereço → coordenadas)
@@ -181,17 +205,20 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - Zoom automático na localização
 
 #### **UI/UX Features**
+
 - Split view: formulário à esquerda, mapa à direita
 - Sincronização bidirecional (form ↔ mapa)
 - Validação de coordenadas dentro de limites geográficos
 - Sugestões de endereços próximos
 
 ### **📸 Step 3: Upload de Imagens**
+
 **Objetivo**: Permitir upload múltiplo com gerenciamento avançado
 
 #### **Validações e Restrições**
 
 **1. Tipos de Arquivo Aceitos**
+
 - **Formatos**: JPEG, PNG, WebP
 - **MIME Types**: `image/jpeg`, `image/png`, `image/webp`
 - **Extensões**: `.jpg`, `.jpeg`, `.png`, `.webp`
@@ -199,6 +226,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Mensagens**: "Formato não suportado. Use JPEG, PNG ou WebP"
 
 **2. Tamanho dos Arquivos**
+
 - **Individual**: Máximo 5MB por imagem
 - **Total**: Máximo 50MB para todas as imagens
 - **Resolução Mínima**: 300x300 pixels
@@ -206,11 +234,13 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Mensagens**: "Imagem muito grande (máx. 5MB)" | "Resolução mínima: 300x300px"
 
 **3. Quantidade de Imagens**
+
 - **Mínimo**: 0 imagens (opcional)
 - **Máximo**: 10 imagens por clínica
 - **Mensagens**: "Máximo 10 imagens permitidas"
 
 **4. Legendas/Alt Text** (opcional)
+
 - **Máscara**: Nenhuma
 - **Validação**:
   - Máximo 200 caracteres por legenda
@@ -219,6 +249,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Mensagens**: "Legenda deve ter no máximo 200 caracteres"
 
 #### **Funcionalidades**
+
 - **Upload múltiplo** (até 10 imagens)
 - **Drag & Drop** zone com feedback visual
 - **Preview em thumbnail** grid responsivo
@@ -231,6 +262,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - **Retry** automático em caso de falha
 
 #### **UI/UX Features**
+
 - Grid responsivo de thumbnails (3x3 no desktop, 2x2 no mobile)
 - Progress bars individuais com cancelamento
 - Preview modal com zoom e navegação
@@ -239,9 +271,11 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 - Estados de loading, success, error para cada imagem
 
 ### **✅ Step 4: Revisão e Confirmação**
+
 **Objetivo**: Revisão final antes do submit
 
 #### **Funcionalidades**
+
 - **Resumo visual** de todas as informações
 - **Edição inline** de campos
 - **Preview do mapa** com localização final
@@ -254,6 +288,7 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 ## 🛠️ Implementação Técnica
 
 ### **1. Componentes Core**
+
 ```typescript
 // 1.1 Stepper Container
 <ClinicStepper />
@@ -276,47 +311,49 @@ Transformar o cadastro de clínica em um **stepper multi-etapas** com melhor UX,
 ```
 
 ### **2. Estado do Stepper**
+
 ```typescript
 interface StepperState {
-  currentStep: number
-  totalSteps: number
-  isValid: boolean[]       // Validação por step
-  isDirty: boolean[]       // Modificação por step
-  formData: ClinicFormData
-  draftId?: string         // Para salvamento
-  errors: StepperErrors
+  currentStep: number;
+  totalSteps: number;
+  isValid: boolean[]; // Validação por step
+  isDirty: boolean[]; // Modificação por step
+  formData: ClinicFormData;
+  draftId?: string; // Para salvamento
+  errors: StepperErrors;
 }
 
 interface ClinicFormData {
-  basicInfo: BasicInfoData
-  address: AddressData
-  location: LocationData
-  images: ImageData[]
-  metadata: StepperMetadata
+  basicInfo: BasicInfoData;
+  address: AddressData;
+  location: LocationData;
+  images: ImageData[];
+  metadata: StepperMetadata;
 }
 ```
 
 ### **3. Hooks Customizados**
+
 ```typescript
 // 3.1 Gerenciamento do Stepper
 const useClinicStepper = () => {
   // Navegação, validação, estado
-}
+};
 
 // 3.2 Salvamento Automático
 const useDraftSaver = (formData, interval = 30000) => {
   // Auto-save a cada 30s
-}
+};
 
 // 3.3 Upload Múltiplo
 const useMultipleImageUpload = () => {
   // Gerenciar múltiplos uploads
-}
+};
 
 // 3.4 Integração com Mapa
 const useMapIntegration = () => {
   // Geocoding, coordenadas, sync
-}
+};
 ```
 
 ---
@@ -324,6 +361,7 @@ const useMapIntegration = () => {
 ## 🎨 Design System & UI
 
 ### **Visual Design**
+
 - **Material-UI Stepper** como base
 - **Cards elevados** para cada etapa
 - **Cores temáticas** para cada tipo de clínica
@@ -331,19 +369,22 @@ const useMapIntegration = () => {
 - **Micro-animações** para transições
 
 ### **Stepper Horizontal**
+
 ```
 ●─────────●─────────●─────────○
 Info      Endereço  Imagens   Review
-Básica             
+Básica
 ```
 
 ### **Indicadores Visuais**
+
 - ✅ **Completed**: Checkmark verde
-- 🔄 **Current**: Círculo azul pulsante  
+- 🔄 **Current**: Círculo azul pulsante
 - ⭕ **Pending**: Círculo vazio
 - ❌ **Error**: X vermelho
 
 ### **Responsividade**
+
 - **Desktop**: Stepper horizontal + sidebar navigation
 - **Tablet**: Stepper horizontal compacto
 - **Mobile**: Stepper vertical + bottom navigation
@@ -391,6 +432,7 @@ Básica
 ### **📋 FASE 1: Infraestrutura Base (Semana 1)** ✅ **COMPLETA**
 
 **Pré-requisitos**: Nenhum
+
 - [x] **Task 1.1** - Criar estrutura de pastas do stepper (`/stepper`, `/steps`, `/hooks`)
 - [x] **Task 1.2** - Configurar Context API para estado global do stepper
 - [x] **Task 1.3** - Implementar hook `useClinicStepper` para navegação
@@ -404,7 +446,8 @@ Básica
 ### **🏢 FASE 2: Etapa 1 - Informações Básicas (Semana 1-2)** ✅ **COMPLETA**
 
 **Pré-requisitos**: Fase 1 completa
-- [x] **Task 2.1** - Criar componente `<Step1BasicInfo />` 
+
+- [x] **Task 2.1** - Criar componente `<Step1BasicInfo />`
 - [x] **Task 2.2** - Implementar máscara CNPJ com biblioteca customizada
 - [x] **Task 2.3** - Implementar máscara telefone com detecção automática (fixo/celular)
 - [x] **Task 2.4** - Criar validação CNPJ com algoritmo dígitos verificadores
@@ -422,6 +465,7 @@ Básica
 ### **🗺️ FASE 3: Etapa 2 - Endereço e Mapa (Semana 2-3)** ✅ **COMPLETA**
 
 **Pré-requisitos**: Fase 2 completa
+
 - [x] **Task 3.1** - Criar componente `<Step2AddressLocation />` com layout split
 - [x] **Task 3.2** - Implementar máscara CEP com validação formato brasileiro
 - [x] **Task 3.3** - Integrar ViaCEP API para auto-preenchimento de endereço
@@ -442,6 +486,7 @@ Básica
 ### **📸 FASE 4: Etapa 3 - Upload Múltiplo (Semana 3)** ✅ **COMPLETA**
 
 **Pré-requisitos**: Fase 3 completa
+
 - [x] **Task 4.1** - Criar componente `<Step3ImageUpload />` base
 - [x] **Task 4.2** - Implementar zona drag & drop com `react-dropzone`
 - [x] **Task 4.3** - Adicionar validação tipos arquivo (MIME type + header check)
@@ -463,6 +508,7 @@ Básica
 ### **✅ FASE 5: Etapa 4 - Revisão Final (Semana 3-4)** ✅ **COMPLETA**
 
 **Pré-requisitos**: Fase 4 completa
+
 - [x] **Task 5.1** - Criar componente `<Step4Review />` com layout cards
 - [x] **Task 5.2** - Implementar resumo visual informações básicas
 - [x] **Task 5.3** - Criar preview mapa com localização final (read-only)
@@ -480,6 +526,7 @@ Básica
 ### **💾 FASE 6: Sistema Draft/Rascunhos (Semana 4)** ✅ **COMPLETA**
 
 **Pré-requisitos**: Fase 5 completa
+
 - [x] **Task 6.1** - Criar serviço `draftService` para salvamento local/remoto
 - [x] **Task 6.2** - Implementar hook `useDraftSaver` com auto-save
 - [x] **Task 6.3** - Adicionar APIs backend para draft (CRUD completo)
@@ -495,6 +542,7 @@ Básica
 ### **🎨 FASE 7: Polish e Responsividade (Semana 4)** ✅ **COMPLETA**
 
 **Pré-requisitos**: Fase 6 completa
+
 - [x] **Task 7.1** - Implementar design responsivo para mobile (stepper vertical)
 - [x] **Task 7.2** - Otimizar layout tablet com stepper horizontal compacto
 - [x] **Task 7.3** - Adicionar micro-animações transições entre etapas
@@ -512,6 +560,7 @@ Básica
 ### **🧪 FASE 8: Testes e Documentação (Semana 4-5)** ✅ **COMPLETA**
 
 **Pré-requisitos**: Fase 7 completa
+
 - [x] **Task 8.1** - Criar testes unitários hook `useClinicWizard`
 - [x] **Task 8.2** - Implementar testes componente `<Step1BasicInfo />`
 - [x] **Task 8.3** - Criar testes integração validações máscaras
@@ -532,12 +581,13 @@ Básica
 ### **📊 DEPENDÊNCIAS CRÍTICAS**
 
 ```
-Task 1.1-1.5 (Base) → Task 2.1-2.10 (Step 1) → Task 3.1-3.12 (Step 2) → 
-Task 4.1-4.13 (Step 3) → Task 5.1-5.9 (Step 4) → Task 6.1-6.7 (Draft) → 
+Task 1.1-1.5 (Base) → Task 2.1-2.10 (Step 1) → Task 3.1-3.12 (Step 2) →
+Task 4.1-4.13 (Step 3) → Task 5.1-5.9 (Step 4) → Task 6.1-6.7 (Draft) →
 Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
 ```
 
-**⚠️ Atenção**: Cada fase deve ser completamente finalizada antes de iniciar a próxima para evitar retrabalho e conflitos de dependências.
+**⚠️ Atenção**: Cada fase deve ser completamente finalizada antes de iniciar a próxima para evitar
+retrabalho e conflitos de dependências.
 
 ---
 
@@ -549,17 +599,19 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
 
 - [ ] **Backend Task B1** - Criar modelo `ClinicDraft` para rascunhos
 - [ ] **Backend Task B2** - Implementar endpoints CRUD draft system:
+
   ```csharp
   POST   /api/clinic/draft          // Criar rascunho
-  PUT    /api/clinic/draft/{id}     // Atualizar rascunho  
+  PUT    /api/clinic/draft/{id}     // Atualizar rascunho
   GET    /api/clinic/draft/{id}     // Buscar rascunho
   DELETE /api/clinic/draft/{id}     // Remover rascunho
   GET    /api/clinic/drafts         // Listar rascunhos usuário
   ```
 
 - [ ] **Backend Task B3** - Estender modelo `Clinic` para múltiplas imagens:
+
   ```csharp
-  public class ClinicImage 
+  public class ClinicImage
   {
       public Guid Id { get; set; }
       public Guid ClinicId { get; set; }
@@ -572,6 +624,7 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
   ```
 
 - [ ] **Backend Task B4** - Implementar endpoints múltiplas imagens:
+
   ```csharp
   POST   /api/clinic/{id}/images    // Upload múltiplo
   DELETE /api/clinic/{id}/images/{imageId} // Remover imagem
@@ -581,6 +634,7 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
   ```
 
 - [ ] **Backend Task B5** - Adicionar endpoints validação:
+
   ```csharp
   GET    /api/clinic/validate/name    // Verificar nome duplicado
   GET    /api/clinic/validate/cnpj    // Verificar CNPJ duplicado
@@ -593,6 +647,7 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
   ```
 
 ### **Serviços Externos**
+
 - **Google Maps API** (ou OpenStreetMap + Leaflet)
 - **ViaCEP API** para busca de endereços brasileiros
 - **IBGE API** para validação de cidades/estados
@@ -604,12 +659,14 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
 ### **📋 Passo a Passo Completo para Obter VITE_GOOGLE_MAPS_API_KEY**
 
 #### **1. Criar Conta Google Cloud Platform (GCP)**
+
 1. Acesse [Google Cloud Console](https://console.cloud.google.com/)
 2. Faça login com sua conta Google (ou crie uma nova)
 3. Se for primeira vez, aceite os termos de uso
 4. Ative a cobrança (necessário um cartão de crédito, mas tem $300 de créditos grátis)
 
 #### **2. Criar Novo Projeto**
+
 1. No topo da página, clique no dropdown de projetos
 2. Clique em "Novo Projeto" (New Project)
 3. **Nome do projeto**: `singleclin-maps` (ou nome de sua escolha)
@@ -618,6 +675,7 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
 6. Aguarde alguns segundos e selecione o projeto criado
 
 #### **3. Habilitar APIs Necessárias**
+
 1. No menu lateral, vá em **"APIs e Serviços" > "Biblioteca"**
 2. Habilite as seguintes APIs (pesquise uma por vez):
 
@@ -631,12 +689,14 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
    - Aguarde ativação (pode levar alguns minutos)
 
 #### **4. Criar Chave de API (API Key)**
+
 1. Vá em **"APIs e Serviços" > "Credenciais"**
 2. Clique em **"+ Criar Credenciais"** → **"Chave de API"**
 3. Uma chave será gerada (formato: `AIzaSyBmnNpyirvqCOyVc9Xqy-hK_Zh44wpvu4g`)
 4. **IMPORTANTE**: Copie e salve esta chave em local seguro
 
 #### **5. Configurar Restrições de Segurança (CRÍTICO)**
+
 1. Na chave criada, clique em "Editar" (ícone de lápis)
 2. **Restrições de Aplicativo**:
    - **Desenvolvimento**: Selecione "Referenciadores HTTP"
@@ -655,6 +715,7 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
    - Clique em "Salvar"
 
 #### **6. Configurar Cobrança e Quotas**
+
 1. Vá em **"APIs e Serviços" > "Quotas"**
 2. Configure limites para evitar surpresas na cobrança:
    - **Maps JavaScript API**: 1.000 chamadas/dia (desenvolvimento)
@@ -664,23 +725,27 @@ Task 7.1-7.9 (Polish) → Task 8.1-8.12 (Tests)
 #### **7. Configurar Variável de Ambiente**
 
 **Desenvolvimento (.env.local):**
+
 ```bash
 # Google Maps API Configuration
 VITE_GOOGLE_MAPS_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 **Produção (.env.production):**
+
 ```bash
 # Google Maps API Configuration
 VITE_GOOGLE_MAPS_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 **Vercel/Netlify:**
+
 - Adicione a variável no dashboard do provedor
 - Nome: `VITE_GOOGLE_MAPS_API_KEY`
 - Valor: sua chave de API
 
 #### **8. Testar a Configuração**
+
 ```bash
 # No diretório do projeto
 npm run dev
@@ -694,13 +759,15 @@ npm run dev
 ### **💰 Custos e Limites**
 
 #### **Cobrança Google Maps (USD)**
-| API | Grátis/mês | Preço após limite |
-|-----|------------|-------------------|
-| Maps JavaScript | 28.500 loads | $7.00 / 1.000 loads |
-| Geocoding | 40.000 requests | $5.00 / 1.000 requests |
-| Places API | 35.000 requests | $17.00 / 1.000 requests |
+
+| API             | Grátis/mês      | Preço após limite       |
+| --------------- | --------------- | ----------------------- |
+| Maps JavaScript | 28.500 loads    | $7.00 / 1.000 loads     |
+| Geocoding       | 40.000 requests | $5.00 / 1.000 requests  |
+| Places API      | 35.000 requests | $17.00 / 1.000 requests |
 
 #### **Estimativa de Uso - SingleClin**
+
 - **Desenvolvimento**: ~200 chamadas/dia = **GRÁTIS**
 - **Produção (100 clínicas/mês)**:
   - Maps: ~3.000 loads/mês = **GRÁTIS**
@@ -710,6 +777,7 @@ npm run dev
 ### **🔒 Segurança e Boas Práticas**
 
 #### **✅ DO (Faça)**
+
 - ✅ Configure restrições de domínio
 - ✅ Configure restrições de API
 - ✅ Configure quotas/limites
@@ -718,30 +786,36 @@ npm run dev
 - ✅ Mantenha chaves em variáveis de ambiente
 
 #### **❌ DON'T (Não Faça)**
+
 - ❌ Nunca commite chaves no código
 - ❌ Nunca use chave sem restrições
-- ❌ Nunca exponha chave no cliente (já é pública com VITE_)
+- ❌ Nunca exponha chave no cliente (já é pública com VITE\_)
 - ❌ Nunca use mesma chave para múltiplos projetos
 - ❌ Nunca ignore alertas de cobrança
 
 ### **🚨 Troubleshooting**
 
 #### **Erro: "Este domínio não está autorizado"**
+
 **Solução:** Adicionar domínio nas restrições da chave
 
 #### **Erro: "Cota excedida"**
+
 **Solução:** Verificar limits no console GCP
 
 #### **Erro: "API não habilitada"**
+
 **Solução:** Habilitar APIs necessárias no console
 
 #### **Mapa não carrega**
+
 1. Verificar se VITE_GOOGLE_MAPS_API_KEY está definida
 2. Verificar no Network tab do browser se há erros 403/400
 3. Verificar se as APIs estão habilitadas
 4. Verificar restrições de domínio
 
 ### **📞 Links Úteis**
+
 - [Google Cloud Console](https://console.cloud.google.com/)
 - [Documentação Maps JavaScript API](https://developers.google.com/maps/documentation/javascript)
 - [Calculadora de Preços](https://cloud.google.com/maps-platform/pricing)
@@ -752,26 +826,31 @@ npm run dev
 ## 📊 Melhorias na UX
 
 ### **Progressive Disclosure**
+
 - Informações complexas reveladas gradualmente
 - Foco em uma tarefa por vez
 - Redução da carga cognitiva
 
 ### **Visual Feedback**
+
 - Indicadores de progresso claros
 - Estados de loading bem definidos
 - Validação em tempo real
 
 ### **Error Handling**
+
 - Mensagens contextual por etapa
 - Sugestões de correção
 - Possibilidade de voltar e corrigir
 
 ### **Performance**
+
 - Lazy loading de componentes
 - Upload assíncrono de imagens
 - Debounce em validações
 
 ### **Accessibility**
+
 - Navegação por teclado
 - Screen reader support
 - Alto contraste
@@ -802,6 +881,7 @@ npm run dev
 ## ✅ RESUMO CHECKLIST GERAL
 
 ### **Progresso por Fase**
+
 - **Fase 1** (Infraestrutura): ✅ **5/5 tasks completas**
 - **Fase 2** (Etapa 1): ✅ **10/10 tasks completas**
 - **Fase 3** (Etapa 2): ✅ **12/12 tasks completas**
@@ -815,6 +895,7 @@ npm run dev
 **TOTAL: 77/83 tasks completas (93%)**
 
 ### **📋 Próximos Passos Recomendados**
+
 1. [x] **Configurar ambiente**: APIs Google Maps, dependências React ✅
    - [x] **OBRIGATÓRIO**: Seguir guia completo da seção "🗝️ CONFIGURAÇÃO GOOGLE MAPS API" acima
    - [x] **Criar conta GCP e obter VITE_GOOGLE_MAPS_API_KEY**
@@ -830,6 +911,8 @@ npm run dev
 
 **📋 DOCUMENTO REFERENCIAL COMPLETO PARA STEPPER DE CADASTRO DE CLÍNICA**
 
-*Este plano transforma completamente a experiência de cadastro de clínicas com **stepper multi-steps**, validações robustas, máscaras inteligentes e UX otimizada. Total de 83 tasks organizadas em 8 fases com dependências claras e sequência inteligente.*
+_Este plano transforma completamente a experiência de cadastro de clínicas com **stepper
+multi-steps**, validações robustas, máscaras inteligentes e UX otimizada. Total de 83 tasks
+organizadas em 8 fases com dependências claras e sequência inteligente._
 
 **🚀 Pronto para implementação sistemática!**

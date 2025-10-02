@@ -1,6 +1,7 @@
 # SingleClin Healthcare Management System
 
-Sistema de gestão de saúde baseado em créditos, permitindo pacientes comprarem planos de tratamento em clínicas principais e utilizarem créditos em clínicas parceiras.
+Sistema de gestão de saúde baseado em créditos, permitindo pacientes comprarem planos de tratamento
+em clínicas principais e utilizarem créditos em clínicas parceiras.
 
 ## 🏗️ Arquitetura
 
@@ -33,8 +34,8 @@ dotnet restore
 dotnet run --urls "http://localhost:5010"
 ```
 
-**Backend estará disponível em:** `http://localhost:5010`
-**Swagger/API Docs:** `http://localhost:5010`
+**Backend estará disponível em:** `http://localhost:5010` **Swagger/API Docs:**
+`http://localhost:5010`
 
 ### 2. Web Admin (React)
 
@@ -145,12 +146,14 @@ git push origin main  # Triggera workflow automaticamente
 ## 📡 Endpoints Funcionais
 
 ### API Status & Health
+
 - `GET /health` - Status da API
 - `GET /health/detailed` - Status detalhado com métricas
 - `GET /health/live` - Liveness probe
 - `GET /health/ready` - Readiness probe
 
 ### Autenticação
+
 - `POST /api/auth/login/firebase` - Login com Firebase token
 - `POST /api/auth/register` - Registro de novo usuário
 - `POST /api/auth/refresh` - Refresh de access token
@@ -158,12 +161,14 @@ git push origin main  # Triggera workflow automaticamente
 - `POST /api/auth/logout` - Logout
 
 ### Clínicas
+
 - `GET /api/clinics` - Listar todas as clínicas
 - `GET /api/clinics/{id}` - Obter dados de uma clínica
 - `POST /api/clinics` - Criar nova clínica (Admin)
 - `PUT /api/clinics/{id}` - Atualizar clínica
 
 ### Transações
+
 - `GET /api/transactions` - Histórico de transações
 - `POST /api/transactions` - Criar nova transação
 - `GET /api/qrcode/generate` - Gerar QR Code para transação
@@ -175,11 +180,13 @@ git push origin main  # Triggera workflow automaticamente
 ### Environment Variables
 
 **Backend** (`appsettings.Development.json`):
+
 - Connection String para PostgreSQL
 - Firebase service account path
 - JWT secret key
 
 **Frontend** (`packages/web-admin/.env`):
+
 - `VITE_API_URL=http://localhost:5010/api`
 - Firebase config keys
 - Google Maps API key
@@ -187,16 +194,30 @@ git push origin main  # Triggera workflow automaticamente
 ### Estrutura de Dados
 
 **Core Models:**
+
 - `IUser`: Autenticação e roles
 - `IClinic`: Informações e parceria
 - `IPlan`: Planos com alocação de créditos
 - `ITransaction`: Registros de uso com QR codes
+
+## 📚 Documentação
+
+A documentação textual do projeto foi organizada em subpastas dentro de `docs/`:
+
+- `docs/guides/`: tutoriais e guias de implantação (ex.: Azure, Firebase, testes).
+- `docs/plans/`: planos de execução, integrações e roadmaps.
+- `docs/reports/`: relatórios de análise e resultados de testes.
+- `docs/checklists/`: listas de verificação e padrões de qualidade.
+- `docs/use-cases/`: especificações de casos de uso e cenários de teste.
+- `docs/automation/`: informações sobre agentes/assistentes utilizados no fluxo de trabalho.
+- `docs/diagrams/`: diagramas e artefatos visuais (placeholder com `.gitkeep`).
 
 ## 📈 CI/CD Status
 
 [![CI Tests](https://github.com/seu-username/singleclin-monorepo/workflows/CI%20Tests/badge.svg)](https://github.com/seu-username/singleclin-monorepo/actions)
 
 **Workflow inclui:**
+
 - Backend tests (.NET)
 - Frontend build (React)
 - E2E tests (Playwright)
@@ -210,6 +231,9 @@ git push origin main  # Triggera workflow automaticamente
 
 ---
 
-**💡 Desenvolvido com metodologia anti-procrastinação: tarefas de 25 minutos com escape hatches para manter momentum!**# Deploy test with correct OIDC
+**💡 Desenvolvido com metodologia anti-procrastinação: tarefas de 25 minutos com escape hatches para
+manter momentum!**# Deploy test with correct OIDC
+
 # Testing OIDC fix 2
+
 # Final deployment test
