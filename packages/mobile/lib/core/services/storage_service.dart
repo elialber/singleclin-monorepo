@@ -1,123 +1,189 @@
-import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 class StorageService extends GetxService {
-  late SharedPreferences _prefs;
+  static const _encryptionKeyName = 'hive_encryption_key';
+  static const _boxName = 'secure_storage';
 
-  @override
-  Future<void> onInit() async {
-    super.onInit();
-    _prefs = await SharedPreferences.getInstance();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  late Box<dynamic> _box;
+  bool _isEncrypted = false;
+
+  Future<StorageService> init() async {
+    final encryptionKey = await _loadOrCreateEncryptionKey();
+
+    _box = await Hive.openBox<dynamic>(
+      _boxName,
+      encryptionCipher: HiveAesCipher(encryptionKey),
+    );
+
+    _isEncrypted = true;
+
+    if (kDebugMode) {
+      print('🔐 StorageService: Hive box opened with encryption');
+    }
+
+    return this;
   }
 
-  /// Salvar string
+  bool get isEncrypted => _isEncrypted;
+
+  void ensureEncrypted() {
+    if (!_isEncrypted) {
+      throw StateError('Secure storage is not encrypted');
+    }
+  }
+
+  Future<Uint8List> _loadOrCreateEncryptionKey() async {
+    final encodedKey = await _secureStorage.read(key: _encryptionKeyName);
+    if (encodedKey != null) {
+      return base64Url.decode(encodedKey);
+    }
+
+    final key = Hive.generateSecureKey();
+    await _secureStorage.write(
+      key: _encryptionKeyName,
+      value: base64UrlEncode(key),
+    );
+    return key;
+  }
+
+  Future<void> _ensureInitialized() async {
+    if (!_box.isOpen) {
+      throw Exception('StorageService not initialized');
+    }
+  }
+
   Future<bool> setString(String key, String value) async {
-    return _prefs.setString(key, value);
+    await _ensureInitialized();
+    await _box.put(key, value);
+    return true;
   }
 
-  /// Obter string
   Future<String?> getString(String key) async {
-    return _prefs.getString(key);
+    await _ensureInitialized();
+    final value = _box.get(key);
+    if (value is String) {
+      return value;
+    }
+    return value?.toString();
   }
 
-  /// Salvar int
   Future<bool> setInt(String key, int value) async {
-    return _prefs.setInt(key, value);
+    await _ensureInitialized();
+    await _box.put(key, value);
+    return true;
   }
 
-  /// Obter int
   Future<int?> getInt(String key) async {
-    return _prefs.getInt(key);
+    await _ensureInitialized();
+    final value = _box.get(key);
+    return value is int ? value : int.tryParse('$value');
   }
 
-  /// Salvar bool
   Future<bool> setBool(String key, bool value) async {
-    return _prefs.setBool(key, value);
+    await _ensureInitialized();
+    await _box.put(key, value);
+    return true;
   }
 
-  /// Obter bool
   Future<bool?> getBool(String key) async {
-    return _prefs.getBool(key);
+    await _ensureInitialized();
+    final value = _box.get(key);
+    if (value is bool) return value;
+    if (value is String) {
+      return value.toLowerCase() == 'true';
+    }
+    return null;
   }
 
-  /// Salvar double
   Future<bool> setDouble(String key, double value) async {
-    return _prefs.setDouble(key, value);
+    await _ensureInitialized();
+    await _box.put(key, value);
+    return true;
   }
 
-  /// Obter double
   Future<double?> getDouble(String key) async {
-    return _prefs.getDouble(key);
+    await _ensureInitialized();
+    final value = _box.get(key);
+    if (value is double) return value;
+    if (value is num) return value.toDouble();
+    return double.tryParse('$value');
   }
 
-  /// Salvar lista de strings
   Future<bool> setStringList(String key, List<String> value) async {
-    return _prefs.setStringList(key, value);
+    await _ensureInitialized();
+    await _box.put(key, value);
+    return true;
   }
 
-  /// Obter lista de strings
   Future<List<String>?> getStringList(String key) async {
-    return _prefs.getStringList(key);
+    await _ensureInitialized();
+    final value = _box.get(key);
+    if (value is List) {
+      return value.map((e) => e.toString()).toList();
+    }
+    return null;
   }
 
-  /// Salvar objeto JSON
   Future<bool> setJson(String key, Map<String, dynamic> value) async {
     return setString(key, json.encode(value));
   }
 
-  /// Obter objeto JSON
   Future<Map<String, dynamic>?> getJson(String key) async {
     final stringValue = await getString(key);
     if (stringValue == null) return null;
-
     try {
       return json.decode(stringValue) as Map<String, dynamic>;
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
 
-  /// Salvar lista de objetos JSON
   Future<bool> setJsonList(String key, List<Map<String, dynamic>> value) async {
     return setString(key, json.encode(value));
   }
 
-  /// Obter lista de objetos JSON
   Future<List<Map<String, dynamic>>?> getJsonList(String key) async {
     final stringValue = await getString(key);
     if (stringValue == null) return null;
-
     try {
-      final List<dynamic> decodedList = json.decode(stringValue);
-      return decodedList.cast<Map<String, dynamic>>();
-    } catch (e) {
+      final List<dynamic> decoded = json.decode(stringValue);
+      return decoded.cast<Map<String, dynamic>>();
+    } catch (_) {
       return null;
     }
   }
 
-  /// Verificar se a chave existe
   Future<bool> containsKey(String key) async {
-    return _prefs.containsKey(key);
+    await _ensureInitialized();
+    return _box.containsKey(key);
   }
 
-  /// Remover valor
   Future<bool> remove(String key) async {
-    return _prefs.remove(key);
+    await _ensureInitialized();
+    await _box.delete(key);
+    return true;
   }
 
-  /// Limpar todos os valores
   Future<bool> clear() async {
-    return _prefs.clear();
+    await _ensureInitialized();
+    await _box.clear();
+    return true;
   }
 
-  /// Obter todas as chaves
   Future<Set<String>> getAllKeys() async {
-    return _prefs.getKeys();
+    await _ensureInitialized();
+    return _box.keys.cast<String>().toSet();
   }
 
-  /// Recarregar preferências
   Future<void> reload() async {
-    await _prefs.reload();
+    await _ensureInitialized();
+    await _box.compact();
   }
 }

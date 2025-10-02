@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
@@ -15,21 +13,29 @@ import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
 class SessionRevocationService {
   SessionRevocationService({
     FirebaseMessaging? messaging,
-    AuthService? authService,
+    FirebaseAuth? firebaseAuth,
+    Future<void> Function(String message)? onRevocation,
     TokenRefreshService? tokenRefreshService,
     StorageService? storageService,
-    FirebaseAuth? firebaseAuth,
+    AuthService? authService,
   })  : _messaging = messaging ?? FirebaseMessaging.instance,
-        _authService = authService ?? Get.find<AuthService>(),
-        _tokenRefreshService = tokenRefreshService ?? Get.find<TokenRefreshService>(),
-        _storageService = storageService ?? Get.find<StorageService>(),
-        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _onRevocation = onRevocation ??
+            (message) async {
+              if (kDebugMode) {
+                print('SessionRevocationService: revocation callback missing -> $message');
+              }
+            },
+        _tokenRefreshService = tokenRefreshService,
+        _storageService = storageService,
+        _authService = authService;
 
   final FirebaseMessaging _messaging;
-  final AuthService _authService;
-  final TokenRefreshService _tokenRefreshService;
-  final StorageService _storageService;
   final FirebaseAuth _firebaseAuth;
+  final Future<void> Function(String message) _onRevocation;
+  final TokenRefreshService? _tokenRefreshService;
+  final StorageService? _storageService;
+  final AuthService? _authService;
 
   StreamSubscription<RemoteMessage>? _messageSubscription;
   StreamSubscription<RemoteMessage>? _openedAppSubscription;
@@ -70,21 +76,17 @@ class SessionRevocationService {
         print('⛔ SessionRevocationService: Revocation message received');
       }
 
-      await _tokenRefreshService.dispose();
-      await _authService.signOut();
-      await _storageService.remove(AppConstants.tokenKey);
       await _firebaseAuth.signOut();
-      await _tokenRefreshService.initialize();
-
-      if (Get.currentRoute != '/login' && Get.currentRoute != '/splash') {
-        await Get.offAllNamed('/login');
-        Get.snackbar(
-          'Sessão encerrada',
-          'Sua sessão foi encerrada pelo servidor.',
-          snackPosition: SnackPosition.TOP,
-          duration: const Duration(seconds: 4),
-        );
+      await _tokenRefreshService?.dispose();
+      await _authService?.signOut();
+      if (_storageService != null) {
+        await _storageService!.remove(AppConstants.tokenKey);
+        await _storageService!.remove(AppConstants.authTokenKey);
+        await _storageService!.remove(AppConstants.userDataKey);
       }
+      final reason =
+          message.data['message'] ?? 'Sua sessão foi encerrada pelo servidor.';
+      await _onRevocation(reason);
     }
   }
 }

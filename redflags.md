@@ -174,7 +174,7 @@
   2. Tratamento de 403/409 para limpar sessão/armazenamento seguro.
   3. Implementar listener de revogação via FCM/Realtime Database.
 
-### Tokens armazenados sem criptografia
+### Tokens armazenados sem criptografia ✅
 
 - **Impacto**: acesso físico ao aparelho expõe Refresh Token/JWT, permitindo uso indevido.
 - **Evidência**: `StorageService` (`packages/mobile/lib/core/services/storage_service.dart:34-92`) e
@@ -188,7 +188,7 @@
 
 ## Red Flags Altos
 
-### Serviços permanentes sem ciclo de vida controlado
+### Serviços permanentes sem ciclo de vida controlado ✅
 
 - **Impacto**: `Get.put(... permanent: true)` em `main.dart:65-99` mantém instâncias (incluindo
   tokens) mesmo após logout; memória e dados sensíveis ficam residentes.
@@ -199,7 +199,7 @@
   2. Garantir que `TokenRefreshService` para timers ao resetar dependências.
   3. Validar que controllers não mantêm referências a usuários antigos.
 
-### Inicialização tolerante sem fallback funcional
+### Inicialização tolerante sem fallback funcional ✅
 
 - **Impacto**: se `Firebase.initializeApp` falhar (`main.dart:26-36`), app continua executando mas
   chamadas a FirebaseAuth causam exceções.

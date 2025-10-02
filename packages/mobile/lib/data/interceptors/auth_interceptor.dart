@@ -1,34 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
-import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
-import 'package:singleclin_mobile/data/services/auth_service.dart';
-import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
-import 'package:singleclin_mobile/core/constants/api_constants.dart';
-import 'package:singleclin_mobile/core/constants/app_constants.dart';
-import 'package:singleclin_mobile/core/services/storage_service.dart';
 
-/// HTTP interceptor for automatic JWT token authentication
-///
-/// This interceptor automatically adds the Firebase Auth ID token
-/// to all HTTP requests and handles token refresh when expired.
+import 'package:singleclin_mobile/core/constants/api_constants.dart';
+import 'package:singleclin_mobile/core/services/session_manager.dart';
+import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
+
+/// HTTP interceptor for automatic JWT token authentication.
 class AuthInterceptor extends Interceptor {
   AuthInterceptor({
     FirebaseAuth? firebaseAuth,
-    TokenRefreshService? tokenRefreshService,
-    AuthService? authService,
-    StorageService? storageService,
+    SessionManager? sessionManager,
   })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _tokenRefreshService = tokenRefreshService ?? Get.find<TokenRefreshService>(),
-        _authService = authService ?? Get.find<AuthService>(),
-        _storageService = storageService ?? Get.find<StorageService>();
+        _sessionManager = sessionManager ?? Get.find<SessionManager>();
 
   final FirebaseAuth _firebaseAuth;
-  final TokenRefreshService _tokenRefreshService;
-  final AuthService _authService;
-  final StorageService _storageService;
+  final SessionManager _sessionManager;
 
   @override
   Future<void> onRequest(
@@ -36,7 +24,8 @@ class AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     try {
-      final String? token = await _tokenRefreshService.getCurrentToken();
+      final tokenService = _sessionManager.tokenRefreshService;
+      final String? token = await tokenService?.getCurrentToken();
 
       if (token != null) {
         options.headers[ApiConstants.authorizationHeader] =
@@ -47,9 +36,7 @@ class AuthInterceptor extends Interceptor {
         }
       } else {
         if (kDebugMode) {
-          print(
-            '⚠️ No authenticated token available - request sent without token: ${options.path}',
-          );
+          print('⚠️ No authenticated token available for ${options.path}');
         }
       }
 
@@ -58,7 +45,6 @@ class AuthInterceptor extends Interceptor {
       if (kDebugMode) {
         print('❌ Error adding auth token: $e');
       }
-
       handler.next(options);
     }
   }
@@ -70,12 +56,8 @@ class AuthInterceptor extends Interceptor {
   ) async {
     final statusCode = err.response?.statusCode;
 
-    if (statusCode == 401) {
+    if (statusCode == ApiConstants.statusUnauthorized) {
       try {
-        if (kDebugMode) {
-          print('🔄 401 Unauthorized - attempting token refresh and retry');
-        }
-
         final Response? retryResponse =
             await _retryWithRefreshedToken(err.requestOptions);
 
@@ -84,27 +66,30 @@ class AuthInterceptor extends Interceptor {
           return;
         }
 
-        await _handleAuthenticationFailure(
-          reason: 'Sua sessão expirou. Faça login novamente.',
+        await _sessionManager.endSession(
+          signOut: true,
+          redirectToLogin: true,
+          message: 'Sua sessão expirou. Faça login novamente.',
         );
       } catch (retryError) {
         if (kDebugMode) {
-          print('❌ Token refresh failed: $retryError');
+          print('❌ Token refresh retry failed: $retryError');
         }
-        await _handleAuthenticationFailure(
-          reason: 'Sua sessão expirou. Faça login novamente.',
+        await _sessionManager.endSession(
+          signOut: true,
+          redirectToLogin: true,
+          message: 'Sua sessão expirou. Faça login novamente.',
         );
       }
-    } else if (statusCode == 403 || statusCode == 409) {
-      await _handleAuthenticationFailure(
-        reason: 'Seu acesso foi revogado. Faça login novamente.',
+    } else if (statusCode == ApiConstants.statusForbidden || statusCode == 409) {
+      await _sessionManager.endSession(
+        signOut: true,
+        redirectToLogin: true,
+        message: 'Seu acesso foi revogado. Faça login novamente.',
       );
     }
 
-    // Convert DioException to custom API exception
     final ApiException apiException = _mapDioExceptionToApiException(err);
-
-    // Create new DioException with custom exception
     final DioException customException = DioException(
       requestOptions: err.requestOptions,
       response: err.response,
@@ -116,7 +101,6 @@ class AuthInterceptor extends Interceptor {
     handler.next(customException);
   }
 
-  /// Retry the failed request with a refreshed token
   Future<Response?> _retryWithRefreshedToken(RequestOptions failedRequest) async {
     try {
       final User? user = _firebaseAuth.currentUser;
@@ -128,7 +112,8 @@ class AuthInterceptor extends Interceptor {
         return null;
       }
 
-      final String? newToken = await _tokenRefreshService.refreshToken();
+      final tokenService = _sessionManager.tokenRefreshService;
+      final String? newToken = await tokenService?.refreshToken();
 
       if (newToken == null) {
         if (kDebugMode) {
@@ -168,7 +153,6 @@ class AuthInterceptor extends Interceptor {
     }
   }
 
-  /// Map DioException to custom ApiException
   ApiException _mapDioExceptionToApiException(DioException err) {
     switch (err.type) {
       case DioExceptionType.connectionTimeout:
@@ -228,12 +212,10 @@ class AuthInterceptor extends Interceptor {
     }
   }
 
-  /// Extract error message from response
   String _getErrorMessageFromResponse(Response? response) {
     if (response?.data != null) {
       final dynamic data = response!.data;
 
-      // Try to extract message from common response formats
       if (data is Map<String, dynamic>) {
         return data['message'] ??
             data['error'] ??
@@ -245,35 +227,5 @@ class AuthInterceptor extends Interceptor {
     }
 
     return 'Request failed with status ${response?.statusCode ?? 'unknown'}';
-  }
-
-  /// Handle authentication failure by signing out and redirecting to login
-  Future<void> _handleAuthenticationFailure({String? reason}) async {
-    try {
-      if (kDebugMode) {
-        print('🚨 Handling authentication failure - signing out user');
-      }
-
-      _tokenRefreshService.dispose();
-      await _authService.signOut();
-      await _storageService.remove(AppConstants.tokenKey);
-      await _tokenRefreshService.initialize();
-
-      if (Get.currentRoute != '/login' && Get.currentRoute != '/splash') {
-        await Get.offAllNamed('/login');
-
-        Get.snackbar(
-          'Sessão Expirada',
-          reason ?? 'Sua sessão expirou. Faça login novamente.',
-          backgroundColor: Get.theme.colorScheme.error.withValues(alpha: 0.1),
-          colorText: Get.theme.colorScheme.error,
-          icon: const Icon(Icons.info_outline),
-        );
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error handling authentication failure: $e');
-      }
-    }
   }
 }

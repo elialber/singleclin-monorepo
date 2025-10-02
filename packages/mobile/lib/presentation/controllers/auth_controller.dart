@@ -3,89 +3,160 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// Removed go_router import - using GetX navigation instead
 
 import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
 import 'package:singleclin_mobile/core/errors/auth_exceptions.dart';
-// Routes are handled by GetX - no separate routes file needed
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/data/services/auth_service.dart';
+import 'package:singleclin_mobile/data/services/firebase_initialization_service.dart';
 import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
 import 'package:singleclin_mobile/data/services/user_api_service.dart';
 import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 
 /// Controller for managing authentication state and UI interactions
 class AuthController extends GetxController {
-  final AuthService _authService = AuthService();
-  final UserApiService _userApiService = UserApiService();
-  final TokenRefreshService _tokenRefreshService =
-      Get.find<TokenRefreshService>();
+  AuthController({
+    AuthService? authService,
+    UserApiService? userApiService,
+    TokenRefreshService? tokenRefreshService,
+    StorageService? storageService,
+    FirebaseInitializationService? firebaseInitializationService,
+  })  : _authService = authService,
+        _userApiService = userApiService ?? UserApiService(),
+        _tokenRefreshService = tokenRefreshService,
+        _storageService = storageService ?? Get.find<StorageService>(),
+        _firebaseInitializationService =
+            firebaseInitializationService ?? Get.find<FirebaseInitializationService>();
+
+  AuthService? _authService;
+  final UserApiService _userApiService;
+  TokenRefreshService? _tokenRefreshService;
+  final StorageService _storageService;
+  final FirebaseInitializationService _firebaseInitializationService;
 
   // Observable states
-  final _isLoading = false.obs;
-  final _currentUser = Rxn<UserEntity?>();
-  final _errorMessage = RxnString();
+  final RxBool _isLoading = false.obs;
+  final Rxn<UserEntity?> _currentUser = Rxn<UserEntity?>();
+  final RxnString _errorMessage = RxnString();
+
+  // Subscriptions
+  StreamSubscription<UserEntity?>? _authStateSubscription;
   StreamSubscription<String>? _tokenFailureSubscription;
+  StreamSubscription<bool>? _firebaseReadySubscription;
 
   // Form controllers
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
-  final nameController = TextEditingController();
-  final forgotEmailController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController forgotEmailController = TextEditingController();
 
   // Form keys
-  final loginFormKey = GlobalKey<FormState>();
-  final registerFormKey = GlobalKey<FormState>();
-  final forgotPasswordFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> registerFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> forgotPasswordFormKey = GlobalKey<FormState>();
+
+  bool _authDependenciesInitialized = false;
 
   // Getters
   bool get isLoading => _isLoading.value;
   UserEntity? get currentUser => _currentUser.value;
   String? get errorMessage => _errorMessage.value;
   bool get isAuthenticated => currentUser != null;
+  bool get isFirebaseReady => _firebaseInitializationService.firebaseReady;
 
   @override
   void onInit() {
     super.onInit();
-    _initAuthStateListener();
-    _checkCurrentUser();
+    _observeFirebaseReadiness();
+    _listenToTokenRefreshFailures();
+
+    if (_firebaseInitializationService.firebaseReady) {
+      unawaited(_initializeAuthDependencies());
+    }
   }
 
-  /// Initialize auth state listener
-  void _initAuthStateListener() {
-    _authService.authStateChanges.listen((user) async {
+  /// Observe Firebase readiness to initialize auth dependencies when available.
+  void _observeFirebaseReadiness() {
+    if (_firebaseInitializationService.firebaseReady) {
+      return;
+    }
+
+    _firebaseReadySubscription =
+        _firebaseInitializationService.firebaseReadyStream.listen((isReady) {
+      if (!isReady) {
+        return;
+      }
+
+      _firebaseReadySubscription?.cancel();
+      unawaited(_initializeAuthDependencies());
+      _listenToTokenRefreshFailures();
+    });
+  }
+
+  Future<void> _initializeAuthDependencies() async {
+    if (_authDependenciesInitialized || !_firebaseInitializationService.firebaseReady) {
+      return;
+    }
+
+    final authService = _ensureAuthService();
+    if (authService == null) {
+      if (kDebugMode) {
+        print('AuthController: AuthService not registered yet.');
+      }
+      return;
+    }
+
+    _authDependenciesInitialized = true;
+
+    _authStateSubscription?.cancel();
+    _authStateSubscription = authService.authStateChanges.listen((user) async {
       _currentUser.value = user;
       if (user != null) {
-        // Sync user with backend after authentication
         await _syncUserWithBackend(user);
-        // Only navigate after successful login, not on app start
         if (Get.currentRoute == '/login') {
           Get.offAllNamed('/discovery');
         }
       }
     });
 
-    _tokenFailureSubscription =
-        _tokenRefreshService.onHardFailure.listen((message) {
-      _setError(message);
-      if (Get.currentRoute != '/login') {
-        Get.offAllNamed('/login');
-      }
+    await _checkCurrentUser(authService);
+  }
 
-      Get.closeAllSnackbars();
-      Get.snackbar(
-        'Sessão expirada',
-        message,
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 4),
-      );
-    });
+  void _listenToTokenRefreshFailures() {
+    _tokenFailureSubscription?.cancel();
+    final tokenService = _ensureTokenRefreshService();
+
+    if (tokenService == null) {
+      return;
+    }
+
+    _tokenFailureSubscription = tokenService.onHardFailure.listen(
+      _handleTokenHardFailure,
+    );
+  }
+
+  void _handleTokenHardFailure(String message) {
+    _setError(message);
+
+    if (Get.currentRoute != '/login') {
+      Get.offAllNamed('/login');
+    }
+
+    Get.closeAllSnackbars();
+    Get.snackbar(
+      'Sessão expirada',
+      message,
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 4),
+    );
   }
 
   /// Check current user on app start
-  Future<void> _checkCurrentUser() async {
+  Future<void> _checkCurrentUser(AuthService authService) async {
     try {
-      final user = await _authService.getCurrentUser();
+      final user = await authService.getCurrentUser();
       _currentUser.value = user;
     } catch (e) {
       debugPrint('Error checking current user: $e');
@@ -98,15 +169,27 @@ class AuthController extends GetxController {
       return;
     }
 
-    _setLoading(true);
     _clearError();
+
+    if (!_ensureFirebaseReadyForAction()) {
+      return;
+    }
+
+    await _initializeAuthDependencies();
+    final authService = _ensureAuthService();
+    if (authService == null) {
+      _setError('Serviço de autenticação indisponível. Tente novamente.');
+      return;
+    }
+
+    _setLoading(true);
 
     try {
       if (kDebugMode) {
         print('🔐 Attempting login with email: ${emailController.text.trim()}');
       }
 
-      await _authService.signInWithEmail(
+      await authService.signInWithEmail(
         email: emailController.text.trim(),
         password: passwordController.text,
       );
@@ -138,15 +221,27 @@ class AuthController extends GetxController {
       return;
     }
 
-    _setLoading(true);
     _clearError();
+
+    if (!_ensureFirebaseReadyForAction()) {
+      return;
+    }
+
+    await _initializeAuthDependencies();
+    final authService = _ensureAuthService();
+    if (authService == null) {
+      _setError('Serviço de autenticação indisponível. Tente novamente.');
+      return;
+    }
+
+    _setLoading(true);
 
     try {
       if (kDebugMode) {
         print('📝 Creating new account for: ${emailController.text.trim()}');
       }
 
-      await _authService.signUp(
+      await authService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text,
         name: nameController.text.trim(),
@@ -175,11 +270,23 @@ class AuthController extends GetxController {
 
   /// Sign in with Google
   Future<void> signInWithGoogle() async {
-    _setLoading(true);
     _clearError();
 
+    if (!_ensureFirebaseReadyForAction()) {
+      return;
+    }
+
+    await _initializeAuthDependencies();
+    final authService = _ensureAuthService();
+    if (authService == null) {
+      _setError('Serviço de autenticação indisponível. Tente novamente.');
+      return;
+    }
+
+    _setLoading(true);
+
     try {
-      await _authService.signInWithGoogle();
+      await authService.signInWithGoogle();
       _showSuccessMessage('Login com Google realizado com sucesso!');
     } on AuthException catch (e) {
       _setError(_getLocalizedErrorMessage(e));
@@ -192,11 +299,23 @@ class AuthController extends GetxController {
 
   /// Sign in with Apple
   Future<void> signInWithApple() async {
-    _setLoading(true);
     _clearError();
 
+    if (!_ensureFirebaseReadyForAction()) {
+      return;
+    }
+
+    await _initializeAuthDependencies();
+    final authService = _ensureAuthService();
+    if (authService == null) {
+      _setError('Serviço de autenticação indisponível. Tente novamente.');
+      return;
+    }
+
+    _setLoading(true);
+
     try {
-      await _authService.signInWithApple();
+      await authService.signInWithApple();
       _showSuccessMessage('Login com Apple realizado com sucesso!');
     } on AuthException catch (e) {
       _setError(_getLocalizedErrorMessage(e));
@@ -213,11 +332,23 @@ class AuthController extends GetxController {
       return;
     }
 
-    _setLoading(true);
     _clearError();
 
+    if (!_ensureFirebaseReadyForAction()) {
+      return;
+    }
+
+    await _initializeAuthDependencies();
+    final authService = _ensureAuthService();
+    if (authService == null) {
+      _setError('Serviço de autenticação indisponível. Tente novamente.');
+      return;
+    }
+
+    _setLoading(true);
+
     try {
-      await _authService.sendPasswordResetEmail(
+      await authService.sendPasswordResetEmail(
         email: forgotEmailController.text.trim(),
       );
       _showSuccessMessage(
@@ -237,9 +368,17 @@ class AuthController extends GetxController {
   /// Sign out
   Future<void> signOut() async {
     try {
-      await _authService.signOut();
+      await _initializeAuthDependencies();
+      final tokenService = _ensureTokenRefreshService();
+      final authService = _ensureAuthService();
+
+      await tokenService?.dispose();
+      await authService?.signOut();
+      await _storageService.remove(AppConstants.tokenKey);
+      await _storageService.remove(AppConstants.authTokenKey);
+      await _storageService.remove(AppConstants.userDataKey);
+      await tokenService?.initialize();
       _clearAllForms();
-      // Navigate to login screen
       Get.offAllNamed('/login');
     } catch (e) {
       _setError('Erro ao fazer logout.');
@@ -267,7 +406,8 @@ class AuthController extends GetxController {
   /// Get current user's ID token with automatic refresh
   Future<String?> getCurrentToken() async {
     try {
-      return await _tokenRefreshService.getCurrentToken();
+      final tokenService = _ensureTokenRefreshService();
+      return await tokenService?.getCurrentToken();
     } catch (e) {
       if (kDebugMode) {
         print('Error getting current token: $e');
@@ -279,7 +419,8 @@ class AuthController extends GetxController {
   /// Force refresh the current user's token
   Future<String?> refreshToken() async {
     try {
-      return await _tokenRefreshService.refreshToken();
+      final tokenService = _ensureTokenRefreshService();
+      return await tokenService?.refreshToken();
     } catch (e) {
       if (kDebugMode) {
         print('Error refreshing token: $e');
@@ -291,7 +432,8 @@ class AuthController extends GetxController {
   /// Check if token is expiring soon
   Future<bool> isTokenExpiringSoon() async {
     try {
-      return await _tokenRefreshService.isTokenExpiringSoon();
+      final tokenService = _ensureTokenRefreshService();
+      return await tokenService?.isTokenExpiringSoon() ?? true;
     } catch (e) {
       if (kDebugMode) {
         print('Error checking token expiration: $e');
@@ -313,6 +455,43 @@ class AuthController extends GetxController {
   /// Clear error message
   void _clearError() {
     _errorMessage.value = null;
+  }
+
+  bool _ensureFirebaseReadyForAction() {
+    if (_firebaseInitializationService.firebaseReady) {
+      return true;
+    }
+
+    _setError(
+      'Não foi possível conectar ao serviço de autenticação. Verifique sua conexão ou tente novamente mais tarde.',
+    );
+    return false;
+  }
+
+  AuthService? _ensureAuthService() {
+    if (_authService != null) {
+      return _authService;
+    }
+
+    if (Get.isRegistered<AuthService>()) {
+      _authService = Get.find<AuthService>();
+      return _authService;
+    }
+
+    return null;
+  }
+
+  TokenRefreshService? _ensureTokenRefreshService() {
+    if (_tokenRefreshService != null) {
+      return _tokenRefreshService;
+    }
+
+    if (Get.isRegistered<TokenRefreshService>()) {
+      _tokenRefreshService = Get.find<TokenRefreshService>();
+      return _tokenRefreshService;
+    }
+
+    return null;
   }
 
   /// Show success message
@@ -397,7 +576,6 @@ class AuthController extends GetxController {
         print('✅ User synced with backend successfully');
       }
     } on ApiException catch (e) {
-      // Log API errors but don't block authentication flow
       if (kDebugMode) {
         print('⚠️ Failed to sync user with backend: ${e.message}');
       }
@@ -415,8 +593,10 @@ class AuthController extends GetxController {
     confirmPasswordController.dispose();
     nameController.dispose();
     forgotEmailController.dispose();
-    _authService.dispose();
+    _authStateSubscription?.cancel();
     _tokenFailureSubscription?.cancel();
+    _firebaseReadySubscription?.cancel();
+    _authService?.dispose();
     super.onClose();
   }
 }

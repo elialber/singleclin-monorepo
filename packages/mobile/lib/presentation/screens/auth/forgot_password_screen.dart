@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:singleclin_mobile/core/utils/form_validators.dart';
+import 'package:singleclin_mobile/data/services/firebase_initialization_service.dart';
 import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/presentation/widgets/firebase_unavailable_view.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -10,6 +12,8 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.find<AuthController>();
+    final FirebaseInitializationService firebaseService =
+        Get.find<FirebaseInitializationService>();
 
     return Scaffold(
       appBar: AppBar(
@@ -21,9 +25,14 @@ class ForgotPasswordScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
+        child: Obx(() {
+          if (!firebaseService.firebaseReady) {
+            return const FirebaseUnavailableView(compact: true);
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
@@ -236,7 +245,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
+        }),
       ),
     );
   }

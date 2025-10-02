@@ -387,14 +387,6 @@ class TokenRefreshService {
     _hardFailureController.add(failureMessage);
     await _clearCurrentMetadata();
     _cancelScheduledRefresh();
-
-    try {
-      await _authService.signOut();
-    } catch (e) {
-      if (kDebugMode) {
-        print('⚠️ TokenRefreshService: Erro ao encerrar sessão após falha: $e');
-      }
-    }
   }
 
   Future<void> _clearCurrentMetadata() async {
@@ -488,6 +480,9 @@ class TokenRefreshService {
     _authStateSubscription?.cancel();
     _authStateSubscription = null;
     _currentUser = null;
+    if (_metadataKey != null) {
+      unawaited(_storageService.remove(_metadataKey!));
+    }
     _metadata = const _TokenRefreshMetadata();
     _metadataKey = null;
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/data/services/auth_service.dart';
-import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
+import 'package:singleclin_mobile/data/services/firebase_initialization_service.dart';
 import 'package:singleclin_mobile/presentation/widgets/singleclin_logo.dart';
 
 /// Splash screen shown on app launch
@@ -13,13 +13,13 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final AuthService _authService = AuthService();
-  final TokenRefreshService _tokenRefreshService =
-      Get.find<TokenRefreshService>();
+  AuthService? _authService;
+  late final FirebaseInitializationService _firebaseService;
 
   @override
   void initState() {
     super.initState();
+    _firebaseService = Get.find<FirebaseInitializationService>();
     _initializeAndNavigate();
   }
 
@@ -27,6 +27,13 @@ class _SplashScreenState extends State<SplashScreen> {
     try {
       // Show splash for minimum duration
       await Future.delayed(const Duration(seconds: 1));
+
+      if (!_firebaseService.firebaseReady) {
+        if (mounted) {
+          Get.offAllNamed('/firebase-unavailable');
+        }
+        return;
+      }
 
       // Add timeout to prevent infinite loading
       final result = await Future.any([
@@ -56,9 +63,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<bool> _checkAuthenticationWithTimeout() async {
     try {
+      final authService = _resolveAuthService();
+      if (authService == null) {
+        return false;
+      }
       // Simple check - just verify if user is authenticated
       // Skip token validation on splash to avoid blocking
-      final isAuthenticated = await _authService.isAuthenticated().timeout(
+      final isAuthenticated = await authService.isAuthenticated().timeout(
         const Duration(seconds: 2),
         onTimeout: () => false,
       );
@@ -69,6 +80,17 @@ class _SplashScreenState extends State<SplashScreen> {
       print('Authentication check error: $e');
       return false;
     }
+  }
+
+  AuthService? _resolveAuthService() {
+    if (_authService != null) {
+      return _authService;
+    }
+    if (Get.isRegistered<AuthService>()) {
+      _authService = Get.find<AuthService>();
+      return _authService;
+    }
+    return null;
   }
 
   @override

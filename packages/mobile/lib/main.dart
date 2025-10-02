@@ -1,10 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import 'package:singleclin_mobile/firebase_options.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/themes/app_theme.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
@@ -14,6 +13,7 @@ import 'package:singleclin_mobile/data/services/auth_service.dart';
 import 'package:singleclin_mobile/data/services/app_lifecycle_observer.dart';
 import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
 import 'package:singleclin_mobile/data/services/session_revocation_service.dart';
+import 'package:singleclin_mobile/data/services/firebase_initialization_service.dart';
 import 'package:singleclin_mobile/presentation/screens/splash_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/auth/login_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/auth/register_screen.dart';
@@ -23,6 +23,7 @@ import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_detai
 import 'package:singleclin_mobile/features/appointment_booking/screens/appointment_booking_screen.dart';
 import 'package:singleclin_mobile/temp_dashboard.dart';
 import 'package:singleclin_mobile/presentation/screens/profile_screen.dart';
+import 'package:singleclin_mobile/presentation/screens/firebase_unavailable_screen.dart';
 import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
 import 'package:singleclin_mobile/core/utils/app_bindings.dart';
@@ -30,15 +31,9 @@ import 'package:singleclin_mobile/core/utils/app_bindings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } catch (e) {
-    print('Firebase initialization failed: $e');
-    // Continue without Firebase for now
-  }
+  final firebaseInitializationService =
+      Get.put(FirebaseInitializationService(), permanent: true);
+  await firebaseInitializationService.initialize();
 
   // Initialize Hive
   await Hive.initFlutter();
@@ -60,12 +55,14 @@ void main() async {
   ]);
 
   // Initialize services
-  await _initServices();
+  await _initServices(firebaseInitializationService);
 
   runApp(const SingleClinApp());
 }
 
-Future<void> _initServices() async {
+Future<void> _initServices(
+  FirebaseInitializationService firebaseInitializationService,
+) async {
   try {
     print('🚀 Initializing services...');
 
@@ -74,48 +71,56 @@ Future<void> _initServices() async {
       () => StorageService().init(),
     ).timeout(
       const Duration(seconds: 5),
-      onTimeout: () {
-        print('⚠️ Storage service initialization timeout');
-        return StorageService(); // Return default instance
-      },
+      onTimeout: () => throw TimeoutException(
+        'Storage service initialization timeout',
+      ),
     );
+    storageService.ensureEncrypted();
 
-    // Initialize API client (singleton instance)
-    Get.put(ApiClient.instance, permanent: true);
+    if (!Get.isRegistered<AuthController>()) {
+      Get.put(AuthController(), permanent: true);
+    }
 
-    // Initialize API service
-    Get.put(ApiService(), permanent: true);
+    Future<void> initializeFirebaseDependentServices() async {
+      final authService = Get.put(AuthService(), permanent: true);
 
-    // Initialize auth service
-    final authService = Get.put(AuthService(), permanent: true);
+      final tokenRefreshService = TokenRefreshService(
+        authService: authService,
+        storageService: storageService,
+      );
+      Get.put<TokenRefreshService>(tokenRefreshService, permanent: true);
+      await tokenRefreshService.initialize();
 
-    // Initialize token refresh service
-    final tokenRefreshService = TokenRefreshService(
-      authService: authService,
-      storageService: storageService,
-    );
-    Get.put<TokenRefreshService>(tokenRefreshService, permanent: true);
-    await tokenRefreshService.initialize();
+      Get.put(ApiClient.instance, permanent: true);
+      Get.put(ApiService(), permanent: true);
 
-    // App lifecycle observer to control refresh cycles
-    final lifecycleObserver = AppLifecycleObserver(tokenRefreshService)
-      ..initialize();
-    Get.put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
+      final lifecycleObserver = AppLifecycleObserver(tokenRefreshService)
+        ..initialize();
+      Get.put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
 
-    // Listen for revocation push notifications
-    final revocationService = SessionRevocationService(
-      tokenRefreshService: tokenRefreshService,
-      storageService: storageService,
-      authService: authService,
-    );
-    await revocationService.initialize();
-    Get.put<SessionRevocationService>(revocationService, permanent: true);
+      final revocationService = SessionRevocationService(
+        tokenRefreshService: tokenRefreshService,
+        storageService: storageService,
+        authService: authService,
+      );
+      await revocationService.initialize();
+      Get.put<SessionRevocationService>(revocationService, permanent: true);
 
-    // Initialize auth controller
-    Get.put(AuthController(), permanent: true);
+    }
+
+    if (firebaseInitializationService.firebaseReady) {
+      await initializeFirebaseDependentServices();
+    } else {
+      firebaseInitializationService.addOnReadyCallback(
+        initializeFirebaseDependentServices,
+      );
+      print('⚠️ Firebase not ready. Deferred auth-dependent service initialization.');
+    }
 
     // Initialize bottom navigation controller
-    Get.put(BottomNavController(), permanent: true);
+    if (!Get.isRegistered<BottomNavController>()) {
+      Get.put(BottomNavController(), permanent: true);
+    }
 
     print('✅ All services initialized successfully');
   } catch (e) {
@@ -148,6 +153,10 @@ class SingleClinApp extends StatelessWidget {
         GetPage(name: '/splash', page: () => const SplashScreen()),
         GetPage(name: '/login', page: () => const LoginScreen()),
         GetPage(name: '/register', page: () => const RegisterScreen()),
+        GetPage(
+          name: '/firebase-unavailable',
+          page: () => const FirebaseUnavailableScreen(),
+        ),
         GetPage(name: '/home', page: () => const ClinicDiscoveryScreen()),
         GetPage(name: '/dashboard', page: () => const TempDashboardScreen()),
         GetPage(
@@ -191,12 +200,5 @@ class SingleClinApp extends StatelessWidget {
       // Enable log in debug mode
       enableLog: false,
     );
-  }
-}
-
-extension StorageServiceInitialization on StorageService {
-  Future<StorageService> init() async {
-    await onInit();
-    return this;
   }
 }
