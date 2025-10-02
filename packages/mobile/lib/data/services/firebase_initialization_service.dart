@@ -102,4 +102,33 @@ class FirebaseInitializationService extends GetxService {
       }
     }
   }
+
+  @visibleForTesting
+  void debugSetState({
+    bool? ready,
+    bool? initializing,
+    String? errorMessage,
+    DateTime? lastAttempt,
+    DateTime? lastSuccess,
+    int? failureCount,
+  }) {
+    if (ready != null) {
+      _firebaseReady.value = ready;
+    }
+    if (initializing != null) {
+      _isInitializing.value = initializing;
+    }
+    if (errorMessage != null) {
+      _lastErrorMessage.value = errorMessage;
+    }
+    if (lastAttempt != null) {
+      _lastAttemptAt.value = lastAttempt;
+    }
+    if (lastSuccess != null) {
+      _lastSuccessAt.value = lastSuccess;
+    }
+    if (failureCount != null) {
+      _consecutiveFailures.value = failureCount;
+    }
+  }
 }
