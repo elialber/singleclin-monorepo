@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/themes/app_theme.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
@@ -27,13 +29,27 @@ import 'package:singleclin_mobile/presentation/screens/firebase_unavailable_scre
 import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
 import 'package:singleclin_mobile/core/utils/app_bindings.dart';
+import 'package:singleclin_mobile/firebase_options.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   final firebaseInitializationService =
       Get.put(FirebaseInitializationService(), permanent: true);
   await firebaseInitializationService.initialize();
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
 
   // Initialize Hive
   await Hive.initFlutter();

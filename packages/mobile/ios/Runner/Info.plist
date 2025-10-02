@@ -64,6 +64,16 @@
 	</array>
 	<key>FlutterDeepLinkingEnabled</key>
 	<true/>
+	<key>GMSApiKey</key>
+	<string>$(GMS_API_KEY)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>google</string>
+		<string>comgooglemaps</string>
+		<string>comgooglemapsurl</string>
+		<string>comgooglemaps-x-callback</string>
+		<string>com.googleusercontent.apps.410494012909-pn2m3j632metfv56li6q17il8r12jt9q</string>
+	</array>
 	<!-- Camera permission for QR code scanning -->
 	<key>NSCameraUsageDescription</key>
 	<string>Este aplicativo precisa de acesso à câmera para escanear códigos QR dos pacientes.</string>
@@ -103,5 +113,10 @@
 	<!-- Reminders (for appointment reminders) -->
 	<key>NSRemindersUsageDescription</key>
 	<string>Este aplicativo pode criar lembretes para seus agendamentos.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>
