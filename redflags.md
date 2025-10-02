@@ -74,7 +74,7 @@
 
 ## Red Flags Altos
 
-### Atualização de usuário não propaga para Firebase e domínio
+### Atualização de usuário não propaga para Firebase e domínio ✅
 
 - **Impacto**: divergência de e-mail, claims e status entre sistemas, afetando autorização e
   experiência do usuário.
@@ -90,7 +90,7 @@
   3. Criar testes de integração cobrindo atualização de e-mail/status para validar propagação
      completa.
 
-### Fluxo de cadastro não é atômico
+### Fluxo de cadastro não é atômico ✅
 
 - **Impacto**: criação parcial de clínicas/usuários quando falhas ocorrem, gerando resíduos e
   inconsciência com Firebase.
@@ -119,7 +119,7 @@
   2. Forçar regeneração de tokens (`SecurityStampValidator`) após sincronização.
   3. Adicionar testes garantindo que o sync invalida sessões antigas e aplica dados corretos.
 
-### Dupla fonte de verdade para usuário
+### Dupla fonte de verdade para usuário ✅
 
 - **Impacto**: `ApplicationUser` e `AppDbContext.User` podem divergir, afetando relatórios e consumo
   de créditos.
@@ -143,3 +143,96 @@
   custo.
 - Mobile envia ID tokens no header padrão, mas o backend depende de header customizado para
   middlewares; alinhar contrato (remover header extra ou documentar fallback consistente).
+
+# Mobile
+
+## Red Flags Críticos
+
+### Token refresh em memória sem persistência ou retries ✅
+
+- **Impacto**: expiração de sessão força logout silencioso; app pode operar com token inválido após
+  voltar do background, gerando falhas de autorização e perda de dados.
+- **Evidência**: `packages/mobile/lib/data/services/token_refresh_service.dart:21-140` mantém
+  `Timer` residente, não salva estado/expiração, nem executa retries; falhas apenas geram logs.
+- **Recomendação**: persistir metadados do refresh (expiração, tentativas), implementar retries com
+  backoff, alertar UI em caso de falha definitiva.
+- **Tasks sugeridas**:
+  1. Armazenar hora de expiração/tentativas em `StorageService` com limpeza adequada.
+  2. Adotar política de retry com backoff e cancelamento seguro.
+  3. Notificar usuário/forçar reautenticação quando todos os retries falharem.
+
+### Dependência direta de FirebaseAuth sem confirmação do backend ✅
+
+- **Impacto**: remoções/desativações no backend não propagam; app continua autenticando com ID
+  tokens já inválidos ou revogados.
+- **Evidência**: `packages/mobile/lib/data/interceptors/auth_interceptor.dart:18-110` e
+  `TokenRefreshService` não consultam backend antes de renovar; apenas verificam Firebase.
+- **Recomendação**: validar status no backend antes de renovar tokens; revogar local ao receber
+  403/409; considerar canal push para revogação imediata.
+- **Tasks sugeridas**:
+  1. Consultar `/auth/profile` (ou claims customizadas) em cada refresh.
+  2. Tratamento de 403/409 para limpar sessão/armazenamento seguro.
+  3. Implementar listener de revogação via FCM/Realtime Database.
+
+### Tokens armazenados sem criptografia
+
+- **Impacto**: acesso físico ao aparelho expõe Refresh Token/JWT, permitindo uso indevido.
+- **Evidência**: `StorageService` (`packages/mobile/lib/core/services/storage_service.dart:34-92`) e
+  `TokenRefreshService` gravam dados em Hive sem `HiveAesCipher`.
+- **Recomendação**: adotar Hive encriptado com chave derivada de SecureStorage/Keychain e limpar
+  dados sensíveis em logout.
+- **Tasks sugeridas**:
+  1. Criar wrapper para abrir boxes com `HiveAesCipher` carregada de storage seguro.
+  2. Invalidar e remover tokens em `AuthController.logout`/revogação.
+  3. Adicionar verificação em tempo de execução para garantir que boxes estão cifradas.
+
+## Red Flags Altos
+
+### Serviços permanentes sem ciclo de vida controlado
+
+- **Impacto**: `Get.put(... permanent: true)` em `main.dart:65-99` mantém instâncias (incluindo
+  tokens) mesmo após logout; memória e dados sensíveis ficam residentes.
+- **Recomendação**: escopar dependências por sessão; executar `Get.reset()`/bindings dedicados ao
+  encerrar sessão.
+- **Tasks sugeridas**:
+  1. Criar Binding para sessão autenticada e liberar recursos no logout.
+  2. Garantir que `TokenRefreshService` para timers ao resetar dependências.
+  3. Validar que controllers não mantêm referências a usuários antigos.
+
+### Inicialização tolerante sem fallback funcional
+
+- **Impacto**: se `Firebase.initializeApp` falhar (`main.dart:26-36`), app continua executando mas
+  chamadas a FirebaseAuth causam exceções.
+- **Recomendação**: abortar login/navegação até que Firebase esteja disponível ou oferecer modo
+  offline restrito com UX clara.
+- **Tasks sugeridas**:
+  1. Expor flag `firebaseReady` e bloquear telas de autenticação até sucesso.
+  2. Oferecer UI de retry/diagnóstico em caso de falha.
+  3. Cobrir com testes instrumentados (modo offline).
+
+### Observador de ciclo de vida inoperante
+
+- **Impacto**: `AppLifecycleObserver`
+  (`packages/mobile/lib/data/services/app_lifecycle_observer.dart:8-70`) apenas loga eventos; token
+  refresh segue ativo mesmo em background prolongado, gastando recursos e sem verificação ao
+  retomar.
+- **Recomendação**: suspender timers em background, revalidar token ao retomar e sincronizar com
+  `FirebaseAuth.idTokenChanges`.
+- **Tasks sugeridas**:
+  1. Suspender `Timer` no `AppLifecycleState.paused`/`inactive`.
+  2. Executar refresh imediato e sincronização com backend ao retornar para `resumed`.
+  3. Testar comportamento em iOS/Android com background prolongado.
+
+## Red Flags Médios
+
+### Ausência de testes instrumentados para fluxos críticos
+
+- **Impacto**: regressões em login, refresh, consumo de créditos passam despercebidas; ausência de
+  cobertura E2E.
+- **Evidência**: diretório `packages/mobile/test` contém apenas testes de widget isolados.
+- **Recomendação**: adicionar suite `integration_test` cobrindo login, perda de token, troca de
+  usuário e cenários offline.
+- **Tasks sugeridas**:
+  1. Configurar firebase emulator/mocks para testes integrados.
+  2. Rodar em CI com devices virtuais (Android/iOS).
+  3. Monitorar métricas de falha via dashboards/quartely review.

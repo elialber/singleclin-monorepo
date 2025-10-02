@@ -11,7 +11,9 @@ import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
 import 'package:singleclin_mobile/data/services/api_client.dart';
 import 'package:singleclin_mobile/data/services/auth_service.dart';
+import 'package:singleclin_mobile/data/services/app_lifecycle_observer.dart';
 import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
+import 'package:singleclin_mobile/data/services/session_revocation_service.dart';
 import 'package:singleclin_mobile/presentation/screens/splash_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/auth/login_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/auth/register_screen.dart';
@@ -68,7 +70,9 @@ Future<void> _initServices() async {
     print('🚀 Initializing services...');
 
     // Initialize storage service first
-    await Get.putAsync(() => StorageService().init()).timeout(
+    final storageService = await Get.putAsync<StorageService>(
+      () => StorageService().init(),
+    ).timeout(
       const Duration(seconds: 5),
       onTimeout: () {
         print('⚠️ Storage service initialization timeout');
@@ -83,10 +87,29 @@ Future<void> _initServices() async {
     Get.put(ApiService(), permanent: true);
 
     // Initialize auth service
-    Get.put(AuthService(), permanent: true);
+    final authService = Get.put(AuthService(), permanent: true);
 
     // Initialize token refresh service
-    Get.put(TokenRefreshService(), permanent: true);
+    final tokenRefreshService = TokenRefreshService(
+      authService: authService,
+      storageService: storageService,
+    );
+    Get.put<TokenRefreshService>(tokenRefreshService, permanent: true);
+    await tokenRefreshService.initialize();
+
+    // App lifecycle observer to control refresh cycles
+    final lifecycleObserver = AppLifecycleObserver(tokenRefreshService)
+      ..initialize();
+    Get.put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
+
+    // Listen for revocation push notifications
+    final revocationService = SessionRevocationService(
+      tokenRefreshService: tokenRefreshService,
+      storageService: storageService,
+      authService: authService,
+    );
+    await revocationService.initialize();
+    Get.put<SessionRevocationService>(revocationService, permanent: true);
 
     // Initialize auth controller
     Get.put(AuthController(), permanent: true);

@@ -4,15 +4,31 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
+import 'package:singleclin_mobile/data/services/auth_service.dart';
+import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
+import 'package:singleclin_mobile/core/constants/api_constants.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
 
 /// HTTP interceptor for automatic JWT token authentication
 ///
 /// This interceptor automatically adds the Firebase Auth ID token
 /// to all HTTP requests and handles token refresh when expired.
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor({FirebaseAuth? firebaseAuth})
-    : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+  AuthInterceptor({
+    FirebaseAuth? firebaseAuth,
+    TokenRefreshService? tokenRefreshService,
+    AuthService? authService,
+    StorageService? storageService,
+  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _tokenRefreshService = tokenRefreshService ?? Get.find<TokenRefreshService>(),
+        _authService = authService ?? Get.find<AuthService>(),
+        _storageService = storageService ?? Get.find<StorageService>();
+
   final FirebaseAuth _firebaseAuth;
+  final TokenRefreshService _tokenRefreshService;
+  final AuthService _authService;
+  final StorageService _storageService;
 
   @override
   Future<void> onRequest(
@@ -20,17 +36,11 @@ class AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     try {
-      // Get current user
-      final User? user = _firebaseAuth.currentUser;
+      final String? token = await _tokenRefreshService.getCurrentToken();
 
-      if (user != null) {
-        // Get ID token (automatically refreshes if expired)
-        final String? token = await user.getIdToken();
-
-        // Add Authorization header
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
+      if (token != null) {
+        options.headers[ApiConstants.authorizationHeader] =
+            '${ApiConstants.bearerTokenPrefix}$token';
 
         if (kDebugMode) {
           print('🔑 Auth token added to request: ${options.path}');
@@ -38,19 +48,17 @@ class AuthInterceptor extends Interceptor {
       } else {
         if (kDebugMode) {
           print(
-            '⚠️ No authenticated user - request sent without token: ${options.path}',
+            '⚠️ No authenticated token available - request sent without token: ${options.path}',
           );
         }
       }
 
-      // Continue with the request
       handler.next(options);
     } catch (e) {
       if (kDebugMode) {
         print('❌ Error adding auth token: $e');
       }
 
-      // Continue without token on error (let the server handle it)
       handler.next(options);
     }
   }
@@ -60,33 +68,37 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    // Handle 401 Unauthorized - token might be expired
-    if (err.response?.statusCode == 401) {
+    final statusCode = err.response?.statusCode;
+
+    if (statusCode == 401) {
       try {
         if (kDebugMode) {
           print('🔄 401 Unauthorized - attempting token refresh and retry');
         }
 
-        // Try to refresh token and retry the request
-        final bool retrySuccessful = await _retryWithRefreshedToken(err);
+        final Response? retryResponse =
+            await _retryWithRefreshedToken(err.requestOptions);
 
-        if (retrySuccessful) {
-          // If retry was successful, don't propagate the original error
+        if (retryResponse != null) {
+          handler.resolve(retryResponse);
           return;
-        } else {
-          // Token refresh failed - redirect to login
-          if (kDebugMode) {
-            print('🚨 Token refresh failed - redirecting to login');
-          }
-          await _handleAuthenticationFailure();
         }
+
+        await _handleAuthenticationFailure(
+          reason: 'Sua sessão expirou. Faça login novamente.',
+        );
       } catch (retryError) {
         if (kDebugMode) {
           print('❌ Token refresh failed: $retryError');
         }
-        // Token refresh failed - redirect to login
-        await _handleAuthenticationFailure();
+        await _handleAuthenticationFailure(
+          reason: 'Sua sessão expirou. Faça login novamente.',
+        );
       }
+    } else if (statusCode == 403 || statusCode == 409) {
+      await _handleAuthenticationFailure(
+        reason: 'Seu acesso foi revogado. Faça login novamente.',
+      );
     }
 
     // Convert DioException to custom API exception
@@ -105,7 +117,7 @@ class AuthInterceptor extends Interceptor {
   }
 
   /// Retry the failed request with a refreshed token
-  Future<bool> _retryWithRefreshedToken(DioException err) async {
+  Future<Response?> _retryWithRefreshedToken(RequestOptions failedRequest) async {
     try {
       final User? user = _firebaseAuth.currentUser;
 
@@ -113,61 +125,46 @@ class AuthInterceptor extends Interceptor {
         if (kDebugMode) {
           print('❌ No authenticated user for token refresh');
         }
-        return false;
+        return null;
       }
 
-      // Force refresh the token
-      final String? newToken = await user.getIdToken(true);
+      final String? newToken = await _tokenRefreshService.refreshToken();
 
       if (newToken == null) {
         if (kDebugMode) {
           print('❌ Failed to refresh token - token is null');
         }
-        return false;
+        return null;
       }
 
       if (kDebugMode) {
         print('✅ Token refreshed successfully');
       }
 
-      // Update the Authorization header with the new token
-      err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+      final RequestOptions retryOptions = failedRequest.copyWith();
+      retryOptions.headers[ApiConstants.authorizationHeader] =
+          '${ApiConstants.bearerTokenPrefix}$newToken';
 
-      // Create a new Dio instance to avoid circular interceptor calls
-      final Dio retryDio = Dio();
+      final Dio retryDio = Dio()
+        ..options = BaseOptions(
+          baseUrl: failedRequest.baseUrl,
+          connectTimeout: failedRequest.connectTimeout,
+          sendTimeout: failedRequest.sendTimeout,
+          receiveTimeout: failedRequest.receiveTimeout,
+        );
 
-      // Copy timeout configuration from original request
-      retryDio.options.connectTimeout = err.requestOptions.connectTimeout;
-      retryDio.options.sendTimeout = err.requestOptions.sendTimeout;
-      retryDio.options.receiveTimeout = err.requestOptions.receiveTimeout;
-
-      // Retry the request
-      final Response response = await retryDio.request(
-        err.requestOptions.path,
-        data: err.requestOptions.data,
-        queryParameters: err.requestOptions.queryParameters,
-        options: Options(
-          method: err.requestOptions.method,
-          headers: err.requestOptions.headers,
-          contentType: err.requestOptions.contentType,
-          responseType: err.requestOptions.responseType,
-          extra: err.requestOptions.extra,
-        ),
-      );
+      final Response response = await retryDio.fetch(retryOptions);
 
       if (kDebugMode) {
-        print('✅ Request retry successful: ${err.requestOptions.path}');
+        print('✅ Request retry successful: ${failedRequest.path}');
       }
 
-      // Resolve the original request with the retry response
-      err.requestOptions.extra['retryResponse'] = response;
-
-      return true;
+      return response;
     } catch (e) {
       if (kDebugMode) {
         print('❌ Request retry failed: $e');
       }
-      return false;
+      return null;
     }
   }
 
@@ -251,24 +248,23 @@ class AuthInterceptor extends Interceptor {
   }
 
   /// Handle authentication failure by signing out and redirecting to login
-  Future<void> _handleAuthenticationFailure() async {
+  Future<void> _handleAuthenticationFailure({String? reason}) async {
     try {
       if (kDebugMode) {
         print('🚨 Handling authentication failure - signing out user');
       }
 
-      // Sign out the Firebase user to clear invalid token
-      await _firebaseAuth.signOut();
+      _tokenRefreshService.dispose();
+      await _authService.signOut();
+      await _storageService.remove(AppConstants.tokenKey);
+      await _tokenRefreshService.initialize();
 
-      // Use GetX to navigate to login screen
-      // Only navigate if we're not already on the login screen
       if (Get.currentRoute != '/login' && Get.currentRoute != '/splash') {
         await Get.offAllNamed('/login');
 
-        // Show user-friendly message
         Get.snackbar(
           'Sessão Expirada',
-          'Sua sessão expirou. Faça login novamente.',
+          reason ?? 'Sua sessão expirou. Faça login novamente.',
           backgroundColor: Get.theme.colorScheme.error.withValues(alpha: 0.1),
           colorText: Get.theme.colorScheme.error,
           icon: const Icon(Icons.info_outline),

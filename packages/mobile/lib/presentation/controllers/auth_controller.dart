@@ -24,6 +24,7 @@ class AuthController extends GetxController {
   final _isLoading = false.obs;
   final _currentUser = Rxn<UserEntity?>();
   final _errorMessage = RxnString();
+  StreamSubscription<String>? _tokenFailureSubscription;
 
   // Form controllers
   final emailController = TextEditingController();
@@ -62,6 +63,22 @@ class AuthController extends GetxController {
           Get.offAllNamed('/discovery');
         }
       }
+    });
+
+    _tokenFailureSubscription =
+        _tokenRefreshService.onHardFailure.listen((message) {
+      _setError(message);
+      if (Get.currentRoute != '/login') {
+        Get.offAllNamed('/login');
+      }
+
+      Get.closeAllSnackbars();
+      Get.snackbar(
+        'Sessão expirada',
+        message,
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 4),
+      );
     });
   }
 
@@ -399,6 +416,7 @@ class AuthController extends GetxController {
     nameController.dispose();
     forgotEmailController.dispose();
     _authService.dispose();
+    _tokenFailureSubscription?.cancel();
     super.onClose();
   }
 }
