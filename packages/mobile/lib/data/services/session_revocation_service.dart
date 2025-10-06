@@ -14,18 +14,15 @@ class SessionRevocationService {
   SessionRevocationService({
     FirebaseMessaging? messaging,
     FirebaseAuth? firebaseAuth,
-    Future<void> Function(String message)? onRevocation,
-  })  : _messaging = messaging ?? FirebaseMessaging.instance,
-        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _onRevocation = onRevocation ??
-            message {
-              if (kDebugMode) {
-                print('SessionRevocationService: revocation callback missing -> $message');
-              }
-            },
-        _tokenRefreshService = tokenRefreshService,
-        _storageService = storageService,
-        _authService = authService;
+    this.onRevocation,
+    TokenRefreshService? tokenRefreshService,
+    StorageService? storageService,
+    AuthService? authService,
+  }) : _messaging = messaging ?? FirebaseMessaging.instance,
+       _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _tokenRefreshService = tokenRefreshService,
+       _storageService = storageService,
+       _authService = authService;
 
   final FirebaseMessaging _messaging;
   final FirebaseAuth _firebaseAuth;
@@ -41,10 +38,12 @@ class SessionRevocationService {
     try {
       await _messaging.requestPermission();
 
-      _messageSubscription =
-          FirebaseMessaging.onMessage.listen(_handleRemoteMessage);
-      _openedAppSubscription =
-          FirebaseMessaging.onMessageOpenedApp.listen(_handleRemoteMessage);
+      _messageSubscription = FirebaseMessaging.onMessage.listen(
+        _handleRemoteMessage,
+      );
+      _openedAppSubscription = FirebaseMessaging.onMessageOpenedApp.listen(
+        _handleRemoteMessage,
+      );
 
       if (kDebugMode) {
         print('🔔 SessionRevocationService: Listening for revocation events');
@@ -74,12 +73,12 @@ class SessionRevocationService {
       }
 
       await _firebaseAuth.signOut();
-      await _tokenRefreshService?.dispose();
+      _tokenRefreshService?.dispose();
       await _authService?.signOut();
       if (_storageService != null) {
-        await _storageService!.remove(AppConstants.tokenKey);
-        await _storageService!.remove(AppConstants.authTokenKey);
-        await _storageService!.remove(AppConstants.userDataKey);
+        await _storageService.remove(AppConstants.tokenKey);
+        await _storageService.remove(AppConstants.authTokenKey);
+        await _storageService.remove(AppConstants.userDataKey);
       }
       final reason =
           message.data['message'] ?? 'Sua sessão foi encerrada pelo servidor.';

@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';\nimport 'package:equatable/equatable.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:singleclin_mobile/features/discovery/models/service.dart';
 
 /// Represents a clinic/healthcare facility in the SingleClin platform
 class Clinic extends Equatable {
-
   const Clinic({
     required this.id,
     required this.name,
@@ -16,7 +16,19 @@ class Clinic extends Equatable {
     required this.longitude,
     required this.phone,
     required this.email,
-    required this.images, required this.rating, required this.reviewCount, required this.categories, required this.services, required this.isVerified, required this.isActive, required this.acceptsSG, required this.schedule, required this.amenities, required this.createdAt, required this.updatedAt, this.website,
+    required this.images,
+    required this.rating,
+    required this.reviewCount,
+    required this.categories,
+    required this.services,
+    required this.isVerified,
+    required this.isActive,
+    required this.acceptsSG,
+    required this.schedule,
+    required this.amenities,
+    required this.createdAt,
+    required this.updatedAt,
+    this.website,
     this.logoUrl,
     this.specialtyDescription,
     this.isFavorite = false,
@@ -49,7 +61,9 @@ class Clinic extends Equatable {
       isVerified: json['isVerified'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
       acceptsSG: json['acceptsSG'] as bool? ?? true,
-      schedule: ClinicSchedule.fromJson(json['schedule'] as Map<String, dynamic>),
+      schedule: ClinicSchedule.fromJson(
+        json['schedule'] as Map<String, dynamic>,
+      ),
       amenities: List<String>.from(json['amenities'] as List? ?? []),
       specialtyDescription: json['specialtyDescription'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -237,40 +251,39 @@ class Clinic extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        address,
-        city,
-        state,
-        zipCode,
-        latitude,
-        longitude,
-        phone,
-        email,
-        website,
-        images,
-        logoUrl,
-        rating,
-        reviewCount,
-        categories,
-        services,
-        isVerified,
-        isActive,
-        acceptsSG,
-        schedule,
-        amenities,
-        specialtyDescription,
-        createdAt,
-        updatedAt,
-        isFavorite,
-        distanceKm,
-      ];
+    id,
+    name,
+    description,
+    address,
+    city,
+    state,
+    zipCode,
+    latitude,
+    longitude,
+    phone,
+    email,
+    website,
+    images,
+    logoUrl,
+    rating,
+    reviewCount,
+    categories,
+    services,
+    isVerified,
+    isActive,
+    acceptsSG,
+    schedule,
+    amenities,
+    specialtyDescription,
+    createdAt,
+    updatedAt,
+    isFavorite,
+    distanceKm,
+  ];
 }
 
 /// Represents clinic operating schedule
 class ClinicSchedule extends Equatable {
-
   const ClinicSchedule({
     required this.weekSchedule,
     this.holidays = const [],
@@ -278,13 +291,14 @@ class ClinicSchedule extends Equatable {
   });
 
   factory ClinicSchedule.fromJson(Map<String, dynamic> json) {
-    final weekScheduleData = json['weekSchedule'] as Map<String, dynamic>? ?? {};
+    final weekScheduleData =
+        json['weekSchedule'] as Map<String, dynamic>? ?? {};
     final weekSchedule = <String, DaySchedule>{};
-    
+
     for (final entry in weekScheduleData.entries) {
       weekSchedule[entry.key] = DaySchedule.fromJson(entry.value);
     }
-    
+
     return ClinicSchedule(
       weekSchedule: weekSchedule,
       holidays: List<String>.from(json['holidays'] as List? ?? []),
@@ -300,9 +314,9 @@ class ClinicSchedule extends Equatable {
     final now = DateTime.now();
     final weekday = _getWeekdayKey(now.weekday);
     final daySchedule = weekSchedule[weekday];
-    
+
     if (daySchedule == null || !daySchedule.isOpen) return false;
-    
+
     final currentTime = TimeOfDay.fromDateTime(now);
     return daySchedule.isOpenAt(currentTime);
   }
@@ -310,47 +324,63 @@ class ClinicSchedule extends Equatable {
   /// Get next opening time as formatted string
   String getNextOpeningTime() {
     if (isOpenNow()) return 'Aberto agora';
-    
+
     final now = DateTime.now();
     // Check today first
     for (int i = 0; i < 7; i++) {
       final checkDate = now.add(Duration(days: i));
       final weekday = _getWeekdayKey(checkDate.weekday);
       final daySchedule = weekSchedule[weekday];
-      
+
       if (daySchedule?.isOpen ?? false) {
         if (i == 0) return 'Abre às ${daySchedule!.openTime.format()}';
         if (i == 1) return 'Abre amanhã às ${daySchedule!.openTime.format()}';
         return 'Abre ${_getWeekdayName(checkDate.weekday)} às ${daySchedule!.openTime.format()}';
       }
     }
-    
+
     return 'Fechado';
   }
 
   String _getWeekdayKey(int weekday) {
     switch (weekday) {
-      case 1: return 'monday';
-      case 2: return 'tuesday';
-      case 3: return 'wednesday';
-      case 4: return 'thursday';
-      case 5: return 'friday';
-      case 6: return 'saturday';
-      case 7: return 'sunday';
-      default: return 'monday';
+      case 1:
+        return 'monday';
+      case 2:
+        return 'tuesday';
+      case 3:
+        return 'wednesday';
+      case 4:
+        return 'thursday';
+      case 5:
+        return 'friday';
+      case 6:
+        return 'saturday';
+      case 7:
+        return 'sunday';
+      default:
+        return 'monday';
     }
   }
 
   String _getWeekdayName(int weekday) {
     switch (weekday) {
-      case 1: return 'segunda';
-      case 2: return 'terça';
-      case 3: return 'quarta';
-      case 4: return 'quinta';
-      case 5: return 'sexta';
-      case 6: return 'sábado';
-      case 7: return 'domingo';
-      default: return '';
+      case 1:
+        return 'segunda';
+      case 2:
+        return 'terça';
+      case 3:
+        return 'quarta';
+      case 4:
+        return 'quinta';
+      case 5:
+        return 'sexta';
+      case 6:
+        return 'sábado';
+      case 7:
+        return 'domingo';
+      default:
+        return '';
     }
   }
 
@@ -359,7 +389,7 @@ class ClinicSchedule extends Equatable {
     for (final entry in weekSchedule.entries) {
       weekScheduleData[entry.key] = entry.value.toJson();
     }
-    
+
     return {
       'weekSchedule': weekScheduleData,
       'holidays': holidays,
@@ -373,7 +403,6 @@ class ClinicSchedule extends Equatable {
 
 /// Represents a single day schedule
 class DaySchedule extends Equatable {
-
   const DaySchedule({
     required this.isOpen,
     required this.openTime,
@@ -416,21 +445,22 @@ class DaySchedule extends Equatable {
   /// Check if open at specific time
   bool isOpenAt(TimeOfDay time) {
     if (!isOpen) return false;
-    
+
     final timeMinutes = time.hour * 60 + time.minute;
     final openMinutes = openTime.hour * 60 + openTime.minute;
     final closeMinutes = closeTime.hour * 60 + closeTime.minute;
-    
+
     // Check if within lunch break
     if (lunchBreakStart != null && lunchBreakEnd != null) {
-      final lunchStartMinutes = lunchBreakStart!.hour * 60 + lunchBreakStart!.minute;
+      final lunchStartMinutes =
+          lunchBreakStart!.hour * 60 + lunchBreakStart!.minute;
       final lunchEndMinutes = lunchBreakEnd!.hour * 60 + lunchBreakEnd!.minute;
-      
+
       if (timeMinutes >= lunchStartMinutes && timeMinutes <= lunchEndMinutes) {
         return false;
       }
     }
-    
+
     return timeMinutes >= openMinutes && timeMinutes <= closeMinutes;
   }
 
@@ -450,12 +480,12 @@ class DaySchedule extends Equatable {
 
   @override
   List<Object?> get props => [
-        isOpen,
-        openTime,
-        closeTime,
-        lunchBreakStart,
-        lunchBreakEnd,
-      ];
+    isOpen,
+    openTime,
+    closeTime,
+    lunchBreakStart,
+    lunchBreakEnd,
+  ];
 }
 
 /// Extension for TimeOfDay formatting

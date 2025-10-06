@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';\nimport 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:singleclin_mobile/features/appointments/models/appointment.dart';
 import 'package:singleclin_mobile/features/appointments/models/appointment_status.dart';
-import 'package:singleclin_mobile/features/appointments/models/cancellation_policy.dart';
 
 /// Appointments Controller
 /// Manages appointment list, filtering, and operations
-class AppointmentsController extends GetxController with GetSingleTickerProviderStateMixin {
+class AppointmentsController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   // Observable state
   final _appointments = <Appointment>[].obs;
   final _isLoading = false.obs;
@@ -13,10 +14,10 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
   final _selectedTabIndex = 0.obs;
   final _searchQuery = ''.obs;
   final _errorMessage = ''.obs;
-  
+
   // Tab controller for appointment tabs
   late TabController tabController;
-  
+
   // Getters
   List<Appointment> get appointments => _appointments;
   bool get isLoading => _isLoading.value;
@@ -24,55 +25,54 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
   int get selectedTabIndex => _selectedTabIndex.value;
   String get searchQuery => _searchQuery.value;
   String get errorMessage => _errorMessage.value;
-  
+
   // Filtered appointments by tab
   List<Appointment> get upcomingAppointments {
     return _filterAppointments(AppointmentStatus.upcomingStatuses);
   }
-  
+
   List<Appointment> get historyAppointments {
     return _filterAppointments(AppointmentStatus.completedStatuses);
   }
-  
+
   List<Appointment> get cancelledAppointments {
     return _filterAppointments(AppointmentStatus.cancelledStatuses);
   }
-  
+
   @override
   void onInit() {
     super.onInit();
-    
+
     // Initialize tab controller
     tabController = TabController(length: 3, vsync: this);
     tabController.addListener(_onTabChanged);
-    
+
     // Load initial data
     loadAppointments();
-    
+
     // Set up refresh timer for upcoming appointments
     _setupRefreshTimer();
   }
-  
+
   @override
   void onClose() {
     tabController.removeListener(_onTabChanged);
     tabController.dispose();
     super.onClose();
   }
-  
+
   /// Load appointments from API
   Future<void> loadAppointments() async {
     try {
       _isLoading(true);
       _errorMessage('');
-      
+
       // Simulate API call - replace with actual service
       await Future.delayed(const Duration(milliseconds: 1500));
-      
+
       // Mock data for demonstration
       final mockAppointments = _generateMockAppointments();
       _appointments.assignAll(mockAppointments);
-      
     } catch (e) {
       _errorMessage('Erro ao carregar agendamentos: $e');
       Get.snackbar(
@@ -84,7 +84,7 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
       _isLoading(false);
     }
   }
-  
+
   /// Refresh appointments
   Future<void> refreshAppointments() async {
     try {
@@ -94,19 +94,28 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
       _isRefreshing(false);
     }
   }
-  
+
   /// Filter appointments by status list
   List<Appointment> _filterAppointments(List<AppointmentStatus> statuses) {
-    var filtered = _appointments.where((appointment) => 
-        statuses.contains(appointment.status)).toList();
-    
+    var filtered = _appointments
+        .where((appointment) => statuses.contains(appointment.status))
+        .toList();
+
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((appointment) =>
-          appointment.serviceName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          appointment.clinicName.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+      filtered = filtered
+          .where(
+            (appointment) =>
+                appointment.serviceName.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                appointment.clinicName.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+          )
+          .toList();
     }
-    
+
     // Sort by date
     filtered.sort((a, b) {
       final aDateTime = DateTime(
@@ -123,7 +132,7 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
         int.parse(b.scheduledTime.split(':')[0]),
         int.parse(b.scheduledTime.split(':')[1]),
       );
-      
+
       // Upcoming: earliest first, History: latest first
       if (statuses == AppointmentStatus.upcomingStatuses) {
         return aDateTime.compareTo(bDateTime);
@@ -131,42 +140,46 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
         return bDateTime.compareTo(aDateTime);
       }
     });
-    
+
     return filtered;
   }
-  
+
   /// Handle tab change
   void _onTabChanged() {
     _selectedTabIndex(tabController.index);
   }
-  
+
   /// Update search query
   void updateSearchQuery(String query) {
     _searchQuery(query);
   }
-  
+
   /// Cancel an appointment
   Future<void> cancelAppointment(String appointmentId) async {
     try {
       _isLoading(true);
-      
+
       // Find appointment
-      final appointment = _appointments.firstWhere((a) => a.id == appointmentId);
-      
+      final appointment = _appointments.firstWhere(
+        (a) => a.id == appointmentId,
+      );
+
       // Navigate to cancellation screen
-      final result = await Get.toNamed('/appointments/cancel', arguments: appointment);
-      
+      final result = await Get.toNamed(
+        '/appointments/cancel',
+        arguments: appointment,
+      );
+
       if (result == true) {
         // Refresh appointments after cancellation
         await loadAppointments();
-        
+
         Get.snackbar(
           'Sucesso',
           'Agendamento cancelado com sucesso',
           snackPosition: SnackPosition.BOTTOM,
         );
       }
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -177,18 +190,20 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
       _isLoading(false);
     }
   }
-  
+
   /// Reschedule an appointment
   Future<void> rescheduleAppointment(String appointmentId) async {
     try {
-      final appointment = _appointments.firstWhere((a) => a.id == appointmentId);
-      
+      final appointment = _appointments.firstWhere(
+        (a) => a.id == appointmentId,
+      );
+
       // Navigate to booking screen with reschedule context
-      final result = await Get.toNamed('/discovery/booking', arguments: {
-        'reschedule': true,
-        'appointment': appointment,
-      });
-      
+      final result = await Get.toNamed(
+        '/discovery/booking',
+        arguments: {'reschedule': true, 'appointment': appointment},
+      );
+
       if (result == true) {
         await loadAppointments();
         Get.snackbar(
@@ -197,7 +212,6 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
           snackPosition: SnackPosition.BOTTOM,
         );
       }
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -206,19 +220,23 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
       );
     }
   }
-  
+
   /// Rate an appointment
   Future<void> rateAppointment(String appointmentId) async {
     try {
-      final appointment = _appointments.firstWhere((a) => a.id == appointmentId);
-      
+      final appointment = _appointments.firstWhere(
+        (a) => a.id == appointmentId,
+      );
+
       // Navigate to rating screen
-      final result = await Get.toNamed('/appointments/rate', arguments: appointment);
-      
+      final result = await Get.toNamed(
+        '/appointments/rate',
+        arguments: appointment,
+      );
+
       if (result == true) {
         await loadAppointments();
       }
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -227,17 +245,18 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
       );
     }
   }
-  
+
   /// Setup refresh timer for real-time updates
   void _setupRefreshTimer() {
     // Refresh every 5 minutes for upcoming appointments
     Stream.periodic(const Duration(minutes: 5)).listen((_) {
-      if (selectedTabIndex == 0) { // Upcoming tab
+      if (selectedTabIndex == 0) {
+        // Upcoming tab
         refreshAppointments();
       }
     });
   }
-  
+
   /// Get appointment statistics
   Map<String, int> get appointmentStats {
     return {
@@ -247,26 +266,28 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
       'total': _appointments.length,
     };
   }
-  
+
   /// Get next appointment
   Appointment? get nextAppointment {
     final upcoming = upcomingAppointments;
     return upcoming.isNotEmpty ? upcoming.first : null;
   }
-  
+
   /// Check if user has appointments today
   bool get hasAppointmentsToday {
     final today = DateTime.now();
-    return _appointments.any((appointment) =>
-        appointment.scheduledDate.year == today.year &&
-        appointment.scheduledDate.month == today.month &&
-        appointment.scheduledDate.day == today.day);
+    return _appointments.any(
+      (appointment) =>
+          appointment.scheduledDate.year == today.year &&
+          appointment.scheduledDate.month == today.month &&
+          appointment.scheduledDate.day == today.day,
+    );
   }
-  
+
   /// Generate mock appointments for demonstration
   List<Appointment> _generateMockAppointments() {
     final now = DateTime.now();
-    
+
     return [
       // Upcoming appointments
       Appointment(
@@ -285,12 +306,13 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
         price: 2.5,
         sgCreditsUsed: 2.5,
         sgCreditsEarned: 0.5,
-        preInstructions: 'Evitar produtos com ácidos 48h antes do procedimento.',
+        preInstructions:
+            'Evitar produtos com ácidos 48h antes do procedimento.',
         isConfirmed: true,
         createdAt: now.subtract(const Duration(days: 3)),
         updatedAt: now.subtract(const Duration(hours: 2)),
       ),
-      
+
       Appointment(
         id: '2',
         userId: 'user1',
@@ -311,7 +333,7 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
         createdAt: now.subtract(const Duration(days: 1)),
         updatedAt: now.subtract(const Duration(hours: 1)),
       ),
-      
+
       // Completed appointments
       Appointment(
         id: '3',
@@ -334,7 +356,7 @@ class AppointmentsController extends GetxController with GetSingleTickerProvider
         createdAt: now.subtract(const Duration(days: 25)),
         updatedAt: now.subtract(const Duration(days: 15)),
       ),
-      
+
       // Cancelled appointment
       Appointment(
         id: '4',

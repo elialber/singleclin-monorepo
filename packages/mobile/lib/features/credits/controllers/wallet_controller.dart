@@ -22,7 +22,7 @@ class WalletController extends GetxController {
   List<WalletTransaction> get recentTransactions => _recentTransactions;
   WalletCurrency get selectedCurrency => _selectedCurrency.value;
   List<Map<String, dynamic>> get notifications => _notifications;
-  
+
   // Transfer getters
   WalletCurrency get transferFromCurrency => _transferFromCurrency.value;
   WalletCurrency get transferToCurrency => _transferToCurrency.value;
@@ -39,8 +39,9 @@ class WalletController extends GetxController {
   double get totalLoyaltyPoints => walletSummary?.totalLoyaltyPoints ?? 0;
   double get monthlySgSpending => walletSummary?.monthlySgSpending ?? 0;
   double get monthlyCashbackEarned => walletSummary?.monthlyCashbackEarned ?? 0;
-  
-  String get totalWalletValueDisplay => walletSummary?.totalWalletValueDisplay ?? r'R$ 0,00';
+
+  String get totalWalletValueDisplay =>
+      walletSummary?.totalWalletValueDisplay ?? r'R$ 0,00';
   bool get hasAnyBalance => walletSummary?.hasAnyBalance ?? false;
 
   List<WalletBalance> get availableBalances => walletSummary?.balances ?? [];
@@ -58,10 +59,10 @@ class WalletController extends GetxController {
   Future<void> loadWalletSummary() async {
     try {
       _isLoading.value = true;
-      
+
       // Mock API call
       await Future.delayed(const Duration(seconds: 1));
-      
+
       final balances = [
         WalletBalance(
           id: 'sg_wallet',
@@ -101,7 +102,7 @@ class WalletController extends GetxController {
           lastUpdated: DateTime.now(),
         ),
       ];
-      
+
       _walletSummary.value = WalletSummary(
         userId: 'user_123',
         balances: balances,
@@ -113,7 +114,6 @@ class WalletController extends GetxController {
         monthlyCashbackEarned: 8.5,
         lastUpdated: DateTime.now(),
       );
-      
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -129,7 +129,7 @@ class WalletController extends GetxController {
     try {
       // Mock API call
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       _recentTransactions.assignAll([
         WalletTransaction(
           id: 'wtx_001',
@@ -197,7 +197,6 @@ class WalletController extends GetxController {
           createdAt: DateTime.now().subtract(const Duration(days: 7)),
         ),
       ]);
-      
     } catch (e) {
       print('Error loading recent transactions: $e');
     }
@@ -207,7 +206,7 @@ class WalletController extends GetxController {
     try {
       // Mock notification loading
       await Future.delayed(const Duration(milliseconds: 300));
-      
+
       _notifications.assignAll([
         {
           'id': 'notif_001',
@@ -231,13 +230,12 @@ class WalletController extends GetxController {
           'id': 'notif_003',
           'type': 'transfer_completed',
           'title': 'Transferência Concluída',
-          'message': 'Transferência de R$ 50,00 foi processada',
+          'message': r'Transferência de R$ 50,00 foi processada',
           'timestamp': DateTime.now().subtract(const Duration(days: 3)),
           'isRead': true,
           'priority': 'low',
         },
       ]);
-      
     } catch (e) {
       print('Error loading notifications: $e');
     }
@@ -252,7 +250,9 @@ class WalletController extends GetxController {
     _transferFromCurrency.value = currency;
     // Ensure we can't transfer to the same currency
     if (_transferToCurrency.value == currency) {
-      final availableCurrencies = WalletCurrency.values.where((c) => c != currency).toList();
+      final availableCurrencies = WalletCurrency.values
+          .where((c) => c != currency)
+          .toList();
       if (availableCurrencies.isNotEmpty) {
         _transferToCurrency.value = availableCurrencies.first;
       }
@@ -273,10 +273,10 @@ class WalletController extends GetxController {
   bool _canTransfer() {
     if (transferAmount <= 0) return false;
     if (transferFromCurrency == transferToCurrency) return false;
-    
+
     final fromBalance = _getBalanceByCurrency(transferFromCurrency);
     if (fromBalance == null) return false;
-    
+
     return fromBalance.canSpend(transferAmount);
   }
 
@@ -307,11 +307,11 @@ class WalletController extends GetxController {
 
     try {
       _isProcessingTransfer.value = true;
-      
+
       // Show confirmation dialog
       final confirmed = await _showTransferConfirmation();
       if (!confirmed) return;
-      
+
       // Show processing dialog
       Get.dialog(
         AlertDialog(
@@ -327,13 +327,13 @@ class WalletController extends GetxController {
         ),
         barrierDismissible: false,
       );
-      
+
       // Mock transfer processing
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // Close processing dialog
       Get.back();
-      
+
       // Show success dialog
       Get.dialog(
         AlertDialog(
@@ -342,11 +342,15 @@ class WalletController extends GetxController {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Transferência de ${_formatAmount(transferAmount, transferFromCurrency)} concluída com sucesso!'),
+              Text(
+                'Transferência de ${_formatAmount(transferAmount, transferFromCurrency)} concluída com sucesso!',
+              ),
               const SizedBox(height: 8),
               Text('De: ${_getCurrencyDisplayName(transferFromCurrency)}'),
               Text('Para: ${_getCurrencyDisplayName(transferToCurrency)}'),
-              Text('Valor convertido: ${_formatAmount(_calculateConvertedAmount(), transferToCurrency)}'),
+              Text(
+                'Valor convertido: ${_formatAmount(_calculateConvertedAmount(), transferToCurrency)}',
+              ),
             ],
           ),
           actions: [
@@ -361,7 +365,6 @@ class WalletController extends GetxController {
           ],
         ),
       );
-      
     } catch (e) {
       Get.back(); // Close any open dialog
       Get.snackbar(
@@ -376,8 +379,11 @@ class WalletController extends GetxController {
 
   Future<bool> _showTransferConfirmation() async {
     final convertedAmount = _calculateConvertedAmount();
-    final exchangeRate = _getExchangeRate(transferFromCurrency, transferToCurrency);
-    
+    final exchangeRate = _getExchangeRate(
+      transferFromCurrency,
+      transferToCurrency,
+    );
+
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: const Text('Confirmar Transferência'),
@@ -388,8 +394,12 @@ class WalletController extends GetxController {
             Text('De: ${_getCurrencyDisplayName(transferFromCurrency)}'),
             Text('Para: ${_getCurrencyDisplayName(transferToCurrency)}'),
             const SizedBox(height: 8),
-            Text('Valor a transferir: ${_formatAmount(transferAmount, transferFromCurrency)}'),
-            Text('Valor a receber: ${_formatAmount(convertedAmount, transferToCurrency)}'),
+            Text(
+              'Valor a transferir: ${_formatAmount(transferAmount, transferFromCurrency)}',
+            ),
+            Text(
+              'Valor a receber: ${_formatAmount(convertedAmount, transferToCurrency)}',
+            ),
             const SizedBox(height: 8),
             Text(
               'Taxa de câmbio: $exchangeRate',
@@ -409,12 +419,15 @@ class WalletController extends GetxController {
         ],
       ),
     );
-    
+
     return confirmed ?? false;
   }
 
   double _calculateConvertedAmount() {
-    final exchangeRate = _getExchangeRate(transferFromCurrency, transferToCurrency);
+    final exchangeRate = _getExchangeRate(
+      transferFromCurrency,
+      transferToCurrency,
+    );
     return transferAmount * exchangeRate;
   }
 
@@ -499,24 +512,32 @@ class WalletController extends GetxController {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: transaction.isCredit 
-                        ? Colors.green.shade600 
+                    color: transaction.isCredit
+                        ? Colors.green.shade600
                         : Colors.red.shade600,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            
+
             _buildTransactionDetailRow('Tipo', transaction.typeDisplayName),
             _buildTransactionDetailRow('Descrição', transaction.description),
-            _buildTransactionDetailRow('Data', 
-              '${transaction.createdAt.day}/${transaction.createdAt.month}/${transaction.createdAt.year} ${transaction.createdAt.hour}:${transaction.createdAt.minute.toString().padLeft(2, '0')}'),
-            _buildTransactionDetailRow('Saldo após', transaction.balanceAfterDisplay),
-            
+            _buildTransactionDetailRow(
+              'Data',
+              '${transaction.createdAt.day}/${transaction.createdAt.month}/${transaction.createdAt.year} ${transaction.createdAt.hour}:${transaction.createdAt.minute.toString().padLeft(2, '0')}',
+            ),
+            _buildTransactionDetailRow(
+              'Saldo após',
+              transaction.balanceAfterDisplay,
+            ),
+
             if (transaction.referenceId != null)
-              _buildTransactionDetailRow('Referência', transaction.referenceId!),
-            
+              _buildTransactionDetailRow(
+                'Referência',
+                transaction.referenceId!,
+              ),
+
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -567,9 +588,8 @@ class WalletController extends GetxController {
     );
   }
 
-  List<Map<String, dynamic>> get unreadNotifications => 
+  List<Map<String, dynamic>> get unreadNotifications =>
       _notifications.where((n) => n['isRead'] == false).toList();
 
   int get unreadNotificationsCount => unreadNotifications.length;
-
 }
