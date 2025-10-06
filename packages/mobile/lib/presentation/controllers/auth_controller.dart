@@ -21,12 +21,13 @@ class AuthController extends GetxController {
     TokenRefreshService? tokenRefreshService,
     StorageService? storageService,
     FirebaseInitializationService? firebaseInitializationService,
-  })  : _authService = authService,
-        _userApiService = userApiService ?? UserApiService(),
-        _tokenRefreshService = tokenRefreshService,
-        _storageService = storageService ?? Get.find<StorageService>(),
-        _firebaseInitializationService =
-            firebaseInitializationService ?? Get.find<FirebaseInitializationService>();
+  }) : _authService = authService,
+       _userApiService = userApiService ?? UserApiService(),
+       _tokenRefreshService = tokenRefreshService,
+       _storageService = storageService ?? Get.find<StorageService>(),
+       _firebaseInitializationService =
+           firebaseInitializationService ??
+           Get.find<FirebaseInitializationService>();
 
   AuthService? _authService;
   final UserApiService _userApiService;
@@ -47,7 +48,8 @@ class AuthController extends GetxController {
   // Form controllers
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController forgotEmailController = TextEditingController();
 
@@ -82,20 +84,22 @@ class AuthController extends GetxController {
       return;
     }
 
-    _firebaseReadySubscription =
-        _firebaseInitializationService.firebaseReadyStream.listen((isReady) {
-      if (!isReady) {
-        return;
-      }
+    _firebaseReadySubscription = _firebaseInitializationService
+        .firebaseReadyStream
+        .listen((isReady) {
+          if (!isReady) {
+            return;
+          }
 
-      _firebaseReadySubscription?.cancel();
-      unawaited(_initializeAuthDependencies());
-      _listenToTokenRefreshFailures();
-    });
+          _firebaseReadySubscription?.cancel();
+          unawaited(_initializeAuthDependencies());
+          _listenToTokenRefreshFailures();
+        });
   }
 
   Future<void> _initializeAuthDependencies() async {
-    if (_authDependenciesInitialized || !_firebaseInitializationService.firebaseReady) {
+    if (_authDependenciesInitialized ||
+        !_firebaseInitializationService.firebaseReady) {
       return;
     }
 
@@ -201,7 +205,9 @@ class AuthController extends GetxController {
       _clearLoginForm();
     } on AuthException catch (e) {
       if (kDebugMode) {
-        print('❌ Authentication failed - AuthException: ${e.code} - ${e.message}');
+        print(
+          '❌ Authentication failed - AuthException: ${e.code} - ${e.message}',
+        );
       }
       _setError(_getLocalizedErrorMessage(e));
     } catch (e) {
@@ -254,7 +260,9 @@ class AuthController extends GetxController {
       _clearRegisterForm();
     } on AuthException catch (e) {
       if (kDebugMode) {
-        print('❌ Account creation failed - AuthException: ${e.code} - ${e.message}');
+        print(
+          '❌ Account creation failed - AuthException: ${e.code} - ${e.message}',
+        );
       }
       _setError(_getLocalizedErrorMessage(e));
     } catch (e) {

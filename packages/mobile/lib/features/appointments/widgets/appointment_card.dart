@@ -6,7 +6,8 @@ import 'package:singleclin_mobile/features/appointments/models/appointment.dart'
 /// Displays appointment information in a card format
 class AppointmentCard extends StatelessWidget {
   const AppointmentCard({
-    required this.appointment, super.key,
+    required this.appointment,
+    super.key,
     this.onTap,
     this.onCancel,
     this.onReschedule,

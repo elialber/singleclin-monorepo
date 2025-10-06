@@ -695,9 +695,7 @@ class ProfileController extends BaseController {
           'Comunicação sobre procedimentos',
         ],
       ),
-      notificationSettings: const NotificationSettings(
-        
-      ),
+      notificationSettings: const NotificationSettings(),
       allergies: const ['Penicilina', 'Frutos do mar'],
       medications: const ['Vitamina D', 'Ômega 3'],
       healthConditions: const ['Hipertensão leve'],

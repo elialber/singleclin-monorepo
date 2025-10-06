@@ -5,12 +5,15 @@ class AuthService extends GetxService {
   final ApiService _apiService = Get.find<ApiService>();
 
   /// Login com email e senha
-  Future<Map<String, dynamic>> loginWithEmail(String email, String password) async {
+  Future<Map<String, dynamic>> loginWithEmail(
+    String email,
+    String password,
+  ) async {
     try {
-      final response = await _apiService.post('/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
+      final response = await _apiService.post(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
 
       if (response.statusCode == 200) {
         return {
@@ -25,10 +28,7 @@ class AuthService extends GetxService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': e.toString(),
-      };
+      return {'success': false, 'message': e.toString()};
     }
   }
 
@@ -37,15 +37,9 @@ class AuthService extends GetxService {
     try {
       // Implementar login com Google usando google_sign_in
       // Por enquanto, retorna erro
-      return {
-        'success': false,
-        'message': 'Login com Google não implementado',
-      };
+      return {'success': false, 'message': 'Login com Google não implementado'};
     } catch (e) {
-      return {
-        'success': false,
-        'message': e.toString(),
-      };
+      return {'success': false, 'message': e.toString()};
     }
   }
 
@@ -54,15 +48,9 @@ class AuthService extends GetxService {
     try {
       // Implementar login com Apple usando sign_in_with_apple
       // Por enquanto, retorna erro
-      return {
-        'success': false,
-        'message': 'Login com Apple não implementado',
-      };
+      return {'success': false, 'message': 'Login com Apple não implementado'};
     } catch (e) {
-      return {
-        'success': false,
-        'message': e.toString(),
-      };
+      return {'success': false, 'message': e.toString()};
     }
   }
 
@@ -74,12 +62,15 @@ class AuthService extends GetxService {
     String? phone,
   }) async {
     try {
-      final response = await _apiService.post('/auth/register', data: {
-        'fullName': fullName,
-        'email': email,
-        'password': password,
-        'phone': phone,
-      });
+      final response = await _apiService.post(
+        '/auth/register',
+        data: {
+          'fullName': fullName,
+          'email': email,
+          'password': password,
+          'phone': phone,
+        },
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return {
@@ -94,25 +85,20 @@ class AuthService extends GetxService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': e.toString(),
-      };
+      return {'success': false, 'message': e.toString()};
     }
   }
 
   /// Recuperação de senha
   Future<Map<String, dynamic>> forgotPassword(String email) async {
     try {
-      final response = await _apiService.post('/auth/forgot-password', data: {
-        'email': email,
-      });
+      final response = await _apiService.post(
+        '/auth/forgot-password',
+        data: {'email': email},
+      );
 
       if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'message': 'Email de recuperação enviado',
-        };
+        return {'success': true, 'message': 'Email de recuperação enviado'};
       } else {
         return {
           'success': false,
@@ -120,10 +106,7 @@ class AuthService extends GetxService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': e.toString(),
-      };
+      return {'success': false, 'message': e.toString()};
     }
   }
 
@@ -164,10 +147,7 @@ class AuthService extends GetxService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': e.toString(),
-      };
+      return {'success': false, 'message': e.toString()};
     }
   }
 
@@ -177,16 +157,13 @@ class AuthService extends GetxService {
     required String newPassword,
   }) async {
     try {
-      final response = await _apiService.put('/auth/change-password', data: {
-        'currentPassword': currentPassword,
-        'newPassword': newPassword,
-      });
+      final response = await _apiService.put(
+        '/auth/change-password',
+        data: {'currentPassword': currentPassword, 'newPassword': newPassword},
+      );
 
       if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'message': 'Senha alterada com sucesso',
-        };
+        return {'success': true, 'message': 'Senha alterada com sucesso'};
       } else {
         return {
           'success': false,
@@ -194,25 +171,20 @@ class AuthService extends GetxService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': e.toString(),
-      };
+      return {'success': false, 'message': e.toString()};
     }
   }
 
   /// Deletar conta
   Future<Map<String, dynamic>> deleteAccount(String password) async {
     try {
-      final response = await _apiService.delete('/auth/account', data: {
-        'password': password,
-      });
+      final response = await _apiService.delete(
+        '/auth/account',
+        data: {'password': password},
+      );
 
       if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'message': 'Conta deletada com sucesso',
-        };
+        return {'success': true, 'message': 'Conta deletada com sucesso'};
       } else {
         return {
           'success': false,
@@ -220,10 +192,7 @@ class AuthService extends GetxService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': e.toString(),
-      };
+      return {'success': false, 'message': e.toString()};
     }
   }
 }

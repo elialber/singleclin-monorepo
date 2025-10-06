@@ -10,7 +10,14 @@ class TrustCertification extends Equatable {
     required this.issuingAuthority,
     required this.certificateNumber,
     required this.issuedDate,
-    required this.status, required this.logoUrl, required this.certificateUrl, required this.verificationUrl, required this.benefits, required this.trustScore, required this.metadata, this.expiryDate,
+    required this.status,
+    required this.logoUrl,
+    required this.certificateUrl,
+    required this.verificationUrl,
+    required this.benefits,
+    required this.trustScore,
+    required this.metadata,
+    this.expiryDate,
   });
 
   factory TrustCertification.fromJson(Map<String, dynamic> json) {
@@ -153,7 +160,9 @@ class PrivacyPolicy extends Equatable {
     required this.content,
     required this.sections,
     required this.isCurrentVersion,
-    required this.changes, required this.language, this.previousVersionId,
+    required this.changes,
+    required this.language,
+    this.previousVersionId,
   });
 
   factory PrivacyPolicy.fromJson(Map<String, dynamic> json) {
@@ -291,7 +300,12 @@ class LgpdCompliance extends Equatable {
   const LgpdCompliance({
     required this.isCompliant,
     required this.lastAuditDate,
-    required this.complianceScore, required this.requirements, required this.dataActivities, required this.dpoContact, required this.userRights, this.nextAuditDate,
+    required this.complianceScore,
+    required this.requirements,
+    required this.dataActivities,
+    required this.dpoContact,
+    required this.userRights,
+    this.nextAuditDate,
   });
 
   factory LgpdCompliance.fromJson(Map<String, dynamic> json) {
@@ -553,7 +567,8 @@ class SecurityAudit extends Equatable {
     required this.overallScore,
     required this.findings,
     required this.recommendations,
-    required this.isPublic, this.nextAuditDate,
+    required this.isPublic,
+    this.nextAuditDate,
   });
 
   factory SecurityAudit.fromJson(Map<String, dynamic> json) {

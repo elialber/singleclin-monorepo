@@ -6,7 +6,8 @@ import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
 /// Provides LGPD compliance controls and information
 class LgpdSettings extends StatelessWidget {
   const LgpdSettings({
-    required this.privacySettings, super.key,
+    required this.privacySettings,
+    super.key,
     this.onConsentUpdate,
     this.onDataExport,
     this.onAccountDeletion,

@@ -40,8 +40,10 @@ void main() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  final firebaseInitializationService =
-      Get.put(FirebaseInitializationService(), permanent: true);
+  final firebaseInitializationService = Get.put(
+    FirebaseInitializationService(),
+    permanent: true,
+  );
   await firebaseInitializationService.initialize();
 
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -82,14 +84,14 @@ Future<void> _initServices(
     print('🚀 Initializing services...');
 
     // Initialize storage service first
-    final storageService = await Get.putAsync<StorageService>(
-      () => StorageService().init(),
-    ).timeout(
-      const Duration(seconds: 5),
-      onTimeout: () => throw TimeoutException(
-        'Storage service initialization timeout',
-      ),
-    );
+    final storageService =
+        await Get.putAsync<StorageService>(
+          () => StorageService().init(),
+        ).timeout(
+          const Duration(seconds: 5),
+          onTimeout: () =>
+              throw TimeoutException('Storage service initialization timeout'),
+        );
     storageService.ensureEncrypted();
 
     if (!Get.isRegistered<AuthController>()) {
@@ -120,7 +122,6 @@ Future<void> _initServices(
       );
       await revocationService.initialize();
       Get.put<SessionRevocationService>(revocationService, permanent: true);
-
     }
 
     if (firebaseInitializationService.firebaseReady) {
@@ -129,7 +130,9 @@ Future<void> _initServices(
       firebaseInitializationService.addOnReadyCallback(
         initializeFirebaseDependentServices,
       );
-      print('⚠️ Firebase not ready. Deferred auth-dependent service initialization.');
+      print(
+        '⚠️ Firebase not ready. Deferred auth-dependent service initialization.',
+      );
     }
 
     // Initialize bottom navigation controller

@@ -32,7 +32,9 @@ class PlanRepositoryImpl implements PlanRepository {
         return null;
       }
 
-      final Map<String, dynamic>? data = (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] as Map<String, dynamic>?;
+      final Map<String, dynamic>? data =
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey]
+              as Map<String, dynamic>?;
       if (data == null || data['current_plan'] == null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: User has no active plan');
@@ -40,7 +42,9 @@ class PlanRepositoryImpl implements PlanRepository {
         return null;
       }
 
-      final userPlan = UserPlanModel.fromJson(data['current_plan'] as Map<String, dynamic>);
+      final userPlan = UserPlanModel.fromJson(
+        data['current_plan'] as Map<String, dynamic>,
+      );
 
       if (kDebugMode) {
         print('✅ PlanRepository: Current plan loaded - ${userPlan.plan.name}');
@@ -84,7 +88,9 @@ class PlanRepositoryImpl implements PlanRepository {
         return null;
       }
 
-      final Map<String, dynamic>? data = (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] as Map<String, dynamic>?;
+      final Map<String, dynamic>? data =
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey]
+              as Map<String, dynamic>?;
       if (data == null || data['current_plan'] == null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: User has no active plan after refresh');
@@ -92,7 +98,9 @@ class PlanRepositoryImpl implements PlanRepository {
         return null;
       }
 
-      final userPlan = UserPlanModel.fromJson(data['current_plan'] as Map<String, dynamic>);
+      final userPlan = UserPlanModel.fromJson(
+        data['current_plan'] as Map<String, dynamic>,
+      );
 
       if (kDebugMode) {
         print('✅ PlanRepository: Plan data refreshed - ${userPlan.plan.name}');
@@ -139,7 +147,8 @@ class PlanRepositoryImpl implements PlanRepository {
       );
 
       if (response.data == null ||
-          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] == null) {
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] ==
+              null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: No transaction history data received');
         }
@@ -147,7 +156,8 @@ class PlanRepositoryImpl implements PlanRepository {
       }
 
       final List<dynamic> transactionsData =
-          (response.data as Map<String, dynamic>)[ApiConstants.dataKey] as List<dynamic>;
+          (response.data as Map<String, dynamic>)[ApiConstants.dataKey]
+              as List<dynamic>;
       final transactions = transactionsData
           .map((json) => TransactionModel.fromJson(json).toEntity())
           .toList();
@@ -191,7 +201,8 @@ class PlanRepositoryImpl implements PlanRepository {
       );
 
       if (response.data == null ||
-          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] == null) {
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] ==
+              null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: No recent transactions data received');
         }
@@ -199,7 +210,8 @@ class PlanRepositoryImpl implements PlanRepository {
       }
 
       final List<dynamic> transactionsData =
-          (response.data as Map<String, dynamic>)[ApiConstants.dataKey] as List<dynamic>;
+          (response.data as Map<String, dynamic>)[ApiConstants.dataKey]
+              as List<dynamic>;
       final transactions = transactionsData
           .map((json) => TransactionModel.fromJson(json).toEntity())
           .toList();
@@ -257,14 +269,17 @@ class PlanRepositoryImpl implements PlanRepository {
       );
 
       if (response.data == null ||
-          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] == null) {
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] ==
+              null) {
         if (kDebugMode) {
           print('⚠️ PlanRepository: No statistics data received');
         }
         return {};
       }
 
-      final Map<String, dynamic> stats = (response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>;
+      final Map<String, dynamic> stats =
+          (response.data as Map<String, dynamic>)[ApiConstants.dataKey]
+              as Map<String, dynamic>;
 
       if (kDebugMode) {
         print('✅ PlanRepository: Plan statistics loaded');

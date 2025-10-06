@@ -5,11 +5,11 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
-  
+
   // Main App Routes
   static const String dashboard = '/dashboard';
   static const String home = '/home';
-  
+
   // Discovery Routes
   static const String discovery = '/discovery';
   static const String clinicDetails = '/clinic-details';
@@ -17,7 +17,7 @@ class AppRoutes {
   static const String searchResults = '/search-results';
   static const String mapView = '/map-view';
   static const String filters = '/filters';
-  
+
   // Appointment Routes
   static const String appointments = '/appointments';
   static const String appointmentDetails = '/appointments/details';
@@ -31,7 +31,7 @@ class AppRoutes {
   static const String rescheduleAppointment = '/reschedule-appointment';
   static const String cancelAppointment = '/appointments/cancel';
   static const String appointmentRate = '/appointments/rate';
-  
+
   // Profile Routes
   static const String profile = '/profile';
   static const String editProfile = '/edit-profile';
@@ -42,7 +42,7 @@ class AppRoutes {
   static const String preferences = '/preferences';
   static const String notificationSettings = '/notification-settings';
   static const String privacySettings = '/privacy-settings';
-  
+
   // Credits Routes
   static const String credits = '/credits';
   static const String creditHistory = '/credit-history';
@@ -52,7 +52,7 @@ class AppRoutes {
   static const String paymentMethods = '/payment-methods';
   static const String addPaymentMethod = '/add-payment-method';
   static const String referralProgram = '/referral-program';
-  
+
   // Engagement Routes
   static const String reviews = '/reviews';
   static const String writeReview = '/write-review';
@@ -65,13 +65,13 @@ class AppRoutes {
   static const String trustCenter = '/trust-center';
   static const String contactSupport = '/contact-support';
   static const String helpCenter = '/help-center';
-  
+
   // Settings Routes
   static const String settings = '/settings';
   static const String about = '/about';
   static const String termsOfService = '/terms-of-service';
   static const String privacyPolicy = '/privacy-policy';
-  
+
   // Error Routes
   static const String error = '/error';
   static const String maintenance = '/maintenance';

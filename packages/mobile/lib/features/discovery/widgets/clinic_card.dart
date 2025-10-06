@@ -7,7 +7,8 @@ import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 /// Clinic card widget optimized for mobile with touch-friendly design
 class ClinicCard extends StatelessWidget {
   const ClinicCard({
-    required this.clinic, super.key,
+    required this.clinic,
+    super.key,
     this.onTap,
     this.onFavoritePressed,
     this.showDistance = true,

@@ -4,7 +4,8 @@ import 'package:singleclin_mobile/core/constants/app_colors.dart';
 /// Custom rating stars widget with SingleClin styling
 class RatingStars extends StatelessWidget {
   const RatingStars({
-    required this.rating, super.key,
+    required this.rating,
+    super.key,
     this.size = 20.0,
     this.allowHalfRating = true,
     this.isInteractive = false,
@@ -71,7 +72,8 @@ class RatingStars extends StatelessWidget {
 /// Interactive rating stars for user input
 class InteractiveRatingStars extends StatefulWidget {
   const InteractiveRatingStars({
-    required this.onRatingChanged, super.key,
+    required this.onRatingChanged,
+    super.key,
     this.initialRating = 0.0,
     this.size = 32.0,
     this.color,
@@ -214,7 +216,8 @@ class _InteractiveRatingStarsState extends State<InteractiveRatingStars>
 /// Rating display with number and text
 class RatingDisplay extends StatelessWidget {
   const RatingDisplay({
-    required this.rating, super.key,
+    required this.rating,
+    super.key,
     this.totalReviews = 0,
     this.starSize = 16.0,
     this.showReviewCount = true,
@@ -261,7 +264,8 @@ class RatingDisplay extends StatelessWidget {
 /// Compact rating bar for lists
 class CompactRating extends StatelessWidget {
   const CompactRating({
-    required this.rating, super.key,
+    required this.rating,
+    super.key,
     this.totalReviews = 0,
     this.width = 60.0,
     this.height = 6.0,
@@ -329,7 +333,9 @@ class CompactRating extends StatelessWidget {
 /// Rating breakdown chart
 class RatingBreakdown extends StatelessWidget {
   const RatingBreakdown({
-    required this.ratingCounts, required this.totalRatings, super.key,
+    required this.ratingCounts,
+    required this.totalRatings,
+    super.key,
   });
   final Map<int, int> ratingCounts;
   final int totalRatings;
@@ -378,7 +384,8 @@ class RatingBreakdown extends StatelessWidget {
 /// Rating category breakdown for detailed reviews
 class CategoryRatingBreakdown extends StatelessWidget {
   const CategoryRatingBreakdown({
-    required this.categoryRatings, super.key,
+    required this.categoryRatings,
+    super.key,
     this.iconSize = 16.0,
   });
   final Map<String, double> categoryRatings;

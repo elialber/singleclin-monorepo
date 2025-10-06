@@ -10,7 +10,12 @@ class Clinic {
     required this.imageUrl,
     required this.images,
     required this.isAvailable,
-    required this.type, required this.services, required this.contact, required this.coordinates, required this.isPartner, this.nextAvailableSlot,
+    required this.type,
+    required this.services,
+    required this.contact,
+    required this.coordinates,
+    required this.isPartner,
+    this.nextAvailableSlot,
     this.description,
   });
 

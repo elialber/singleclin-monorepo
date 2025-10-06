@@ -4,7 +4,13 @@ import 'package:flutter/foundation.dart';
 class DashboardStats {
   const DashboardStats({
     required this.sgBalance,
-    required this.totalAppointments, required this.completedAppointments, required this.upcomingAppointments, required this.cancelledAppointments, required this.lastUpdated, required this.hasActiveSubscription, this.renewalDate,
+    required this.totalAppointments,
+    required this.completedAppointments,
+    required this.upcomingAppointments,
+    required this.cancelledAppointments,
+    required this.lastUpdated,
+    required this.hasActiveSubscription,
+    this.renewalDate,
     this.subscriptionPlan,
     this.categoryUsage = const {},
   });

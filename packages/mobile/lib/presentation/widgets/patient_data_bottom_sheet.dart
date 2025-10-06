@@ -102,9 +102,11 @@ class _PatientDataBottomSheetState extends State<PatientDataBottomSheet> {
           final patientMap = _patientData!;
           _patientName = patientMap['name'] as String?;
           _patientPhoto = patientMap['photo'] as String?;
-          final activePlanData = patientMap['activePlan'] as Map<String, dynamic>?;
+          final activePlanData =
+              patientMap['activePlan'] as Map<String, dynamic>?;
           _activePlan = activePlanData?['name'] as String?;
-          _remainingCredits = (activePlanData?['remainingCredits'] as int?) ?? 0;
+          _remainingCredits =
+              (activePlanData?['remainingCredits'] as int?) ?? 0;
           _isLoadingPatient = false;
         });
       }

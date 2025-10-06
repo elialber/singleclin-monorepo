@@ -6,7 +6,8 @@ import 'package:singleclin_mobile/features/profile/models/health_record.dart';
 /// Displays a health record in timeline format
 class HealthTimeline extends StatelessWidget {
   const HealthTimeline({
-    required this.record, super.key,
+    required this.record,
+    super.key,
     this.onTap,
     this.onEdit,
     this.onArchive,

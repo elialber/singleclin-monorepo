@@ -22,7 +22,10 @@ class WalletBalance {
     required this.userId,
     required this.currency,
     required this.balance,
-    required this.lifetimeEarned, required this.lifetimeSpent, required this.lastUpdated, this.lockedBalance = 0,
+    required this.lifetimeEarned,
+    required this.lifetimeSpent,
+    required this.lastUpdated,
+    this.lockedBalance = 0,
     this.metadata,
   });
 
@@ -140,7 +143,8 @@ class WalletTransaction {
     required this.amount,
     required this.balanceAfter,
     required this.description,
-    required this.createdAt, this.referenceId,
+    required this.createdAt,
+    this.referenceId,
     this.referenceType,
     this.metadata,
   });

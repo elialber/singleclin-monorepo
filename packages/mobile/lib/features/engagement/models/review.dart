@@ -19,7 +19,13 @@ class Review extends Equatable {
     required this.beforePhotos,
     required this.afterPhotos,
     required this.createdAt,
-    required this.status, required this.isRecommended, required this.wouldReturn, required this.helpfulCount, required this.notHelpfulCount, required this.responses, this.updatedAt,
+    required this.status,
+    required this.isRecommended,
+    required this.wouldReturn,
+    required this.helpfulCount,
+    required this.notHelpfulCount,
+    required this.responses,
+    this.updatedAt,
   });
 
   factory Review.fromJson(Map<String, dynamic> json) {

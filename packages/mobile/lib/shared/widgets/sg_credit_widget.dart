@@ -4,7 +4,8 @@ import 'package:singleclin_mobile/core/constants/app_strings.dart';
 
 class SgCreditWidget extends StatelessWidget {
   const SgCreditWidget({
-    required this.credits, super.key,
+    required this.credits,
+    super.key,
     this.onTap,
     this.showRenewInfo = false,
     this.renewDate,
@@ -200,7 +201,9 @@ class SgCreditWidget extends StatelessWidget {
 
 class SgCostChip extends StatelessWidget {
   const SgCostChip({
-    required this.cost, required this.isAffordable, super.key,
+    required this.cost,
+    required this.isAffordable,
+    super.key,
     this.fontSize = 12,
   });
   final int cost;
@@ -245,7 +248,12 @@ class SgCostChip extends StatelessWidget {
 
 class SgTransactionItem extends StatelessWidget {
   const SgTransactionItem({
-    required this.title, required this.description, required this.amount, required this.isPositive, required this.date, super.key,
+    required this.title,
+    required this.description,
+    required this.amount,
+    required this.isPositive,
+    required this.date,
+    super.key,
     this.icon,
     this.onTap,
   });

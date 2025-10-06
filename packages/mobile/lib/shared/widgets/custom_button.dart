@@ -7,7 +7,8 @@ enum ButtonSize { small, medium, large }
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
-    required this.text, super.key,
+    required this.text,
+    super.key,
     this.onPressed,
     this.variant = ButtonVariant.primary,
     this.size = ButtonSize.medium,
@@ -199,7 +200,8 @@ class CustomButton extends StatelessWidget {
 
 class CustomIconButton extends StatelessWidget {
   const CustomIconButton({
-    required this.icon, super.key,
+    required this.icon,
+    super.key,
     this.onPressed,
     this.backgroundColor,
     this.iconColor,
@@ -248,7 +250,8 @@ class CustomIconButton extends StatelessWidget {
 
 class CustomFloatingActionButton extends StatelessWidget {
   const CustomFloatingActionButton({
-    required this.icon, super.key,
+    required this.icon,
+    super.key,
     this.onPressed,
     this.label,
     this.isExtended = false,

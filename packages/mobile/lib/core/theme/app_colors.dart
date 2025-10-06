@@ -7,20 +7,26 @@ class AppColors {
   AppColors._();
 
   // === SINGLECLIN BRAND COLORS ===
-  
+
   // Primary Colors - SingleClin Brand
-  static const Color singleclinPrimary = Color(0xFF005156); // Azul-Esverdeado (Pantone 7476 C)
+  static const Color singleclinPrimary = Color(
+    0xFF005156,
+  ); // Azul-Esverdeado (Pantone 7476 C)
   static const Color singleclinBlack = Color(0xFF000000); // Preto
   static const Color singleclinWhite = Color(0xFFFFFFFF); // Branco
   static const Color singleclinLightGrey = Color(0xFFE6E6E6); // Cinza Claro
 
   // Primary Colors for Light/Dark Themes
   static const Color primaryLight = singleclinPrimary; // #005156
-  static const Color primaryDark = Color(0xFF006B71); // Slightly lighter for dark mode visibility
+  static const Color primaryDark = Color(
+    0xFF006B71,
+  ); // Slightly lighter for dark mode visibility
 
   // Secondary Colors
   static const Color secondaryLight = singleclinLightGrey; // #E6E6E6
-  static const Color secondaryDark = Color(0xFF424242); // Darker grey for contrast in dark mode
+  static const Color secondaryDark = Color(
+    0xFF424242,
+  ); // Darker grey for contrast in dark mode
 
   // Background Colors
   static const Color backgroundLight = singleclinWhite; // #FFFFFF
@@ -28,7 +34,9 @@ class AppColors {
 
   // Surface Colors (cards, dialogs, etc.)
   static const Color surfaceLight = singleclinWhite; // #FFFFFF
-  static const Color surfaceDark = Color(0xFF1A1A1A); // Very dark grey, not pure black
+  static const Color surfaceDark = Color(
+    0xFF1A1A1A,
+  ); // Very dark grey, not pure black
 
   // Text Colors
   static const Color textPrimaryLight = singleclinBlack; // #000000
@@ -62,11 +70,11 @@ class AppColors {
   // SingleClin Brand Gradients
   static const List<Color> singleclinPrimaryGradient = [
     singleclinPrimary, // #005156
-    singleclinBlack,   // #000000
+    singleclinBlack, // #000000
   ];
 
   static const List<Color> singleclinSecondaryGradient = [
-    singleclinWhite,     // #FFFFFF
+    singleclinWhite, // #FFFFFF
     singleclinLightGrey, // #E6E6E6
   ];
 

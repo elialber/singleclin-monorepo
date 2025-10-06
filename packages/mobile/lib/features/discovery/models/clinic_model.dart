@@ -7,7 +7,17 @@ class ClinicModel {
     required this.latitude,
     required this.longitude,
     required this.phone,
-    required this.imageUrls, required this.rating, required this.reviewCount, required this.services, required this.specialties, required this.schedule, required this.isVerified, required this.isActive, required this.createdAt, required this.updatedAt, this.email,
+    required this.imageUrls,
+    required this.rating,
+    required this.reviewCount,
+    required this.services,
+    required this.specialties,
+    required this.schedule,
+    required this.isVerified,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+    this.email,
     this.website,
   });
 

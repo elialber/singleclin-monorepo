@@ -27,7 +27,10 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
+      return UserModel.fromJson(
+        (response.data as Map<String, dynamic>)[ApiConstants.dataKey]
+            as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -67,7 +70,10 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
+      return UserModel.fromJson(
+        (response.data as Map<String, dynamic>)[ApiConstants.dataKey]
+            as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -131,7 +137,10 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
+      return UserModel.fromJson(
+        (response.data as Map<String, dynamic>)[ApiConstants.dataKey]
+            as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -154,7 +163,10 @@ class UserApiService {
         throw const GenericApiException('No user data received', 'no_data');
       }
 
-      return UserModel.fromJson((response.data as Map<String, dynamic>)[ApiConstants.dataKey] as Map<String, dynamic>);
+      return UserModel.fromJson(
+        (response.data as Map<String, dynamic>)[ApiConstants.dataKey]
+            as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -196,12 +208,19 @@ class UserApiService {
       );
 
       if (response.data == null ||
-          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] == null) {
+          (response.data as Map<String, dynamic>?)?[ApiConstants.dataKey] ==
+              null) {
         throw const GenericApiException('No users data received', 'no_data');
       }
 
-      final List<dynamic> usersData = (response.data as Map<String, dynamic>)[ApiConstants.dataKey] as List<dynamic>;
-      return usersData.map((userData) => UserModel.fromJson(userData as Map<String, dynamic>)).toList();
+      final List<dynamic> usersData =
+          (response.data as Map<String, dynamic>)[ApiConstants.dataKey]
+              as List<dynamic>;
+      return usersData
+          .map(
+            (userData) => UserModel.fromJson(userData as Map<String, dynamic>),
+          )
+          .toList();
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
@@ -243,7 +262,8 @@ class UserApiService {
 
       // Extract and store JWT token from sync response
       // The response structure is: { "accessToken": "...", "userId": "...", "email": "...", ... }
-      if (responseData.containsKey('accessToken') && responseData['accessToken'] != null) {
+      if (responseData.containsKey('accessToken') &&
+          responseData['accessToken'] != null) {
         final jwtToken = responseData['accessToken'] as String;
 
         // Store the JWT token for future API calls
@@ -253,8 +273,12 @@ class UserApiService {
         print('DEBUG: Token length: ${jwtToken.length} characters');
 
         // Verify storage immediately
-        final storedToken = await _storageService.getString(AppConstants.tokenKey);
-        print('DEBUG: Verification - token stored correctly: ${storedToken != null && storedToken == jwtToken}');
+        final storedToken = await _storageService.getString(
+          AppConstants.tokenKey,
+        );
+        print(
+          'DEBUG: Verification - token stored correctly: ${storedToken != null && storedToken == jwtToken}',
+        );
       } else {
         print('DEBUG: No accessToken found in sync response');
       }
@@ -272,7 +296,6 @@ class UserApiService {
         'createdAt': DateTime.now().toIso8601String(),
         'updatedAt': DateTime.now().toIso8601String(),
       });
-
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;

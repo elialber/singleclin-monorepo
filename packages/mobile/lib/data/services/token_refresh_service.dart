@@ -17,9 +17,9 @@ class TokenRefreshService {
     AuthService? authService,
     FirebaseAuth? firebaseAuth,
     StorageService? storageService,
-  })  : _authService = authService ?? AuthService(),
-        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _storageService = storageService ?? Get.find<StorageService>();
+  }) : _authService = authService ?? AuthService(),
+       _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _storageService = storageService ?? Get.find<StorageService>();
   final AuthService _authService;
   final FirebaseAuth _firebaseAuth;
   final StorageService _storageService;
@@ -69,8 +69,9 @@ class TokenRefreshService {
       print('🔄 TokenRefreshService: Initializing...');
     }
 
-    _authStateSubscription =
-        _authService.authStateChanges.listen(_handleAuthStateChange);
+    _authStateSubscription = _authService.authStateChanges.listen(
+      _handleAuthStateChange,
+    );
 
     final currentUser = await _authService.getCurrentUser();
     await _handleAuthStateChange(currentUser);
@@ -245,7 +246,9 @@ class TokenRefreshService {
       if (kDebugMode) {
         print('⚠️ TokenRefreshService: Firebase currentUser is null');
       }
-      return const _RefreshOutcome.failure('Sessão expirada. Faça login novamente.');
+      return const _RefreshOutcome.failure(
+        'Sessão expirada. Faça login novamente.',
+      );
     }
 
     try {
@@ -262,12 +265,14 @@ class TokenRefreshService {
 
       if (validation.retryable) {
         return _RefreshOutcome.retryable(
-          validation.message ?? 'Falha na validação da sessão. Tentando novamente...',
+          validation.message ??
+              'Falha na validação da sessão. Tentando novamente...',
         );
       }
 
       return _RefreshOutcome.failure(
-        validation.message ?? 'Sua sessão foi invalidada. Faça login novamente.',
+        validation.message ??
+            'Sua sessão foi invalidada. Faça login novamente.',
       );
     } on PlatformException catch (e) {
       if (e.code == 'network_error') {
@@ -286,11 +291,15 @@ class TokenRefreshService {
       if (kDebugMode) {
         print('❌ TokenRefreshService: Erro inesperado ao renovar token: $e');
       }
-      return const _RefreshOutcome.retryable('Erro ao renovar token. Tentando novamente...');
+      return const _RefreshOutcome.retryable(
+        'Erro ao renovar token. Tentando novamente...',
+      );
     }
   }
 
-  Future<_SessionValidationResult> _validateSessionWithBackend(String token) async {
+  Future<_SessionValidationResult> _validateSessionWithBackend(
+    String token,
+  ) async {
     try {
       final response = await _sessionCheckClient.get(
         ApiConstants.profileEndpoint,
@@ -426,7 +435,9 @@ class TokenRefreshService {
     if (forceRefresh) {
       final outcome = await _executeRefreshAttempt();
       if (kDebugMode) {
-        print('▶️ TokenRefreshService: Retomado com refresh imediato (success=${outcome.success}, retryable=${outcome.retryable})');
+        print(
+          '▶️ TokenRefreshService: Retomado com refresh imediato (success=${outcome.success}, retryable=${outcome.retryable})',
+        );
       }
       if (!outcome.success && !outcome.retryable) {
         return;
@@ -454,8 +465,9 @@ class TokenRefreshService {
         return true;
       }
 
-      final Duration timeUntilExpiration =
-          expirationTime.difference(DateTime.now());
+      final Duration timeUntilExpiration = expirationTime.difference(
+        DateTime.now(),
+      );
       return timeUntilExpiration.inMinutes < 10;
     } catch (e) {
       if (kDebugMode) {
@@ -554,7 +566,9 @@ class TokenRefreshService {
 
           if (validation.retryable) {
             if (kDebugMode) {
-              print('⚠️ TokenRefreshService: Validação via idTokenChanges pediu retry');
+              print(
+                '⚠️ TokenRefreshService: Validação via idTokenChanges pediu retry',
+              );
             }
             await _scheduleRefresh();
             return;
@@ -563,7 +577,9 @@ class TokenRefreshService {
           await _handleHardFailure(validation.message);
         } catch (error, stackTrace) {
           if (kDebugMode) {
-            print('⚠️ TokenRefreshService: Erro ao tratar idTokenChanges -> $error');
+            print(
+              '⚠️ TokenRefreshService: Erro ao tratar idTokenChanges -> $error',
+            );
             debugPrintStack(stackTrace: stackTrace);
           }
         }
@@ -629,15 +645,14 @@ class _TokenRefreshMetadata {
 }
 
 class _SessionValidationResult {
-
   const _SessionValidationResult.success()
-      : this._(success: true, retryable: false);
+    : this._(success: true, retryable: false);
 
   const _SessionValidationResult.retryable(String message)
-      : this._(success: false, retryable: true, message: message);
+    : this._(success: false, retryable: true, message: message);
 
   const _SessionValidationResult.failure(String message)
-      : this._(success: false, retryable: false, message: message);
+    : this._(success: false, retryable: false, message: message);
   const _SessionValidationResult._({
     required this.success,
     required this.retryable,
@@ -650,15 +665,14 @@ class _SessionValidationResult {
 }
 
 class _RefreshOutcome {
-
   const _RefreshOutcome.success(String token)
-      : this._(success: true, retryable: false, token: token);
+    : this._(success: true, retryable: false, token: token);
 
   const _RefreshOutcome.retryable(String message)
-      : this._(success: false, retryable: true, message: message);
+    : this._(success: false, retryable: true, message: message);
 
   const _RefreshOutcome.failure(String message)
-      : this._(success: false, retryable: false, message: message);
+    : this._(success: false, retryable: false, message: message);
   const _RefreshOutcome._({
     required this.success,
     required this.retryable,
@@ -671,6 +685,8 @@ class _RefreshOutcome {
   final String? token;
   final String? message;
 
-  static const _RefreshOutcome skipped =
-      _RefreshOutcome._(success: false, retryable: false);
+  static const _RefreshOutcome skipped = _RefreshOutcome._(
+    success: false,
+    retryable: false,
+  );
 }

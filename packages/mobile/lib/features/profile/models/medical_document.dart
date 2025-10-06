@@ -11,7 +11,10 @@ class MedicalDocument extends Equatable {
     required this.type,
     required this.mimeType,
     required this.fileSize,
-    required this.uploadedAt, required this.createdAt, required this.updatedAt, this.fileUrl,
+    required this.uploadedAt,
+    required this.createdAt,
+    required this.updatedAt,
+    this.fileUrl,
     this.thumbnailUrl,
     this.localPath,
     this.description,
@@ -432,7 +435,8 @@ class DocumentSharePermission extends Equatable {
     required this.sharedWithType,
     required this.sharedWithName,
     required this.permissions,
-    required this.createdAt, this.expiresAt,
+    required this.createdAt,
+    this.expiresAt,
     this.isActive = true,
   });
 

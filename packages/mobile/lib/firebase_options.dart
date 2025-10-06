@@ -63,7 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '410494012909',
     projectId: 'singleclin-app',
     storageBucket: 'singleclin-app.firebasestorage.app',
-    iosClientId: '410494012909-pn2m3j632metfv56li6q17il8r12jt9q.apps.googleusercontent.com',
+    iosClientId:
+        '410494012909-pn2m3j632metfv56li6q17il8r12jt9q.apps.googleusercontent.com',
     iosBundleId: 'br.com.singleclin.singleclinApp',
   );
 }

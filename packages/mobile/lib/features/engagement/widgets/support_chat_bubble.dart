@@ -7,7 +7,9 @@ import 'package:singleclin_mobile/features/engagement/models/support_ticket.dart
 /// Chat bubble widget for support conversations
 class SupportChatBubble extends StatelessWidget {
   const SupportChatBubble({
-    required this.message, required this.isUser, super.key,
+    required this.message,
+    required this.isUser,
+    super.key,
     this.showTimestamp = true,
     this.showSenderName = true,
   });
@@ -311,7 +313,9 @@ class SupportChatBubble extends StatelessWidget {
 /// Live chat bubble for real-time support
 class LiveChatBubble extends StatelessWidget {
   const LiveChatBubble({
-    required this.message, required this.isUser, super.key,
+    required this.message,
+    required this.isUser,
+    super.key,
     this.showAvatar = true,
   });
   final ChatMessage message;
@@ -391,7 +395,6 @@ class LiveChatBubble extends StatelessWidget {
 
 /// Typing indicator for live chat
 class TypingIndicator extends StatefulWidget {
-
   const TypingIndicator({super.key, this.senderName = 'Atendente'});
   final String senderName;
 
@@ -501,9 +504,9 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
 /// Chat status indicator
 class ChatStatusIndicator extends StatelessWidget {
-
   const ChatStatusIndicator({
-    required this.status, super.key,
+    required this.status,
+    super.key,
     this.queuePosition = 0,
   });
   final ChatStatus status;
@@ -589,7 +592,9 @@ class ChatStatusIndicator extends StatelessWidget {
 /// Quick reply buttons for support chat
 class QuickReplyButtons extends StatelessWidget {
   const QuickReplyButtons({
-    required this.replies, required this.onReplySelected, super.key,
+    required this.replies,
+    required this.onReplySelected,
+    super.key,
   });
   final List<String> replies;
   final Function(String) onReplySelected;

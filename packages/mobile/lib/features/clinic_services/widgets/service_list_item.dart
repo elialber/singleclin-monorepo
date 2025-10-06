@@ -4,7 +4,11 @@ import 'package:singleclin_mobile/features/clinic_services/models/clinic_service
 
 class ServiceListItem extends StatelessWidget {
   const ServiceListItem({
-    required this.service, required this.userCredits, required this.creditsLoaded, required this.onBookPressed, super.key,
+    required this.service,
+    required this.userCredits,
+    required this.creditsLoaded,
+    required this.onBookPressed,
+    super.key,
   });
   final ClinicService service;
   final int userCredits;

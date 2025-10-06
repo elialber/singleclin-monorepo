@@ -6,7 +6,8 @@ import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
 /// Displays user photo, name, and completion progress
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
-    required this.profile, super.key,
+    required this.profile,
+    super.key,
     this.isEditing = false,
     this.isUpdatingPhoto = false,
     this.onPhotoUpdate,

@@ -18,18 +18,19 @@ class ClinicApiService {
         final Map<String, dynamic> responseData = response.data;
         print('📄 Paginated response detected');
 
-        if (responseData.containsKey('items') && responseData['items'] is List) {
+        if (responseData.containsKey('items') &&
+            responseData['items'] is List) {
           final List<dynamic> clinicsData = responseData['items'];
           print('✅ Found ${clinicsData.length} clinics from paginated API');
           print('📊 Total count: ${responseData['totalCount']}');
-          print('📄 Page ${responseData['pageNumber']} of ${responseData['totalPages']}');
+          print(
+            '📄 Page ${responseData['pageNumber']} of ${responseData['totalPages']}',
+          );
 
-          final clinics = clinicsData
-              .map((dto) {
-                print('🏥 Processing clinic: ${dto['name'] ?? 'Unknown'}');
-                return Clinic.fromBackendDto(dto as Map<String, dynamic>);
-              })
-              .toList();
+          final clinics = clinicsData.map((dto) {
+            print('🏥 Processing clinic: ${dto['name'] ?? 'Unknown'}');
+            return Clinic.fromBackendDto(dto as Map<String, dynamic>);
+          }).toList();
 
           print('🎯 Successfully converted ${clinics.length} clinics');
           return clinics;
@@ -42,12 +43,10 @@ class ClinicApiService {
         final List<dynamic> clinicsData = response.data;
         print('✅ Found ${clinicsData.length} clinics from direct array API');
 
-        final clinics = clinicsData
-            .map((dto) {
-              print('🏥 Processing clinic: ${dto['name'] ?? 'Unknown'}');
-              return Clinic.fromBackendDto(dto as Map<String, dynamic>);
-            })
-            .toList();
+        final clinics = clinicsData.map((dto) {
+          print('🏥 Processing clinic: ${dto['name'] ?? 'Unknown'}');
+          return Clinic.fromBackendDto(dto as Map<String, dynamic>);
+        }).toList();
 
         print('🎯 Successfully converted ${clinics.length} clinics');
         return clinics;
@@ -67,18 +66,16 @@ class ClinicApiService {
     try {
       final response = await _apiClient.get(
         '/Clinic/active',
-        queryParameters: {
-          'search': query,
-        },
+        queryParameters: {'search': query},
       );
-      
+
       if (response.data is List) {
         final List<dynamic> clinicsData = response.data;
         return clinicsData
             .map((dto) => Clinic.fromBackendDto(dto as Map<String, dynamic>))
             .toList();
       }
-      
+
       return [];
     } catch (e) {
       print('Error searching clinics: $e');
@@ -90,11 +87,11 @@ class ClinicApiService {
   Future<Clinic?> getClinicById(String id) async {
     try {
       final response = await _apiClient.get('/Clinic/$id');
-      
+
       if (response.data != null) {
         return Clinic.fromBackendDto(response.data as Map<String, dynamic>);
       }
-      
+
       return null;
     } catch (e) {
       print('Error fetching clinic by ID: $e');
@@ -107,18 +104,16 @@ class ClinicApiService {
     try {
       final response = await _apiClient.get(
         '/Clinic/active',
-        queryParameters: {
-          'type': type.toString(),
-        },
+        queryParameters: {'type': type.toString()},
       );
-      
+
       if (response.data is List) {
         final List<dynamic> clinicsData = response.data;
         return clinicsData
             .map((dto) => Clinic.fromBackendDto(dto as Map<String, dynamic>))
             .toList();
       }
-      
+
       return [];
     } catch (e) {
       print('Error fetching clinics by type: $e');

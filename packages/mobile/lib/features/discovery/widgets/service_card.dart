@@ -7,7 +7,8 @@ import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
 /// Service card widget optimized for mobile touch interactions
 class ServiceCard extends StatelessWidget {
   const ServiceCard({
-    required this.service, super.key,
+    required this.service,
+    super.key,
     this.onTap,
     this.onBookPressed,
     this.compact = false,

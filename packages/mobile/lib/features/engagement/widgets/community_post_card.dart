@@ -7,7 +7,8 @@ import 'package:singleclin_mobile/features/engagement/models/community_post.dart
 /// Community post card widget
 class CommunityPostCard extends StatelessWidget {
   const CommunityPostCard({
-    required this.post, super.key,
+    required this.post,
+    super.key,
     this.onTap,
     this.onLike,
     this.onComment,
@@ -502,7 +503,8 @@ class CommunityPostCard extends StatelessWidget {
 /// Post comment widget
 class PostCommentCard extends StatelessWidget {
   const PostCommentCard({
-    required this.comment, super.key,
+    required this.comment,
+    super.key,
     this.onLike,
     this.onReply,
     this.onReport,
@@ -708,7 +710,8 @@ class PostCommentCard extends StatelessWidget {
 /// Community event card
 class CommunityEventCard extends StatelessWidget {
   const CommunityEventCard({
-    required this.event, super.key,
+    required this.event,
+    super.key,
     this.onJoin,
     this.onLeave,
     this.onTap,

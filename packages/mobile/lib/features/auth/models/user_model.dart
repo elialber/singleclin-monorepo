@@ -3,7 +3,11 @@ class UserModel {
     required this.id,
     required this.email,
     required this.fullName,
-    required this.sgCredits, required this.isActive, required this.createdAt, required this.updatedAt, this.phone,
+    required this.sgCredits,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+    this.phone,
     this.profileImageUrl,
     this.birthDate,
     this.address,
@@ -121,7 +125,9 @@ class UserSubscription {
     required this.monthlyCredits,
     required this.monthlyPrice,
     required this.startDate,
-    required this.isActive, required this.status, this.endDate,
+    required this.isActive,
+    required this.status,
+    this.endDate,
   });
 
   factory UserSubscription.fromJson(Map<String, dynamic> json) {

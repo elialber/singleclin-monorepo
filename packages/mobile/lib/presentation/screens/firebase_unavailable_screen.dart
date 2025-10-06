@@ -11,7 +11,8 @@ class FirebaseUnavailableScreen extends StatefulWidget {
   const FirebaseUnavailableScreen({super.key});
 
   @override
-  State<FirebaseUnavailableScreen> createState() => _FirebaseUnavailableScreenState();
+  State<FirebaseUnavailableScreen> createState() =>
+      _FirebaseUnavailableScreenState();
 }
 
 class _FirebaseUnavailableScreenState extends State<FirebaseUnavailableScreen> {
@@ -22,8 +23,9 @@ class _FirebaseUnavailableScreenState extends State<FirebaseUnavailableScreen> {
   void initState() {
     super.initState();
     _firebaseService = Get.find<FirebaseInitializationService>();
-    _firebaseReadySubscription =
-        _firebaseService.firebaseReadyStream.listen((isReady) {
+    _firebaseReadySubscription = _firebaseService.firebaseReadyStream.listen((
+      isReady,
+    ) {
       if (isReady && mounted) {
         Get.offAllNamed('/splash');
       }

@@ -5,9 +5,9 @@ import 'package:singleclin_mobile/features/engagement/models/trust_certification
 
 /// Trust badge widget for displaying certifications
 class TrustBadge extends StatelessWidget {
-
   const TrustBadge({
-    required this.certification, super.key,
+    required this.certification,
+    super.key,
     this.onTap,
     this.size = 48.0,
     this.showTooltip = true,
@@ -169,7 +169,8 @@ class TrustBadge extends StatelessWidget {
 /// Trust score widget with circular progress
 class TrustScoreWidget extends StatelessWidget {
   const TrustScoreWidget({
-    required this.score, super.key,
+    required this.score,
+    super.key,
     this.size = 80.0,
     this.showLabel = true,
   });
@@ -482,7 +483,8 @@ class SecurityScoreBadge extends StatelessWidget {
 /// LGPD compliance indicator
 class LgpdComplianceIndicator extends StatelessWidget {
   const LgpdComplianceIndicator({
-    required this.compliance, super.key,
+    required this.compliance,
+    super.key,
     this.onTap,
   });
   final LgpdCompliance compliance;
@@ -569,9 +571,11 @@ class LgpdComplianceIndicator extends StatelessWidget {
 
 /// Emergency contact card
 class EmergencyContactCard extends StatelessWidget {
-
   const EmergencyContactCard({
-    required this.title, required this.contact, required this.icon, super.key,
+    required this.title,
+    required this.contact,
+    required this.icon,
+    super.key,
     this.onTap,
   });
   final String title;
@@ -632,7 +636,8 @@ class EmergencyContactCard extends StatelessWidget {
 /// Trust level indicator
 class TrustLevelIndicator extends StatelessWidget {
   const TrustLevelIndicator({
-    required this.trustScore, super.key,
+    required this.trustScore,
+    super.key,
     this.isCompact = false,
   });
   final int trustScore;

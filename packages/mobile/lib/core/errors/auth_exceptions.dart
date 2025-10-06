@@ -75,22 +75,27 @@ class AuthExceptionMapper {
   static AuthException fromFirebaseException(dynamic exception) {
     String code = 'unknown';
     String message = 'An unknown error occurred';
-    
+
     try {
       // Try to access code and message properties safely
       if (exception != null) {
         // Use reflection-safe approach for accessing properties
         final String exceptionString = exception.toString();
         if (exceptionString.contains('code:')) {
-          final codeMatch = RegExp(r'code:\s*([^,\s}]+)').firstMatch(exceptionString);
+          final codeMatch = RegExp(
+            r'code:\s*([^,\s}]+)',
+          ).firstMatch(exceptionString);
           if (codeMatch != null) {
             code = codeMatch.group(1) ?? 'unknown';
           }
         }
         if (exceptionString.contains('message:')) {
-          final messageMatch = RegExp(r'message:\s*([^,}]+)').firstMatch(exceptionString);
+          final messageMatch = RegExp(
+            r'message:\s*([^,}]+)',
+          ).firstMatch(exceptionString);
           if (messageMatch != null) {
-            message = messageMatch.group(1)?.trim() ?? 'An unknown error occurred';
+            message =
+                messageMatch.group(1)?.trim() ?? 'An unknown error occurred';
           } else {
             message = exceptionString;
           }

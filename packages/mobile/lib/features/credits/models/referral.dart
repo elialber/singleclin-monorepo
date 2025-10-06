@@ -5,7 +5,10 @@ class Referral {
     required this.id,
     required this.referralProgramId,
     required this.referredUserId,
-    required this.creditsEarned, required this.status, required this.referredAt, this.referredUserName,
+    required this.creditsEarned,
+    required this.status,
+    required this.referredAt,
+    this.referredUserName,
     this.referredUserEmail,
     this.rejectionReason,
     this.approvedAt,
@@ -107,7 +110,9 @@ class ReferralProgram {
     required this.referrals,
     required this.monthlyStats,
     required this.currentRanking,
-    required this.createdAt, required this.updatedAt, this.rankingTier,
+    required this.createdAt,
+    required this.updatedAt,
+    this.rankingTier,
   });
 
   factory ReferralProgram.fromJson(Map<String, dynamic> json) {

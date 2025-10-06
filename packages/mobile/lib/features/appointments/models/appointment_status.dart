@@ -4,52 +4,124 @@ import 'package:flutter/material.dart';
 /// Defines all possible states of a medical appointment
 enum AppointmentStatus {
   /// Appointment has been created but not confirmed by clinic
-  pending('pending', 'Pendente', 'Em análise pela clínica', '#FF9800', Icons.schedule),
-  
-  /// Appointment confirmed by clinic
-  confirmed('confirmed', 'Confirmado', 'Confirmado pela clínica', '#4CAF50', Icons.check_circle),
-  
-  /// Patient has checked in for appointment
-  checkedIn('checked_in', 'Check-in', 'Check-in realizado', '#2196F3', Icons.how_to_reg),
-  
-  /// Appointment is in progress
-  inProgress('in_progress', 'Em atendimento', 'Procedimento em andamento', '#9C27B0', Icons.medical_services),
-  
-  /// Appointment completed successfully
-  completed('completed', 'Concluído', 'Procedimento finalizado', '#2E7D32', Icons.check_circle_outline),
-  
-  /// Appointment cancelled by patient
-  cancelled('cancelled', 'Cancelado', 'Cancelado pelo paciente', '#F44336', Icons.cancel),
-  
-  /// Appointment cancelled by clinic
-  cancelledByClinic('cancelled_by_clinic', 'Cancelado', 'Cancelado pela clínica', '#D32F2F', Icons.cancel_outlined),
-  
-  /// Patient didn't show up
-  noShow('no_show', 'Falta', 'Paciente não compareceu', '#795548', Icons.person_off),
-  
-  /// Appointment needs to be rescheduled
-  needsRescheduling('needs_rescheduling', 'Reagendar', 'Necessita reagendamento', '#FF5722', Icons.event_busy),
-  
-  /// Waiting for patient documents/consent
-  waitingDocuments('waiting_documents', 'Aguardando docs', 'Documentos pendentes', '#607D8B', Icons.description),
-  
-  /// Appointment refunded
-  refunded('refunded', 'Reembolsado', 'Créditos reembolsados', '#00BCD4', Icons.attach_money);
+  pending(
+    'pending',
+    'Pendente',
+    'Em análise pela clínica',
+    '#FF9800',
+    Icons.schedule,
+  ),
 
-  const AppointmentStatus(this.value, this.label, this.description, this.colorHex, this.iconData);
+  /// Appointment confirmed by clinic
+  confirmed(
+    'confirmed',
+    'Confirmado',
+    'Confirmado pela clínica',
+    '#4CAF50',
+    Icons.check_circle,
+  ),
+
+  /// Patient has checked in for appointment
+  checkedIn(
+    'checked_in',
+    'Check-in',
+    'Check-in realizado',
+    '#2196F3',
+    Icons.how_to_reg,
+  ),
+
+  /// Appointment is in progress
+  inProgress(
+    'in_progress',
+    'Em atendimento',
+    'Procedimento em andamento',
+    '#9C27B0',
+    Icons.medical_services,
+  ),
+
+  /// Appointment completed successfully
+  completed(
+    'completed',
+    'Concluído',
+    'Procedimento finalizado',
+    '#2E7D32',
+    Icons.check_circle_outline,
+  ),
+
+  /// Appointment cancelled by patient
+  cancelled(
+    'cancelled',
+    'Cancelado',
+    'Cancelado pelo paciente',
+    '#F44336',
+    Icons.cancel,
+  ),
+
+  /// Appointment cancelled by clinic
+  cancelledByClinic(
+    'cancelled_by_clinic',
+    'Cancelado',
+    'Cancelado pela clínica',
+    '#D32F2F',
+    Icons.cancel_outlined,
+  ),
+
+  /// Patient didn't show up
+  noShow(
+    'no_show',
+    'Falta',
+    'Paciente não compareceu',
+    '#795548',
+    Icons.person_off,
+  ),
+
+  /// Appointment needs to be rescheduled
+  needsRescheduling(
+    'needs_rescheduling',
+    'Reagendar',
+    'Necessita reagendamento',
+    '#FF5722',
+    Icons.event_busy,
+  ),
+
+  /// Waiting for patient documents/consent
+  waitingDocuments(
+    'waiting_documents',
+    'Aguardando docs',
+    'Documentos pendentes',
+    '#607D8B',
+    Icons.description,
+  ),
+
+  /// Appointment refunded
+  refunded(
+    'refunded',
+    'Reembolsado',
+    'Créditos reembolsados',
+    '#00BCD4',
+    Icons.attach_money,
+  );
+
+  const AppointmentStatus(
+    this.value,
+    this.label,
+    this.description,
+    this.colorHex,
+    this.iconData,
+  );
 
   /// String value used in API communication
   final String value;
-  
+
   /// Display label for UI
   final String label;
-  
+
   /// Detailed description
   final String description;
-  
+
   /// Hex color code for UI theming
   final String colorHex;
-  
+
   /// Material icon for visual representation
   final IconData iconData;
 
@@ -75,25 +147,23 @@ enum AppointmentStatus {
 
   /// Get all upcoming appointment statuses
   static List<AppointmentStatus> get upcomingStatuses => [
-        pending,
-        confirmed,
-        checkedIn,
-        inProgress,
-        waitingDocuments,
-      ];
+    pending,
+    confirmed,
+    checkedIn,
+    inProgress,
+    waitingDocuments,
+  ];
 
-  /// Get all completed appointment statuses  
-  static List<AppointmentStatus> get completedStatuses => [
-        completed,
-      ];
+  /// Get all completed appointment statuses
+  static List<AppointmentStatus> get completedStatuses => [completed];
 
   /// Get all cancelled appointment statuses
   static List<AppointmentStatus> get cancelledStatuses => [
-        cancelled,
-        cancelledByClinic,
-        noShow,
-        refunded,
-      ];
+    cancelled,
+    cancelledByClinic,
+    noShow,
+    refunded,
+  ];
 
   /// Check if status allows cancellation
   bool get allowsCancellation {
@@ -212,11 +282,7 @@ extension AppointmentStatusExtension on AppointmentStatus {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            iconData,
-            size: fontSize ?? 14,
-            color: color,
-          ),
+          Icon(iconData, size: fontSize ?? 14, color: color),
           const SizedBox(width: 4),
           Text(
             label,

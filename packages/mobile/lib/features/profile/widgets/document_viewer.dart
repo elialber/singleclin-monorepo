@@ -6,7 +6,8 @@ import 'package:singleclin_mobile/features/profile/models/medical_document.dart'
 /// Displays document information with preview and actions
 class DocumentViewer extends StatelessWidget {
   const DocumentViewer({
-    required this.document, super.key,
+    required this.document,
+    super.key,
     this.onTap,
     this.onDownload,
     this.onShare,

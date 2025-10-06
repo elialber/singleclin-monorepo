@@ -12,7 +12,11 @@ class FaqItem extends Equatable {
     required this.helpfulCount,
     required this.notHelpfulCount,
     required this.createdAt,
-    required this.sortOrder, required this.isPublished, required this.relatedQuestions, required this.attachments, this.updatedAt,
+    required this.sortOrder,
+    required this.isPublished,
+    required this.relatedQuestions,
+    required this.attachments,
+    this.updatedAt,
     this.videoUrl,
   });
 

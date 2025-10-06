@@ -5,7 +5,8 @@ import 'package:singleclin_mobile/features/credits/models/credit_transaction_mod
 
 class TransactionItem extends StatelessWidget {
   const TransactionItem({
-    required this.transaction, super.key,
+    required this.transaction,
+    super.key,
     this.onTap,
     this.showDate = true,
     this.compact = false,

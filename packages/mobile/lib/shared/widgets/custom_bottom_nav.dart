@@ -4,7 +4,9 @@ import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class CustomBottomNav extends StatelessWidget {
   const CustomBottomNav({
-    required this.currentIndex, required this.onTap, super.key,
+    required this.currentIndex,
+    required this.onTap,
+    super.key,
   });
   final int currentIndex;
   final Function(int) onTap;

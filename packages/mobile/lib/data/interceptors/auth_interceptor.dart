@@ -8,11 +8,9 @@ import 'package:singleclin_mobile/core/services/session_manager.dart';
 
 /// HTTP interceptor for automatic JWT token authentication.
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor({
-    FirebaseAuth? firebaseAuth,
-    SessionManager? sessionManager,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _sessionManager = sessionManager ?? Get.find<SessionManager>();
+  AuthInterceptor({FirebaseAuth? firebaseAuth, SessionManager? sessionManager})
+    : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+      _sessionManager = sessionManager ?? Get.find<SessionManager>();
 
   final FirebaseAuth _firebaseAuth;
   final SessionManager _sessionManager;
@@ -57,8 +55,9 @@ class AuthInterceptor extends Interceptor {
 
     if (statusCode == ApiConstants.statusUnauthorized) {
       try {
-        final Response? retryResponse =
-            await _retryWithRefreshedToken(err.requestOptions);
+        final Response? retryResponse = await _retryWithRefreshedToken(
+          err.requestOptions,
+        );
 
         if (retryResponse != null) {
           handler.resolve(retryResponse);
@@ -80,7 +79,8 @@ class AuthInterceptor extends Interceptor {
           message: 'Sua sessão expirou. Faça login novamente.',
         );
       }
-    } else if (statusCode == ApiConstants.statusForbidden || statusCode == 409) {
+    } else if (statusCode == ApiConstants.statusForbidden ||
+        statusCode == 409) {
       await _sessionManager.endSession(
         signOut: true,
         redirectToLogin: true,
@@ -100,7 +100,9 @@ class AuthInterceptor extends Interceptor {
     handler.next(customException);
   }
 
-  Future<Response?> _retryWithRefreshedToken(RequestOptions failedRequest) async {
+  Future<Response?> _retryWithRefreshedToken(
+    RequestOptions failedRequest,
+  ) async {
     try {
       final User? user = _firebaseAuth.currentUser;
 

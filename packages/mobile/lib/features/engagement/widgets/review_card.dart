@@ -8,7 +8,8 @@ import 'package:singleclin_mobile/features/engagement/widgets/rating_stars.dart'
 /// Card widget for displaying user reviews
 class ReviewCard extends StatelessWidget {
   const ReviewCard({
-    required this.review, super.key,
+    required this.review,
+    super.key,
     this.showClinicInfo = true,
     this.showServiceInfo = true,
     this.isCompact = false,
@@ -477,7 +478,11 @@ class CompactReviewCard extends StatelessWidget {
 /// Review summary widget for clinic/service pages
 class ReviewSummary extends StatelessWidget {
   const ReviewSummary({
-    required this.averageRating, required this.totalReviews, required this.ratingBreakdown, required this.recentReviews, super.key,
+    required this.averageRating,
+    required this.totalReviews,
+    required this.ratingBreakdown,
+    required this.recentReviews,
+    super.key,
     this.onSeeAllReviews,
   });
   final double averageRating;

@@ -4,7 +4,8 @@ import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class CreditBalanceCard extends StatefulWidget {
   const CreditBalanceCard({
-    required this.balance, super.key,
+    required this.balance,
+    super.key,
     this.lockedBalance = 0,
     this.isLowBalance = false,
     this.onTap,

@@ -63,9 +63,7 @@ class FirebaseUnavailableView extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: isInitializing
-                          ? null
-                          : firebaseService.retry,
+                      onPressed: isInitializing ? null : firebaseService.retry,
                       icon: isInitializing
                           ? SizedBox(
                               height: 20,
@@ -79,11 +77,16 @@ class FirebaseUnavailableView extends StatelessWidget {
                             )
                           : const Icon(Icons.refresh_rounded),
                       label: Text(
-                        isInitializing ? 'Tentando novamente...' : 'Tentar novamente',
+                        isInitializing
+                            ? 'Tentando novamente...'
+                            : 'Tentar novamente',
                       ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -95,9 +98,13 @@ class FirebaseUnavailableView extends StatelessWidget {
                 ),
                 SizedBox(height: spacing),
                 Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -105,9 +112,8 @@ class FirebaseUnavailableView extends StatelessWidget {
                       children: [
                         Text(
                           'Diagnóstico rápido',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 12),
                         _DiagnosticRow(
@@ -154,8 +160,10 @@ class FirebaseUnavailableView extends StatelessWidget {
       return 'Nunca';
     }
     final local = timestamp.toLocal();
-    final date = '${local.day.toString().padLeft(2, '0')}/${local.month.toString().padLeft(2, '0')}/${local.year}';
-    final time = '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+    final date =
+        '${local.day.toString().padLeft(2, '0')}/${local.month.toString().padLeft(2, '0')}/${local.year}';
+    final time =
+        '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
     return '$date às $time';
   }
 
@@ -178,10 +186,25 @@ class FirebaseUnavailableView extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               SizedBox(height: 12),
-              _TipItem(icon: Icons.wifi_tethering_off, text: 'Verifique se o dispositivo está conectado à internet.'),
-              _TipItem(icon: Icons.shield_moon, text: 'Confirme se VPN ou firewall não estão bloqueando o Firebase.'),
-              _TipItem(icon: Icons.update, text: 'Tente fechar e abrir o app novamente após alguns segundos.'),
-              _TipItem(icon: Icons.support_agent, text: 'Se o problema persistir, contate o suporte informando o horário e a mensagem de erro.'),
+              _TipItem(
+                icon: Icons.wifi_tethering_off,
+                text: 'Verifique se o dispositivo está conectado à internet.',
+              ),
+              _TipItem(
+                icon: Icons.shield_moon,
+                text:
+                    'Confirme se VPN ou firewall não estão bloqueando o Firebase.',
+              ),
+              _TipItem(
+                icon: Icons.update,
+                text:
+                    'Tente fechar e abrir o app novamente após alguns segundos.',
+              ),
+              _TipItem(
+                icon: Icons.support_agent,
+                text:
+                    'Se o problema persistir, contate o suporte informando o horário e a mensagem de erro.',
+              ),
               SizedBox(height: 8),
             ],
           ),
@@ -244,10 +267,7 @@ class _TipItem extends StatelessWidget {
           Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),

@@ -26,7 +26,9 @@ void main() {
 
   tearDown(Get.reset);
 
-  testWidgets('FirebaseUnavailableView shows diagnostics and triggers retry', (tester) async {
+  testWidgets('FirebaseUnavailableView shows diagnostics and triggers retry', (
+    tester,
+  ) async {
     final service = _StubFirebaseInitializationService()
       ..debugSetState(
         ready: false,
@@ -39,14 +41,15 @@ void main() {
 
     await tester.pumpWidget(
       const GetMaterialApp(
-        home: Scaffold(
-          body: FirebaseUnavailableView(compact: true),
-        ),
+        home: Scaffold(body: FirebaseUnavailableView(compact: true)),
       ),
     );
 
     expect(find.text('Serviço de autenticação indisponível'), findsOneWidget);
-    expect(find.textContaining('Tentativas consecutivas falhas'), findsOneWidget);
+    expect(
+      find.textContaining('Tentativas consecutivas falhas'),
+      findsOneWidget,
+    );
     expect(find.text('Tentar novamente'), findsOneWidget);
 
     await tester.tap(find.text('Tentar novamente'));
@@ -55,15 +58,16 @@ void main() {
     expect(service.retried, isTrue);
   });
 
-  testWidgets('FirebaseUnavailableView recovery tips sheet opens', (tester) async {
-    final service = _StubFirebaseInitializationService()..debugSetState(ready: false);
+  testWidgets('FirebaseUnavailableView recovery tips sheet opens', (
+    tester,
+  ) async {
+    final service = _StubFirebaseInitializationService()
+      ..debugSetState(ready: false);
     Get.put<FirebaseInitializationService>(service);
 
     await tester.pumpWidget(
       const GetMaterialApp(
-        home: Scaffold(
-          body: FirebaseUnavailableView(compact: true),
-        ),
+        home: Scaffold(body: FirebaseUnavailableView(compact: true)),
       ),
     );
 

@@ -7,7 +7,8 @@ import 'package:singleclin_mobile/features/engagement/models/feedback_report.dar
 /// Feedback form widget for collecting user feedback
 class FeedbackForm extends StatefulWidget {
   const FeedbackForm({
-    required this.onSubmit, super.key,
+    required this.onSubmit,
+    super.key,
     this.isSubmitting = false,
     this.error,
     this.templates,
@@ -593,7 +594,8 @@ class _FeedbackFormState extends State<FeedbackForm> {
 /// Feature request voting card
 class FeatureRequestCard extends StatelessWidget {
   const FeatureRequestCard({
-    required this.request, super.key,
+    required this.request,
+    super.key,
     this.onVote,
     this.onComment,
   });

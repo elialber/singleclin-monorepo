@@ -4,7 +4,9 @@ import 'package:singleclin_mobile/features/credits/models/credit_package.dart';
 
 class CreditPackageCard extends StatelessWidget {
   const CreditPackageCard({
-    required this.package, required this.onTap, super.key,
+    required this.package,
+    required this.onTap,
+    super.key,
     this.isSelected = false,
     this.onDetails,
   });

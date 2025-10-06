@@ -38,7 +38,10 @@ class _SplashScreenState extends State<SplashScreen> {
       // Add timeout to prevent infinite loading
       final result = await Future.any([
         _checkAuthenticationWithTimeout(),
-        Future.delayed(const Duration(seconds: 5), () => false), // 5-second timeout
+        Future.delayed(
+          const Duration(seconds: 5),
+          () => false,
+        ), // 5-second timeout
       ]);
 
       if (result == true) {
@@ -73,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
         const Duration(seconds: 2),
         onTimeout: () => false,
       );
-      
+
       print('🔍 Authentication check result: $isAuthenticated');
       return isAuthenticated;
     } catch (e) {
@@ -101,9 +104,7 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Logo
-            const SingleClinLogo(
-              size: 120,
-            ),
+            const SingleClinLogo(size: 120),
             const SizedBox(height: 24),
             Text(
               'SingleClin',

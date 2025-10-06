@@ -385,9 +385,8 @@ class TrustCenterScreen extends StatelessWidget {
                         ...[
                           const SizedBox(height: 12),
                           ElevatedButton.icon(
-                            onPressed: () => controller.viewCertificate(
-                              cert.certificateUrl,
-                            ),
+                            onPressed: () =>
+                                controller.viewCertificate(cert.certificateUrl),
                             icon: const Icon(Icons.download),
                             label: const Text('Ver Certificado'),
                             style: ElevatedButton.styleFrom(

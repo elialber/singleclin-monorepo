@@ -14,9 +14,9 @@ class SessionManager extends GetxService {
     required AuthService authService,
     required StorageService storageService,
     FirebaseAuth? firebaseAuth,
-  })  : _authService = authService,
-        _storageService = storageService,
-        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+  }) : _authService = authService,
+       _storageService = storageService,
+       _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   final AuthService _authService;
   final StorageService _storageService;
@@ -26,8 +26,8 @@ class SessionManager extends GetxService {
 
   TokenRefreshService? get tokenRefreshService =>
       Get.isRegistered<TokenRefreshService>()
-          ? Get.find<TokenRefreshService>()
-          : null;
+      ? Get.find<TokenRefreshService>()
+      : null;
 
   Future<void> startSession() async {
     if (isSessionActive) {
@@ -45,14 +45,12 @@ class SessionManager extends GetxService {
     Get.put<TokenRefreshService>(tokenService);
     await tokenService.initialize();
 
-    final lifecycleObserver = AppLifecycleObserver(tokenService)
-      ..initialize();
+    final lifecycleObserver = AppLifecycleObserver(tokenService)..initialize();
     Get.put<AppLifecycleObserver>(lifecycleObserver);
 
     final revocationService = SessionRevocationService(
-      onRevocation: (reason) => forceLogout(
-        reason ?? 'Sua sessão foi encerrada pelo servidor.',
-      ),
+      onRevocation: (reason) =>
+          forceLogout(reason ?? 'Sua sessão foi encerrada pelo servidor.'),
     );
     await revocationService.initialize();
     Get.put<SessionRevocationService>(revocationService);
@@ -101,7 +99,9 @@ class SessionManager extends GetxService {
       await _storageService.remove(AppConstants.userDataKey);
     }
 
-    if (redirectToLogin && Get.currentRoute != '/login' && Get.currentRoute != '/splash') {
+    if (redirectToLogin &&
+        Get.currentRoute != '/login' &&
+        Get.currentRoute != '/splash') {
       await Get.offAllNamed('/login');
       if (message != null) {
         Get.snackbar(
@@ -122,10 +122,6 @@ class SessionManager extends GetxService {
   }
 
   Future<void> forceLogout(String message) async {
-    await endSession(
-      signOut: true,
-      redirectToLogin: true,
-      message: message,
-    );
+    await endSession(signOut: true, redirectToLogin: true, message: message);
   }
 }

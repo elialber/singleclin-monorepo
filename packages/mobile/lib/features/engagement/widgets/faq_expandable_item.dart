@@ -5,7 +5,10 @@ import 'package:singleclin_mobile/features/engagement/models/faq_item.dart';
 /// Expandable FAQ item widget with smooth animations
 class FaqExpandableItem extends StatefulWidget {
   const FaqExpandableItem({
-    required this.item, required this.isExpanded, required this.onTap, super.key,
+    required this.item,
+    required this.isExpanded,
+    required this.onTap,
+    super.key,
     this.onHelpfulVote,
     this.onFeedback,
     this.relatedItems,
@@ -519,7 +522,9 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
 /// Compact FAQ item for search results
 class CompactFaqItem extends StatelessWidget {
   const CompactFaqItem({
-    required this.item, required this.onTap, super.key,
+    required this.item,
+    required this.onTap,
+    super.key,
     this.highlightText,
   });
   final FaqItem item;
@@ -654,7 +659,9 @@ class CompactFaqItem extends StatelessWidget {
 /// FAQ category filter chips
 class FaqCategoryChips extends StatelessWidget {
   const FaqCategoryChips({
-    required this.categoryCounts, required this.onCategorySelected, super.key,
+    required this.categoryCounts,
+    required this.onCategorySelected,
+    super.key,
     this.selectedCategory,
   });
   final FaqCategory? selectedCategory;
