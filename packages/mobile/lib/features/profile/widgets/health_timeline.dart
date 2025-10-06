@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:singleclin_mobile/features/profile/models/health_record.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/models/health_record.dart';
 
 /// Health Timeline Widget
 /// Displays a health record in timeline format
 class HealthTimeline extends StatelessWidget {
   const HealthTimeline({
-    Key? key,
-    required this.record,
+    required this.record, super.key,
     this.onTap,
     this.onEdit,
     this.onArchive,
     this.onDelete,
-  }) : super(key: key);
+  });
   final HealthRecord record;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;

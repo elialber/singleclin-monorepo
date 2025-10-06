@@ -2,10 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' hide Response;
-
 import 'package:singleclin_mobile/core/constants/api_constants.dart';
-import 'package:singleclin_mobile/core/services/session_manager.dart';
 import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
+import 'package:singleclin_mobile/core/services/session_manager.dart';
 
 /// HTTP interceptor for automatic JWT token authentication.
 class AuthInterceptor extends Interceptor {

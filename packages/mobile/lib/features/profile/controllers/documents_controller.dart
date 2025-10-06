@@ -1,6 +1,7 @@
 import 'dart:io';
-import 'package:get/get.dart';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:singleclin_mobile/features/profile/models/medical_document.dart';
 
@@ -123,7 +124,7 @@ class DocumentsController extends GetxController {
   /// Upload document from file picker
   Future<void> uploadDocumentFromFile() async {
     try {
-      final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+      final result = await FilePicker.platform.pickFiles();
 
       if (result == null || result.files.isEmpty) return;
 

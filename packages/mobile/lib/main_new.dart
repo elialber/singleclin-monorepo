@@ -1,11 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
-
-import 'package:singleclin_mobile/firebase_options.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/themes/app_theme.dart';
 import 'package:singleclin_mobile/core/utils/app_bindings.dart';
+import 'package:singleclin_mobile/firebase_options.dart';
 import 'package:singleclin_mobile/routes/app_pages.dart';
 import 'package:singleclin_mobile/routes/app_routes.dart';
 

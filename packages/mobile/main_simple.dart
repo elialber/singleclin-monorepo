@@ -97,7 +97,7 @@ class SingleClinApp extends StatelessWidget {
 
 extension StorageServiceInitialization on StorageService {
   Future<StorageService> init() async {
-    await onInit();
+    onInit();
     return this;
   }
 }

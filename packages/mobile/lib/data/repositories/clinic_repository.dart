@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:singleclin_mobile/core/repositories/base_repository.dart';
 import 'package:singleclin_mobile/core/services/cache_service.dart';
 import 'package:singleclin_mobile/core/services/network_service.dart';
 import 'package:singleclin_mobile/features/discovery/models/clinic_model.dart';
-import 'dart:convert';
 
 /// Repository for clinic data with offline-first capabilities
 ///

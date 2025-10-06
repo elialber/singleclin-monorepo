@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
-import 'dart:async';
-import 'dart:io';
+import 'package:get/get.dart';
 
 /// Service for monitoring network connectivity and status
 ///

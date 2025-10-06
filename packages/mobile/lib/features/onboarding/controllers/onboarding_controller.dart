@@ -1,5 +1,5 @@
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/features/onboarding/models/onboarding_step.dart';
 

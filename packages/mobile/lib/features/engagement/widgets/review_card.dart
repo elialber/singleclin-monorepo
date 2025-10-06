@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:singleclin_mobile/features/engagement/models/review.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/review.dart';
 import 'package:singleclin_mobile/features/engagement/widgets/rating_stars.dart';
 
 /// Card widget for displaying user reviews
 class ReviewCard extends StatelessWidget {
   const ReviewCard({
-    Key? key,
-    required this.review,
+    required this.review, super.key,
     this.showClinicInfo = true,
     this.showServiceInfo = true,
     this.isCompact = false,
@@ -18,7 +17,7 @@ class ReviewCard extends StatelessWidget {
     this.onReport,
     this.onDelete,
     this.canDelete = false,
-  }) : super(key: key);
+  });
   final Review review;
   final bool showClinicInfo;
   final bool showServiceInfo;
@@ -459,8 +458,7 @@ class ReviewCard extends StatelessWidget {
 
 /// Compact review card for lists
 class CompactReviewCard extends StatelessWidget {
-  const CompactReviewCard({Key? key, required this.review, this.onTap})
-    : super(key: key);
+  const CompactReviewCard({required this.review, super.key, this.onTap});
   final Review review;
   final VoidCallback? onTap;
 
@@ -479,13 +477,9 @@ class CompactReviewCard extends StatelessWidget {
 /// Review summary widget for clinic/service pages
 class ReviewSummary extends StatelessWidget {
   const ReviewSummary({
-    Key? key,
-    required this.averageRating,
-    required this.totalReviews,
-    required this.ratingBreakdown,
-    required this.recentReviews,
+    required this.averageRating, required this.totalReviews, required this.ratingBreakdown, required this.recentReviews, super.key,
     this.onSeeAllReviews,
-  }) : super(key: key);
+  });
   final double averageRating;
   final int totalReviews;
   final Map<int, int> ratingBreakdown;
@@ -583,7 +577,7 @@ class ReviewSummary extends StatelessWidget {
 
 /// Review stats widget for user profile
 class UserReviewStats extends StatelessWidget {
-  const UserReviewStats({Key? key, required this.stats}) : super(key: key);
+  const UserReviewStats({required this.stats, super.key});
   final ReviewStats stats;
 
   @override

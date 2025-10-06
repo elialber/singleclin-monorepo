@@ -1,10 +1,11 @@
 import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:singleclin_mobile/data/models/user_model.dart';
+import 'package:singleclin_mobile/data/repositories/user_repository.dart';
 import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
 import 'package:singleclin_mobile/presentation/controllers/base_controller.dart';
-import 'package:singleclin_mobile/data/repositories/user_repository.dart';
-import 'package:singleclin_mobile/data/models/user_model.dart';
 
 /// Profile Controller with offline-first capabilities
 /// Manages user profile data, editing, and LGPD compliance features
@@ -695,7 +696,7 @@ class ProfileController extends BaseController {
         ],
       ),
       notificationSettings: const NotificationSettings(
-        emailNotifications: true,
+        
       ),
       allergies: const ['Penicilina', 'Frutos do mar'],
       medications: const ['Vitamina D', 'Ômega 3'],

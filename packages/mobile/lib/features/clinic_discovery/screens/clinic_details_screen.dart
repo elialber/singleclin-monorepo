@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 
 class ClinicDetailsScreen extends StatefulWidget {
   const ClinicDetailsScreen({super.key, this.clinic});

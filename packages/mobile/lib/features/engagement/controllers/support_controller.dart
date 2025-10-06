@@ -1,9 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:singleclin_mobile/features/engagement/models/support_ticket.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/engagement/models/support_ticket.dart';
 
 /// Controller for customer support system
 class SupportController extends GetxController {

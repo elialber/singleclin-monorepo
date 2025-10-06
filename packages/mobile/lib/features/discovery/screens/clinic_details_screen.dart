@@ -1,22 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:url_launcher/url_launcher.dart';
-
+import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
-import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
-import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/booking_controller.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
 import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
 import 'package:singleclin_mobile/features/discovery/models/service.dart';
-import 'package:singleclin_mobile/features/discovery/widgets/service_card.dart';
 import 'package:singleclin_mobile/features/discovery/screens/booking_screen.dart';
+import 'package:singleclin_mobile/features/discovery/widgets/service_card.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Clinic details screen with gallery, services, and booking CTA
 class ClinicDetailsScreen extends StatefulWidget {
-  const ClinicDetailsScreen({Key? key, required this.clinic}) : super(key: key);
+  const ClinicDetailsScreen({required this.clinic, super.key});
   final Clinic clinic;
 
   @override

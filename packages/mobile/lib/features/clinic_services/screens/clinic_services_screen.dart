@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/clinic_services/controllers/clinic_services_controller.dart';
 import 'package:singleclin_mobile/features/clinic_services/widgets/service_list_item.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ClinicServicesScreen extends StatelessWidget {
   const ClinicServicesScreen({super.key});

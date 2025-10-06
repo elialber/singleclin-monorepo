@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/features/engagement/controllers/reviews_controller.dart';
 import 'package:singleclin_mobile/features/engagement/widgets/review_card.dart';
-import 'package:singleclin_mobile/features/engagement/widgets/rating_stars.dart';
 
 class ReviewsScreen extends StatelessWidget {
   const ReviewsScreen({super.key});

@@ -19,10 +19,9 @@ class CreditTransactionModel {
     required this.type,
     required this.source,
     required this.description,
-    this.relatedEntityId,
+    required this.createdAt, this.relatedEntityId,
     this.relatedEntityType,
     this.metadata,
-    required this.createdAt,
   });
 
   factory CreditTransactionModel.fromJson(Map<String, dynamic> json) {
@@ -308,10 +307,7 @@ class ReferralRecord {
     required this.id,
     required this.referralProgramId,
     required this.referredUserId,
-    this.referredUserName,
-    required this.creditsEarned,
-    required this.isActive,
-    required this.referredAt,
+    required this.creditsEarned, required this.isActive, required this.referredAt, this.referredUserName,
   });
 
   factory ReferralRecord.fromJson(Map<String, dynamic> json) {

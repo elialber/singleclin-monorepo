@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/features/engagement/controllers/write_review_controller.dart';
-import 'package:singleclin_mobile/features/engagement/widgets/rating_stars.dart';
 
 class WriteReviewScreen extends StatelessWidget {
   const WriteReviewScreen({super.key});

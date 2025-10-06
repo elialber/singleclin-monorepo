@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
-import 'package:singleclin_mobile/features/discovery/models/service.dart';
+import 'package:flutter/material.dart';
 import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
 
 /// Represents a booking/appointment in the SingleClin system
 class Booking extends Equatable {
@@ -10,21 +10,13 @@ class Booking extends Equatable {
     required this.userId,
     required this.clinicId,
     required this.serviceId,
-    this.clinic,
+    required this.scheduledDate, required this.scheduledTime, required this.status, required this.totalCostSG, required this.paymentStatus, required this.reminders, required this.createdAt, required this.updatedAt, this.clinic,
     this.service,
-    required this.scheduledDate,
-    required this.scheduledTime,
-    required this.status,
-    required this.totalCostSG,
-    required this.paymentStatus,
     this.notes,
     this.cancellationReason,
     this.cancellationDate,
     this.professionalId,
     this.professionalName,
-    required this.reminders,
-    required this.createdAt,
-    required this.updatedAt,
     this.requiresPreparation = false,
     this.preparationNotes,
     this.hasFollowUp = false,

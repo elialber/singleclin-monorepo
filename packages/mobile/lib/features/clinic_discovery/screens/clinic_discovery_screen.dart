@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/controllers/clinic_discovery_controller.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/widgets/clinic_card.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/controllers/clinic_discovery_controller.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class ClinicDiscoveryScreen extends StatelessWidget {
   const ClinicDiscoveryScreen({super.key});

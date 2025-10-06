@@ -13,13 +13,12 @@ class SupportTicket extends Equatable {
     required this.messages,
     required this.attachments,
     required this.createdAt,
-    this.updatedAt,
+    required this.tags, this.updatedAt,
     this.resolvedAt,
     this.assignedAgentId,
     this.assignedAgentName,
     this.satisfactionRating,
     this.satisfactionComment,
-    required this.tags,
   });
 
   factory SupportTicket.fromJson(Map<String, dynamic> json) {
@@ -294,14 +293,9 @@ class ChatSession extends Equatable {
   const ChatSession({
     required this.id,
     required this.userId,
-    this.agentId,
+    required this.status, required this.messages, required this.createdAt, required this.queuePosition, required this.topic, this.agentId,
     this.agentName,
-    required this.status,
-    required this.messages,
-    required this.createdAt,
     this.endedAt,
-    required this.queuePosition,
-    required this.topic,
   });
 
   factory ChatSession.fromJson(Map<String, dynamic> json) {

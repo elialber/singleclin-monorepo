@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
-import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_discovery_screen.dart';
+import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
 
 class TempDashboardScreen extends StatelessWidget {
   const TempDashboardScreen({super.key});

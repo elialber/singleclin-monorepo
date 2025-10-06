@@ -15,14 +15,9 @@ class FeedbackReport extends Equatable {
     required this.appVersion,
     required this.osVersion,
     required this.createdAt,
-    this.updatedAt,
-    required this.status,
-    required this.votesCount,
-    required this.hasVoted,
-    required this.tags,
+    required this.status, required this.votesCount, required this.hasVoted, required this.tags, required this.comments, this.updatedAt,
     this.developerResponse,
     this.resolvedAt,
-    required this.comments,
   });
 
   factory FeedbackReport.fromJson(Map<String, dynamic> json) {
@@ -258,10 +253,8 @@ class FeatureRequest extends Equatable {
     required this.status,
     required this.priority,
     required this.createdAt,
-    this.plannedFor,
+    required this.tags, required this.comments, this.plannedFor,
     this.estimatedEffort,
-    required this.tags,
-    required this.comments,
     this.roadmapUrl,
   });
 
@@ -355,13 +348,8 @@ class RoadmapItem extends Equatable {
     required this.title,
     required this.description,
     required this.status,
-    this.plannedRelease,
-    required this.category,
-    required this.tags,
-    required this.userVotes,
-    required this.hasVoted,
+    required this.category, required this.tags, required this.userVotes, required this.hasVoted, required this.features, this.plannedRelease,
     this.progress,
-    required this.features,
   });
 
   factory RoadmapItem.fromJson(Map<String, dynamic> json) {
@@ -435,13 +423,7 @@ class BetaProgram extends Equatable {
     required this.name,
     required this.description,
     required this.startDate,
-    this.endDate,
-    required this.isEnrolled,
-    required this.maxParticipants,
-    required this.currentParticipants,
-    required this.requirements,
-    required this.benefits,
-    required this.status,
+    required this.isEnrolled, required this.maxParticipants, required this.currentParticipants, required this.requirements, required this.benefits, required this.status, this.endDate,
   });
 
   factory BetaProgram.fromJson(Map<String, dynamic> json) {

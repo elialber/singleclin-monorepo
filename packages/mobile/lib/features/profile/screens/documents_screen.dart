@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/profile/controllers/documents_controller.dart';
 import 'package:singleclin_mobile/features/profile/widgets/document_viewer.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Documents Screen
 /// Secure document management with upload and LGPD compliance
@@ -542,8 +542,9 @@ class DocumentsScreen extends GetView<DocumentsController> {
   String _formatBytes(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024)
+    if (bytes < 1024 * 1024 * 1024) {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 }

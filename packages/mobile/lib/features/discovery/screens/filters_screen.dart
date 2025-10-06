@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/filters_controller.dart';
 import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
 
 /// Advanced filters screen with mobile-optimized touch interactions
 class FiltersScreen extends StatefulWidget {

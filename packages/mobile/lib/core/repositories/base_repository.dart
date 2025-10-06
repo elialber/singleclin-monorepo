@@ -1,7 +1,8 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
-import 'package:singleclin_mobile/core/services/network_service.dart';
 import 'package:singleclin_mobile/core/services/cache_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
 
 /// Base repository providing offline-first functionality
 ///

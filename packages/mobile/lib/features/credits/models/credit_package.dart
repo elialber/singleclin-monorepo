@@ -11,10 +11,9 @@ class CreditPackage {
     required this.discount,
     required this.isPopular,
     required this.isActive,
-    this.isPromo = false,
+    required this.type, this.isPromo = false,
     this.promoEndDate,
     this.promoDescription,
-    required this.type,
     this.bonusFeatures,
     this.iconUrl,
   });
@@ -151,12 +150,9 @@ class PaymentMethod {
     required this.id,
     required this.type,
     required this.displayName,
-    this.last4,
+    required this.isDefault, required this.isActive, required this.createdAt, this.last4,
     this.brand,
-    required this.isDefault,
-    required this.isActive,
     this.expiryDate,
-    required this.createdAt,
   });
 
   factory PaymentMethod.fromJson(Map<String, dynamic> json) {

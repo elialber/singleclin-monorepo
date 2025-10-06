@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/appointments/controllers/appointments_controller.dart';
 import 'package:singleclin_mobile/features/appointments/widgets/appointment_card.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Appointments Screen
 /// Main appointments management screen with tabbed interface

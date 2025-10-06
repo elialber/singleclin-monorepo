@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:singleclin_mobile/features/credits/models/referral.dart';
 
 class ReferralController extends GetxController {

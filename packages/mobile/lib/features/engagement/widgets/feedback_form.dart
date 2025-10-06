@@ -1,18 +1,17 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:singleclin_mobile/features/engagement/models/feedback_report.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/feedback_report.dart';
 
 /// Feedback form widget for collecting user feedback
 class FeedbackForm extends StatefulWidget {
   const FeedbackForm({
-    Key? key,
-    required this.onSubmit,
+    required this.onSubmit, super.key,
     this.isSubmitting = false,
     this.error,
     this.templates,
-  }) : super(key: key);
+  });
   final Function(Map<String, dynamic>) onSubmit;
   final bool isSubmitting;
   final String? error;
@@ -594,11 +593,10 @@ class _FeedbackFormState extends State<FeedbackForm> {
 /// Feature request voting card
 class FeatureRequestCard extends StatelessWidget {
   const FeatureRequestCard({
-    Key? key,
-    required this.request,
+    required this.request, super.key,
     this.onVote,
     this.onComment,
-  }) : super(key: key);
+  });
   final FeatureRequest request;
   final VoidCallback? onVote;
   final VoidCallback? onComment;

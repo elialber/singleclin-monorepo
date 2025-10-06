@@ -1,11 +1,11 @@
-import 'package:get/get.dart';
+import 'dart:async';
+
 import 'package:dio/dio.dart';
+import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/models/cache_entity.dart';
 import 'package:singleclin_mobile/core/services/cache_service.dart';
-import 'package:singleclin_mobile/core/services/network_service.dart';
 import 'package:singleclin_mobile/core/services/hive_box_manager.dart';
-import 'dart:async';
-import 'dart:math';
+import 'package:singleclin_mobile/core/services/network_service.dart';
 
 /// Central synchronization service for offline-first architecture
 ///

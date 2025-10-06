@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/profile/controllers/health_history_controller.dart';
 import 'package:singleclin_mobile/features/profile/widgets/health_timeline.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Health History Screen
 /// Shows medical history timeline with records and metrics

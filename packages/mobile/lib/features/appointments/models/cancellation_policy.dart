@@ -10,13 +10,11 @@ class CancellationPolicy extends Equatable {
     required this.categoryId,
     required this.rules,
     required this.description,
-    this.allowsEmergencyException = true,
+    required this.createdAt, required this.updatedAt, this.allowsEmergencyException = true,
     this.emergencyExceptions = const [],
     this.allowsRescheduling = true,
     this.maxReschedulingCount = 3,
     this.requiresJustification = false,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   /// Factory method to create from JSON

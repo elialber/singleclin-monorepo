@@ -6,9 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
-import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/core/constants/api_constants.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/data/services/auth_service.dart';
 import 'package:singleclin_mobile/domain/entities/user_entity.dart';
 
@@ -195,7 +194,6 @@ class TokenRefreshService {
       final now = DateTime.now();
       _metadata = _TokenRefreshMetadata(
         lastSuccessAt: now,
-        retryCount: 0,
         nextAttemptAt: now.add(_refreshInterval),
       );
       await _saveMetadata();
@@ -592,6 +590,19 @@ class _TokenRefreshMetadata {
     this.nextAttemptAt,
   });
 
+  factory _TokenRefreshMetadata.fromJson(Map<String, dynamic> json) {
+    DateTime? parseDate(String? value) {
+      if (value == null) return null;
+      return DateTime.tryParse(value);
+    }
+
+    return _TokenRefreshMetadata(
+      lastSuccessAt: parseDate(json['lastSuccessAt'] as String?),
+      retryCount: (json['retryCount'] as num?)?.toInt() ?? 0,
+      nextAttemptAt: parseDate(json['nextAttemptAt'] as String?),
+    );
+  }
+
   final DateTime? lastSuccessAt;
   final int retryCount;
   final DateTime? nextAttemptAt;
@@ -615,31 +626,9 @@ class _TokenRefreshMetadata {
       'nextAttemptAt': nextAttemptAt?.toIso8601String(),
     };
   }
-
-  factory _TokenRefreshMetadata.fromJson(Map<String, dynamic> json) {
-    DateTime? parseDate(String? value) {
-      if (value == null) return null;
-      return DateTime.tryParse(value);
-    }
-
-    return _TokenRefreshMetadata(
-      lastSuccessAt: parseDate(json['lastSuccessAt'] as String?),
-      retryCount: (json['retryCount'] as num?)?.toInt() ?? 0,
-      nextAttemptAt: parseDate(json['nextAttemptAt'] as String?),
-    );
-  }
 }
 
 class _SessionValidationResult {
-  const _SessionValidationResult._({
-    required this.success,
-    required this.retryable,
-    this.message,
-  });
-
-  final bool success;
-  final bool retryable;
-  final String? message;
 
   const _SessionValidationResult.success()
       : this._(success: true, retryable: false);
@@ -649,9 +638,27 @@ class _SessionValidationResult {
 
   const _SessionValidationResult.failure(String message)
       : this._(success: false, retryable: false, message: message);
+  const _SessionValidationResult._({
+    required this.success,
+    required this.retryable,
+    this.message,
+  });
+
+  final bool success;
+  final bool retryable;
+  final String? message;
 }
 
 class _RefreshOutcome {
+
+  const _RefreshOutcome.success(String token)
+      : this._(success: true, retryable: false, token: token);
+
+  const _RefreshOutcome.retryable(String message)
+      : this._(success: false, retryable: true, message: message);
+
+  const _RefreshOutcome.failure(String message)
+      : this._(success: false, retryable: false, message: message);
   const _RefreshOutcome._({
     required this.success,
     required this.retryable,
@@ -666,13 +673,4 @@ class _RefreshOutcome {
 
   static const _RefreshOutcome skipped =
       _RefreshOutcome._(success: false, retryable: false);
-
-  const _RefreshOutcome.success(String token)
-      : this._(success: true, retryable: false, token: token);
-
-  const _RefreshOutcome.retryable(String message)
-      : this._(success: false, retryable: true, message: message);
-
-  const _RefreshOutcome.failure(String message)
-      : this._(success: false, retryable: false, message: message);
 }

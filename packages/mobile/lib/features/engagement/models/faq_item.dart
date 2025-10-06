@@ -12,12 +12,8 @@ class FaqItem extends Equatable {
     required this.helpfulCount,
     required this.notHelpfulCount,
     required this.createdAt,
-    this.updatedAt,
-    required this.sortOrder,
-    required this.isPublished,
-    required this.relatedQuestions,
+    required this.sortOrder, required this.isPublished, required this.relatedQuestions, required this.attachments, this.updatedAt,
     this.videoUrl,
-    required this.attachments,
   });
 
   factory FaqItem.fromJson(Map<String, dynamic> json) {

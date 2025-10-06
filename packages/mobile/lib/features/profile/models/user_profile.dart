@@ -6,19 +6,12 @@ class UserProfile extends Equatable {
   const UserProfile({
     required this.id,
     required this.email,
-    this.photoUrl,
-    required this.personalInfo,
-    required this.healthInfo,
-    required this.contactInfo,
-    required this.privacySettings,
-    required this.notificationSettings,
+    required this.personalInfo, required this.healthInfo, required this.contactInfo, required this.privacySettings, required this.notificationSettings, required this.createdAt, required this.updatedAt, this.photoUrl,
     this.emergencyContacts = const [],
     this.allergies = const [],
     this.medications = const [],
     this.healthConditions = const [],
     this.additionalData,
-    required this.createdAt,
-    required this.updatedAt,
     this.lastLoginAt,
     this.isActive = true,
     this.isVerified = false,
@@ -463,11 +456,7 @@ class Address extends Equatable {
   const Address({
     required this.street,
     required this.number,
-    this.complement,
-    required this.neighborhood,
-    required this.city,
-    required this.state,
-    required this.zipCode,
+    required this.neighborhood, required this.city, required this.state, required this.zipCode, this.complement,
     this.country = 'Brasil',
   });
 

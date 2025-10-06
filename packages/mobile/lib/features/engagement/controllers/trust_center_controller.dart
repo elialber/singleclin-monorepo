@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:singleclin_mobile/features/engagement/models/trust_certification.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/engagement/models/trust_certification.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Controller for trust center and transparency features
 class TrustCenterController extends GetxController {

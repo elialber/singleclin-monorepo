@@ -1,22 +1,21 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:singleclin_mobile/features/engagement/models/trust_certification.dart';
+import 'package:flutter/material.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/trust_certification.dart';
 
 /// Trust badge widget for displaying certifications
 class TrustBadge extends StatelessWidget {
-  final TrustCertification certification;
-  final VoidCallback? onTap;
-  final double size;
-  final bool showTooltip;
 
   const TrustBadge({
-    super.key,
-    required this.certification,
+    required this.certification, super.key,
     this.onTap,
     this.size = 48.0,
     this.showTooltip = true,
   });
+  final TrustCertification certification;
+  final VoidCallback? onTap;
+  final double size;
+  final bool showTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -170,11 +169,10 @@ class TrustBadge extends StatelessWidget {
 /// Trust score widget with circular progress
 class TrustScoreWidget extends StatelessWidget {
   const TrustScoreWidget({
-    Key? key,
-    required this.score,
+    required this.score, super.key,
     this.size = 80.0,
     this.showLabel = true,
-  }) : super(key: key);
+  });
   final int score;
   final double size;
   final bool showLabel;
@@ -261,8 +259,7 @@ class TrustScoreWidget extends StatelessWidget {
 
 /// Trust metrics summary widget
 class TrustMetricsSummary extends StatelessWidget {
-  const TrustMetricsSummary({Key? key, required this.metrics})
-    : super(key: key);
+  const TrustMetricsSummary({required this.metrics, super.key});
   final TrustMetrics metrics;
 
   @override
@@ -428,8 +425,7 @@ class TrustMetricsSummary extends StatelessWidget {
 
 /// Security score badge
 class SecurityScoreBadge extends StatelessWidget {
-  const SecurityScoreBadge({Key? key, required this.score, this.onTap})
-    : super(key: key);
+  const SecurityScoreBadge({required this.score, super.key, this.onTap});
   final String score;
   final VoidCallback? onTap;
 
@@ -486,10 +482,9 @@ class SecurityScoreBadge extends StatelessWidget {
 /// LGPD compliance indicator
 class LgpdComplianceIndicator extends StatelessWidget {
   const LgpdComplianceIndicator({
-    Key? key,
-    required this.compliance,
+    required this.compliance, super.key,
     this.onTap,
-  }) : super(key: key);
+  });
   final LgpdCompliance compliance;
   final VoidCallback? onTap;
 
@@ -574,18 +569,15 @@ class LgpdComplianceIndicator extends StatelessWidget {
 
 /// Emergency contact card
 class EmergencyContactCard extends StatelessWidget {
+
+  const EmergencyContactCard({
+    required this.title, required this.contact, required this.icon, super.key,
+    this.onTap,
+  });
   final String title;
   final String contact;
   final IconData icon;
   final VoidCallback? onTap;
-
-  const EmergencyContactCard({
-    super.key,
-    required this.title,
-    required this.contact,
-    required this.icon,
-    this.onTap,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -640,10 +632,9 @@ class EmergencyContactCard extends StatelessWidget {
 /// Trust level indicator
 class TrustLevelIndicator extends StatelessWidget {
   const TrustLevelIndicator({
-    Key? key,
-    required this.trustScore,
+    required this.trustScore, super.key,
     this.isCompact = false,
-  }) : super(key: key);
+  });
   final int trustScore;
   final bool isCompact;
 

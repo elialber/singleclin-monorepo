@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
 import 'package:singleclin_mobile/features/credits/models/subscription_plan.dart';
 import 'package:singleclin_mobile/features/credits/models/wallet_balance.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class CreditsController extends GetxController {
   // Reactive variables
@@ -587,8 +587,9 @@ class CreditsController extends GetxController {
         .where((t) => DateTime.now().difference(t.createdAt).inDays <= 30)
         .length;
 
-    if (recentBonusTransactions >= 20)
+    if (recentBonusTransactions >= 20) {
       return 1.5; // 50% bonus for very active users
+    }
     if (recentBonusTransactions >= 10) return 1.3; // 30% bonus for active users
     if (recentBonusTransactions >= 5) return 1.1; // 10% bonus for regular users
     return 1.0; // No bonus for inactive users

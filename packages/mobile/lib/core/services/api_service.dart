@@ -1,11 +1,12 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:get/get.dart' as getx;
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart' as getx;
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
-import 'dart:io';
 
 class ApiService extends getx.GetxService {
   late Dio _dio;

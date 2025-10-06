@@ -19,11 +19,7 @@ class CommunityPost extends Equatable {
     required this.isLikedByMe,
     required this.isBookmarked,
     required this.createdAt,
-    this.updatedAt,
-    required this.status,
-    required this.comments,
-    required this.isAnonymous,
-    required this.visibility,
+    required this.status, required this.comments, required this.isAnonymous, required this.visibility, this.updatedAt,
     this.clinicId,
     this.clinicName,
   });
@@ -218,10 +214,8 @@ class PostComment extends Equatable {
     required this.likesCount,
     required this.isLikedByMe,
     required this.createdAt,
-    this.updatedAt,
-    required this.isAnonymous,
+    required this.isAnonymous, required this.replies, this.updatedAt,
     this.parentCommentId,
-    required this.replies,
   });
 
   factory PostComment.fromJson(Map<String, dynamic> json) {
@@ -310,17 +304,9 @@ class CommunityEvent extends Equatable {
     required this.type,
     required this.startTime,
     required this.endTime,
-    this.location,
+    required this.speakers, required this.tags, required this.attendeesCount, required this.maxAttendees, required this.isAttending, required this.isReminder, required this.status, required this.materials, this.location,
     this.meetingLink,
-    required this.speakers,
-    required this.tags,
-    required this.attendeesCount,
-    required this.maxAttendees,
-    required this.isAttending,
-    required this.isReminder,
-    required this.status,
     this.recordingUrl,
-    required this.materials,
   });
 
   factory CommunityEvent.fromJson(Map<String, dynamic> json) {

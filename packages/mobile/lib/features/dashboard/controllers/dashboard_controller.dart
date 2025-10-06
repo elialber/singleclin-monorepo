@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
+import 'package:singleclin_mobile/features/appointment/models/appointment_model.dart';
 import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
-import 'package:singleclin_mobile/features/appointment/models/appointment_model.dart';
-import 'package:singleclin_mobile/core/constants/app_constants.dart';
 
 class DashboardController extends GetxController {
   final ClinicApiService _clinicApiService = ClinicApiService();

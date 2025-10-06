@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
-
-import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
-import 'package:singleclin_mobile/features/discovery/controllers/map_controller.dart';
-import 'package:singleclin_mobile/features/discovery/controllers/filters_controller.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/booking_controller.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/filters_controller.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/map_controller.dart';
 
 /// Discovery module binding for dependency injection
 class DiscoveryBinding extends Bindings {

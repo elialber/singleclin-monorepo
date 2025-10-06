@@ -34,8 +34,6 @@ class UserModel extends UserEntity {
       updatedAt: entity.updatedAt,
       // Initialize offline fields with defaults
       lastSyncAt: DateTime.now(),
-      isLocalOnly: false,
-      syncVersion: 1,
     );
   }
 

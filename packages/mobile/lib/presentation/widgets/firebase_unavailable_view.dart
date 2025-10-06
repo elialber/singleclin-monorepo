@@ -40,7 +40,6 @@ class FirebaseUnavailableView extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 520),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Icon(
                   Icons.cloud_off,
@@ -66,9 +65,7 @@ class FirebaseUnavailableView extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: isInitializing
                           ? null
-                          : () {
-                              firebaseService.retry();
-                            },
+                          : firebaseService.retry,
                       icon: isInitializing
                           ? SizedBox(
                               height: 20,
@@ -100,7 +97,7 @@ class FirebaseUnavailableView extends StatelessWidget {
                 Card(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 0,
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -170,12 +167,12 @@ class FirebaseUnavailableView extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        return const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
                 'Como reestabelecer a conexão',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),

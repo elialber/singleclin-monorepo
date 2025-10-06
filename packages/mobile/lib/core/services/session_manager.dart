@@ -1,7 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/data/services/app_lifecycle_observer.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/routes/app_routes.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
 import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
 
 /// User profile screen
 class ProfileScreen extends StatelessWidget {

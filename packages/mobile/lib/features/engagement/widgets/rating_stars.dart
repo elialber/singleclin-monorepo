@@ -4,8 +4,7 @@ import 'package:singleclin_mobile/core/constants/app_colors.dart';
 /// Custom rating stars widget with SingleClin styling
 class RatingStars extends StatelessWidget {
   const RatingStars({
-    Key? key,
-    required this.rating,
+    required this.rating, super.key,
     this.size = 20.0,
     this.allowHalfRating = true,
     this.isInteractive = false,
@@ -13,7 +12,7 @@ class RatingStars extends StatelessWidget {
     this.color,
     this.unratedColor,
     this.maxRating = 5,
-  }) : super(key: key);
+  });
   final double rating;
   final double size;
   final bool allowHalfRating;
@@ -72,16 +71,15 @@ class RatingStars extends StatelessWidget {
 /// Interactive rating stars for user input
 class InteractiveRatingStars extends StatefulWidget {
   const InteractiveRatingStars({
-    Key? key,
+    required this.onRatingChanged, super.key,
     this.initialRating = 0.0,
     this.size = 32.0,
-    required this.onRatingChanged,
     this.color,
     this.unratedColor,
     this.maxRating = 5,
     this.allowHalfRating = true,
     this.label,
-  }) : super(key: key);
+  });
   final double initialRating;
   final double size;
   final Function(double) onRatingChanged;
@@ -216,13 +214,12 @@ class _InteractiveRatingStarsState extends State<InteractiveRatingStars>
 /// Rating display with number and text
 class RatingDisplay extends StatelessWidget {
   const RatingDisplay({
-    Key? key,
-    required this.rating,
+    required this.rating, super.key,
     this.totalReviews = 0,
     this.starSize = 16.0,
     this.showReviewCount = true,
     this.textStyle,
-  }) : super(key: key);
+  });
   final double rating;
   final int totalReviews;
   final double starSize;
@@ -264,14 +261,13 @@ class RatingDisplay extends StatelessWidget {
 /// Compact rating bar for lists
 class CompactRating extends StatelessWidget {
   const CompactRating({
-    Key? key,
-    required this.rating,
+    required this.rating, super.key,
     this.totalReviews = 0,
     this.width = 60.0,
     this.height = 6.0,
     this.backgroundColor,
     this.foregroundColor,
-  }) : super(key: key);
+  });
   final double rating;
   final int totalReviews;
   final double width;
@@ -333,10 +329,8 @@ class CompactRating extends StatelessWidget {
 /// Rating breakdown chart
 class RatingBreakdown extends StatelessWidget {
   const RatingBreakdown({
-    Key? key,
-    required this.ratingCounts,
-    required this.totalRatings,
-  }) : super(key: key);
+    required this.ratingCounts, required this.totalRatings, super.key,
+  });
   final Map<int, int> ratingCounts;
   final int totalRatings;
 
@@ -384,10 +378,9 @@ class RatingBreakdown extends StatelessWidget {
 /// Rating category breakdown for detailed reviews
 class CategoryRatingBreakdown extends StatelessWidget {
   const CategoryRatingBreakdown({
-    Key? key,
-    required this.categoryRatings,
+    required this.categoryRatings, super.key,
     this.iconSize = 16.0,
-  }) : super(key: key);
+  });
   final Map<String, double> categoryRatings;
   final double iconSize;
 

@@ -4,13 +4,7 @@ import 'package:flutter/foundation.dart';
 class DashboardStats {
   const DashboardStats({
     required this.sgBalance,
-    this.renewalDate,
-    required this.totalAppointments,
-    required this.completedAppointments,
-    required this.upcomingAppointments,
-    required this.cancelledAppointments,
-    required this.lastUpdated,
-    required this.hasActiveSubscription,
+    required this.totalAppointments, required this.completedAppointments, required this.upcomingAppointments, required this.cancelledAppointments, required this.lastUpdated, required this.hasActiveSubscription, this.renewalDate,
     this.subscriptionPlan,
     this.categoryUsage = const {},
   });
@@ -18,15 +12,12 @@ class DashboardStats {
   factory DashboardStats.empty() {
     return DashboardStats(
       sgBalance: 0.0,
-      renewalDate: null,
       totalAppointments: 0,
       completedAppointments: 0,
       upcomingAppointments: 0,
       cancelledAppointments: 0,
       lastUpdated: DateTime.now(),
       hasActiveSubscription: false,
-      subscriptionPlan: null,
-      categoryUsage: const {},
     );
   }
 

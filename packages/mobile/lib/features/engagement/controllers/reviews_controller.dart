@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/features/engagement/models/review.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/engagement/models/review.dart';
 
 /// Controller for managing user reviews and ratings
 class ReviewsController extends GetxController {

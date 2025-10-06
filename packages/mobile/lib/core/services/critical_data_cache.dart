@@ -1,11 +1,12 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/models/cache_entity.dart';
-import 'package:singleclin_mobile/core/services/network_service.dart';
 import 'package:singleclin_mobile/core/services/cache_service.dart';
-import 'package:singleclin_mobile/data/repositories/user_repository.dart';
-import 'package:singleclin_mobile/data/repositories/credit_repository.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
 import 'package:singleclin_mobile/data/repositories/clinic_repository.dart';
-import 'dart:async';
+import 'package:singleclin_mobile/data/repositories/credit_repository.dart';
+import 'package:singleclin_mobile/data/repositories/user_repository.dart';
 
 /// Critical Data Cache Manager
 ///

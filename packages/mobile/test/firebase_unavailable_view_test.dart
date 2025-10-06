@@ -24,9 +24,7 @@ void main() {
     Get.testMode = true;
   });
 
-  tearDown(() {
-    Get.reset();
-  });
+  tearDown(Get.reset);
 
   testWidgets('FirebaseUnavailableView shows diagnostics and triggers retry', (tester) async {
     final service = _StubFirebaseInitializationService()
@@ -40,7 +38,7 @@ void main() {
     Get.put<FirebaseInitializationService>(service);
 
     await tester.pumpWidget(
-      GetMaterialApp(
+      const GetMaterialApp(
         home: Scaffold(
           body: FirebaseUnavailableView(compact: true),
         ),
@@ -62,7 +60,7 @@ void main() {
     Get.put<FirebaseInitializationService>(service);
 
     await tester.pumpWidget(
-      GetMaterialApp(
+      const GetMaterialApp(
         home: Scaffold(
           body: FirebaseUnavailableView(compact: true),
         ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:singleclin_mobile/features/appointments/controllers/appointment_details_controller.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/appointments/controllers/appointment_details_controller.dart';
 
 /// Status Timeline Widget
 /// Displays appointment status timeline with visual indicators
 class StatusTimeline extends StatelessWidget {
-  const StatusTimeline({Key? key, required this.events}) : super(key: key);
+  const StatusTimeline({required this.events, super.key});
   final List<TimelineEvent> events;
 
   @override

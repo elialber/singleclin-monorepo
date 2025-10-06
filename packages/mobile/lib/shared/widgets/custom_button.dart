@@ -7,8 +7,7 @@ enum ButtonSize { small, medium, large }
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
-    Key? key,
-    required this.text,
+    required this.text, super.key,
     this.onPressed,
     this.variant = ButtonVariant.primary,
     this.size = ButtonSize.medium,
@@ -19,7 +18,7 @@ class CustomButton extends StatelessWidget {
     this.foregroundColor,
     this.padding,
     this.borderRadius,
-  }) : super(key: key);
+  });
   final String text;
   final VoidCallback? onPressed;
   final ButtonVariant variant;
@@ -200,8 +199,7 @@ class CustomButton extends StatelessWidget {
 
 class CustomIconButton extends StatelessWidget {
   const CustomIconButton({
-    Key? key,
-    required this.icon,
+    required this.icon, super.key,
     this.onPressed,
     this.backgroundColor,
     this.iconColor,
@@ -209,7 +207,7 @@ class CustomIconButton extends StatelessWidget {
     this.iconSize,
     this.tooltip,
     this.padding,
-  }) : super(key: key);
+  });
   final IconData icon;
   final VoidCallback? onPressed;
   final Color? backgroundColor;
@@ -250,14 +248,13 @@ class CustomIconButton extends StatelessWidget {
 
 class CustomFloatingActionButton extends StatelessWidget {
   const CustomFloatingActionButton({
-    Key? key,
+    required this.icon, super.key,
     this.onPressed,
-    required this.icon,
     this.label,
     this.isExtended = false,
     this.backgroundColor,
     this.foregroundColor,
-  }) : super(key: key);
+  });
   final VoidCallback? onPressed;
   final IconData icon;
   final String? label;

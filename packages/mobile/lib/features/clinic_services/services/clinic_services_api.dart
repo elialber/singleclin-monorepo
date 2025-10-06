@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/features/clinic_services/models/clinic_service.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/clinic_services/models/clinic_service.dart';
 
 class ClinicServicesApi {
   static final ApiService _apiService = Get.find<ApiService>();

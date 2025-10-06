@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
 
+import 'package:flutter/foundation.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/services/location_service.dart';
-import 'package:singleclin_mobile/core/constants/app_constants.dart';
+import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
-import 'package:singleclin_mobile/features/discovery/models/service.dart';
 import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
 
 /// Main discovery controller managing clinic search, filtering, and display modes
 class DiscoveryController extends GetxController {

@@ -5,11 +5,11 @@ import 'package:singleclin_mobile/core/constants/app_colors.dart';
 /// Draws the medical cross logo for the SingleClin brand
 class SingleClinLogo extends StatelessWidget {
   const SingleClinLogo({
-    Key? key,
+    super.key,
     this.size = 60.0,
     this.color = AppColors.primary,
     this.strokeWidth = 4.0,
-  }) : super(key: key);
+  });
   final double size;
   final Color color;
   final double strokeWidth;

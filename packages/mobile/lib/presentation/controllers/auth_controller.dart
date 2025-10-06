@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/errors/api_exceptions.dart';
 import 'package:singleclin_mobile/core/errors/auth_exceptions.dart';
-import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/data/services/auth_service.dart';
 import 'package:singleclin_mobile/data/services/firebase_initialization_service.dart';
@@ -372,7 +371,7 @@ class AuthController extends GetxController {
       final tokenService = _ensureTokenRefreshService();
       final authService = _ensureAuthService();
 
-      await tokenService?.dispose();
+      tokenService?.dispose();
       await authService?.signOut();
       await _storageService.remove(AppConstants.tokenKey);
       await _storageService.remove(AppConstants.authTokenKey);

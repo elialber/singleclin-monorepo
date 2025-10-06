@@ -4,8 +4,7 @@ import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
-    Key? key,
-    required this.title,
+    required this.title, super.key,
     this.actions,
     this.leading,
     this.showBackButton = true,
@@ -17,7 +16,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.flexibleSpace,
     this.bottom,
     this.systemOverlayStyle,
-  }) : super(key: key);
+  });
   final String title;
   final List<Widget>? actions;
   final Widget? leading;
@@ -71,8 +70,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 class SliverCustomAppBar extends StatelessWidget {
   const SliverCustomAppBar({
-    Key? key,
-    required this.title,
+    required this.title, super.key,
     this.actions,
     this.leading,
     this.showBackButton = true,
@@ -83,7 +81,7 @@ class SliverCustomAppBar extends StatelessWidget {
     this.flexibleSpace,
     this.pinned = true,
     this.floating = false,
-  }) : super(key: key);
+  });
   final String title;
   final List<Widget>? actions;
   final Widget? leading;

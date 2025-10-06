@@ -1,21 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 
 /// Clinic card widget optimized for mobile with touch-friendly design
 class ClinicCard extends StatelessWidget {
   const ClinicCard({
-    Key? key,
-    required this.clinic,
+    required this.clinic, super.key,
     this.onTap,
     this.onFavoritePressed,
     this.showDistance = true,
     this.compact = false,
-  }) : super(key: key);
+  });
   final Clinic clinic;
   final VoidCallback? onTap;
   final VoidCallback? onFavoritePressed;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/core/constants/app_strings.dart';
 import 'package:singleclin_mobile/features/dashboard/controllers/dashboard_controller.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
 import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/core/constants/app_strings.dart';
 
 class DashboardScreen extends GetView<DashboardController> {
   const DashboardScreen({super.key});

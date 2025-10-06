@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:singleclin_mobile/core/models/cache_entity.dart';
-import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:singleclin_mobile/core/models/cache_entity.dart';
 
 /// Centralized manager for Hive boxes organized by entity types
 ///

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:table_calendar/table_calendar.dart';
-
 import 'package:singleclin_mobile/core/services/api_service.dart';
-import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/features/discovery/models/booking.dart';
 import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
 import 'package:singleclin_mobile/features/discovery/models/service.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 /// Booking controller managing appointment scheduling and calendar integration
 class BookingController extends GetxController {

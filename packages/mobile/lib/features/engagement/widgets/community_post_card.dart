@@ -1,14 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:singleclin_mobile/features/engagement/models/community_post.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/community_post.dart';
 
 /// Community post card widget
 class CommunityPostCard extends StatelessWidget {
   const CommunityPostCard({
-    Key? key,
-    required this.post,
+    required this.post, super.key,
     this.onTap,
     this.onLike,
     this.onComment,
@@ -16,7 +15,7 @@ class CommunityPostCard extends StatelessWidget {
     this.onBookmark,
     this.onReport,
     this.isCompact = false,
-  }) : super(key: key);
+  });
   final CommunityPost post;
   final VoidCallback? onTap;
   final VoidCallback? onLike;
@@ -503,12 +502,11 @@ class CommunityPostCard extends StatelessWidget {
 /// Post comment widget
 class PostCommentCard extends StatelessWidget {
   const PostCommentCard({
-    Key? key,
-    required this.comment,
+    required this.comment, super.key,
     this.onLike,
     this.onReply,
     this.onReport,
-  }) : super(key: key);
+  });
   final PostComment comment;
   final VoidCallback? onLike;
   final VoidCallback? onReply;
@@ -710,12 +708,11 @@ class PostCommentCard extends StatelessWidget {
 /// Community event card
 class CommunityEventCard extends StatelessWidget {
   const CommunityEventCard({
-    Key? key,
-    required this.event,
+    required this.event, super.key,
     this.onJoin,
     this.onLeave,
     this.onTap,
-  }) : super(key: key);
+  });
   final CommunityEvent event;
   final VoidCallback? onJoin;
   final VoidCallback? onLeave;

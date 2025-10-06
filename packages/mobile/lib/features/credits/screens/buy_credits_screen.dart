@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/credits/controllers/buy_credits_controller.dart';
 import 'package:singleclin_mobile/features/credits/widgets/credit_package_card.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class BuyCreditsScreen extends StatelessWidget {
   const BuyCreditsScreen({super.key});

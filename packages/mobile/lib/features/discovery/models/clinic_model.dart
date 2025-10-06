@@ -7,18 +7,8 @@ class ClinicModel {
     required this.latitude,
     required this.longitude,
     required this.phone,
-    this.email,
+    required this.imageUrls, required this.rating, required this.reviewCount, required this.services, required this.specialties, required this.schedule, required this.isVerified, required this.isActive, required this.createdAt, required this.updatedAt, this.email,
     this.website,
-    required this.imageUrls,
-    required this.rating,
-    required this.reviewCount,
-    required this.services,
-    required this.specialties,
-    required this.schedule,
-    required this.isVerified,
-    required this.isActive,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory ClinicModel.fromJson(Map<String, dynamic> json) {
@@ -170,7 +160,7 @@ class ClinicSchedule {
   ClinicSchedule({required this.weekdays});
 
   factory ClinicSchedule.fromJson(Map<String, dynamic> json) {
-    Map<String, DaySchedule> schedules = {};
+    final Map<String, DaySchedule> schedules = {};
     json.forEach((key, value) {
       if (value != null) {
         schedules[key] = DaySchedule.fromJson(value);

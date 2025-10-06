@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/routes/app_routes.dart';
-import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
 
 class CustomBottomNav extends StatelessWidget {
   const CustomBottomNav({
-    Key? key,
-    required this.currentIndex,
-    required this.onTap,
-  }) : super(key: key);
+    required this.currentIndex, required this.onTap, super.key,
+  });
   final int currentIndex;
   final Function(int) onTap;
 

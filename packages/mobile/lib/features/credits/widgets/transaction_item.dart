@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
 
 class TransactionItem extends StatelessWidget {
   const TransactionItem({
-    super.key,
-    required this.transaction,
+    required this.transaction, super.key,
     this.onTap,
     this.showDate = true,
     this.compact = false,

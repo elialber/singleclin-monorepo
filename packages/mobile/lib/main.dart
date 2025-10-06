@@ -1,35 +1,34 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
-import 'package:singleclin_mobile/core/themes/app_theme.dart';
-import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
+import 'package:singleclin_mobile/core/themes/app_theme.dart';
 import 'package:singleclin_mobile/data/services/api_client.dart';
-import 'package:singleclin_mobile/data/services/auth_service.dart';
 import 'package:singleclin_mobile/data/services/app_lifecycle_observer.dart';
-import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
-import 'package:singleclin_mobile/data/services/session_revocation_service.dart';
+import 'package:singleclin_mobile/data/services/auth_service.dart';
 import 'package:singleclin_mobile/data/services/firebase_initialization_service.dart';
-import 'package:singleclin_mobile/presentation/screens/splash_screen.dart';
+import 'package:singleclin_mobile/data/services/session_revocation_service.dart';
+import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
+import 'package:singleclin_mobile/features/appointment_booking/screens/appointment_booking_screen.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_details_screen.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_discovery_screen.dart';
+import 'package:singleclin_mobile/firebase_options.dart';
+import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/presentation/screens/auth/login_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/auth/register_screen.dart';
-import 'package:singleclin_mobile/presentation/screens/home_screen.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_discovery_screen.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_details_screen.dart';
-import 'package:singleclin_mobile/features/appointment_booking/screens/appointment_booking_screen.dart';
-import 'package:singleclin_mobile/temp_dashboard.dart';
-import 'package:singleclin_mobile/presentation/screens/profile_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/firebase_unavailable_screen.dart';
-import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/presentation/screens/home_screen.dart';
+import 'package:singleclin_mobile/presentation/screens/profile_screen.dart';
+import 'package:singleclin_mobile/presentation/screens/splash_screen.dart';
 import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
-import 'package:singleclin_mobile/core/utils/app_bindings.dart';
-import 'package:singleclin_mobile/firebase_options.dart';
+import 'package:singleclin_mobile/temp_dashboard.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

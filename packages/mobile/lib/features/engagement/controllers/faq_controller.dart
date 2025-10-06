@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/features/engagement/models/faq_item.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/engagement/models/faq_item.dart';
 
 /// Controller for FAQ and knowledge base
 class FaqController extends GetxController {

@@ -1,12 +1,12 @@
 name: singleclin_mobile
-description: "SingleClin - Plataforma de saúde e bem-estar com sistema de créditos SG"
+description: 'SingleClin - Plataforma de saúde e bem-estar com sistema de créditos SG'
 publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
-  flutter: ">=3.19.0"
+  flutter: '>=3.19.0'
 
 dependencies:
   flutter:
@@ -19,32 +19,32 @@ dependencies:
   photo_view: ^0.15.0
   shimmer: ^3.0.0
   lottie: ^3.1.0
-  
+
   # State Management & Navigation
   get: ^4.6.6
-  
+
   # Networking
   dio: ^5.7.0
   connectivity_plus: ^6.0.5
-  
+
   # Storage & Cache
   shared_preferences: ^2.3.3
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.4
-  
+
   # Authentication
   firebase_core: ^4.1.0
   firebase_auth: ^6.0.2
   google_sign_in: ^7.1.1
   sign_in_with_apple: ^7.0.1
   crypto: ^3.0.5
-  
+
   # Location Services
   geolocator: ^14.0.2
   geocoding: ^4.0.0
   google_maps_flutter: ^2.9.0
-  
+
   # Media & File Handling
   image_picker: ^1.1.2
   file_picker: ^10.3.2
@@ -53,49 +53,55 @@ dependencies:
   path: ^1.9.0
   mime: ^2.0.0
   flutter_image_compress: ^2.3.0
-  
+
   # QR Code
   qr_flutter: ^4.1.0
   # mobile_scanner: ^7.0.1
-  
+
   # Date & Time
   intl: ^0.20.2
   table_calendar: ^3.1.2
-  
+
   # UI Components
   flutter_rating_bar: ^4.0.1
   pin_code_fields: ^8.0.1
   smooth_page_indicator: ^1.2.0
   pull_to_refresh: ^2.0.0
   infinite_scroll_pagination: ^5.1.1
-  
+
   # Utilities
   equatable: ^2.0.5
   url_launcher: ^6.3.0
   share_plus: ^11.1.0
   device_info_plus: ^11.5.0
   package_info_plus: ^8.0.2
-  
+
   # Notifications
   firebase_messaging: ^16.0.1
   flutter_local_notifications: ^19.4.1
-  
+
   # Audio/Video
   audioplayers: ^6.1.0
-  
+
   # Security
   flutter_secure_storage: ^9.2.2
-  
+
   # Analytics & Crashlytics
   # firebase_analytics: ^12.0.1
   firebase_crashlytics: ^5.0.1
-  
+
   # Performance
   firebase_performance: ^0.11.0+1
-  
+
   # WebView
   webview_flutter: ^4.9.0
 
+  dartz: any
+  uuid: any
+  go_router: any
+  mobile_scanner: any
+  screen_brightness: any
+  screenshot: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -113,7 +119,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -154,19 +159,19 @@ flutter:
 
 # App Icon Configuration
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: 'launcher_icon'
   ios: true
-  image_path: "assets/icons/app_icon.png"
+  image_path: 'assets/icons/app_icon.png'
   min_sdk_android: 21
   web:
     generate: true
-    image_path: "assets/icons/app_icon.png"
-    background_color: "#005156"
-    theme_color: "#005156"
+    image_path: 'assets/icons/app_icon.png'
+    background_color: '#005156'
+    theme_color: '#005156'
   windows:
     generate: true
-    image_path: "assets/icons/app_icon.png"
+    image_path: 'assets/icons/app_icon.png'
     icon_size: 48
   macos:
     generate: true
-    image_path: "assets/icons/app_icon.png"
+    image_path: 'assets/icons/app_icon.png'

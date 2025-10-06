@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/filters_controller.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
-import 'package:singleclin_mobile/features/discovery/widgets/clinic_card.dart';
-import 'package:singleclin_mobile/features/discovery/screens/map_view_screen.dart';
-import 'package:singleclin_mobile/features/discovery/screens/filters_screen.dart';
 import 'package:singleclin_mobile/features/discovery/screens/clinic_details_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/filters_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/map_view_screen.dart';
+import 'package:singleclin_mobile/features/discovery/widgets/clinic_card.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
 
 /// Main discovery screen with dual view mode (list/map) and search functionality
 class DiscoveryScreen extends StatefulWidget {

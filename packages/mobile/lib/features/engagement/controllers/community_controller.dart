@@ -1,10 +1,11 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:singleclin_mobile/features/engagement/models/community_post.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
 import 'package:singleclin_mobile/features/credits/controllers/credits_controller.dart';
+import 'package:singleclin_mobile/features/engagement/models/community_post.dart';
 
 /// Controller for community interactions and social features
 class CommunityController extends GetxController {

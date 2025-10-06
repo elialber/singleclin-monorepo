@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
 import 'package:singleclin_mobile/core/services/auth_service.dart';
 import 'package:singleclin_mobile/core/services/location_service.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
 

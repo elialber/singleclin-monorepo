@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_constants.dart';
+import 'package:singleclin_mobile/core/services/storage_service.dart';
+import 'package:singleclin_mobile/data/models/user_model.dart';
 import 'package:singleclin_mobile/data/services/auth_service.dart';
 import 'package:singleclin_mobile/data/services/user_api_service.dart';
 import 'package:singleclin_mobile/domain/entities/user_entity.dart';
-import 'package:singleclin_mobile/core/services/storage_service.dart';
-import 'package:singleclin_mobile/core/constants/app_constants.dart';
-import 'package:singleclin_mobile/data/models/user_model.dart';
 import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class AuthController extends GetxController {

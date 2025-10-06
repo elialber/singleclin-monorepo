@@ -10,7 +10,7 @@ class HealthRecord extends Equatable {
     required this.title,
     required this.description,
     required this.date,
-    this.clinicId,
+    required this.createdAt, required this.updatedAt, this.clinicId,
     this.clinicName,
     this.professionalId,
     this.professionalName,
@@ -24,8 +24,6 @@ class HealthRecord extends Equatable {
     this.tags = const [],
     this.status = HealthRecordStatus.active,
     this.metadata,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   /// Factory method to create from JSON

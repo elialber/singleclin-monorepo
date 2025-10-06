@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 
 class ClinicCard extends StatelessWidget {
-  const ClinicCard({Key? key, required this.clinic, this.onTap})
-    : super(key: key);
+  const ClinicCard({required this.clinic, super.key, this.onTap});
   final Clinic clinic;
   final VoidCallback? onTap;
 

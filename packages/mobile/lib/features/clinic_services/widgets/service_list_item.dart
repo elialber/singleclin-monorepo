@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:singleclin_mobile/features/clinic_services/models/clinic_service.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/clinic_services/models/clinic_service.dart';
 
 class ServiceListItem extends StatelessWidget {
   const ServiceListItem({
-    Key? key,
-    required this.service,
-    required this.userCredits,
-    required this.creditsLoaded,
-    required this.onBookPressed,
-  }) : super(key: key);
+    required this.service, required this.userCredits, required this.creditsLoaded, required this.onBookPressed, super.key,
+  });
   final ClinicService service;
   final int userCredits;
   final bool creditsLoaded;

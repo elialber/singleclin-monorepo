@@ -1,17 +1,15 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-
-import 'package:singleclin_mobile/core/services/location_service.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
-import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
+import 'package:singleclin_mobile/core/services/location_service.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
+import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
 
 /// Map controller managing Google Maps integration and marker management
 class MapController extends GetxController {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/profile/controllers/profile_controller.dart';
-import 'package:singleclin_mobile/features/profile/widgets/profile_header.dart';
 import 'package:singleclin_mobile/features/profile/widgets/lgpd_settings.dart';
+import 'package:singleclin_mobile/features/profile/widgets/profile_header.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 /// Profile Screen
 /// Main profile screen with user information and LGPD settings

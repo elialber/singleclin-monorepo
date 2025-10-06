@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
 
 /// Profile Header Widget
 /// Displays user photo, name, and completion progress
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
-    Key? key,
-    required this.profile,
+    required this.profile, super.key,
     this.isEditing = false,
     this.isUpdatingPhoto = false,
     this.onPhotoUpdate,
     this.onPhotoRemove,
-  }) : super(key: key);
+  });
   final UserProfile profile;
   final bool isEditing;
   final bool isUpdatingPhoto;

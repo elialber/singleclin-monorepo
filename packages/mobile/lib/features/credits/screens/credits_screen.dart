@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/credits/controllers/credits_controller.dart';
 import 'package:singleclin_mobile/features/credits/widgets/credit_balance_card.dart';
 import 'package:singleclin_mobile/features/credits/widgets/transaction_item.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});

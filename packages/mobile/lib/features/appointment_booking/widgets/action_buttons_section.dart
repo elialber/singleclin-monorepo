@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 
 class ActionButtonsSection extends StatefulWidget {
-  const ActionButtonsSection({Key? key, required this.clinic})
-    : super(key: key);
+  const ActionButtonsSection({required this.clinic, super.key});
   final Clinic clinic;
 
   @override

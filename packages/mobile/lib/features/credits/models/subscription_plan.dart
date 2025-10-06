@@ -13,16 +13,12 @@ class SubscriptionPlan {
     required this.monthlyPrice,
     required this.annualPrice,
     required this.features,
-    this.restrictions = const [],
-    required this.isPopular,
-    required this.isActive,
+    required this.isPopular, required this.isActive, required this.sortOrder, required this.category, this.restrictions = const [],
     this.hasFreeTrial = false,
     this.freeTrialDays = 0,
     this.maxClinics = 999,
     this.maxAppointmentsPerDay = 999,
     this.discountPercentage = 0,
-    required this.sortOrder,
-    required this.category,
   });
 
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) {
@@ -137,22 +133,12 @@ class UserSubscription {
     required this.id,
     required this.userId,
     required this.planId,
-    this.plan,
-    required this.status,
-    required this.billingCycle,
-    required this.startDate,
+    required this.status, required this.billingCycle, required this.startDate, required this.nextBillingDate, required this.creditsBalance, required this.creditsUsedThisMonth, required this.creditsTotal, required this.amountPaid, required this.createdAt, required this.updatedAt, this.plan,
     this.endDate,
-    required this.nextBillingDate,
     this.cancelDate,
     this.pauseDate,
-    required this.creditsBalance,
-    required this.creditsUsedThisMonth,
-    required this.creditsTotal,
-    required this.amountPaid,
     this.paymentMethodId,
     this.metadata,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory UserSubscription.fromJson(Map<String, dynamic> json) {

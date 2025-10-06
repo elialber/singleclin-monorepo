@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart';
-
 import 'package:singleclin_mobile/core/services/location_service.dart';
-import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
+import 'package:singleclin_mobile/features/discovery/models/filter_options.dart';
 
 /// Filters controller managing advanced filtering options and search refinement
 class FiltersController extends GetxController {

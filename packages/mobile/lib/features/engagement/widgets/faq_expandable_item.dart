@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:singleclin_mobile/features/engagement/models/faq_item.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/faq_item.dart';
 
 /// Expandable FAQ item widget with smooth animations
 class FaqExpandableItem extends StatefulWidget {
   const FaqExpandableItem({
-    Key? key,
-    required this.item,
-    required this.isExpanded,
-    required this.onTap,
+    required this.item, required this.isExpanded, required this.onTap, super.key,
     this.onHelpfulVote,
     this.onFeedback,
     this.relatedItems,
-  }) : super(key: key);
+  });
   final FaqItem item;
   final bool isExpanded;
   final VoidCallback onTap;
@@ -523,11 +519,9 @@ class _FaqExpandableItemState extends State<FaqExpandableItem>
 /// Compact FAQ item for search results
 class CompactFaqItem extends StatelessWidget {
   const CompactFaqItem({
-    Key? key,
-    required this.item,
-    required this.onTap,
+    required this.item, required this.onTap, super.key,
     this.highlightText,
-  }) : super(key: key);
+  });
   final FaqItem item;
   final VoidCallback onTap;
   final String? highlightText;
@@ -660,11 +654,9 @@ class CompactFaqItem extends StatelessWidget {
 /// FAQ category filter chips
 class FaqCategoryChips extends StatelessWidget {
   const FaqCategoryChips({
-    Key? key,
+    required this.categoryCounts, required this.onCategorySelected, super.key,
     this.selectedCategory,
-    required this.categoryCounts,
-    required this.onCategorySelected,
-  }) : super(key: key);
+  });
   final FaqCategory? selectedCategory;
   final Map<FaqCategory, int> categoryCounts;
   final Function(FaqCategory?) onCategorySelected;

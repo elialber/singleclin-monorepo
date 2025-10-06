@@ -1,6 +1,6 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 
 class ClinicDiscoveryService {
   final ClinicApiService _clinicApiService = ClinicApiService();

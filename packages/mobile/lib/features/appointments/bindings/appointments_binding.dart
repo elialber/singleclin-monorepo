@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/features/appointments/controllers/appointments_controller.dart';
 import 'package:singleclin_mobile/features/appointments/controllers/appointment_details_controller.dart';
+import 'package:singleclin_mobile/features/appointments/controllers/appointments_controller.dart';
 import 'package:singleclin_mobile/features/appointments/controllers/cancellation_controller.dart';
 
 /// Appointments Binding

@@ -1,21 +1,19 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
+import 'package:flutter/material.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
 import 'package:singleclin_mobile/features/discovery/models/service.dart';
+import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
 
 /// Service card widget optimized for mobile touch interactions
 class ServiceCard extends StatelessWidget {
   const ServiceCard({
-    Key? key,
-    required this.service,
+    required this.service, super.key,
     this.onTap,
     this.onBookPressed,
     this.compact = false,
     this.showDescription = true,
     this.userSGCredits,
-  }) : super(key: key);
+  });
   final Service service;
   final VoidCallback? onTap;
   final VoidCallback? onBookPressed;

@@ -1,6 +1,6 @@
-import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 
 class LocationService extends GetxService {

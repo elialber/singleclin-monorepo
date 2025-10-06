@@ -1,12 +1,13 @@
 import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:singleclin_mobile/features/engagement/models/feedback_report.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
 import 'package:singleclin_mobile/features/credits/controllers/credits_controller.dart';
+import 'package:singleclin_mobile/features/engagement/models/feedback_report.dart';
 
 /// Controller for app feedback and improvement suggestions
 class FeedbackController extends GetxController {

@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/appointment_booking/widgets/action_buttons_section.dart';
 import 'package:singleclin_mobile/features/appointment_booking/widgets/clinic_image_carousel.dart';
 import 'package:singleclin_mobile/features/appointment_booking/widgets/clinic_info_section.dart';
-import 'package:singleclin_mobile/features/appointment_booking/widgets/action_buttons_section.dart';
 import 'package:singleclin_mobile/features/appointment_booking/widgets/reviews_section.dart';
 import 'package:singleclin_mobile/features/appointment_booking/widgets/subscription_section.dart';
-import 'package:singleclin_mobile/features/appointment_booking/widgets/location_section.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/features/clinic_services/screens/clinic_services_screen.dart';
-import 'package:singleclin_mobile/core/constants/app_colors.dart';
 
 class AppointmentBookingScreen extends StatelessWidget {
-  const AppointmentBookingScreen({Key? key, required this.clinic})
-    : super(key: key);
+  const AppointmentBookingScreen({required this.clinic, super.key});
   final Clinic clinic;
 
   @override

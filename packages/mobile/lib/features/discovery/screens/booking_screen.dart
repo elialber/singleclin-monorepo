@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:table_calendar/table_calendar.dart';
-
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
-import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/booking_controller.dart';
 import 'package:singleclin_mobile/features/discovery/models/booking.dart';
 import 'package:singleclin_mobile/features/discovery/widgets/service_card.dart';
+import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
+import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 /// Booking screen with step-by-step appointment scheduling
 class BookingScreen extends StatefulWidget {

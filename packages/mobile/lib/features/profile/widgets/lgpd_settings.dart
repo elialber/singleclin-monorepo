@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
 
 /// LGPD Settings Widget
 /// Provides LGPD compliance controls and information
 class LgpdSettings extends StatelessWidget {
   const LgpdSettings({
-    Key? key,
-    required this.privacySettings,
+    required this.privacySettings, super.key,
     this.onConsentUpdate,
     this.onDataExport,
     this.onAccountDeletion,
     this.isEditable = true,
-  }) : super(key: key);
+  });
   final PrivacySettings privacySettings;
   final Function(String, bool)? onConsentUpdate;
   final VoidCallback? onDataExport;

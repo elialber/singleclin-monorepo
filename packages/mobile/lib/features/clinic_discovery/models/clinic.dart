@@ -10,12 +10,7 @@ class Clinic {
     required this.imageUrl,
     required this.images,
     required this.isAvailable,
-    this.nextAvailableSlot,
-    required this.type,
-    required this.services,
-    required this.contact,
-    required this.coordinates,
-    required this.isPartner,
+    required this.type, required this.services, required this.contact, required this.coordinates, required this.isPartner, this.nextAvailableSlot,
     this.description,
   });
 
@@ -63,7 +58,7 @@ class Clinic {
     // First check for featuredImage from real API response
     if (dto['featuredImage'] != null &&
         dto['featuredImage'] is Map<String, dynamic>) {
-      var featuredImage = dto['featuredImage'] as Map<String, dynamic>;
+      final featuredImage = dto['featuredImage'] as Map<String, dynamic>;
       if (featuredImage['imageUrl'] != null &&
           featuredImage['imageUrl'].toString().isNotEmpty) {
         mainImageUrl = featuredImage['imageUrl'];
@@ -76,14 +71,14 @@ class Clinic {
     if (dto['images'] != null &&
         dto['images'] is List &&
         (dto['images'] as List).isNotEmpty) {
-      var imagesList = dto['images'] as List;
+      final imagesList = dto['images'] as List;
       print('📸 Found additional images list with ${imagesList.length} items');
 
       // Extract all image URLs from ClinicImageDto objects
-      for (var imageItem in imagesList) {
+      for (final imageItem in imagesList) {
         if (imageItem is Map<String, dynamic> &&
             imageItem['imageUrl'] != null) {
-          String imageUrl = imageItem['imageUrl'];
+          final String imageUrl = imageItem['imageUrl'];
           if (!allImages.contains(imageUrl)) {
             print('🖼️ Adding additional image URL: $imageUrl');
             allImages.add(imageUrl);
@@ -113,7 +108,7 @@ class Clinic {
 
     // Parse services and extract categories from backend
     List<Map<String, dynamic>> clinicServices = [];
-    Set<String> serviceCategories = {};
+    final Set<String> serviceCategories = {};
 
     print('🛠️ Processing services for clinic: ${dto['name']}');
     if (dto['services'] != null && dto['services'] is List) {
@@ -151,21 +146,20 @@ class Clinic {
     print('🎯 Final categories for ${dto['name']}: $serviceCategories');
 
     // Create contact info from backend fields
-    ContactInfo contact = ContactInfo(
+    final ContactInfo contact = ContactInfo(
       phone: dto['phoneNumber'] ?? '',
       email: dto['email'] ?? '',
       whatsapp: dto['phoneNumber'], // Use phone as whatsapp fallback
-      website: null,
     );
 
     // Create coordinates from backend latitude/longitude
-    Location coordinates = Location(
+    final Location coordinates = Location(
       latitude: (dto['latitude'] ?? 0).toDouble(),
       longitude: (dto['longitude'] ?? 0).toDouble(),
     );
 
     // Use real data from API, only add fallback if completely missing
-    bool needsFallback = allImages.isEmpty && clinicServices.isEmpty;
+    final bool needsFallback = allImages.isEmpty && clinicServices.isEmpty;
 
     print(
       '🧪 Using real API data for ${dto['name']}. Needs fallback: $needsFallback',
@@ -209,7 +203,6 @@ class Clinic {
       contact: contact,
       coordinates: coordinates,
       isPartner: clinicType == ClinicType.partner,
-      description: null, // TODO: add description field to backend
     );
   }
   final String id;

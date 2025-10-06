@@ -22,10 +22,7 @@ class WalletBalance {
     required this.userId,
     required this.currency,
     required this.balance,
-    this.lockedBalance = 0,
-    required this.lifetimeEarned,
-    required this.lifetimeSpent,
-    required this.lastUpdated,
+    required this.lifetimeEarned, required this.lifetimeSpent, required this.lastUpdated, this.lockedBalance = 0,
     this.metadata,
   });
 
@@ -143,10 +140,9 @@ class WalletTransaction {
     required this.amount,
     required this.balanceAfter,
     required this.description,
-    this.referenceId,
+    required this.createdAt, this.referenceId,
     this.referenceType,
     this.metadata,
-    required this.createdAt,
   });
 
   factory WalletTransaction.fromJson(Map<String, dynamic> json) {

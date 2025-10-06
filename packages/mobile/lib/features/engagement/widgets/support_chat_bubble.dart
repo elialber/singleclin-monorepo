@@ -1,18 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:singleclin_mobile/features/engagement/models/support_ticket.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/engagement/models/support_ticket.dart';
 
 /// Chat bubble widget for support conversations
 class SupportChatBubble extends StatelessWidget {
   const SupportChatBubble({
-    Key? key,
-    required this.message,
-    required this.isUser,
+    required this.message, required this.isUser, super.key,
     this.showTimestamp = true,
     this.showSenderName = true,
-  }) : super(key: key);
+  });
   final TicketMessage message;
   final bool isUser;
   final bool showTimestamp;
@@ -313,11 +311,9 @@ class SupportChatBubble extends StatelessWidget {
 /// Live chat bubble for real-time support
 class LiveChatBubble extends StatelessWidget {
   const LiveChatBubble({
-    Key? key,
-    required this.message,
-    required this.isUser,
+    required this.message, required this.isUser, super.key,
     this.showAvatar = true,
-  }) : super(key: key);
+  });
   final ChatMessage message;
   final bool isUser;
   final bool showAvatar;
@@ -395,9 +391,9 @@ class LiveChatBubble extends StatelessWidget {
 
 /// Typing indicator for live chat
 class TypingIndicator extends StatefulWidget {
-  final String senderName;
 
   const TypingIndicator({super.key, this.senderName = 'Atendente'});
+  final String senderName;
 
   @override
   State<TypingIndicator> createState() => _TypingIndicatorState();
@@ -505,14 +501,13 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
 /// Chat status indicator
 class ChatStatusIndicator extends StatelessWidget {
-  final ChatStatus status;
-  final int queuePosition;
 
   const ChatStatusIndicator({
-    super.key,
-    required this.status,
+    required this.status, super.key,
     this.queuePosition = 0,
   });
+  final ChatStatus status;
+  final int queuePosition;
 
   @override
   Widget build(BuildContext context) {
@@ -594,10 +589,8 @@ class ChatStatusIndicator extends StatelessWidget {
 /// Quick reply buttons for support chat
 class QuickReplyButtons extends StatelessWidget {
   const QuickReplyButtons({
-    Key? key,
-    required this.replies,
-    required this.onReplySelected,
-  }) : super(key: key);
+    required this.replies, required this.onReplySelected, super.key,
+  });
   final List<String> replies;
   final Function(String) onReplySelected;
 

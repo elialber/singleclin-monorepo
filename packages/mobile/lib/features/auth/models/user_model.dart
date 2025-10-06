@@ -3,16 +3,12 @@ class UserModel {
     required this.id,
     required this.email,
     required this.fullName,
-    this.phone,
+    required this.sgCredits, required this.isActive, required this.createdAt, required this.updatedAt, this.phone,
     this.profileImageUrl,
     this.birthDate,
     this.address,
     this.emergencyContact,
-    required this.sgCredits,
     this.creditsRenewDate,
-    required this.isActive,
-    required this.createdAt,
-    required this.updatedAt,
     this.subscription,
     this.preferences,
   });
@@ -125,9 +121,7 @@ class UserSubscription {
     required this.monthlyCredits,
     required this.monthlyPrice,
     required this.startDate,
-    this.endDate,
-    required this.isActive,
-    required this.status,
+    required this.isActive, required this.status, this.endDate,
   });
 
   factory UserSubscription.fromJson(Map<String, dynamic> json) {

@@ -62,10 +62,7 @@ class CacheMetadata {
     required this.key,
     required this.cachedAt,
     required this.lastAccessed,
-    this.expiresAt,
-    required this.accessCount,
-    required this.entityType,
-    required this.size,
+    required this.accessCount, required this.entityType, required this.size, this.expiresAt,
     this.customData,
   });
 
@@ -165,8 +162,7 @@ class PendingOperation {
     required this.operation,
     required this.boxType,
     required this.entityKey,
-    this.data,
-    required this.createdAt,
+    required this.createdAt, this.data,
     this.retryCount = 0,
     this.lastRetryAt,
     this.errorMessage,

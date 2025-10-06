@@ -15,13 +15,10 @@ class SessionRevocationService {
     FirebaseMessaging? messaging,
     FirebaseAuth? firebaseAuth,
     Future<void> Function(String message)? onRevocation,
-    TokenRefreshService? tokenRefreshService,
-    StorageService? storageService,
-    AuthService? authService,
   })  : _messaging = messaging ?? FirebaseMessaging.instance,
         _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
         _onRevocation = onRevocation ??
-            (message) async {
+            message {
               if (kDebugMode) {
                 print('SessionRevocationService: revocation callback missing -> $message');
               }

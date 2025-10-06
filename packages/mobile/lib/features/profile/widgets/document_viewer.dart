@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:singleclin_mobile/features/profile/models/medical_document.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/profile/models/medical_document.dart';
 
 /// Document Viewer Widget
 /// Displays document information with preview and actions
 class DocumentViewer extends StatelessWidget {
   const DocumentViewer({
-    Key? key,
-    required this.document,
+    required this.document, super.key,
     this.onTap,
     this.onDownload,
     this.onShare,
     this.onDelete,
-  }) : super(key: key);
+  });
   final MedicalDocument document;
   final VoidCallback? onTap;
   final VoidCallback? onDownload;

@@ -1,26 +1,21 @@
 import 'package:get/get.dart';
-
-// Only core working screens
-import 'package:singleclin_mobile/features/onboarding/screens/splash_screen.dart';
-import 'package:singleclin_mobile/features/onboarding/screens/onboarding_screen.dart';
+import 'package:singleclin_mobile/features/appointments/bindings/appointments_binding.dart';
+import 'package:singleclin_mobile/features/appointments/screens/appointment_details_screen.dart';
+// Only working appointment screens
+import 'package:singleclin_mobile/features/appointments/screens/appointments_screen.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_binding.dart';
+import 'package:singleclin_mobile/features/auth/screens/forgot_password_screen.dart';
 import 'package:singleclin_mobile/features/auth/screens/login_screen.dart';
 import 'package:singleclin_mobile/features/auth/screens/register_screen.dart';
-import 'package:singleclin_mobile/features/auth/screens/forgot_password_screen.dart';
-
+import 'package:singleclin_mobile/features/dashboard/controllers/dashboard_binding.dart';
 // Dashboard screens
 import 'package:singleclin_mobile/features/dashboard/screens/dashboard_screen.dart';
 import 'package:singleclin_mobile/features/dashboard/screens/home_screen.dart';
-
-// Only working appointment screens
-import 'package:singleclin_mobile/features/appointments/screens/appointments_screen.dart';
-import 'package:singleclin_mobile/features/appointments/screens/appointment_details_screen.dart';
-
 // Working bindings only
 import 'package:singleclin_mobile/features/onboarding/controllers/onboarding_binding.dart';
-import 'package:singleclin_mobile/features/auth/controllers/auth_binding.dart';
-import 'package:singleclin_mobile/features/dashboard/controllers/dashboard_binding.dart';
-import 'package:singleclin_mobile/features/appointments/bindings/appointments_binding.dart';
-
+import 'package:singleclin_mobile/features/onboarding/screens/onboarding_screen.dart';
+// Only core working screens
+import 'package:singleclin_mobile/features/onboarding/screens/splash_screen.dart';
 import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class AppPagesMinimal {

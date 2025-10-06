@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/features/discovery/controllers/map_controller.dart';
 import 'package:singleclin_mobile/features/discovery/controllers/discovery_controller.dart';
+import 'package:singleclin_mobile/features/discovery/controllers/map_controller.dart';
 import 'package:singleclin_mobile/features/discovery/models/clinic.dart';
 import 'package:singleclin_mobile/features/discovery/widgets/clinic_card.dart';
 
 /// Map view screen with Google Maps integration and interactive markers
 class MapViewScreen extends StatefulWidget {
-  const MapViewScreen({Key? key, required this.clinics, this.onClinicTap})
-    : super(key: key);
+  const MapViewScreen({required this.clinics, super.key, this.onClinicTap});
   final List<Clinic> clinics;
   final Function(Clinic)? onClinicTap;
 
