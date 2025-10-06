@@ -51,7 +51,7 @@ public class QRCodeService : IQRCodeService
 
             // Check cache first (1-minute cache to avoid unnecessary regeneration)
             var cacheKey = $"{QR_CACHE_PREFIX}{userPlanId}_{userId}_{size}_{expirationMinutes}";
-            if (_memoryCache.TryGetValue(cacheKey, out QRCodeResult? cachedResult))
+            if (_memoryCache.TryGetValue(cacheKey, out QRCodeResult? cachedResult) && cachedResult != null)
             {
                 _logger.LogDebug("Returning cached QR Code for user plan {UserPlanId}", userPlanId);
                 return cachedResult;

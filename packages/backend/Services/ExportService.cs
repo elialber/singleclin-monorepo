@@ -58,7 +58,7 @@ namespace SingleClin.API.Services
 
                 // Add report data based on type
                 var startRow = request.Options.IncludeFilters ? 8 : 4;
-                var dataEndRow = await AddReportDataToExcel(worksheet, reportData, request, startRow);
+                var dataEndRow = AddReportDataToExcel(worksheet, reportData, request, startRow);
 
                 // Add charts if requested
                 if (request.Options.IncludeCharts && reportData.ChartData != null)
@@ -99,7 +99,7 @@ namespace SingleClin.API.Services
             }
         }
 
-        public async Task<ExportResponse> ExportToPdfAsync<T>(
+        public Task<ExportResponse> ExportToPdfAsync<T>(
             ReportResponse<T> reportData,
             ExportRequest request,
             CancellationToken cancellationToken = default) where T : class
@@ -197,7 +197,7 @@ namespace SingleClin.API.Services
                 var pdf = document.GeneratePdf();
                 var fileName = GenerateFileName(request, "pdf");
 
-                return new ExportResponse
+                var response = new ExportResponse
                 {
                     Success = true,
                     FileName = fileName,
@@ -211,15 +211,19 @@ namespace SingleClin.API.Services
                         ["Format"] = "PDF"
                     }
                 };
+
+                return Task.FromResult(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error exporting report to PDF");
-                return new ExportResponse
+                var failureResponse = new ExportResponse
                 {
                     Success = false,
                     Warnings = new List<string> { ex.Message }
                 };
+
+                return Task.FromResult(failureResponse);
             }
         }
 
@@ -242,7 +246,7 @@ namespace SingleClin.API.Services
                     {
                         var method = GetType().GetMethod(nameof(AddReportDataToExcel), BindingFlags.NonPublic | BindingFlags.Instance);
                         var genericMethod = method?.MakeGenericMethod(reportType.GetGenericArguments()[0]);
-                        await (Task<int>)genericMethod?.Invoke(this, new object[] { worksheet, report.Value, request, 4 })!;
+                        genericMethod?.Invoke(this, new object[] { worksheet, report.Value, request, 4 });
                     }
 
                     FormatExcelWorksheet(worksheet);
@@ -302,7 +306,7 @@ namespace SingleClin.API.Services
             worksheet.Cells[$"B{startRow + 2}"].Value = request.TimeZone;
         }
 
-        private async Task<int> AddReportDataToExcel<T>(
+        private int AddReportDataToExcel<T>(
             ExcelWorksheet worksheet,
             ReportResponse<T> reportData,
             ExportRequest request,

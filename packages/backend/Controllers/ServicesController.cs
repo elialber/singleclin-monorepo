@@ -37,7 +37,7 @@ public class ServicesController : BaseController
     [ProducesResponseType(400)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetServicesByClinic([Required] Guid clinicId)
+    public IActionResult GetServicesByClinic([Required] Guid clinicId)
     {
         try
         {
@@ -74,7 +74,7 @@ public class ServicesController : BaseController
     [ProducesResponseType(400)]
     [ProducesResponseType(401)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetServiceById([Required] Guid serviceId)
+    public IActionResult GetServiceById([Required] Guid serviceId)
     {
         try
         {
@@ -114,7 +114,7 @@ public class ServicesController : BaseController
     [ProducesResponseType(typeof(IEnumerable<ClinicServiceDto>), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(401)]
-    public async Task<IActionResult> SearchServices(
+    public IActionResult SearchServices(
         [FromQuery] string? query = null,
         [FromQuery] string? category = null,
         [FromQuery] Guid? clinicId = null,
@@ -218,7 +218,7 @@ public class ServicesController : BaseController
     )]
     [ProducesResponseType(typeof(IEnumerable<string>), 200)]
     [ProducesResponseType(401)]
-    public async Task<IActionResult> GetServiceCategories()
+    public IActionResult GetServiceCategories()
     {
         try
         {

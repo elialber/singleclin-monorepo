@@ -3083,7 +3083,7 @@
             When the clinic was last updated
             </summary>
         </member>
-        <member name="P:SingleClin.API.DTOs.Clinic.ClinicResponseDto.ImageUrl">
+        <member name="F:SingleClin.API.DTOs.Clinic.ClinicResponseDto._legacyImageUrl">
             <summary>
             URL da imagem/logo da clínica (DEPRECATED - use Images collection)
             </summary>

@@ -364,7 +364,7 @@ namespace SingleClin.API.Controllers
 
                     try
                     {
-                        object reportData = reportType switch
+                        object? reportData = reportType switch
                         {
                             ReportType.UsageByPeriod => await _reportService.GenerateUsageReportAsync(reportRequest),
                             ReportType.ClinicRanking => await _reportService.GenerateClinicRankingAsync(reportRequest),
@@ -373,7 +373,7 @@ namespace SingleClin.API.Controllers
                             _ => null
                         };
 
-                        if (reportData != null)
+                        if (reportData is not null)
                         {
                             reports.Add(GetReportTitle(reportType), reportData);
                         }

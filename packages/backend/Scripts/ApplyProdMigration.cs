@@ -45,7 +45,8 @@ namespace SingleClin.API.Scripts
                 );";
 
             using var tableExistsCmd = new NpgsqlCommand(tableExistsQuery, connection);
-            var tableExists = (bool)await tableExistsCmd.ExecuteScalarAsync();
+            var tableExistsResult = await tableExistsCmd.ExecuteScalarAsync();
+            var tableExists = tableExistsResult as bool? ?? false;
 
             if (!tableExists)
             {
@@ -63,7 +64,8 @@ namespace SingleClin.API.Scripts
                 );";
 
             using var columnExistsCmd = new NpgsqlCommand(columnExistsQuery, connection);
-            var columnExists = (bool)await columnExistsCmd.ExecuteScalarAsync();
+            var columnExistsResult = await columnExistsCmd.ExecuteScalarAsync();
+            var columnExists = columnExistsResult as bool? ?? false;
 
             if (columnExists)
             {
@@ -85,7 +87,8 @@ namespace SingleClin.API.Scripts
 
             // Verificar se foi adicionada corretamente
             using var verifyCmd = new NpgsqlCommand(columnExistsQuery, connection);
-            var verifyResult = (bool)await verifyCmd.ExecuteScalarAsync();
+            var verifyScalar = await verifyCmd.ExecuteScalarAsync();
+            var verifyResult = verifyScalar as bool? ?? false;
 
             if (verifyResult)
             {
@@ -94,7 +97,13 @@ namespace SingleClin.API.Scripts
                 // Contar registros na tabela
                 var countQuery = "SELECT COUNT(*) FROM \"ClinicServices\"";
                 using var countCmd = new NpgsqlCommand(countQuery, connection);
-                var recordCount = (long)await countCmd.ExecuteScalarAsync();
+                var countScalar = await countCmd.ExecuteScalarAsync();
+                var recordCount = countScalar switch
+                {
+                    long longValue => longValue,
+                    int intValue => intValue,
+                    _ => Convert.ToInt64(countScalar ?? 0)
+                };
 
                 Console.WriteLine($"📊 Total de registros na tabela ClinicServices: {recordCount}");
             }

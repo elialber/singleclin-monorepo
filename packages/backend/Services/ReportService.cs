@@ -5,6 +5,7 @@ using SingleClin.API.Data.Models;
 using SingleClin.API.DTOs.Report;
 using SingleClin.API.DTOs.Common;
 using System.Diagnostics;
+using System.Linq;
 
 namespace SingleClin.API.Services
 {
@@ -105,7 +106,8 @@ namespace SingleClin.API.Services
 
                 if (request.ServiceTypes?.Any() == true)
                 {
-                    transactionsQuery = transactionsQuery.Where(t => request.ServiceTypes.Contains(t.ServiceType));
+                    transactionsQuery = transactionsQuery
+                        .Where(t => t.ServiceType != null && request.ServiceTypes.Contains(t.ServiceType));
                 }
 
                 // Get period data based on aggregation level
@@ -480,7 +482,7 @@ namespace SingleClin.API.Services
             }
         }
 
-        public async Task<byte[]> ExportReportAsync(
+        public Task<byte[]> ExportReportAsync(
             object reportData,
             ExportFormat format,
             CancellationToken cancellationToken = default)
@@ -490,7 +492,7 @@ namespace SingleClin.API.Services
             throw new NotImplementedException("Export functionality will be implemented in a future task");
         }
 
-        public async Task<List<ReportTypeInfo>> GetAvailableReportTypesAsync(string userRole)
+        public Task<List<ReportTypeInfo>> GetAvailableReportTypesAsync(string userRole)
         {
             var reportTypes = new List<ReportTypeInfo>
             {
@@ -533,9 +535,11 @@ namespace SingleClin.API.Services
             };
 
             // Filter by role
-            return await Task.FromResult(reportTypes
+            var filteredReports = reportTypes
                 .Where(rt => rt.RequiredRoles.Contains(userRole))
-                .ToList());
+                .ToList();
+
+            return Task.FromResult(filteredReports);
         }
 
         public async Task ClearReportCacheAsync(ReportType? reportType = null)

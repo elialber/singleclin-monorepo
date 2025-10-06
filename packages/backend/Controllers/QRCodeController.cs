@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SingleClin.API.DTOs;
 using SingleClin.API.DTOs.QRCode;
@@ -84,7 +85,9 @@ public class QRCodeController : BaseController
             if (!userPlan)
             {
                 _logger.LogWarning("User {UserId} has no valid plan for QR Code generation", userId);
-                return Forbid(ResponseWrapper<object>.CreateFailure("No valid plan found or plan is inactive").ToString());
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    ResponseWrapper<object>.CreateFailure("No valid plan found or plan is inactive"));
             }
 
             // Generate QR Code using orchestrator service

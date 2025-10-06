@@ -385,7 +385,7 @@ namespace SingleClin.API.Services
             }
         }
 
-        public async Task<bool> IsWithinQuietHoursAsync(CancellationToken cancellationToken = default)
+        public Task<bool> IsWithinQuietHoursAsync(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -396,17 +396,17 @@ namespace SingleClin.API.Services
                 // Handle quiet hours that span midnight
                 if (startTime > endTime)
                 {
-                    return now >= startTime || now <= endTime;
+                    return Task.FromResult(now >= startTime || now <= endTime);
                 }
                 else
                 {
-                    return now >= startTime && now <= endTime;
+                    return Task.FromResult(now >= startTime && now <= endTime);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking quiet hours, defaulting to false");
-                return false;
+                return Task.FromResult(false);
             }
         }
 

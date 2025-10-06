@@ -80,7 +80,7 @@ public class AuditingInterceptor : SaveChangesInterceptor
         }
     }
 
-    private static object GetPrimaryKeyValue(EntityEntry entry)
+    private static object? GetPrimaryKeyValue(EntityEntry entry)
     {
         var keyProperties = entry.Metadata.FindPrimaryKey()?.Properties;
         if (keyProperties == null || !keyProperties.Any())

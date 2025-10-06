@@ -1,4 +1,5 @@
 using SingleClin.API.Data.Models.Enums;
+using System.Linq;
 
 namespace SingleClin.API.DTOs.Clinic;
 
@@ -70,8 +71,14 @@ public class ClinicResponseDto
     /// <summary>
     /// URL da imagem/logo da clínica (DEPRECATED - use Images collection)
     /// </summary>
+    private string? _legacyImageUrl;
+
     [Obsolete("Use Images collection instead. Will be removed in future version.")]
-    public string? ImageUrl { get; set; }
+    public string? ImageUrl
+    {
+        get => _legacyImageUrl ?? FeaturedImage?.ImageUrl;
+        set => _legacyImageUrl = value;
+    }
 
     /// <summary>
     /// Collection of images associated with this clinic
@@ -102,7 +109,7 @@ public class ClinicResponseDto
     /// Indicates if the clinic has an image (backward compatibility)
     /// </summary>
     [Obsolete("Use HasImages instead. Will be removed in future version.")]
-    public bool HasImage => HasImages || !string.IsNullOrEmpty(ImageUrl);
+    public bool HasImage => HasImages || !string.IsNullOrEmpty(_legacyImageUrl);
 
     /// <summary>
     /// Type display name for UI

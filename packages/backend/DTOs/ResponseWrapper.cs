@@ -117,7 +117,7 @@ public class ResponseWrapper : ResponseWrapper<object>
     }
 
     // Alias methods for backward compatibility
-    public static ResponseWrapper CreateSuccess(object? data = null, string? message = null, int statusCode = 200)
+    public new static ResponseWrapper CreateSuccess(object? data = null, string? message = null, int statusCode = 200)
     {
         return new ResponseWrapper
         {

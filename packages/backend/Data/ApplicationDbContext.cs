@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data.Models;
+using System.Text.RegularExpressions;
 
 namespace SingleClin.API.Data;
 
@@ -153,12 +154,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         }
     }
 
-    private static string ToSnakeCase(string input)
+    private static string? ToSnakeCase(string? input)
     {
         if (string.IsNullOrEmpty(input))
+        {
             return input;
+        }
 
-        var startUnderscores = System.Text.RegularExpressions.Regex.Match(input, @"^_+");
-        return startUnderscores + System.Text.RegularExpressions.Regex.Replace(input, @"([a-z0-9])([A-Z])", "$1_$2").ToLower();
+        var startUnderscores = Regex.Match(input, @"^_+").Value;
+        var snakeCased = Regex.Replace(input, @"([a-z0-9])([A-Z])", "$1_$2").ToLower();
+        return startUnderscores + snakeCased;
     }
 }

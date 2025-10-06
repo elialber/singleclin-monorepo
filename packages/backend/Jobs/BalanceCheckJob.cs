@@ -30,13 +30,13 @@ namespace SingleClin.API.Jobs
         /// <summary>
         /// Executes the balance check job
         /// </summary>
-        public async Task ExecuteAsync()
+        public Task ExecuteAsync()
         {
             try
             {
                 _logger.LogInformation("Balance check job is temporarily disabled due to database schema issues");
                 // TODO: Re-enable after fixing User.ApplicationUserId column mapping issue
-                return;
+                return Task.CompletedTask;
 
                 /*
                 _logger.LogInformation("Starting balance check job execution at {Timestamp}", DateTime.UtcNow);

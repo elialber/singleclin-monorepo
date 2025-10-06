@@ -15,6 +15,7 @@ using SingleClin.API.Data.Models;
 using SingleClin.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.Linq;
 
 namespace SingleClin.API.Controllers;
 
@@ -216,6 +217,7 @@ public class ClinicController : ControllerBase
     )]
     public IActionResult DebugToken()
     {
+        var identity = HttpContext.User.Identity;
         var claims = HttpContext.User.Claims.Select(c => new
         {
             Type = c.Type,
@@ -224,8 +226,8 @@ public class ClinicController : ControllerBase
 
         return Ok(new
         {
-            IsAuthenticated = HttpContext.User.Identity.IsAuthenticated,
-            AuthenticationType = HttpContext.User.Identity.AuthenticationType,
+            IsAuthenticated = identity?.IsAuthenticated ?? false,
+            AuthenticationType = identity?.AuthenticationType,
             Claims = claims,
             Policies = new
             {
@@ -807,8 +809,41 @@ public class ClinicController : ControllerBase
                 return BadRequest(new { message = "Invalid image file. Please ensure it's a valid JPEG, PNG, or WebP image under 5MB." });
             }
 
-            // Upload image via service
-            var clinic = await _clinicService.UpdateImageAsync(id, image);
+            var existingImages = await _clinicService.GetImagesAsync(id);
+            foreach (var existingImage in existingImages)
+            {
+                var deleted = await _clinicService.DeleteImageAsync(id, existingImage.Id);
+                if (!deleted)
+                {
+                    _logger.LogWarning("Failed to delete existing image {ImageId} for clinic {ClinicId}", existingImage.Id, id);
+                }
+            }
+
+            var uploadResponse = await _clinicService.AddImagesAsync(id, new MultipleImageUploadDto
+            {
+                Images = new[] { image },
+                FeaturedImageIndex = 0
+            });
+
+            if (!uploadResponse.Success)
+            {
+                var errorMessage = uploadResponse.ErrorMessages.FirstOrDefault() ?? "Failed to upload clinic image";
+                _logger.LogWarning("Image upload failed for clinic: {ClinicId}. Errors: {Errors}",
+                    id, string.Join(", ", uploadResponse.ErrorMessages));
+
+                return BadRequest(new
+                {
+                    message = errorMessage,
+                    errors = uploadResponse.ErrorMessages
+                });
+            }
+
+            var clinic = await _clinicService.GetByIdAsync(id);
+            if (clinic == null)
+            {
+                _logger.LogWarning("Clinic not found after image upload: {ClinicId}", id);
+                return NotFound(new { message = "Clinic not found" });
+            }
 
             _logger.LogInformation("Successfully uploaded image for clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
 
@@ -855,9 +890,35 @@ public class ClinicController : ControllerBase
     {
         try
         {
-            var clinic = await _clinicService.DeleteImageAsync(id);
+            var existingImages = await _clinicService.GetImagesAsync(id);
+            if (!existingImages.Any())
+            {
+                _logger.LogInformation("No images to delete for clinic: {ClinicId}", id);
+                var clinicWithoutImages = await _clinicService.GetByIdAsync(id);
+                if (clinicWithoutImages == null)
+                {
+                    return NotFound(new { message = "Clinic not found" });
+                }
 
-            _logger.LogInformation("Successfully deleted image for clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
+                return Ok(clinicWithoutImages);
+            }
+
+            foreach (var image in existingImages)
+            {
+                var deleted = await _clinicService.DeleteImageAsync(id, image.Id);
+                if (!deleted)
+                {
+                    _logger.LogWarning("Failed to delete image {ImageId} for clinic {ClinicId}", image.Id, id);
+                }
+            }
+
+            var clinic = await _clinicService.GetByIdAsync(id);
+            if (clinic == null)
+            {
+                return NotFound(new { message = "Clinic not found" });
+            }
+
+            _logger.LogInformation("Successfully deleted images for clinic: {ClinicName} (ID: {ClinicId})", clinic.Name, clinic.Id);
 
             return Ok(clinic);
         }

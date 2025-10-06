@@ -482,7 +482,7 @@ public class Program
                 {
                     if (FirebaseApp.DefaultInstance == null)
                     {
-                        GoogleCredential credential = null;
+                        GoogleCredential? credential = null;
 
                         // Try JSON string first (for container deployments)
                         if (!string.IsNullOrEmpty(serviceAccountJson))
@@ -510,14 +510,16 @@ public class Program
 
                         if (credential != null)
                         {
-                            FirebaseApp.Create(new AppOptions
+                            var appOptions = new AppOptions
                             {
                                 Credential = credential,
                                 ProjectId = projectId
-                            });
+                            };
+
+                            var firebaseApp = FirebaseApp.Create(appOptions);
 
                             logger.LogInformation("✅ Firebase Admin SDK initialized successfully!");
-                            logger.LogInformation("Firebase Project: {ProjectId}", FirebaseApp.DefaultInstance.Options.ProjectId);
+                            logger.LogInformation("Firebase Project: {ProjectId}", firebaseApp.Options.ProjectId);
                         }
                         else
                         {
@@ -657,31 +659,41 @@ public class Program
         // Schedule recurring jobs
         var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
 
+        var localRecurringOptions = new RecurringJobOptions
+        {
+            TimeZone = TimeZoneInfo.Local
+        };
+
         // Schedule balance check job to run every 4 hours
         recurringJobManager.AddOrUpdate<BalanceCheckJob>(
             "balance-check-job",
             job => job.ExecuteAsync(),
             "0 */4 * * *", // Every 4 hours at minute 0
-            TimeZoneInfo.Local);
+            localRecurringOptions);
+
+        var utcRecurringOptions = new RecurringJobOptions
+        {
+            TimeZone = TimeZoneInfo.Utc
+        };
 
         // Daily cleanup to revoke duplicate Firebase-issued refresh tokens
         recurringJobManager.AddOrUpdate<FirebaseRefreshTokenCleanupJob>(
             "firebase-refresh-token-cleanup",
             job => job.ExecuteAsync(),
             Cron.Daily(),
-            TimeZoneInfo.Utc);
+            utcRecurringOptions);
 
         recurringJobManager.AddOrUpdate<FirebaseUserReconciliationJob>(
             "firebase-user-reconciliation",
             job => job.ExecuteAsync(),
             Cron.Daily(),
-            TimeZoneInfo.Utc);
+            utcRecurringOptions);
 
         recurringJobManager.AddOrUpdate<DomainUserReconciliationJob>(
             "domain-user-reconciliation",
             job => job.ExecuteAsync(),
             Cron.Daily(),
-            TimeZoneInfo.Utc);
+            utcRecurringOptions);
 
         // Perform an immediate cleanup on startup to remove legacy duplicate tokens
         using (var cleanupScope = app.Services.CreateScope())

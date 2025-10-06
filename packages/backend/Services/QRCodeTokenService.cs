@@ -141,13 +141,13 @@ public class QRCodeTokenService : IQRCodeTokenService
     /// <summary>
     /// Extract claims from token without consuming the nonce
     /// </summary>
-    public async Task<QRTokenClaims?> ParseTokenAsync(string token)
+    public Task<QRTokenClaims?> ParseTokenAsync(string token)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                return null;
+                return Task.FromResult<QRTokenClaims?>(null);
             }
 
             // Validate token structure and signature
@@ -169,7 +169,7 @@ public class QRCodeTokenService : IQRCodeTokenService
             if (validatedToken is not JwtSecurityToken jwtToken)
             {
                 _logger.LogWarning("Token is not a valid JWT token");
-                return null;
+                return Task.FromResult<QRTokenClaims?>(null);
             }
 
             // Extract QR-specific claims
@@ -187,13 +187,13 @@ public class QRCodeTokenService : IQRCodeTokenService
                 tokenTypeClaim != "qr_code")
             {
                 _logger.LogWarning("QR Code token missing required claims");
-                return null;
+                return Task.FromResult<QRTokenClaims?>(null);
             }
 
             if (!Guid.TryParse(userPlanIdClaim, out var userPlanId))
             {
                 _logger.LogWarning("Invalid userPlanId in QR Code token: {UserPlanId}", userPlanIdClaim);
-                return null;
+                return Task.FromResult<QRTokenClaims?>(null);
             }
 
             var issuedAt = DateTime.UnixEpoch;
@@ -220,22 +220,22 @@ public class QRCodeTokenService : IQRCodeTokenService
             };
 
             _logger.LogDebug("Successfully parsed QR Code token for user plan {UserPlanId}", userPlanId);
-            return qrClaims;
+            return Task.FromResult<QRTokenClaims?>(qrClaims);
         }
         catch (SecurityTokenExpiredException)
         {
             _logger.LogWarning("QR Code token has expired");
-            return null;
+            return Task.FromResult<QRTokenClaims?>(null);
         }
         catch (SecurityTokenException ex)
         {
             _logger.LogWarning("Invalid QR Code token: {Message}", ex.Message);
-            return null;
+            return Task.FromResult<QRTokenClaims?>(null);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to parse QR Code token");
-            return null;
+            return Task.FromResult<QRTokenClaims?>(null);
         }
     }
 

@@ -162,7 +162,7 @@ public class TransactionController : BaseController
     )]
     [SwaggerResponse(200, "Transactions retrieved successfully")]
     [SwaggerResponse(403, "Insufficient permissions")]
-    public async Task<ActionResult<ResponseWrapper<object>>> GetClinicTransactions(
+    public ActionResult<ResponseWrapper<object>> GetClinicTransactions(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
@@ -213,7 +213,7 @@ public class TransactionController : BaseController
     )]
     [SwaggerResponse(200, "Transactions retrieved successfully", typeof(ResponseWrapper<TransactionListResponseDto>))]
     [SwaggerResponse(403, "Insufficient permissions")]
-    public async Task<ActionResult<ResponseWrapper<TransactionListResponseDto>>> GetTransactions([FromQuery] TransactionFilterDto filter)
+    public ActionResult<ResponseWrapper<TransactionListResponseDto>> GetTransactions([FromQuery] TransactionFilterDto filter)
     {
         try
         {
@@ -372,7 +372,7 @@ public class TransactionController : BaseController
     )]
     [SwaggerResponse(200, "Metrics retrieved successfully", typeof(ResponseWrapper<DashboardMetricsDto>))]
     [SwaggerResponse(403, "Insufficient permissions")]
-    public async Task<ActionResult<ResponseWrapper<DashboardMetricsDto>>> GetDashboardMetrics(
+    public ActionResult<ResponseWrapper<DashboardMetricsDto>> GetDashboardMetrics(
         [FromQuery] DateTime? startDate = null,
         [FromQuery] DateTime? endDate = null)
     {

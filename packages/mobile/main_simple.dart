@@ -3,14 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'lib/core/constants/app_constants.dart';
-import 'lib/core/theme/app_theme.dart';
-import 'lib/core/services/storage_service.dart';
 import 'lib/core/services/api_service.dart';
 import 'lib/core/services/auth_service.dart';
-import 'lib/features/onboarding/screens/enhanced_splash_screen.dart';
+import 'lib/core/services/storage_service.dart';
+import 'lib/core/theme/app_theme.dart';
+import 'lib/features/auth/controllers/auth_controller.dart';
 import 'lib/features/auth/screens/login_screen.dart';
 import 'lib/features/dashboard/screens/home_screen.dart';
-import 'lib/features/auth/controllers/auth_controller.dart';
+import 'lib/features/onboarding/screens/enhanced_splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

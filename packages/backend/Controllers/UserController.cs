@@ -118,11 +118,11 @@ public class UserController : BaseController
             try
             {
                 await _userService.SendUserConfirmationEmailAsync(Guid.Parse(result.User!.Id), dto.Password!);
-                _logger.LogInformation("Confirmation email sent to user {UserId}", result.User.Id);
+                _logger.LogInformation("Confirmation email sent to user {UserId}", result.User?.Id);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send confirmation email to user {UserId}", result.User.Id);
+                _logger.LogError(ex, "Failed to send confirmation email to user {UserId}", result.User?.Id);
                 // Don't fail the user creation if email fails - user is already created
             }
 
@@ -482,8 +482,8 @@ public class UserController : BaseController
     /// Consume credits for a service (mock endpoint for testing)
     /// </summary>
     [HttpPost("{id}/credits/consume")]
-    [AllowAnonymous] // Allow anonymous access for mobile app  
-    public async Task<ActionResult<object>> ConsumeCredits(string id, [FromBody] ConsumeCreditsRequest request)
+    [AllowAnonymous] // Allow anonymous access for mobile app
+    public ActionResult<object> ConsumeCredits(string id, [FromBody] ConsumeCreditsRequest request)
     {
         try
         {

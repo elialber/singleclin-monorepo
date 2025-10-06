@@ -138,11 +138,16 @@ namespace SingleClin.API.Controllers
                 }
 
                 // Update recurring job schedule
+                var options = new RecurringJobOptions
+                {
+                    TimeZone = TimeZoneInfo.Local
+                };
+
                 _recurringJobManager.AddOrUpdate<BalanceCheckJob>(
                     "balance-check-job",
                     job => job.ExecuteAsync(),
                     cronExpression,
-                    TimeZoneInfo.Local);
+                    options);
 
                 return Ok(ResponseWrapper<object>.SuccessResponse(
                     new { cronExpression, updatedAt = DateTime.UtcNow },
@@ -194,11 +199,16 @@ namespace SingleClin.API.Controllers
                 _logger.LogInformation("Admin enabling balance check job with default schedule");
 
                 // Add recurring job with default schedule (every 4 hours)
+                var options = new RecurringJobOptions
+                {
+                    TimeZone = TimeZoneInfo.Local
+                };
+
                 _recurringJobManager.AddOrUpdate<BalanceCheckJob>(
                     "balance-check-job",
                     job => job.ExecuteAsync(),
                     "0 */4 * * *", // Every 4 hours at minute 0
-                    TimeZoneInfo.Local);
+                    options);
 
                 return Ok(ResponseWrapper<object>.SuccessResponse(
                     new { cronExpression = "0 */4 * * *", enabledAt = DateTime.UtcNow },

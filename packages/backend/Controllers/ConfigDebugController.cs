@@ -23,7 +23,7 @@ public class ConfigDebugController : ControllerBase
     [HttpGet("all")]
     public IActionResult GetAllConfig()
     {
-        var configData = new Dictionary<string, object>();
+        var configData = new Dictionary<string, object?>();
 
         // Get all configuration as JSON
         foreach (var section in _configuration.GetChildren())
@@ -112,7 +112,7 @@ public class ConfigDebugController : ControllerBase
         }
     }
 
-    private object GetConfigSection(IConfigurationSection section)
+    private object? GetConfigSection(IConfigurationSection section)
     {
         var children = section.GetChildren().ToList();
 
@@ -121,7 +121,7 @@ public class ConfigDebugController : ControllerBase
             return section.Value;
         }
 
-        var result = new Dictionary<string, object>();
+        var result = new Dictionary<string, object?>();
         foreach (var child in children)
         {
             result[child.Key] = GetConfigSection(child);

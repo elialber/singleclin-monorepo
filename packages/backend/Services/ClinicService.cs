@@ -6,6 +6,7 @@ using SingleClin.API.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Data;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace SingleClin.API.Services;
 
@@ -343,41 +344,37 @@ public class ClinicService : IClinicService
     /// <returns>Updated clinic with new image</returns>
     public async Task<ClinicResponseDto> UpdateImageAsync(Guid id, IFormFile imageFile)
     {
-        var clinic = await _clinicRepository.GetByIdAsync(id);
-        if (clinic == null)
-        {
-            throw new InvalidOperationException($"Clinic with ID {id} not found");
-        }
-
         try
         {
-            // Remove existing image if present
-            if (!string.IsNullOrEmpty(clinic.ImageFileName))
+            var existingImages = await GetImagesAsync(id);
+            foreach (var existingImage in existingImages)
             {
-                await _imageUploadService.DeleteImageAsync(clinic.ImageFileName, "clinics");
+                var deleted = await DeleteImageAsync(id, existingImage.Id);
+                if (!deleted)
+                {
+                    _logger.LogWarning("Failed to remove existing image {ImageId} for clinic {ClinicId}", existingImage.Id, id);
+                }
             }
 
-            // Upload new image
-            var uploadResult = await _imageUploadService.UploadImageAsync(imageFile, "clinics");
-
-            if (uploadResult.Success)
+            var uploadResult = await AddImagesAsync(id, new MultipleImageUploadDto
             {
-                // Update clinic with new image information
-                clinic.ImageUrl = uploadResult.Url;
-                clinic.ImageFileName = uploadResult.FileName;
-                clinic.ImageSize = uploadResult.Size;
-                clinic.ImageContentType = uploadResult.ContentType;
-                clinic.UpdatedAt = DateTime.UtcNow;
+                Images = new[] { imageFile },
+                FeaturedImageIndex = 0
+            });
 
-                await _clinicRepository.UpdateAsync(clinic);
-
-                _logger.LogInformation("Successfully updated image for clinic {ClinicId}: {ImageUrl}",
-                    id, uploadResult.Url);
-            }
-            else
+            if (!uploadResult.Success)
             {
-                throw new InvalidOperationException($"Image upload failed: {uploadResult.ErrorMessage}");
+                var errorMessage = uploadResult.ErrorMessages.FirstOrDefault() ?? "Image upload failed";
+                throw new InvalidOperationException(errorMessage);
             }
+
+            var clinic = await _clinicRepository.GetByIdAsync(id);
+            if (clinic == null)
+            {
+                throw new InvalidOperationException($"Clinic with ID {id} not found");
+            }
+
+            _logger.LogInformation("Successfully updated image for clinic {ClinicId}", id);
 
             return MapToResponseDto(clinic);
         }
@@ -395,32 +392,30 @@ public class ClinicService : IClinicService
     /// <returns>Updated clinic without image</returns>
     public async Task<ClinicResponseDto> DeleteImageAsync(Guid id)
     {
-        var clinic = await _clinicRepository.GetByIdAsync(id);
-        if (clinic == null)
-        {
-            throw new InvalidOperationException($"Clinic with ID {id} not found");
-        }
-
         try
         {
-            // Delete image from storage if exists
-            if (!string.IsNullOrEmpty(clinic.ImageFileName))
+            var clinic = await _clinicRepository.GetByIdAsync(id);
+            if (clinic == null)
             {
-                await _imageUploadService.DeleteImageAsync(clinic.ImageFileName, "clinics");
+                throw new InvalidOperationException($"Clinic with ID {id} not found");
             }
 
-            // Clear image fields
-            clinic.ImageUrl = null;
-            clinic.ImageFileName = null;
-            clinic.ImageSize = null;
-            clinic.ImageContentType = null;
-            clinic.UpdatedAt = DateTime.UtcNow;
+            var images = clinic.Images?.ToList() ?? new List<ClinicImage>();
 
-            await _clinicRepository.UpdateAsync(clinic);
+            foreach (var image in images)
+            {
+                var deleted = await DeleteImageAsync(id, image.Id);
+                if (!deleted)
+                {
+                    _logger.LogWarning("Failed to delete image {ImageId} for clinic {ClinicId}", image.Id, id);
+                }
+            }
 
-            _logger.LogInformation("Successfully deleted image for clinic {ClinicId}", id);
+            var updatedClinic = await _clinicRepository.GetByIdAsync(id) ?? clinic;
 
-            return MapToResponseDto(clinic);
+            _logger.LogInformation("Successfully deleted images for clinic {ClinicId}", id);
+
+            return MapToResponseDto(updatedClinic);
         }
         catch (Exception ex)
         {
@@ -545,7 +540,13 @@ public class ClinicService : IClinicService
             throw new InvalidOperationException($"Clinic with ID {clinicId} not found");
         }
 
-        var image = clinic.Images?.FirstOrDefault(i => i.Id == imageId);
+        var images = clinic.Images;
+        if (images == null)
+        {
+            throw new InvalidOperationException($"Image with ID {imageId} not found in clinic {clinicId}");
+        }
+
+        var image = images.FirstOrDefault(i => i.Id == imageId);
         if (image == null)
         {
             throw new InvalidOperationException($"Image with ID {imageId} not found in clinic {clinicId}");
@@ -554,7 +555,7 @@ public class ClinicService : IClinicService
         // If setting as featured, clear other featured images first
         if (updateDto.IsFeatured && !image.IsFeatured)
         {
-            foreach (var otherImage in clinic.Images.Where(i => i.IsFeatured))
+            foreach (var otherImage in images.Where(i => i.IsFeatured))
             {
                 otherImage.IsFeatured = false;
             }
@@ -581,7 +582,13 @@ public class ClinicService : IClinicService
             return false;
         }
 
-        var image = clinic.Images?.FirstOrDefault(i => i.Id == imageId);
+        var images = clinic.Images;
+        if (images == null)
+        {
+            return false;
+        }
+
+        var image = images.FirstOrDefault(i => i.Id == imageId);
         if (image == null)
         {
             return false;
@@ -593,7 +600,7 @@ public class ClinicService : IClinicService
             await _imageUploadService.DeleteImageAsync(image.StorageFileName, "clinics");
 
             // Remove from clinic
-            clinic.Images.Remove(image);
+            images.Remove(image);
             await _clinicRepository.UpdateAsync(clinic);
 
             _logger.LogInformation("Successfully deleted image {ImageId} from clinic {ClinicId}", imageId, clinicId);
@@ -615,14 +622,20 @@ public class ClinicService : IClinicService
             throw new InvalidOperationException($"Clinic with ID {clinicId} not found");
         }
 
-        var image = clinic.Images?.FirstOrDefault(i => i.Id == imageId);
+        var images = clinic.Images;
+        if (images == null)
+        {
+            throw new InvalidOperationException($"Image with ID {imageId} not found in clinic {clinicId}");
+        }
+
+        var image = images.FirstOrDefault(i => i.Id == imageId);
         if (image == null)
         {
             throw new InvalidOperationException($"Image with ID {imageId} not found in clinic {clinicId}");
         }
 
         // Clear all featured flags
-        foreach (var img in clinic.Images)
+        foreach (var img in images)
         {
             img.IsFeatured = false;
         }
@@ -646,9 +659,16 @@ public class ClinicService : IClinicService
             throw new InvalidOperationException($"Clinic with ID {clinicId} not found");
         }
 
+        var images = clinic.Images;
+        if (images == null || images.Count == 0)
+        {
+            _logger.LogInformation("No images to reorder for clinic {ClinicId}", clinicId);
+            return new List<ClinicImageDto>();
+        }
+
         foreach (var imageOrder in imageOrders)
         {
-            var image = clinic.Images?.FirstOrDefault(i => i.Id == imageOrder.Key);
+            var image = images.FirstOrDefault(i => i.Id == imageOrder.Key);
             if (image != null)
             {
                 image.DisplayOrder = imageOrder.Value;
@@ -660,7 +680,7 @@ public class ClinicService : IClinicService
 
         _logger.LogInformation("Successfully reordered images for clinic {ClinicId}", clinicId);
 
-        return clinic.Images?.Select(MapToImageDto).OrderBy(i => i.DisplayOrder).ToList() ?? new List<ClinicImageDto>();
+        return images.Select(MapToImageDto).OrderBy(i => i.DisplayOrder).ToList();
     }
 
     private static ClinicResponseDto MapToActiveClinicsResponseDto(Clinic clinic)
@@ -679,7 +699,6 @@ public class ClinicService : IClinicService
                 IsActive = clinic.IsActive,
                 Latitude = clinic.Latitude,
                 Longitude = clinic.Longitude,
-                ImageUrl = clinic.ImageUrl ?? "",
                 Images = clinic.Images?.Select(MapToImageDto).ToList() ?? new List<ClinicImageDto>(), // Include actual images for mobile app
                 Services = clinic.Services?.Select(MapToServiceDto).ToList() ?? new List<ClinicServiceDto>(), // Include actual services for mobile app
                 CreatedAt = clinic.CreatedAt,
@@ -703,7 +722,6 @@ public class ClinicService : IClinicService
                 IsActive = false,
                 Latitude = 0,
                 Longitude = 0,
-                ImageUrl = "",
                 Images = new List<ClinicImageDto>(),
                 Services = new List<ClinicServiceDto>(),
                 CreatedAt = DateTime.UtcNow,
@@ -727,7 +745,6 @@ public class ClinicService : IClinicService
             IsActive = clinic.IsActive,
             Latitude = clinic.Latitude,
             Longitude = clinic.Longitude,
-            ImageUrl = clinic.ImageUrl,
             Images = clinic.Images?.Select(MapToImageDto).ToList() ?? new List<ClinicImageDto>(),
             Services = clinic.Services?.Select(MapToServiceDto).ToList() ?? new List<ClinicServiceDto>(),
             CreatedAt = clinic.CreatedAt,

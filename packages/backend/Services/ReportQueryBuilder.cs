@@ -333,9 +333,9 @@ namespace SingleClin.API.Services
             this ReportQueryBuilder<Transaction> builder,
             List<string>? serviceTypes)
         {
-            return builder.WhereIf(
-                serviceTypes?.Any() == true,
-                t => serviceTypes!.Contains(t.ServiceType));
+        return builder.WhereIf(
+            serviceTypes?.Any() == true,
+            t => t.ServiceType != null && serviceTypes!.Contains(t.ServiceType));
         }
 
         /// <summary>
