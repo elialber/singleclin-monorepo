@@ -10,10 +10,10 @@ import 'package:singleclin_mobile/core/services/session_manager.dart';
 class AuthInterceptor extends Interceptor {
   AuthInterceptor({FirebaseAuth? firebaseAuth, SessionManager? sessionManager})
     : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-      _sessionManager = sessionManager ?? Get.find<SessionManager>();
+      _sessionManager = sessionManager;
 
   final FirebaseAuth _firebaseAuth;
-  final SessionManager _sessionManager;
+  final SessionManager? _sessionManager;
 
   @override
   Future<void> onRequest(
@@ -21,7 +21,14 @@ class AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     try {
-      final tokenService = _sessionManager.tokenRefreshService;
+      // Try to get SessionManager if not provided in constructor
+      final sessionManager =
+          _sessionManager ??
+          (Get.isRegistered<SessionManager>()
+              ? Get.find<SessionManager>()
+              : null);
+
+      final tokenService = sessionManager?.tokenRefreshService;
       final String? token = await tokenService?.getCurrentToken();
 
       if (token != null) {
@@ -64,7 +71,7 @@ class AuthInterceptor extends Interceptor {
           return;
         }
 
-        await _sessionManager.endSession(
+        await _sessionManager?.endSession(
           signOut: true,
           redirectToLogin: true,
           message: 'Sua sessão expirou. Faça login novamente.',
@@ -73,7 +80,7 @@ class AuthInterceptor extends Interceptor {
         if (kDebugMode) {
           print('❌ Token refresh retry failed: $retryError');
         }
-        await _sessionManager.endSession(
+        await _sessionManager?.endSession(
           signOut: true,
           redirectToLogin: true,
           message: 'Sua sessão expirou. Faça login novamente.',
@@ -81,7 +88,7 @@ class AuthInterceptor extends Interceptor {
       }
     } else if (statusCode == ApiConstants.statusForbidden ||
         statusCode == 409) {
-      await _sessionManager.endSession(
+      await _sessionManager?.endSession(
         signOut: true,
         redirectToLogin: true,
         message: 'Seu acesso foi revogado. Faça login novamente.',
@@ -113,7 +120,7 @@ class AuthInterceptor extends Interceptor {
         return null;
       }
 
-      final tokenService = _sessionManager.tokenRefreshService;
+      final tokenService = _sessionManager?.tokenRefreshService;
       final String? newToken = await tokenService?.refreshToken();
 
       if (newToken == null) {

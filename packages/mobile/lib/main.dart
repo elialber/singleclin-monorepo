@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/core/services/session_manager.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/core/themes/app_theme.dart';
 import 'package:singleclin_mobile/data/services/api_client.dart';
@@ -100,6 +101,17 @@ Future<void> _initServices(
 
     Future<void> initializeFirebaseDependentServices() async {
       final authService = Get.put(AuthService(), permanent: true);
+
+      // Initialize SessionManager with required dependencies
+      if (!Get.isRegistered<SessionManager>()) {
+        Get.put(
+          SessionManager(
+            authService: authService,
+            storageService: storageService,
+          ),
+          permanent: true,
+        );
+      }
 
       final tokenRefreshService = TokenRefreshService(
         authService: authService,
