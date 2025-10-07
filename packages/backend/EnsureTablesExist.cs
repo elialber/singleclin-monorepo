@@ -75,8 +75,8 @@ public static class EnsureTablesExist
                     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
                     updated_at timestamp with time zone NOT NULL DEFAULT NOW(),
                     CONSTRAINT pk_user_plans PRIMARY KEY (id),
-                    CONSTRAINT fk_user_plans_user_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                    CONSTRAINT fk_user_plans_plan_plan_id FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE CASCADE
+                    CONSTRAINT fk_user_plans_user_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
+                    CONSTRAINT fk_user_plans_plan_plan_id FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE RESTRICT
                 );
             ");
 

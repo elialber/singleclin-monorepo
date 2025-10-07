@@ -72,9 +72,12 @@ public class DomainUserSyncService : IDomainUserSyncService
             return;
         }
 
-        _appDbContext.Users.Remove(domainUser);
+        // Soft delete: mark as inactive instead of hard delete to preserve UserPlans and audit trail
+        domainUser.IsActive = false;
+        domainUser.UpdatedAt = DateTime.UtcNow;
+        
         await _appDbContext.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Domain user removed for ApplicationUserId={UserId}", applicationUserId);
+        _logger.LogInformation("Domain user marked as inactive (soft delete) for ApplicationUserId={UserId}", applicationUserId);
     }
 
     private static string? ExtractFirstName(string fullName)
