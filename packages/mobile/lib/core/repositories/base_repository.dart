@@ -1,24 +1,29 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:singleclin_mobile/core/services/cache_service.dart';
-import 'package:singleclin_mobile/core/services/network_service.dart';
 
 /// Base repository providing offline-first functionality
 ///
 /// This abstract class implements the Repository Pattern with transparent
 /// caching, automatic sync, and offline support.
+import 'package:meta/meta.dart';
+import 'package:singleclin_mobile/core/services/cache_service.dart';
+import 'package:singleclin_mobile/core/services/network_service.dart';
+
 abstract class BaseRepository<T> {
   BaseRepository({
     required CacheService cacheService,
     required NetworkService networkService,
     required Dio dio,
-  }) : _cacheService = cacheService,
-       _networkService = networkService,
-       _dio = dio;
-  final CacheService _cacheService;
-  final NetworkService _networkService;
-  final Dio _dio;
+  }) : cacheService = cacheService,
+       networkService = networkService,
+       dio = dio;
+  @protected
+  final CacheService cacheService;
+  @protected
+  final NetworkService networkService;
+  @protected
+  final Dio dio;
 
   /// Box name for Hive storage - must be implemented by subclasses
   String get boxName;
@@ -46,8 +51,7 @@ abstract class BaseRepository<T> {
   }) async {
     final cacheKey = getCacheKey(id);
 
-    // If offline only or no network, try cache first
-    if (offlineOnly || !_networkService.isConnected) {
+    if (offlineOnly || !networkService.isConnected) {
       final cached = await _getCachedData(cacheKey);
       if (cached != null) return cached;
 
@@ -97,7 +101,7 @@ abstract class BaseRepository<T> {
     final cacheKey = _buildListCacheKey(filters, limit, offset);
 
     // Offline strategy
-    if (offlineOnly || !_networkService.isConnected) {
+    if (offlineOnly || !networkService.isConnected) {
       final cached = await _getCachedList(cacheKey);
       if (cached.isNotEmpty) return cached;
 
@@ -138,7 +142,7 @@ abstract class BaseRepository<T> {
 
   /// Create/Update with offline queue support
   Future<T?> save(T object, String? id) async {
-    if (!_networkService.isConnected) {
+    if (!networkService.isConnected) {
       // Queue for later sync
       await _queueOperation('save', object, id);
       // Return optimistic result and cache locally
@@ -163,7 +167,7 @@ abstract class BaseRepository<T> {
 
   /// Delete with offline queue support
   Future<bool> delete(String id) async {
-    if (!_networkService.isConnected) {
+    if (!networkService.isConnected) {
       // Queue for later sync and remove from cache
       await _queueOperation('delete', null, id);
       await _removeCachedData(getCacheKey(id));
@@ -185,7 +189,7 @@ abstract class BaseRepository<T> {
 
   /// Force sync all cached data with server
   Future<void> syncAll() async {
-    if (!_networkService.isConnected) return;
+    if (!networkService.isConnected) return;
 
     try {
       await _processPendingOperations();
@@ -198,7 +202,29 @@ abstract class BaseRepository<T> {
 
   /// Clear all cached data for this repository
   Future<void> clearCache() async {
-    await _cacheService.clearBox(boxName);
+    await cacheService.clearBox(boxName);
+  }
+
+  /// Get cache health information for this repository
+  Future<Map<String, dynamic>> getCacheInfo() async {
+    final stats = await cacheService.getCacheStats(boxName);
+    final lastAccessed = stats['lastAccessed'] != null
+        ? DateTime.parse(stats['lastAccessed'])
+        : null;
+    final freshness = lastAccessed != null
+        ? 1.0 -
+              (DateTime.now().difference(lastAccessed).inHours / 24).clamp(
+                0.0,
+                1.0,
+              )
+        : 0.0;
+
+    return {
+      'size': stats['sizeBytes'],
+      'itemCount': stats['itemCount'],
+      'hitRate': 0.9, // Placeholder - implement proper tracking if needed
+      'freshness': freshness,
+    };
   }
 
   // Abstract methods to be implemented by subclasses
@@ -213,30 +239,30 @@ abstract class BaseRepository<T> {
 
   // Private helper methods
   Future<T?> _getCachedData(String cacheKey) async {
-    final data = await _cacheService.get(boxName, cacheKey);
+    final data = await cacheService.get(boxName, cacheKey);
     return data != null ? fromMap(data) : null;
   }
 
   Future<List<T>> _getCachedList(String cacheKey) async {
-    final data = await _cacheService.getList(boxName, cacheKey);
+    final data = await cacheService.getList(boxName, cacheKey);
     return data.map(fromMap).toList();
   }
 
   Future<void> _cacheData(String cacheKey, T data) async {
-    await _cacheService.put(boxName, cacheKey, toMap(data));
+    await cacheService.put(boxName, cacheKey, toMap(data));
   }
 
   Future<void> _cacheList(String cacheKey, List<T> data) async {
     final mapped = data.map(toMap).toList();
-    await _cacheService.putList(boxName, cacheKey, mapped);
+    await cacheService.putList(boxName, cacheKey, mapped);
   }
 
   Future<void> _removeCachedData(String cacheKey) async {
-    await _cacheService.delete(boxName, cacheKey);
+    await cacheService.delete(boxName, cacheKey);
   }
 
   bool _isCacheExpired(String cacheKey) {
-    final timestamp = _cacheService.getTimestamp(boxName, cacheKey);
+    final timestamp = cacheService.getTimestamp(boxName, cacheKey);
     if (timestamp == null) return true;
 
     final age = DateTime.now().difference(timestamp).inMinutes;
@@ -295,11 +321,11 @@ abstract class BaseRepository<T> {
       'timestamp': DateTime.now().toIso8601String(),
     };
 
-    await _cacheService.putToQueue('pending_operations', operationData);
+    await cacheService.putToQueue('pending_operations', operationData);
   }
 
   Future<void> _processPendingOperations() async {
-    final operations = await _cacheService.getQueue('pending_operations');
+    final operations = await cacheService.getQueue('pending_operations');
 
     for (final operation in operations) {
       if (operation['boxName'] != boxName) continue;
@@ -316,7 +342,7 @@ abstract class BaseRepository<T> {
         }
 
         // Remove from queue after successful processing
-        await _cacheService.removeFromQueue('pending_operations', operation);
+        await cacheService.removeFromQueue('pending_operations', operation);
       } catch (e) {
         print('Failed to process pending operation: $e');
         // Keep in queue for next sync attempt

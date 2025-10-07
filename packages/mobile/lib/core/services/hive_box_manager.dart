@@ -56,10 +56,8 @@ class HiveBoxManager extends GetxService {
 
   Future<void> _initializeHive() async {
     try {
-      // Initialize Hive if not already done
-      if (!Hive.isInitialized) {
-        await Hive.initFlutter();
-      }
+      // Initialize Hive
+      await Hive.initFlutter();
 
       // Initialize essential boxes first
       await _initializeBox(BoxType.metadata);

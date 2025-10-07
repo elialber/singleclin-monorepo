@@ -18,6 +18,12 @@ class TrustCenterController extends GetxController {
   final Rx<LgpdCompliance?> lgpdCompliance = Rx<LgpdCompliance?>(null);
   final RxList<SecurityAudit> securityAudits = <SecurityAudit>[].obs;
   final Rx<TrustMetrics?> trustMetrics = Rx<TrustMetrics?>(null);
+  final TextEditingController securityReportController =
+      TextEditingController();
+
+  // Derived simple score for UI (0-100)
+  double get securityScore =>
+      (trustMetrics.value?.overallTrustScore ?? 0).toDouble();
 
   // Terms and policies
   final RxMap<String, String> termsOfUse = <String, String>{}.obs;
@@ -291,6 +297,21 @@ class TrustCenterController extends GetxController {
     }
   }
 
+  /// Submit security report using controller text
+  Future<void> submitSecurityReport() async {
+    final text = securityReportController.text.trim();
+    if (text.isEmpty) {
+      Get.snackbar(
+        'Atenção',
+        'Descreva o problema de segurança antes de enviar',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    await reportSecurityConcern(text);
+    securityReportController.clear();
+  }
+
   /// Contact data protection officer
   Future<void> contactDPO(String subject, String message) async {
     try {
@@ -330,6 +351,57 @@ class TrustCenterController extends GetxController {
         'Não foi possível abrir o link',
         snackPosition: SnackPosition.BOTTOM,
       );
+    }
+  }
+
+  /// Open full LGPD policy
+  void openLgpdPolicy() {
+    launchExternalUrl('https://singleclin.com.br/politica-lgpd');
+  }
+
+  /// Exercise a user right
+  Future<void> exerciseUserRight(String rightType) async {
+    await _apiService.post('/trust/exercise-right', data: {'type': rightType});
+    Get.snackbar(
+      'Solicitação enviada',
+      'Seu pedido para exercer o direito "$rightType" foi registrado',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  /// Policies list for UI
+  List<_PolicyItem> get policies => [
+    _PolicyItem(
+      id: 'privacy',
+      title: 'Política de Privacidade',
+      description: 'Como coletamos, usamos e protegemos seus dados pessoais.',
+      icon: Icons.privacy_tip,
+      lastUpdated: currentPrivacyPolicy.value?.effectiveDate ?? DateTime.now(),
+      url: 'https://singleclin.com.br/privacidade',
+    ),
+    _PolicyItem(
+      id: 'terms',
+      title: 'Termos de Uso',
+      description: 'As regras de utilização da plataforma SingleClin.',
+      icon: Icons.gavel,
+      lastUpdated: DateTime.now(),
+      url: 'https://singleclin.com.br/termos',
+    ),
+    _PolicyItem(
+      id: 'cookies',
+      title: 'Política de Cookies',
+      description: 'Entenda como utilizamos cookies e tecnologias similares.',
+      icon: Icons.cookie,
+      lastUpdated: DateTime.now(),
+      url: 'https://singleclin.com.br/cookies',
+    ),
+  ];
+
+  /// Open policy by id
+  void openPolicy(String id) {
+    final item = policies.firstWhereOrNull((p) => p.id == id);
+    if (item != null) {
+      launchExternalUrl(item.url);
     }
   }
 
@@ -441,6 +513,56 @@ class TrustCenterController extends GetxController {
     return total > 0 ? compliant / total : 0.0;
   }
 
+  // ---- UI helpers for TrustCenterScreen ----
+  List<_DataUsageCategory> get dataUsageCategories => [
+    _DataUsageCategory(
+      icon: Icons.analytics_outlined,
+      name: 'Análise de Uso',
+      purpose:
+          'Compreender como o app é utilizado para melhorar sua experiência.',
+      dataTypes: const ['Eventos de navegação', 'Cliques', 'Tempo de sessão'],
+      retentionPeriod: '12 meses',
+    ),
+    _DataUsageCategory(
+      icon: Icons.notifications_active_outlined,
+      name: 'Notificações',
+      purpose: 'Enviar avisos relevantes e lembretes de agendamento.',
+      dataTypes: const ['Token de push', 'Preferências de notificações'],
+      retentionPeriod: 'Enquanto houver consentimento',
+    ),
+    _DataUsageCategory(
+      icon: Icons.payment_outlined,
+      name: 'Pagamentos',
+      purpose: 'Processar transações e emitir comprovantes.',
+      dataTypes: const ['Dados de pagamento', 'Histórico de compras'],
+      retentionPeriod: '5 anos',
+    ),
+  ];
+
+  List<_UserRightItem> get userRights => const [
+    _UserRightItem(
+      title: 'Acesso aos Dados',
+      description: 'Solicite uma cópia dos dados pessoais que mantemos.',
+      icon: Icons.folder_shared,
+      actionable: true,
+      type: 'access',
+    ),
+    _UserRightItem(
+      title: 'Correção de Dados',
+      description: 'Corrija informações desatualizadas ou incorretas.',
+      icon: Icons.edit,
+      actionable: true,
+      type: 'rectification',
+    ),
+    _UserRightItem(
+      title: 'Exclusão de Dados',
+      description: 'Solicite a remoção de seus dados pessoais.',
+      icon: Icons.delete_forever,
+      actionable: true,
+      type: 'erasure',
+    ),
+  ];
+
   /// Get user rights that can be exercised
   List<UserRight> get exercisableRights {
     return lgpdCompliance.value?.userRights
@@ -501,4 +623,51 @@ class TrustCenterController extends GetxController {
       );
     }
   }
+}
+
+class _PolicyItem {
+  final String id;
+  final String title;
+  final String description;
+  final IconData icon;
+  final DateTime lastUpdated;
+  final String url;
+  _PolicyItem({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.lastUpdated,
+    required this.url,
+  });
+}
+
+class _DataUsageCategory {
+  final IconData icon;
+  final String name;
+  final String purpose;
+  final List<String> dataTypes;
+  final String retentionPeriod;
+  const _DataUsageCategory({
+    required this.icon,
+    required this.name,
+    required this.purpose,
+    required this.dataTypes,
+    required this.retentionPeriod,
+  });
+}
+
+class _UserRightItem {
+  final String title;
+  final String description;
+  final IconData icon;
+  final bool actionable;
+  final String type;
+  const _UserRightItem({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.actionable,
+    required this.type,
+  });
 }

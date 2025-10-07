@@ -626,6 +626,13 @@ class SecurityAudit extends Equatable {
   ];
 }
 
+extension SecurityAuditDisplay on SecurityAudit {
+  String get name => 'Auditoria de Segurança - $auditor';
+  String get description => 'Relatório conduzido por $auditor';
+  DateTime get lastAuditDate => auditDate;
+  String get status => overallScore; // letter grade like A, B
+}
+
 /// Security finding
 class SecurityFinding extends Equatable {
   const SecurityFinding({

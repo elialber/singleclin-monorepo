@@ -45,6 +45,7 @@ import 'package:singleclin_mobile/features/profile/screens/documents_screen.dart
 import 'package:singleclin_mobile/features/profile/screens/health_history_screen.dart';
 // Module 3 - Profile screens
 import 'package:singleclin_mobile/features/profile/screens/profile_screen.dart';
+import 'package:singleclin_mobile/presentation/screens/clinic/scan_history_screen.dart';
 import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class AppPages {
@@ -122,6 +123,10 @@ class AppPages {
       page: () => AppointmentBookingScreen(clinic: Get.arguments),
     ),
     GetPage(name: AppRoutes.clinicServices, page: ClinicServicesScreen.new),
+    GetPage(
+      name: AppRoutes.clinicScanHistory,
+      page: () => const ScanHistoryScreen(),
+    ),
 
     // Module 3 - Appointment Routes
     GetPage(

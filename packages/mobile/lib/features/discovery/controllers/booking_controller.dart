@@ -156,13 +156,12 @@ class BookingController extends GetxController {
 
       final endDate = DateTime.now().add(const Duration(days: daysAhead));
       final response = await _apiService
-          .get('/clinics/${clinic.id}/services/${service.id}/availability', {
+          .get('/clinics/${clinic.id}/services/${service.id}/availability', queryParameters: {
             'startDate': DateTime.now().toIso8601String(),
             'endDate': endDate.toIso8601String(),
           });
 
-      if (response.isSuccess && response.data != null) {
-        final datesData = response.data['availableDates'] as List;
+      if (response.statusCode == 200 && response.data != null) {
         _availableDates.value = datesData
             .map((d) => DateTime.parse(d as String))
             .toList();
@@ -209,10 +208,10 @@ class BookingController extends GetxController {
 
       final response = await _apiService.get(
         '/clinics/${clinic.id}/services/${service.id}/timeslots',
-        {'date': date.toIso8601String()},
+        queryParameters: {'date': date.toIso8601String()},
       );
 
-      if (response.isSuccess && response.data != null) {
+      if (response.statusCode == 200 && response.data != null) {
         final slotsData = response.data['timeSlots'] as List;
         _availableTimeSlots.value = slotsData
             .map((slot) => TimeSlot.fromJson(slot))
@@ -317,7 +316,7 @@ class BookingController extends GetxController {
         bookingRequest.toJson(),
       );
 
-      if (response.isSuccess) {
+      if (response.statusCode == 200) {
         _showBookingSuccessDialog();
         _resetBookingState();
         return true;

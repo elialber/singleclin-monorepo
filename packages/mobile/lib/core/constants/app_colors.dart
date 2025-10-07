@@ -200,18 +200,14 @@ class AppColors {
     }
   }
 
-  /// Get color with opacity
-  static Color withOpacity(Color color, double opacity) {
-    return color.withOpacity(opacity);
-  }
 
   /// Get lighter version of color
   static Color lighter(Color color, [double amount = 0.1]) {
-    return Color.alphaBlend(white.withOpacity(amount), color);
+    return Color.alphaBlend(white.withAlpha((255 * amount).round()), color);
   }
 
   /// Get darker version of color
   static Color darker(Color color, [double amount = 0.1]) {
-    return Color.alphaBlend(black.withOpacity(amount), color);
+    return Color.alphaBlend(black.withAlpha((255 * amount).round()), color);
   }
 }

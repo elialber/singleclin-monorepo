@@ -36,7 +36,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   @override
   Future<CreditTransactionModel?> fetchFromNetwork(String id) async {
     try {
-      final response = await _dio.get('/api/credits/transactions/$id');
+      final response = await dio.get('/api/credits/transactions/$id');
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         return CreditTransactionModel.fromJson(response.data['data']);
@@ -55,13 +55,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
     int? offset,
   }) async {
     try {
-      final queryParams = <String, dynamic>{
-        if (filters != null) ...filters,
-        if (limit != null) 'limit': limit,
-        if (offset != null) 'offset': offset,
-      };
-
-      final response = await _dio.get(
+      final response = await dio.get(
         '/api/credits/transactions',
         queryParameters: queryParams,
       );
@@ -91,10 +85,10 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
 
       if (id != null) {
         // Update existing transaction (rare)
-        response = await _dio.put('/api/credits/transactions/$id', data: data);
+        response = await dio.put('/api/credits/transactions/$id', data: data);
       } else {
         // Create new transaction
-        response = await _dio.post('/api/credits/transactions', data: data);
+        response = await dio.post('/api/credits/transactions', data: data);
       }
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -110,7 +104,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   @override
   Future<bool> deleteFromNetwork(String id) async {
     try {
-      final response = await _dio.delete('/api/credits/transactions/$id');
+      final response = await dio.delete('/api/credits/transactions/$id');
       return response.statusCode == 200 && response.data['success'] == true;
     } catch (e) {
       print('❌ Failed to delete transaction from network: $e');
@@ -127,7 +121,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
 
       // Check cache first unless forced refresh
       if (!forceRefresh) {
-        final cachedBalance = await _cacheService.get(
+        final cachedBalance = await cacheService.get(
           'wallet_balance',
           balanceKey,
         );
@@ -137,14 +131,14 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
       }
 
       // Try to fetch from network
-      if (await _networkService.isConnected) {
-        final response = await _dio.get('/api/credits/balance');
+      if (networkService.isConnected) {
+        final response = await dio.get('/api/credits/balance');
 
         if (response.statusCode == 200 && response.data['success'] == true) {
           final balance = WalletBalance.fromJson(response.data['data']);
 
           // Cache the balance
-          await _cacheService.put(
+          await cacheService.put(
             'wallet_balance',
             balanceKey,
             balance.toJson(),
@@ -156,7 +150,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
       }
 
       // Fallback to cached data if available
-      final cachedBalance = await _cacheService.get(
+      final cachedBalance = await cacheService.get(
         'wallet_balance',
         balanceKey,
       );
@@ -168,7 +162,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
     } catch (e) {
       print('❌ Failed to get wallet balance: $e');
       // Try to return cached data as last resort
-      final cachedBalance = await _cacheService.get(
+      final cachedBalance = await cacheService.get(
         'wallet_balance',
         'current_balance',
       );
@@ -281,13 +275,13 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
     Map<String, dynamic>? paymentDetails,
   }) async {
     try {
-      if (!await _networkService.isConnected) {
+      if (!networkService.isConnected) {
         throw NetworkException(
           'Internet connection required for credit purchase',
         );
       }
 
-      final response = await _dio.post(
+      final response = await dio.post(
         '/api/credits/purchase',
         data: {
           'amount': amount,
@@ -328,12 +322,11 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
     String? qrCodeToken,
   }) async {
     try {
-      if (!await _networkService.isConnected) {
+      if (!networkService.isConnected) {
         throw NetworkException('Internet connection required for credit usage');
       }
 
-      final response = await _dio.post(
-        '/api/credits/use',
+      final response = await dio.post(
         data: {
           'serviceId': serviceId,
           'amount': amount,
@@ -373,13 +366,13 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
     String? note,
   }) async {
     try {
-      if (!await _networkService.isConnected) {
+      if (!networkService.isConnected) {
         throw NetworkException(
           'Internet connection required for credit transfer',
         );
       }
 
-      final response = await _dio.post(
+      final response = await dio.post(
         '/api/credits/transfer',
         data: {
           'recipientUserId': recipientUserId,
@@ -408,7 +401,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   Future<List<Map<String, dynamic>>> getAvailableCreditPackages() async {
     try {
       // Check cache first
-      final cached = await _cacheService.getList(
+      final cached = await cacheService.getList(
         'credit_packages',
         'available_packages',
       );
@@ -417,8 +410,8 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
       }
 
       // Fetch from network
-      if (await _networkService.isConnected) {
-        final response = await _dio.get('/api/credits/packages');
+      if (networkService.isConnected) {
+        final response = await dio.get('/api/credits/packages');
 
         if (response.statusCode == 200 && response.data['success'] == true) {
           final packages = List<Map<String, dynamic>>.from(
@@ -426,7 +419,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
           );
 
           // Cache packages
-          await _cacheService.putList(
+          await cacheService.putList(
             'credit_packages',
             'available_packages',
             packages,
@@ -448,7 +441,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   /// Preload critical credit data for offline usage
   Future<void> preloadCriticalData() async {
     try {
-      if (!await _networkService.isConnected) return;
+      if (!networkService.isConnected) return;
 
       print('📥 Preloading critical credit data...');
 
@@ -470,7 +463,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   /// Sync pending credit operations when back online
   Future<void> syncPendingOperations() async {
     try {
-      if (!await _networkService.isConnected) return;
+      if (!networkService.isConnected) return;
 
       await syncAll(); // Use base repository sync
 
@@ -484,7 +477,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   // Private helper methods
 
   bool _isBalanceCacheExpired(String key) {
-    final timestamp = _cacheService.getTimestamp('wallet_balance', key);
+    final timestamp = cacheService.getTimestamp('wallet_balance', key);
     if (timestamp == null) return true;
 
     // Balance cache expires after 10 minutes
@@ -492,13 +485,13 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   }
 
   Future<void> _setBalanceCacheTimestamp(String key) async {
-    await _cacheService.put('wallet_balance', '${key}_timestamp', {
+    await cacheService.put('wallet_balance', '${key}_timestamp', {
       'timestamp': DateTime.now().toIso8601String(),
     });
   }
 
   bool _isPackagesCacheExpired() {
-    final timestamp = _cacheService.getTimestamp(
+    final timestamp = cacheService.getTimestamp(
       'credit_packages',
       'available_packages',
     );
@@ -509,7 +502,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   }
 
   Future<void> _setPackagesCacheTimestamp() async {
-    await _cacheService.put('credit_packages', 'packages_timestamp', {
+    await cacheService.put('credit_packages', 'packages_timestamp', {
       'timestamp': DateTime.now().toIso8601String(),
     });
   }

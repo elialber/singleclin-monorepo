@@ -396,8 +396,8 @@ class FeedbackController extends GetxController {
       for (final screenshot in screenshots) {
         final response = await _apiService.uploadFile(
           '/upload/feedback-screenshot',
-          screenshot,
-          fileField: 'screenshot',
+          screenshot.path,
+          fileName: screenshot.path.split('/').last,
         );
 
         uploadedUrls.add(response.data['url']);

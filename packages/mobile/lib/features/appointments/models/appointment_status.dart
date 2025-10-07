@@ -300,20 +300,20 @@ extension AppointmentStatusExtension on AppointmentStatus {
   /// Get notification message for status change
   String getStatusChangeMessage(String serviceName) {
     switch (this) {
-      case confirmed:
+      case AppointmentStatus.confirmed:
         return 'Seu agendamento para $serviceName foi confirmado!';
-      case checkedIn:
+      case AppointmentStatus.checkedIn:
         return 'Check-in realizado para $serviceName. Aguarde ser chamado.';
-      case inProgress:
+      case AppointmentStatus.inProgress:
         return 'Seu procedimento $serviceName está em andamento.';
-      case completed:
+      case AppointmentStatus.completed:
         return 'Procedimento $serviceName finalizado com sucesso!';
-      case cancelled:
-      case cancelledByClinic:
+      case AppointmentStatus.cancelled:
+      case AppointmentStatus.cancelledByClinic:
         return 'Agendamento para $serviceName foi cancelado.';
-      case waitingDocuments:
+      case AppointmentStatus.waitingDocuments:
         return 'Documentos pendentes para $serviceName. Verifique os requisitos.';
-      case needsRescheduling:
+      case AppointmentStatus.needsRescheduling:
         return 'Reagendamento necessário para $serviceName.';
       default:
         return 'Status do agendamento $serviceName foi atualizado.';

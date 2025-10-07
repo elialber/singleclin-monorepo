@@ -54,7 +54,7 @@ class AppTheme {
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.lightGrey.withOpacity(0.1),
+        fillColor: AppColors.lightGrey.withAlpha(25),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.lightGrey),
@@ -119,8 +119,8 @@ class AppTheme {
 
       // Chip Theme
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.lightGrey.withOpacity(0.3),
-        selectedColor: AppColors.primary.withOpacity(0.2),
+        backgroundColor: AppColors.lightGrey.withAlpha(77),
+        selectedColor: AppColors.primary.withAlpha(51),
         secondarySelectedColor: AppColors.primary,
         labelStyle: const TextStyle(color: AppColors.onSurface),
         secondaryLabelStyle: const TextStyle(color: AppColors.primary),

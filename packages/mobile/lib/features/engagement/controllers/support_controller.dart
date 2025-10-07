@@ -316,8 +316,8 @@ class SupportController extends GetxController {
       for (final attachment in attachments) {
         final response = await _apiService.uploadFile(
           '/upload/support-attachment',
-          attachment,
-          fileField: 'attachment',
+          attachment.path,
+          fileName: attachment.path.split('/').last,
         );
 
         uploadedUrls.add(response.data['url']);

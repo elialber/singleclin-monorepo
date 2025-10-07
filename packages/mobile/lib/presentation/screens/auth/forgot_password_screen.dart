@@ -244,8 +244,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                 ],
               ),
             ],
-          )
-        }),
+          ),
+        ),
       ),
     );
   }

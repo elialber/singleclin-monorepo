@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/features/appointments/models/appointment.dart';
 import 'package:singleclin_mobile/features/appointments/models/appointment_status.dart';

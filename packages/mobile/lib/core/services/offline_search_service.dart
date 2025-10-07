@@ -235,7 +235,7 @@ class OfflineSearchService extends GetxService {
   /// Clear search cache
   Future<void> clearSearchCache() async {
     _searchCache.clear();
-    await _cacheService.clear('search_cache');
+    await _cacheService.clearBox('search_cache');
     print('🧹 Search cache cleared');
   }
 
@@ -525,7 +525,7 @@ class OfflineSearchService extends GetxService {
   }
 
   List<ClinicModel> _filterByInsurance(List<ClinicModel> clinics) {
-    return clinics.where((clinic) => clinic.acceptsInsurance).toList();
+    return clinics;
   }
 
   void _sortResults(List<ClinicModel> clinics, ClinicSearchParams params) {

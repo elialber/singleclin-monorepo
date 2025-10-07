@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -319,9 +320,9 @@ class DocumentsController extends GetxController {
       final permission = DocumentSharePermission(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         documentId: documentId,
-        sharedWithId: shareWith['id'],
-        sharedWithType: shareWith['type'],
-        sharedWithName: shareWith['name'],
+        sharedWithId: shareWith['id']!,
+        sharedWithType: shareWith['type']!,
+        sharedWithName: shareWith['name']!,
         permissions: DocumentPermission.standardPermissions,
         expiresAt: DateTime.now().add(const Duration(days: 30)),
         createdAt: DateTime.now(),
@@ -331,7 +332,7 @@ class DocumentsController extends GetxController {
       final index = _documents.indexWhere((d) => d.id == documentId);
       _documents[index] = document.copyWith(
         isShared: true,
-        sharedWith: [...document.sharedWith, shareWith['id']],
+        sharedWith: [...document.sharedWith, shareWith['id']!],
         updatedAt: DateTime.now(),
       );
 

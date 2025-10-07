@@ -32,6 +32,8 @@ class AppRoutes {
   static const String cancelAppointment = '/appointments/cancel';
   static const String appointmentRate = '/appointments/rate';
 
+  static const String clinicScanHistory = '/clinic/scan-history';
+
   // Profile Routes
   static const String profile = '/profile';
   static const String editProfile = '/edit-profile';

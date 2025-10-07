@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/core/constants/app_strings.dart';
 import 'package:singleclin_mobile/features/dashboard/controllers/dashboard_controller.dart';
+import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
 import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
 import 'package:singleclin_mobile/shared/widgets/sg_credit_widget.dart';
@@ -266,7 +267,7 @@ class DashboardScreen extends GetView<DashboardController> {
       {
         'name': AppStrings.facialAesthetics,
         'icon': Icons.face_outlined,
-        'color': AppColors.categoryFacial,
+        'color': AppColors.getCategoryColor(AppStrings.facialAesthetics),
       },
       {
         'name': AppStrings.injectableTherapies,
@@ -276,12 +277,12 @@ class DashboardScreen extends GetView<DashboardController> {
       {
         'name': AppStrings.bodyAesthetics,
         'icon': Icons.accessibility_new_outlined,
-        'color': AppColors.categoryBody,
+        'color': AppColors.getCategoryColor(AppStrings.bodyAesthetics),
       },
       {
         'name': AppStrings.wellness,
         'icon': Icons.spa_outlined,
-        'color': AppColors.categoryWellness,
+        'color': AppColors.getCategoryColor(AppStrings.wellness),
       },
     ];
 
@@ -309,28 +310,28 @@ class DashboardScreen extends GetView<DashboardController> {
             final category = categories[index];
             return GestureDetector(
               onTap: () =>
-                  controller.navigateToCategory(category['name'] as String),
+                  controller.navigateToCategory(category['name']! as String),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: (category['color'] as Color).withOpacity(0.1),
+                  color: (category['color']! as Color).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: category['color'] as Color),
+                  border: Border.all(color: category['color']! as Color),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      category['icon'] as IconData,
+                      category['icon']! as IconData,
                       size: 32,
-                      color: category['color'] as Color,
+                      color: category['color']! as Color,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      category['name'] as String,
+                      category['name']! as String,
                       style: Get.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: category['color'] as Color,
+                        color: category['color']! as Color,
                       ),
                       textAlign: TextAlign.center,
                       maxLines: 2,
@@ -394,7 +395,7 @@ class DashboardScreen extends GetView<DashboardController> {
   }
 
   Widget _buildNearbyClinicSection() {
-    if (controller.nearbyClinic.isEmpty) {
+    if (controller.nearbyClinics.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -420,9 +421,9 @@ class DashboardScreen extends GetView<DashboardController> {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: controller.nearbyClinic.take(3).length,
+          itemCount: controller.nearbyClinics.take(3).length,
           itemBuilder: (context, index) {
-            final clinic = controller.nearbyClinic[index];
+            final clinic = controller.nearbyClinics[index];
             return Container(
               margin: EdgeInsets.only(bottom: index < 2 ? 12 : 0),
               child: _buildClinicCard(clinic),

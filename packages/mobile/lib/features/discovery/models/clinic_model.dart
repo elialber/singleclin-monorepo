@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class ClinicModel {
   ClinicModel({
     required this.id,
@@ -107,7 +109,7 @@ class ClinicModel {
         (dLat / 2) * (dLat / 2) +
         (dLng / 2) * (dLng / 2) * (latitude.toDouble() * userLat.toDouble());
 
-    final double c = 2 * (a.squareRoot().asin());
+    final double c = 2 * asin(sqrt(a));
 
     return earthRadius * c;
   }

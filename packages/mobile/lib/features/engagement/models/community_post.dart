@@ -412,6 +412,48 @@ class CommunityEvent extends Equatable {
   ];
 }
 
+extension CommunityEventCopyWith on CommunityEvent {
+  CommunityEvent copyWith({
+    String? id,
+    String? title,
+    String? description,
+    EventType? type,
+    DateTime? startTime,
+    DateTime? endTime,
+    String? location,
+    String? meetingLink,
+    List<String>? speakers,
+    List<String>? tags,
+    int? attendeesCount,
+    int? maxAttendees,
+    bool? isAttending,
+    bool? isReminder,
+    EventStatus? status,
+    String? recordingUrl,
+    List<String>? materials,
+  }) {
+    return CommunityEvent(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      type: type ?? this.type,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      location: location ?? this.location,
+      meetingLink: meetingLink ?? this.meetingLink,
+      speakers: speakers ?? this.speakers,
+      tags: tags ?? this.tags,
+      attendeesCount: attendeesCount ?? this.attendeesCount,
+      maxAttendees: maxAttendees ?? this.maxAttendees,
+      isAttending: isAttending ?? this.isAttending,
+      isReminder: isReminder ?? this.isReminder,
+      status: status ?? this.status,
+      recordingUrl: recordingUrl ?? this.recordingUrl,
+      materials: materials ?? this.materials,
+    );
+  }
+}
+
 /// Enums for community functionality
 enum PostType {
   experience,

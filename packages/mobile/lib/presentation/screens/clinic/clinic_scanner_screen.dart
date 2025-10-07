@@ -4,9 +4,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:singleclin_mobile/core/routes/app_routes.dart';
 import 'package:singleclin_mobile/presentation/widgets/manual_code_dialog.dart';
 import 'package:singleclin_mobile/presentation/widgets/patient_data_bottom_sheet.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
 
 /// Screen for clinic staff to scan patient QR codes
 ///
@@ -159,7 +159,7 @@ class _ClinicScannerScreenState extends State<ClinicScannerScreen>
     return MobileScanner(
       controller: _controller,
       onDetect: _onQRCodeDetected,
-      errorBuilder: (context, error, child) {
+      errorBuilder: (context, error) {
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

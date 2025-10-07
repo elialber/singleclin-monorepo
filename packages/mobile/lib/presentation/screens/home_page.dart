@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:singleclin_mobile/core/routes/app_router.dart';
-import 'package:singleclin_mobile/core/routes/app_routes.dart';
+
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/presentation/controllers/home_controller.dart';
 
 /// Home page using GetX for state management
@@ -157,17 +157,17 @@ class HomePage extends StatelessWidget {
               alignment: WrapAlignment.center,
               children: [
                 OutlinedButton.icon(
-                  onPressed: () => context.go(AppRoutes.qrGenerate),
+                  onPressed: () => context.go('/qr-code'),
                   icon: const Icon(Icons.qr_code),
                   label: const Text('QR Code'),
                 ),
                 OutlinedButton.icon(
-                  onPressed: () => context.go(AppRoutes.profile),
+                  onPressed: () => context.go('/profile'),
                   icon: const Icon(Icons.person),
                   label: const Text('Perfil'),
                 ),
                 OutlinedButton.icon(
-                  onPressed: AppRouter.logout,
+                  onPressed: () => Get.find<AuthController>().logout(),
                   icon: const Icon(Icons.logout),
                   label: const Text('Sair'),
                 ),

@@ -348,6 +348,42 @@ class FeatureRequest extends Equatable {
   ];
 }
 
+extension FeatureRequestCopyWith on FeatureRequest {
+  FeatureRequest copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? category,
+    int? votesCount,
+    bool? hasVoted,
+    RequestStatus? status,
+    RequestPriority? priority,
+    DateTime? createdAt,
+    DateTime? plannedFor,
+    String? estimatedEffort,
+    List<String>? tags,
+    List<FeedbackComment>? comments,
+    String? roadmapUrl,
+  }) {
+    return FeatureRequest(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      votesCount: votesCount ?? this.votesCount,
+      hasVoted: hasVoted ?? this.hasVoted,
+      status: status ?? this.status,
+      priority: priority ?? this.priority,
+      createdAt: createdAt ?? this.createdAt,
+      plannedFor: plannedFor ?? this.plannedFor,
+      estimatedEffort: estimatedEffort ?? this.estimatedEffort,
+      tags: tags ?? this.tags,
+      comments: comments ?? this.comments,
+      roadmapUrl: roadmapUrl ?? this.roadmapUrl,
+    );
+  }
+}
+
 /// Product roadmap item
 class RoadmapItem extends Equatable {
   const RoadmapItem({
@@ -428,6 +464,36 @@ class RoadmapItem extends Equatable {
   ];
 }
 
+extension RoadmapItemCopyWith on RoadmapItem {
+  RoadmapItem copyWith({
+    String? id,
+    String? title,
+    String? description,
+    RoadmapStatus? status,
+    DateTime? plannedRelease,
+    String? category,
+    List<String>? tags,
+    int? userVotes,
+    bool? hasVoted,
+    String? progress,
+    List<String>? features,
+  }) {
+    return RoadmapItem(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      plannedRelease: plannedRelease ?? this.plannedRelease,
+      category: category ?? this.category,
+      tags: tags ?? this.tags,
+      userVotes: userVotes ?? this.userVotes,
+      hasVoted: hasVoted ?? this.hasVoted,
+      progress: progress ?? this.progress,
+      features: features ?? this.features,
+    );
+  }
+}
+
 /// Beta program enrollment
 class BetaProgram extends Equatable {
   const BetaProgram({
@@ -506,6 +572,36 @@ class BetaProgram extends Equatable {
     benefits,
     status,
   ];
+}
+
+extension BetaProgramCopyWith on BetaProgram {
+  BetaProgram copyWith({
+    String? id,
+    String? name,
+    String? description,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? isEnrolled,
+    int? maxParticipants,
+    int? currentParticipants,
+    List<String>? requirements,
+    List<String>? benefits,
+    BetaStatus? status,
+  }) {
+    return BetaProgram(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      isEnrolled: isEnrolled ?? this.isEnrolled,
+      maxParticipants: maxParticipants ?? this.maxParticipants,
+      currentParticipants: currentParticipants ?? this.currentParticipants,
+      requirements: requirements ?? this.requirements,
+      benefits: benefits ?? this.benefits,
+      status: status ?? this.status,
+    );
+  }
 }
 
 /// Enums for feedback system

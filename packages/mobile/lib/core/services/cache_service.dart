@@ -22,10 +22,8 @@ class CacheService extends GetxService {
   }
 
   Future<void> _initializeHive() async {
-    // Initialize Hive if not already done
-    if (!Hive.isInitialized) {
-      await Hive.initFlutter();
-    }
+    // Initialize Hive
+    await Hive.initFlutter();
 
     // Open metadata box for timestamps and cache info
     _metadataBox = await Hive.openBox(_metadataBoxName);

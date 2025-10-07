@@ -254,6 +254,10 @@ class TokenRefreshService {
     try {
       final token = await firebaseUser.getIdToken(true);
 
+      if (token == null) {
+        return const _RefreshOutcome.failure('Não foi possível obter o token de sessão.');
+      }
+
       if (kDebugMode) {
         print('✅ TokenRefreshService: Token refreshed com sucesso');
       }
@@ -550,6 +554,9 @@ class TokenRefreshService {
 
         try {
           final token = await firebaseUser.getIdToken();
+          if (token == null) {
+            return;
+          }
           final validation = await _validateSessionWithBackend(token);
 
           if (validation.success) {

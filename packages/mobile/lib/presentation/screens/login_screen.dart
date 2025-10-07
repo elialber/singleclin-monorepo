@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:singleclin_mobile/core/routes/app_routes.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
 
 /// Login screen for user authentication
 class LoginScreen extends StatelessWidget {

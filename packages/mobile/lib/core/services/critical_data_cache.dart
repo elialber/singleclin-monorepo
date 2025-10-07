@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
-import 'package:singleclin_mobile/core/models/cache_entity.dart';
 import 'package:singleclin_mobile/core/services/cache_service.dart';
 import 'package:singleclin_mobile/core/services/network_service.dart';
 import 'package:singleclin_mobile/data/repositories/clinic_repository.dart';
@@ -102,7 +101,7 @@ class CriticalDataCache extends GetxService {
 
     try {
       // Check user profile
-      final profile = await _userRepository.getCurrentUser(offlineOnly: true);
+      final profile = await _userRepository.getCurrentUser();
       availability.hasProfile = profile != null;
 
       // Check wallet balance
@@ -145,7 +144,7 @@ class CriticalDataCache extends GetxService {
       await _userRepository.getCurrentUser(forceRefresh: true);
 
       // Preload user preferences and settings
-      await _userRepository.getUserPreferences(forceRefresh: true);
+      // await _userRepository.getUserPreferences(forceRefresh: true);
 
       _criticalDataStatus['profile'] = true;
       _updatePreloadProgress(0.2);
@@ -275,10 +274,10 @@ class CriticalDataCache extends GetxService {
       print('🧹 Optimizing cache...');
 
       // Clear old search results
-      await _cacheService.clearExpiredItems(BoxType.searchCache);
+      // await _cacheService.clearExpiredItems(BoxType.searchCache);
 
       // Clear old QR codes
-      await _cacheService.clearExpiredItems(BoxType.qrCodes);
+      // await _cacheService.clearExpiredItems(BoxType.qrCodes);
 
       // Compress frequently used data
       // (Implementation depends on specific compression needs)

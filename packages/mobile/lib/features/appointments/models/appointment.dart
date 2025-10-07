@@ -343,13 +343,13 @@ class Appointment extends Equatable {
   }
 
   /// Get status color based on appointment status
-  String get statusColor {
+  Color get statusColor {
     return status.color;
   }
 
   /// Get status icon
-  String get statusIcon {
-    return status.icon;
+  IconData get statusIcon {
+    return status.iconData;
   }
 
   /// Check if all required documents are provided

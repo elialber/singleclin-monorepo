@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:get/get.dart';
 import 'package:singleclin_mobile/features/profile/models/user_profile.dart';
 
 /// LGPD Settings Widget

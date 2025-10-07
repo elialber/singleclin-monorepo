@@ -372,6 +372,7 @@ class AppointmentsController extends GetxController
         status: AppointmentStatus.cancelled,
         price: 1.5,
         sgCreditsUsed: 1.5,
+        sgCreditsEarned: 0.0, // No credits earned for cancelled appointment
         refundAmount: 1.5,
         cancellationReason: 'Cancelamento devido a conflito de horário',
         cancelledAt: now.subtract(const Duration(days: 7)),

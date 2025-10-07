@@ -49,7 +49,7 @@ class StorageService extends GetxService {
       key: _encryptionKeyName,
       value: base64UrlEncode(key),
     );
-    return key;
+    return Uint8List.fromList(key);
   }
 
   Future<void> _ensureInitialized() async {

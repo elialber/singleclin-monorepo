@@ -486,8 +486,8 @@ class CommunityController extends GetxController {
       for (final image in selectedImages) {
         final response = await _apiService.uploadFile(
           '/upload/community-image',
-          image,
-          fileField: 'image',
+          image.path,
+          fileName: image.path.split('/').last,
         );
 
         uploadedUrls.add(response.data['url']);

@@ -366,6 +366,34 @@ class ChatSession extends Equatable {
   ];
 }
 
+extension ChatSessionCopyWith on ChatSession {
+  ChatSession copyWith({
+    String? id,
+    String? userId,
+    String? agentId,
+    String? agentName,
+    ChatStatus? status,
+    List<ChatMessage>? messages,
+    DateTime? createdAt,
+    DateTime? endedAt,
+    int? queuePosition,
+    String? topic,
+  }) {
+    return ChatSession(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      agentId: agentId ?? this.agentId,
+      agentName: agentName ?? this.agentName,
+      status: status ?? this.status,
+      messages: messages ?? this.messages,
+      createdAt: createdAt ?? this.createdAt,
+      endedAt: endedAt ?? this.endedAt,
+      queuePosition: queuePosition ?? this.queuePosition,
+      topic: topic ?? this.topic,
+    );
+  }
+}
+
 /// Chat message
 class ChatMessage extends Equatable {
   const ChatMessage({

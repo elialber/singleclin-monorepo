@@ -46,6 +46,7 @@ class CreditHistoryController extends GetxController {
   List<CreditTransactionModel> get transactions => _filteredTransactions;
   bool get hasMoreData => _hasMoreData.value;
   int get currentPage => _currentPage.value;
+  String get error => _errorMessage.value;
 
   // Filter getters
   HistoryPeriodFilter get periodFilter => _periodFilter.value;
@@ -87,6 +88,11 @@ class CreditHistoryController extends GetxController {
     super.onInit();
     loadTransactionHistory();
     _setupFilterListeners();
+  }
+
+  @override
+  Future<void> refresh() async {
+    await loadTransactionHistory(isRefresh: true);
   }
 
   void _setupFilterListeners() {

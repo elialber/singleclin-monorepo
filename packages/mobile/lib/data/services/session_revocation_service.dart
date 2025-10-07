@@ -14,19 +14,20 @@ class SessionRevocationService {
   SessionRevocationService({
     FirebaseMessaging? messaging,
     FirebaseAuth? firebaseAuth,
-    this.onRevocation,
+    Future<void> Function(String message)? onRevocation,
     TokenRefreshService? tokenRefreshService,
     StorageService? storageService,
     AuthService? authService,
   }) : _messaging = messaging ?? FirebaseMessaging.instance,
        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _onRevocation = onRevocation,
        _tokenRefreshService = tokenRefreshService,
        _storageService = storageService,
        _authService = authService;
 
   final FirebaseMessaging _messaging;
   final FirebaseAuth _firebaseAuth;
-  final Future<void> Function(String message) _onRevocation;
+  final Future<void> Function(String message)? _onRevocation;
   final TokenRefreshService? _tokenRefreshService;
   final StorageService? _storageService;
   final AuthService? _authService;
@@ -82,7 +83,9 @@ class SessionRevocationService {
       }
       final reason =
           message.data['message'] ?? 'Sua sessão foi encerrada pelo servidor.';
-      await _onRevocation(reason);
+      if (_onRevocation != null) {
+        await _onRevocation(reason);
+      }
     }
   }
 }

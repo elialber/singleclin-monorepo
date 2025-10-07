@@ -373,7 +373,7 @@ class CreditsScreen extends StatelessWidget {
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: color.shade700,
+                color: color is MaterialColor ? color.shade700 : color,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),

@@ -57,7 +57,7 @@ class SyncService extends GetxService {
       await _processPendingOperations();
 
       // Setup automatic sync when network becomes available
-      _networkService.isConnected.listen((isConnected) {
+      _networkService.isConnectedRx.listen((isConnected) {
         if (isConnected && !_syncInProgress.value) {
           _scheduleSync(immediate: true);
         }
@@ -404,7 +404,7 @@ class SyncService extends GetxService {
 
   void _setupBackgroundSync() {
     _backgroundSyncTimer = Timer.periodic(_backgroundSyncInterval, (timer) {
-      if (Get.find<NetworkService>().isConnected.value &&
+      if (Get.find<NetworkService>().isConnected &&
           !_syncInProgress.value) {
         _scheduleSync(background: true);
       }

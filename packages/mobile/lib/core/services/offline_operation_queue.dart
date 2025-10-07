@@ -236,18 +236,23 @@ class OfflineOperationQueue extends GetxService {
       };
 
       // Count by type
+      final operationsByType = stats['operationsByType']! as Map<String, int>;
+      final operationsByBoxType =
+          stats['operationsByBoxType']! as Map<String, int>;
+      final operationsByPriority =
+          stats['operationsByPriority']! as Map<String, int>;
+
       for (final op in operations) {
         final typeName = op.operation.name;
-        stats['operationsByType'][typeName] =
-            (stats['operationsByType'][typeName] ?? 0) + 1;
+        operationsByType[typeName] = (operationsByType[typeName] ?? 0) + 1;
 
         final boxTypeName = op.boxType.name;
-        stats['operationsByBoxType'][boxTypeName] =
-            (stats['operationsByBoxType'][boxTypeName] ?? 0) + 1;
+        operationsByBoxType[boxTypeName] =
+            (operationsByBoxType[boxTypeName] ?? 0) + 1;
 
         final priority = op.metadata?['priority'] ?? 'normal';
-        stats['operationsByPriority'][priority] =
-            (stats['operationsByPriority'][priority] ?? 0) + 1;
+        operationsByPriority[priority] =
+            (operationsByPriority[priority] ?? 0) + 1;
       }
 
       return stats;

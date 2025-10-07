@@ -1,3 +1,5 @@
+import 'package:singleclin_mobile/features/discovery/models/clinic_model.dart';
+
 enum AppointmentStatus {
   pending,
   confirmed,

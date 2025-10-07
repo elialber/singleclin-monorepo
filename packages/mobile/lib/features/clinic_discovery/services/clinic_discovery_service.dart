@@ -175,23 +175,20 @@ class ClinicDiscoveryService {
 
       // Return clinics that are available now or have emergency services
       return allClinics.where((clinic) {
-        return clinic.isAvailable &&
-            (clinic.services.any(
-                      (service) =>
-                          (service['name'] ?? '').toLowerCase().contains(
-                            'urgência',
-                          ) ||
-                          (service['name'] ?? '').toLowerCase().contains(
-                            'pronto socorro',
-                          ) ||
-                          (service['name'] ?? '').toLowerCase().contains(
-                            'emergência',
-                          ),
-                    ) ||
-                    clinic.nextAvailableSlot?.isBefore(
-                      DateTime.now().add(const Duration(hours: 2)),
-                    ) ??
-                false);
+        final hasEmergencyService = clinic.services.any((service) {
+          final name = (service['name'] ?? '').toString().toLowerCase();
+          return name.contains('urgência') ||
+              name.contains('pronto socorro') ||
+              name.contains('emergência');
+        });
+
+        final hasSoonSlot =
+            (clinic.nextAvailableSlot?.isBefore(
+              DateTime.now().add(const Duration(hours: 2)),
+            )) ??
+            false;
+
+        return clinic.isAvailable && (hasEmergencyService || hasSoonSlot);
       }).toList();
     } catch (e) {
       print('❌ Error getting emergency clinics: $e');

@@ -18,7 +18,7 @@ class NetworkService extends GetxService {
   final _connectionQuality = ConnectionQuality.good.obs;
 
   // Stream subscription
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   // Connection test settings
   static const String _testUrl = 'https://www.google.com';
@@ -84,32 +84,29 @@ class NetworkService extends GetxService {
 
   Future<void> _checkInitialConnectivity() async {
     final result = await _connectivity.checkConnectivity();
-    _connectionType.value = result;
-
-    if (result == ConnectivityResult.none) {
-      _isConnected.value = false;
-      _connectionQuality.value = ConnectionQuality.none;
-    } else {
-      // Test actual internet connectivity
-      final isActuallyConnected = await _testInternetConnection();
-      _isConnected.value = isActuallyConnected;
-
-      if (isActuallyConnected) {
-        await _testConnectionQuality();
-      } else {
-        _connectionQuality.value = ConnectionQuality.none;
-      }
-    }
+    _onConnectivityChanged(result);
   }
 
-  void _onConnectivityChanged(ConnectivityResult result) {
+  void _onConnectivityChanged(List<ConnectivityResult> result) {
     print('📶 Connectivity changed to: $result');
-    _connectionType.value = result;
-
-    if (result == ConnectivityResult.none) {
+    if (result.contains(ConnectivityResult.none)) {
       _isConnected.value = false;
+      _connectionType.value = ConnectivityResult.none;
       _connectionQuality.value = ConnectionQuality.none;
     } else {
+      if (result.contains(ConnectivityResult.wifi)) {
+        _connectionType.value = ConnectivityResult.wifi;
+      } else if (result.contains(ConnectivityResult.mobile)) {
+        _connectionType.value = ConnectivityResult.mobile;
+      } else if (result.contains(ConnectivityResult.ethernet)) {
+        _connectionType.value = ConnectivityResult.ethernet;
+      } else if (result.contains(ConnectivityResult.bluetooth)) {
+        _connectionType.value = ConnectivityResult.bluetooth;
+      } else if (result.contains(ConnectivityResult.vpn)) {
+        _connectionType.value = ConnectivityResult.vpn;
+      } else {
+        _connectionType.value = ConnectivityResult.other;
+      }
       // Test actual connection when connectivity is detected
       _testAndUpdateConnection();
     }
@@ -132,7 +129,6 @@ class NetworkService extends GetxService {
       final response = await _dio.get(
         _testUrl,
         options: Options(
-          connectTimeout: _testTimeout,
           receiveTimeout: _testTimeout,
           sendTimeout: _testTimeout,
         ),
@@ -150,10 +146,7 @@ class NetworkService extends GetxService {
 
       final response = await _dio.get(
         _testUrl,
-        options: Options(
-          connectTimeout: _testTimeout,
-          receiveTimeout: _testTimeout,
-        ),
+        options: Options(receiveTimeout: _testTimeout),
       );
 
       stopwatch.stop();

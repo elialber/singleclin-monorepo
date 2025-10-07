@@ -94,17 +94,19 @@ class DiscoveryController extends GetxController {
   Future<void> _loadUserLocation() async {
     try {
       final position = await _locationService.getCurrentPosition();
-      _userLocation.value = position;
+      if (position != null) {
+        _userLocation.value = position;
 
-      // Update filters with user location if not set
-      if (_filterOptions.value.location == null) {
-        final locationFilter = LocationFilter(
-          latitude: position.latitude,
-          longitude: position.longitude,
-        );
-        _filterOptions.value = _filterOptions.value.copyWith(
-          location: locationFilter,
-        );
+        // Update filters with user location if not set
+        if (_filterOptions.value.location == null) {
+          final locationFilter = LocationFilter(
+            latitude: position.latitude,
+            longitude: position.longitude,
+          );
+          _filterOptions.value = _filterOptions.value.copyWith(
+            location: locationFilter,
+          );
+        }
       }
     } catch (e) {
       debugPrint('Erro ao obter localização: $e');

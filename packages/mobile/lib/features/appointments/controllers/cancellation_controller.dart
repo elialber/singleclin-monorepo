@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/features/appointments/models/appointment.dart';
 import 'package:singleclin_mobile/features/appointments/models/cancellation_policy.dart';
@@ -184,7 +185,7 @@ class CancellationController extends GetxController {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Tem certeza que deseja cancelar este agendamento?'),
+                const Text('Tem certeza que deseja cancelar este agendamento?'),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -195,7 +196,7 @@ class CancellationController extends GetxController {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Resumo do Reembolso:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),

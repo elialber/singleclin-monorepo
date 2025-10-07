@@ -18,7 +18,7 @@ class WriteReviewController extends GetxController {
 
   // Observable state
   final RxBool isSubmitting = false.obs;
-  final RxInt currentStep = 0.obs;
+  final RxInt _currentStep = 0.obs;
   final RxString error = ''.obs;
 
   // Rating values
@@ -37,6 +37,9 @@ class WriteReviewController extends GetxController {
   final RxList<File> beforePhotos = <File>[].obs;
   final RxList<File> afterPhotos = <File>[].obs;
   final RxBool isUploadingPhotos = false.obs;
+
+  // Terms agreement
+  final RxBool _agreeToTerms = false.obs;
 
   // Appointment and clinic info
   String appointmentId = '';
@@ -68,56 +71,65 @@ class WriteReviewController extends GetxController {
 
   /// Move to next step
   void nextStep() {
-    if (currentStep.value < 4) {
-      currentStep.value++;
+    if (_currentStep.value < 4) {
+      _currentStep.value++;
+      update();
     }
   }
 
   /// Move to previous step
   void previousStep() {
-    if (currentStep.value > 0) {
-      currentStep.value--;
+    if (_currentStep.value > 0) {
+      _currentStep.value--;
+      update();
     }
   }
 
   /// Go to specific step
   void goToStep(int step) {
-    currentStep.value = step;
+    _currentStep.value = step;
   }
 
   /// Update overall rating
   void updateOverallRating(double rating) {
     overallRating.value = rating;
+    update();
   }
 
   /// Update service rating
   void updateServiceRating(double rating) {
     serviceRating.value = rating;
+    update();
   }
 
   /// Update cleanliness rating
   void updateCleanlinessRating(double rating) {
     cleanlinessRating.value = rating;
+    update();
   }
 
   /// Update staff rating
   void updateStaffRating(double rating) {
     staffRating.value = rating;
+    update();
   }
 
   /// Update value rating
   void updateValueRating(double rating) {
     valueRating.value = rating;
+    update();
   }
 
   /// Toggle recommendation
   void toggleRecommendation() {
     isRecommended.value = !isRecommended.value;
+    update();
   }
 
   /// Toggle would return
   void toggleWouldReturn() {
     wouldReturn.value = !wouldReturn.value;
+    update();
   }
 
   /// Toggle tag selection
@@ -127,6 +139,7 @@ class WriteReviewController extends GetxController {
     } else {
       selectedTags.add(tag);
     }
+    update();
   }
 
   /// Pick before photos
@@ -219,6 +232,7 @@ class WriteReviewController extends GetxController {
   void removeBeforePhoto(int index) {
     if (index < beforePhotos.length) {
       beforePhotos.removeAt(index);
+      update();
     }
   }
 
@@ -226,6 +240,7 @@ class WriteReviewController extends GetxController {
   void removeAfterPhoto(int index) {
     if (index < afterPhotos.length) {
       afterPhotos.removeAt(index);
+      update();
     }
   }
 
@@ -274,7 +289,7 @@ class WriteReviewController extends GetxController {
 
       // Award SG credits for review
       await _creditsController.awardCreditsForReview(
-        reviewId: response.data['reviewId'],
+        response.data['reviewId'],
         hasPhotos: beforePhotos.isNotEmpty || afterPhotos.isNotEmpty,
       );
 
@@ -313,8 +328,8 @@ class WriteReviewController extends GetxController {
       for (final photo in photos) {
         final response = await _apiService.uploadFile(
           '/upload/review-photo',
-          photo,
-          fileField: 'photo',
+          photo.path,
+          fileName: photo.path.split('/').last,
           data: {'type': type, 'appointmentId': appointmentId},
         );
 
@@ -380,7 +395,7 @@ class WriteReviewController extends GetxController {
 
   /// Get current step title
   String get currentStepTitle {
-    switch (currentStep.value) {
+    switch (_currentStep.value) {
       case 0:
         return 'Avaliação Geral';
       case 1:
@@ -398,12 +413,12 @@ class WriteReviewController extends GetxController {
 
   /// Get progress percentage
   double get progressPercentage {
-    return (currentStep.value + 1) / 5;
+    return (_currentStep.value + 1) / 5;
   }
 
   /// Check if current step is valid
   bool get isCurrentStepValid {
-    switch (currentStep.value) {
+    switch (_currentStep.value) {
       case 0:
         return overallRating.value > 0;
       case 1:
@@ -421,5 +436,64 @@ class WriteReviewController extends GetxController {
       default:
         return false;
     }
+  }
+
+  // ---- Compatibility getters/methods expected by WriteReviewScreen ----
+  int get currentStep => _currentStep.value;
+  bool get canProceed => isCurrentStepValid;
+  bool get isLoading => isSubmitting.value;
+  List<File> get selectedPhotos => beforePhotos;
+  void removePhoto(int index) => removeBeforePhoto(index);
+  double get rating => overallRating.value;
+  void setRating(double value) => updateOverallRating(value);
+  String getRatingDescription() {
+    final r = overallRating.value;
+    if (r >= 4.5) return 'Excelente';
+    if (r >= 3.5) return 'Muito bom';
+    if (r >= 2.5) return 'Bom';
+    if (r >= 1.5) return 'Regular';
+    return 'Ruim';
+  }
+
+  bool get agreeToTerms => _agreeToTerms.value;
+  void setAgreeToTerms(bool? value) {
+    _agreeToTerms.value = value ?? false;
+    update();
+  }
+
+  Future<void> pickFromCamera() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
+      if (image == null) return;
+      final compressed = await compressImage(File(image.path));
+      if (compressed != null) {
+        beforePhotos.add(compressed);
+        update();
+      }
+    } catch (_) {}
+  }
+
+  Future<void> pickFromGallery() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final List<XFile> images = await picker.pickMultiImage(
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
+      for (final img in images) {
+        final compressed = await compressImage(File(img.path));
+        if (compressed != null) {
+          beforePhotos.add(compressed);
+        }
+      }
+      update();
+    } catch (_) {}
   }
 }

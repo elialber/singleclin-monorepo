@@ -35,7 +35,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
   @override
   Future<ClinicModel?> fetchFromNetwork(String id) async {
     try {
-      final response = await _dio.get('/api/clinics/$id');
+      final response = await dio.get('/api/clinics/$id');
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         return ClinicModel.fromJson(response.data['data']);
@@ -60,7 +60,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
         if (offset != null) 'offset': offset,
       };
 
-      final response = await _dio.get(
+      final response = await dio.get(
         '/api/clinics',
         queryParameters: queryParams,
       );
@@ -84,10 +84,10 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
 
       if (id != null) {
         // Update existing clinic (admin only)
-        response = await _dio.put('/api/clinics/$id', data: data);
+        response = await dio.put('/api/clinics/$id', data: data);
       } else {
         // Create new clinic (admin only)
-        response = await _dio.post('/api/clinics', data: data);
+        response = await dio.post('/api/clinics', data: data);
       }
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -103,7 +103,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
   @override
   Future<bool> deleteFromNetwork(String id) async {
     try {
-      final response = await _dio.delete('/api/clinics/$id');
+      final response = await dio.delete('/api/clinics/$id');
       return response.statusCode == 200 && response.data['success'] == true;
     } catch (e) {
       print('❌ Failed to delete clinic from network: $e');
@@ -159,7 +159,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
       if (latitude != null && longitude != null) 'radius': radiusKm,
     };
 
-    if (offlineOnly || !await _networkService.isConnected) {
+    if (offlineOnly || !networkService.isConnected) {
       // Perform offline text search
       return _performOfflineTextSearch(
         query,
@@ -197,7 +197,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
     );
 
     // Filter by specialty offline if needed
-    if (offlineOnly || !await _networkService.isConnected) {
+    if (offlineOnly || !networkService.isConnected) {
       return clinics
           .where(
             (clinic) => clinic.specialties.any(
@@ -259,7 +259,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
       // Keep only last 20 items
       final limitedIds = recentIds.take(20).toList();
 
-      await _cacheService.putList(
+      await cacheService.putList(
         boxName,
         'recently_viewed',
         limitedIds
@@ -303,7 +303,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
         await _saveFavoriteIds(favoriteIds);
 
         // Try to sync with server if online
-        if (await _networkService.isConnected) {
+        if (networkService.isConnected) {
           await _syncFavoritesToServer(favoriteIds);
         }
       }
@@ -321,7 +321,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
         await _saveFavoriteIds(favoriteIds);
 
         // Try to sync with server if online
-        if (await _networkService.isConnected) {
+        if (networkService.isConnected) {
           await _syncFavoritesToServer(favoriteIds);
         }
       }
@@ -343,7 +343,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
     double radiusKm = 25.0,
   }) async {
     try {
-      if (!await _networkService.isConnected) return;
+      if (!networkService.isConnected) return;
 
       print(
         '📥 Preloading clinics for area (lat: $latitude, lng: $longitude, radius: ${radiusKm}km)',
@@ -419,17 +419,17 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
   }
 
   Future<List<String>> _getRecentlyViewedIds() async {
-    final data = await _cacheService.getList(boxName, 'recently_viewed');
+    final data = await cacheService.getList(boxName, 'recently_viewed');
     return data.map((item) => item['id'] as String).toList();
   }
 
   Future<List<String>> _getFavoriteIds() async {
-    final data = await _cacheService.getList(boxName, 'favorites');
+    final data = await cacheService.getList(boxName, 'favorites');
     return data.map((item) => item as String).toList();
   }
 
   Future<void> _saveFavoriteIds(List<String> favoriteIds) async {
-    await _cacheService.putList(
+    await cacheService.putList(
       boxName,
       'favorites',
       favoriteIds.map((id) => id).toList(),
@@ -438,7 +438,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
 
   Future<void> _syncFavoritesToServer(List<String> favoriteIds) async {
     try {
-      await _dio.put(
+      await dio.put(
         '/api/user/favorites/clinics',
         data: {'clinicIds': favoriteIds},
       );
