@@ -147,12 +147,12 @@ class AppPages {
       binding: AppointmentsBinding(),
     ),
 
-    // Module 3 - Profile Routes
-    GetPage(
-      name: AppRoutes.profile,
-      page: () => const ProfileScreen(),
-      binding: ProfileBinding(),
-    ),
+    // Module 3 - Profile Routes - TEMPORARIAMENTE COMENTADO
+    // GetPage(
+    //   name: AppRoutes.profile,
+    //   page: () => const ProfileScreen(),
+    //   binding: ProfileBinding(),
+    // ),
     // TEMPORARIAMENTE COMENTADO - Health History e Documents têm erros
     // GetPage(
     //   name: AppRoutes.healthHistory,
