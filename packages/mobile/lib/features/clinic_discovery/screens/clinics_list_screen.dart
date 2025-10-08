@@ -15,7 +15,11 @@ class ClinicsListScreen extends StatelessWidget {
     final controller = Get.put(ClinicsListController());
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Clínicas', showBackButton: false),
+      appBar: const CustomAppBar(
+        title: 'Descubra Clínicas',
+        showBackButton: false,
+      ),
+      backgroundColor: AppColors.background,
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
@@ -61,96 +65,185 @@ class ClinicsListScreen extends StatelessWidget {
           );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.clinics.length,
-          itemBuilder: (context, index) {
-            final clinic = controller.clinics[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: InkWell(
-                onTap: () {
-                  // Navigate to ClinicServicesScreen passing the clinic
-                  Get.to(() => const ClinicServicesScreen(), arguments: clinic);
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          clinic.imageUrl.isNotEmpty
-                              ? clinic.imageUrl
-                              : 'https://via.placeholder.com/60',
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceVariant,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.local_hospital,
-                                color: AppColors.primary,
-                                size: 30,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              clinic.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.star, color: AppColors.warning, size: 16),
-                                const SizedBox(width: 4),
-                                Text(
-                                  clinic.rating.toStringAsFixed(1),
-                                  style: const TextStyle(fontWeight: FontWeight.w600),
-                                ),
-                                const SizedBox(width: 12),
-                                const Icon(Icons.location_on, color: AppColors.primary, size: 16),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '${clinic.distance.toStringAsFixed(1)} km',
-                                  style: const TextStyle(color: AppColors.mediumGrey),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.mediumGrey),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
+        return RefreshIndicator(
+          onRefresh: controller.loadClinics,
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: controller.clinics.length,
+            itemBuilder: (context, index) {
+              final clinic = controller.clinics[index];
+              return _buildClinicCard(clinic);
+            },
+          ),
         );
       }),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: 0,
         onTap: (index) => Get.find<BottomNavController>().changePage(index),
+      ),
+    );
+  }
+
+  Widget _buildClinicCard(clinic) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: () {
+          Get.to(() => const ClinicServicesScreen(), arguments: clinic);
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Imagem principal com carousel se houver múltiplas imagens
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: clinic.images.isNotEmpty
+                      ? SizedBox(
+                          height: 200,
+                          width: double.infinity,
+                          child: PageView.builder(
+                            itemCount: clinic.images.length,
+                            itemBuilder: (context, imageIndex) {
+                              return Image.network(
+                                clinic.images[imageIndex],
+                                height: 200,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 200,
+                                    color: AppColors.surfaceVariant,
+                                    child: const Icon(
+                                      Icons.local_hospital,
+                                      color: AppColors.primary,
+                                      size: 60,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        )
+                      : Container(
+                          height: 200,
+                          color: AppColors.surfaceVariant,
+                          child: const Icon(
+                            Icons.local_hospital,
+                            color: AppColors.primary,
+                            size: 60,
+                          ),
+                        ),
+                ),
+                // Indicador de múltiplas fotos
+                if (clinic.images.length > 1)
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.photo_library, color: Colors.white, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${clinic.images.length}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            
+            // Informações da clínica
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    clinic.name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: AppColors.warning, size: 18),
+                      const SizedBox(width: 4),
+                      Text(
+                        clinic.rating.toStringAsFixed(1),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        ' (${clinic.reviewCount} avaliações)',
+                        style: TextStyle(
+                          color: AppColors.mediumGrey,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.location_on, color: AppColors.primary, size: 18),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${clinic.distance.toStringAsFixed(1)} km',
+                        style: const TextStyle(
+                          color: AppColors.mediumGrey,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (clinic.specializations.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: clinic.specializations.take(3).map((spec) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            spec,
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
