@@ -98,6 +98,7 @@ public class AppDbContext : DbContext
 
         // Apply entity configurations
         modelBuilder.ApplyConfiguration(new Data.Configurations.ClinicImageConfiguration());
+        modelBuilder.ApplyConfiguration(new Data.Configurations.ServiceConfiguration());
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
