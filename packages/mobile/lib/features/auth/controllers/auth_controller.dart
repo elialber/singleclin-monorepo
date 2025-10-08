@@ -115,9 +115,9 @@ class AuthController extends GetxController {
       _isAuthenticated.value = true;
 
       // Step 6: Navigate to appropriate screen
-      // TEMP: Dashboard está comentado, ir para clinic discovery
-      Get.offAllNamed('/clinic-discovery-with-nav');
-      
+      // TEMP: Dashboard está comentado, ir para clinic services
+      Get.offAllNamed(AppRoutes.clinicServices);
+
       // final onboardingCompleted = await isOnboardingCompleted();
       // if (onboardingCompleted) {
       //   Get.offAllNamed(AppRoutes.dashboard);
@@ -167,9 +167,9 @@ class AuthController extends GetxController {
       _isAuthenticated.value = true;
 
       // Step 6: Navigate to appropriate screen
-      // TEMP: Dashboard está comentado, ir para clinic discovery
-      Get.offAllNamed('/clinic-discovery-with-nav');
-      
+      // TEMP: Dashboard está comentado, ir para clinic services
+      Get.offAllNamed(AppRoutes.clinicServices);
+
       // final onboardingCompleted = await isOnboardingCompleted();
       // if (onboardingCompleted) {
       //   Get.offAllNamed(AppRoutes.dashboard);
@@ -357,9 +357,9 @@ class AuthController extends GetxController {
     _user.value = userProfile;
     _isAuthenticated.value = true;
 
-    // Navigate to clinic discovery (dashboard está comentado)
-    Get.offAllNamed('/clinic-discovery-with-nav');
-    
+    // Navigate to clinic services (dashboard está comentado)
+    Get.offAllNamed(AppRoutes.clinicServices);
+
     // final onboardingCompleted = await isOnboardingCompleted();
     // if (onboardingCompleted) {
     //   Get.offAllNamed(AppRoutes.dashboard);
