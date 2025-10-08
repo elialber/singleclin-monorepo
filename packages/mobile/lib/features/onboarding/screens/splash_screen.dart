@@ -89,13 +89,15 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigateToNextScreen() {
-    final controller = Get.find<OnboardingController>();
-
-    if (controller.shouldShowOnboarding()) {
-      Get.offNamed('/onboarding');
-    } else {
-      Get.offNamed('/dashboard');
-    }
+    // TEMP: Pular onboarding e dashboard (comentados) - ir direto para login
+    Get.offNamed('/login');
+    
+    // final controller = Get.find<OnboardingController>();
+    // if (controller.shouldShowOnboarding()) {
+    //   Get.offNamed('/onboarding');
+    // } else {
+    //   Get.offNamed('/dashboard');
+    // }
   }
 
   @override
