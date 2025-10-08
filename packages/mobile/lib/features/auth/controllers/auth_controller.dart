@@ -115,12 +115,15 @@ class AuthController extends GetxController {
       _isAuthenticated.value = true;
 
       // Step 6: Navigate to appropriate screen
-      final onboardingCompleted = await isOnboardingCompleted();
-      if (onboardingCompleted) {
-        Get.offAllNamed(AppRoutes.dashboard);
-      } else {
-        Get.offAllNamed(AppRoutes.onboarding);
-      }
+      // TEMP: Dashboard está comentado, ir para clinic discovery
+      Get.offAllNamed('/clinic-discovery-with-nav');
+      
+      // final onboardingCompleted = await isOnboardingCompleted();
+      // if (onboardingCompleted) {
+      //   Get.offAllNamed(AppRoutes.dashboard);
+      // } else {
+      //   Get.offAllNamed(AppRoutes.onboarding);
+      // }
 
       return true;
     } catch (e) {
@@ -164,12 +167,15 @@ class AuthController extends GetxController {
       _isAuthenticated.value = true;
 
       // Step 6: Navigate to appropriate screen
-      final onboardingCompleted = await isOnboardingCompleted();
-      if (onboardingCompleted) {
-        Get.offAllNamed(AppRoutes.dashboard);
-      } else {
-        Get.offAllNamed(AppRoutes.onboarding);
-      }
+      // TEMP: Dashboard está comentado, ir para clinic discovery
+      Get.offAllNamed('/clinic-discovery-with-nav');
+      
+      // final onboardingCompleted = await isOnboardingCompleted();
+      // if (onboardingCompleted) {
+      //   Get.offAllNamed(AppRoutes.dashboard);
+      // } else {
+      //   Get.offAllNamed(AppRoutes.onboarding);
+      // }
 
       return true;
     } catch (e) {
@@ -351,13 +357,15 @@ class AuthController extends GetxController {
     _user.value = userProfile;
     _isAuthenticated.value = true;
 
-    // Navigate to dashboard or onboarding
-    final onboardingCompleted = await isOnboardingCompleted();
-    if (onboardingCompleted) {
-      Get.offAllNamed(AppRoutes.dashboard);
-    } else {
-      Get.offAllNamed(AppRoutes.onboarding);
-    }
+    // Navigate to clinic discovery (dashboard está comentado)
+    Get.offAllNamed('/clinic-discovery-with-nav');
+    
+    // final onboardingCompleted = await isOnboardingCompleted();
+    // if (onboardingCompleted) {
+    //   Get.offAllNamed(AppRoutes.dashboard);
+    // } else {
+    //   Get.offAllNamed(AppRoutes.onboarding);
+    // }
   }
 
   /// Limpar erro

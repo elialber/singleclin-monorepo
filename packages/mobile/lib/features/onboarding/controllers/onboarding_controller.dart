@@ -48,11 +48,11 @@ class OnboardingController extends GetxController
   Future<void> _checkFirstLaunch() async {
     try {
       isLoading.value = true;
-      
+
       // TEMP: Forçar que onboarding nunca seja exibido
       await _storageService.setBool(_firstLaunchKey, true);
       isFirstLaunch.value = false;
-      
+
       // final hasSeenOnboarding =
       //     await _storageService.getBool(_firstLaunchKey) ?? false;
       // isFirstLaunch.value = !hasSeenOnboarding;

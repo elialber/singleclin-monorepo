@@ -61,11 +61,12 @@ class AppPages {
       page: () => const SplashScreen(),
       binding: OnboardingBinding(),
     ),
-    GetPage(
-      name: AppRoutes.onboarding,
-      page: () => const OnboardingScreen(),
-      binding: OnboardingBinding(),
-    ),
+    // TEMP: Onboarding removido do fluxo
+    // GetPage(
+    //   name: AppRoutes.onboarding,
+    //   page: () => const OnboardingScreen(),
+    //   binding: OnboardingBinding(),
+    // ),
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginScreen(),
