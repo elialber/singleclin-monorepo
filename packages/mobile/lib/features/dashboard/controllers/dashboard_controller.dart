@@ -3,6 +3,7 @@ import 'package:singleclin_mobile/data/services/clinic_api_service.dart';
 import 'package:singleclin_mobile/features/appointment/models/appointment_model.dart';
 import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
+import 'package:singleclin_mobile/features/discovery/models/service.dart';
 
 class DashboardController extends GetxController {
   final ClinicApiService _clinicApiService = ClinicApiService();
@@ -12,8 +13,8 @@ class DashboardController extends GetxController {
   final RxBool _isLoading = false.obs;
   final RxString _error = ''.obs;
   final RxList<Clinic> _nearbyClinics = <Clinic>[].obs;
-  final RxList<ServiceModel> _recommendedServices = <ServiceModel>[].obs;
-  final RxList<ServiceModel> _popularServices = <ServiceModel>[].obs;
+  final RxList<Service> _recommendedServices = <Service>[].obs;
+  final RxList<Service> _popularServices = <Service>[].obs;
   final Rx<AppointmentModel?> _nextAppointment = Rx<AppointmentModel?>(null);
   final RxString _searchQuery = ''.obs;
   final RxList<String> _recentSearches = <String>[].obs;
@@ -22,16 +23,17 @@ class DashboardController extends GetxController {
   bool get isLoading => _isLoading.value;
   String get error => _error.value;
   List<Clinic> get nearbyClinics => _nearbyClinics;
-  List<ServiceModel> get recommendedServices => _recommendedServices;
-  List<ServiceModel> get popularServices => _popularServices;
+  List<Service> get recommendedServices => _recommendedServices;
+  List<Service> get popularServices => _popularServices;
   AppointmentModel? get nextAppointment => _nextAppointment.value;
   String get searchQuery => _searchQuery.value;
   List<String> get recentSearches => _recentSearches;
 
   // User data getters
-  int get userCredits => _authController.user?.sgCredits ?? 0;
-  DateTime? get creditsRenewDate => _authController.user?.creditsRenewDate;
-  String get userName => _authController.user?.fullName ?? 'Usuário';
+  // TODO: Implement credit system integration
+  int get userCredits => 0; // Placeholder until credit system is implemented
+  DateTime? get creditsRenewDate => null; // Placeholder
+  String get userName => _authController.user?.displayName ?? 'Usuário';
 
   @override
   void onInit() {
