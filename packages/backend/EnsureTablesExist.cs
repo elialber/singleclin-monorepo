@@ -32,13 +32,12 @@ public static class EnsureTablesExist
                 );
             ");
 
-            // Drop and recreate tables to fix schema issues
-            await context.Database.ExecuteSqlRawAsync(@"DROP TABLE IF EXISTS user_plans CASCADE;");
-            await context.Database.ExecuteSqlRawAsync(@"DROP TABLE IF EXISTS users CASCADE;");
-
-            // Recreate users table with all required columns
+            // CRITICAL FIX: DO NOT drop tables - this deletes all user data!
+            // These tables should be created by migrations, not dropped on every startup
+            
+            // Create users table only if it doesn't exist
             await context.Database.ExecuteSqlRawAsync(@"
-                CREATE TABLE users (
+                CREATE TABLE IF NOT EXISTS users (
                     id uuid NOT NULL DEFAULT gen_random_uuid(),
                     application_user_id uuid NOT NULL,
                     email character varying(255) NOT NULL,
@@ -58,9 +57,9 @@ public static class EnsureTablesExist
                 );
             ");
 
-            // Create user_plans table  
+            // Create user_plans table only if it doesn't exist
             await context.Database.ExecuteSqlRawAsync(@"
-                CREATE TABLE user_plans (
+                CREATE TABLE IF NOT EXISTS user_plans (
                     id uuid NOT NULL DEFAULT gen_random_uuid(),
                     user_id uuid NOT NULL,
                     plan_id uuid NOT NULL,
