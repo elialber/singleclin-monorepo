@@ -10,6 +10,7 @@ class AppointmentsApiService {
     bool? includeCompleted,
   }) async {
     try {
+      print('DEBUG: Fetching appointments from API...');
       final queryParameters = <String, dynamic>{};
       if (includeCompleted != null) {
         queryParameters['includeCompleted'] = includeCompleted.toString();
@@ -20,12 +21,16 @@ class AppointmentsApiService {
         queryParameters: queryParameters.isNotEmpty ? queryParameters : null,
       );
 
+      print('DEBUG: API Response status: ${response.statusCode}');
+      print('DEBUG: API Response data type: ${response.data.runtimeType}');
+
       if (response.statusCode == 200) {
         final data = response.data;
 
         // Handle both direct array and nested data structure
         List<dynamic> appointmentsJson;
         if (data is Map<String, dynamic>) {
+          print('DEBUG: Response is Map, keys: ${data.keys}');
           if (data.containsKey('data')) {
             appointmentsJson = data['data'] as List<dynamic>;
           } else if (data.containsKey('appointments')) {
@@ -34,35 +39,48 @@ class AppointmentsApiService {
             appointmentsJson = [];
           }
         } else if (data is List) {
+          print('DEBUG: Response is List with ${data.length} items');
           appointmentsJson = data;
         } else {
+          print('DEBUG: Response is unknown type, returning empty');
           appointmentsJson = [];
         }
 
-        return appointmentsJson
-            .map((json) => AppointmentModel.fromJson(json as Map<String, dynamic>))
+        print('DEBUG: Parsing ${appointmentsJson.length} appointments from JSON');
+        final appointments = appointmentsJson
+            .map(
+              (json) => AppointmentModel.fromJson(json as Map<String, dynamic>),
+            )
             .toList();
+
+        print('DEBUG: Successfully parsed ${appointments.length} appointments');
+        return appointments;
       } else {
         throw Exception('Failed to load appointments: ${response.statusCode}');
       }
     } catch (e) {
       print('DEBUG: Error fetching appointments: $e');
+      print('DEBUG: Error stack trace: ${StackTrace.current}');
       throw Exception('Error fetching appointments: $e');
     }
   }
 
   /// Get appointment by ID
-  static Future<AppointmentModel?> getAppointmentById(String appointmentId) async {
+  static Future<AppointmentModel?> getAppointmentById(
+    String appointmentId,
+  ) async {
     try {
-      final response = await _apiService.get(
-        '/Appointments/$appointmentId',
-      );
+      final response = await _apiService.get('/Appointments/$appointmentId');
 
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) {
-          final appointmentJson = data.containsKey('data') ? data['data'] : data;
-          return AppointmentModel.fromJson(appointmentJson as Map<String, dynamic>);
+          final appointmentJson = data.containsKey('data')
+              ? data['data']
+              : data;
+          return AppointmentModel.fromJson(
+            appointmentJson as Map<String, dynamic>,
+          );
         }
         return null;
       } else if (response.statusCode == 404) {
@@ -76,4 +94,3 @@ class AppointmentsApiService {
     }
   }
 }
-
