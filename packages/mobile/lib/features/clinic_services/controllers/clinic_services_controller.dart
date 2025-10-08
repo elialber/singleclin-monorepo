@@ -112,9 +112,7 @@ class ClinicServicesController extends GetxController {
 
       final userId = _authController.user?.id;
       print('DEBUG: loadUserCredits - userId: $userId');
-      print(
-        'DEBUG: loadUserCredits - user: ${_authController.user}',
-      );
+      print('DEBUG: loadUserCredits - user: ${_authController.user}');
 
       // Force sync user with backend to ensure user exists
       try {

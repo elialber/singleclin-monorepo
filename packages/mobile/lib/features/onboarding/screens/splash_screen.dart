@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/features/onboarding/controllers/onboarding_controller.dart';
+import 'package:singleclin_mobile/routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -88,16 +90,26 @@ class _SplashScreenState extends State<SplashScreen>
     _navigateToNextScreen();
   }
 
-  void _navigateToNextScreen() {
-    // TEMP: Pular onboarding e dashboard (comentados) - ir direto para login
-    Get.offNamed('/login');
-
-    // final controller = Get.find<OnboardingController>();
-    // if (controller.shouldShowOnboarding()) {
-    //   Get.offNamed('/onboarding');
-    // } else {
-    //   Get.offNamed('/dashboard');
-    // }
+  Future<void> _navigateToNextScreen() async {
+    // Verificar se o usuário está autenticado
+    try {
+      final authController = Get.find<AuthController>();
+      
+      // Aguardar um pouco para garantir que o AuthController verificou o status
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      if (authController.isAuthenticated) {
+        // Usuário já está logado, ir para a tela principal
+        Get.offNamed(AppRoutes.clinicServices);
+      } else {
+        // Usuário não está logado, ir para login
+        Get.offNamed('/login');
+      }
+    } catch (e) {
+      // Se AuthController não estiver registrado ainda, ir para login
+      print('Error checking auth status: $e');
+      Get.offNamed('/login');
+    }
   }
 
   @override
