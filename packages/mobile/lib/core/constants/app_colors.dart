@@ -13,6 +13,9 @@ class AppColors {
   /// Primary Brand Color - Azul-Esverdeado (Pantone 7476 C)
   static const Color primary = Color(0xFF005156);
 
+  /// Secondary Brand Color - Accent color
+  static const Color secondary = Color(0xFF00838F);
+
   /// Primary Light - Lighter version for hover states
   static const Color primaryLight = Color(0xFF006B71);
 

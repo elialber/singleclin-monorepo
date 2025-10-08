@@ -12,10 +12,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: 'SingleClin',
-        showBackButton: false,
-      ),
+      appBar: const CustomAppBar(title: 'SingleClin', showBackButton: false),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -37,7 +34,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
-            
+
             // Card de Transações
             _buildMenuCard(
               icon: Icons.receipt_long_outlined,
@@ -48,9 +45,9 @@ class HomeScreen extends StatelessWidget {
                 Get.find<BottomNavController>().changePage(1);
               },
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Card de Planos
             _buildMenuCard(
               icon: Icons.card_membership_outlined,
@@ -80,9 +77,7 @@ class HomeScreen extends StatelessWidget {
   }) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -97,11 +92,7 @@ class HomeScreen extends StatelessWidget {
                   color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 32,
-                ),
+                child: Icon(icon, color: color, size: 32),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -137,4 +128,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-

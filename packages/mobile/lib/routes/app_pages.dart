@@ -91,12 +91,9 @@ class AppPages {
     //   page: () => const DashboardScreen(),
     //   binding: DashboardBinding(),
     // ),
-    
+
     // Home Route - Tela inicial simples
-    GetPage(
-      name: AppRoutes.home,
-      page: () => const HomeScreen(),
-    ),
+    GetPage(name: AppRoutes.home, page: () => const HomeScreen()),
 
     // Discovery Routes
     // TEMPORARIAMENTE COMENTADO - DiscoveryScreen tem erros

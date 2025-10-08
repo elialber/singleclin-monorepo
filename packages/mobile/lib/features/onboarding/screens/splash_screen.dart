@@ -94,10 +94,10 @@ class _SplashScreenState extends State<SplashScreen>
     // Verificar se o usuário está autenticado
     try {
       final authController = Get.find<AuthController>();
-      
+
       // Aguardar um pouco para garantir que o AuthController verificou o status
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       if (authController.isAuthenticated) {
         // Usuário já está logado, ir para a tela principal (Home)
         Get.offNamed(AppRoutes.home);

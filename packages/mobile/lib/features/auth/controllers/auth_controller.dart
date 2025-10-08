@@ -357,8 +357,8 @@ class AuthController extends GetxController {
     _user.value = userProfile;
     _isAuthenticated.value = true;
 
-               // Navigate to home screen (dashboard está comentado)
-               Get.offAllNamed(AppRoutes.home);
+    // Navigate to home screen (dashboard está comentado)
+    Get.offAllNamed(AppRoutes.home);
 
     // final onboardingCompleted = await isOnboardingCompleted();
     // if (onboardingCompleted) {
