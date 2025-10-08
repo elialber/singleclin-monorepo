@@ -11,8 +11,10 @@ public class ClinicImageConfiguration : IEntityTypeConfiguration<ClinicImage>
 {
     public void Configure(EntityTypeBuilder<ClinicImage> builder)
     {
-        // Note: Table name is auto-converted to snake_case (clinic_images) by ApplicationDbContext
-        // Do NOT use builder.ToTable() to avoid overriding the convention
+        // Explicitly set table name to clinic_images (already in snake_case)
+        // The entity name "ClinicImage" would become "clinic_image" with snake_case,
+        // but the actual table is "clinic_images" (pluralized)
+        builder.ToTable("clinic_images");
 
         // Primary key
         builder.HasKey(ci => ci.Id);
