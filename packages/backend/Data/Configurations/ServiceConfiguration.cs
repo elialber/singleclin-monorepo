@@ -8,8 +8,8 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service>
 {
     public void Configure(EntityTypeBuilder<Service> builder)
     {
-        // Table name
-        builder.ToTable("ClinicServices");
+        // Note: Table name is auto-converted to snake_case (clinic_services) by ApplicationDbContext
+        // Do NOT use builder.ToTable() to avoid overriding the convention
 
         // Primary key
         builder.HasKey(cs => cs.Id);
