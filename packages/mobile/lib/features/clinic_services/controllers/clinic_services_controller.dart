@@ -323,12 +323,13 @@ class ClinicServicesController extends GetxController {
         if (responseData != null) {
           appointmentId = responseData['id']?.toString() ?? 'N/A';
           scheduledDate = responseData['scheduledDate']?.toString() ?? 'N/A';
-          
+
           // Format date if available
           if (scheduledDate != 'N/A') {
             try {
               final date = DateTime.parse(scheduledDate);
-              scheduledDate = '${date.day}/${date.month}/${date.year} às ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+              scheduledDate =
+                  '${date.day}/${date.month}/${date.year} às ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
             } catch (e) {
               print('DEBUG: Error parsing date: $e');
             }
@@ -363,7 +364,7 @@ class ClinicServicesController extends GetxController {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Title
                 const Text(
                   'Agendamento Confirmado!',
@@ -375,18 +376,15 @@ class ClinicServicesController extends GetxController {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Subtitle
                 Text(
                   'Seu agendamento foi realizado com sucesso',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Appointment Details Card
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -403,11 +401,7 @@ class ClinicServicesController extends GetxController {
                         service.name,
                       ),
                       const SizedBox(height: 12),
-                      _buildDetailRow(
-                        Icons.business,
-                        'Clínica',
-                        clinic.name,
-                      ),
+                      _buildDetailRow(Icons.business, 'Clínica', clinic.name),
                       const SizedBox(height: 12),
                       _buildDetailRow(
                         Icons.calendar_today,
@@ -438,48 +432,31 @@ class ClinicServicesController extends GetxController {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
-                // Action Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Get.back(); // Close dialog
-                          Get.back(); // Go back to previous screen
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(color: Colors.grey[400]!),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text('Voltar'),
+
+                // Action Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.back(); // Close dialog
+                      Get.back(); // Go back to previous screen
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.back(); // Close dialog
-                          Get.back(); // Go back to previous screen
-                          Get.toNamed('/appointments'); // Navigate to appointments screen
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Ver Agendamentos',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                    child: const Text(
+                      'OK',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -523,11 +500,7 @@ class ClinicServicesController extends GetxController {
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: Colors.grey[600],
-        ),
+        Icon(icon, size: 20, color: Colors.grey[600]),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
