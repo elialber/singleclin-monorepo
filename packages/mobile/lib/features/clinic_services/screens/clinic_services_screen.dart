@@ -25,10 +25,7 @@ class ClinicServicesScreen extends StatelessWidget {
 
   Widget _buildClinicListView(ClinicServicesController controller) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: 'Clínicas',
-        showBackButton: false,
-      ),
+      appBar: const CustomAppBar(title: 'Clínicas', showBackButton: false),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
@@ -41,7 +38,11 @@ class ClinicServicesScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppColors.error,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   controller.error.value,
@@ -63,7 +64,11 @@ class ClinicServicesScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.business_outlined, size: 64, color: AppColors.mediumGrey),
+                Icon(
+                  Icons.business_outlined,
+                  size: 64,
+                  color: AppColors.mediumGrey,
+                ),
                 SizedBox(height: 16),
                 Text(
                   'Nenhuma clínica disponível',
@@ -82,7 +87,9 @@ class ClinicServicesScreen extends StatelessWidget {
             return Card(
               margin: const EdgeInsets.only(bottom: 12),
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: InkWell(
                 onTap: () => controller.selectClinic(clinic),
                 borderRadius: BorderRadius.circular(12),
@@ -131,25 +138,41 @@ class ClinicServicesScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(Icons.star, color: AppColors.warning, size: 16),
+                                const Icon(
+                                  Icons.star,
+                                  color: AppColors.warning,
+                                  size: 16,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   clinic.rating.toStringAsFixed(1),
-                                  style: const TextStyle(fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                                 const SizedBox(width: 12),
-                                const Icon(Icons.location_on, color: AppColors.primary, size: 16),
+                                const Icon(
+                                  Icons.location_on,
+                                  color: AppColors.primary,
+                                  size: 16,
+                                ),
                                 const SizedBox(width: 2),
                                 Text(
                                   '${clinic.distance.toStringAsFixed(1)} km',
-                                  style: const TextStyle(color: AppColors.mediumGrey),
+                                  style: const TextStyle(
+                                    color: AppColors.mediumGrey,
+                                  ),
                                 ),
                               ],
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.mediumGrey),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: AppColors.mediumGrey,
+                      ),
                     ],
                   ),
                 ),
@@ -191,7 +214,10 @@ class ClinicServicesScreen extends StatelessWidget {
             margin: const EdgeInsets.only(right: 16),
             child: Obx(
               () => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.onPrimary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
@@ -199,7 +225,11 @@ class ClinicServicesScreen extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.account_balance_wallet, color: AppColors.onPrimary, size: 16),
+                    const Icon(
+                      Icons.account_balance_wallet,
+                      color: AppColors.onPrimary,
+                      size: 16,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${controller.userCredits.value}',
@@ -285,7 +315,11 @@ class ClinicServicesScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(Icons.star, color: AppColors.warning, size: 16),
+                                const Icon(
+                                  Icons.star,
+                                  color: AppColors.warning,
+                                  size: 16,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   clinic.rating.toStringAsFixed(1),
@@ -295,11 +329,18 @@ class ClinicServicesScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                const Icon(Icons.location_on, color: AppColors.primary, size: 16),
+                                const Icon(
+                                  Icons.location_on,
+                                  color: AppColors.primary,
+                                  size: 16,
+                                ),
                                 const SizedBox(width: 2),
                                 Text(
                                   '${clinic.distance.toStringAsFixed(1)} km',
-                                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
                               ],
                             ),
@@ -314,16 +355,25 @@ class ClinicServicesScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.info.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.info.withOpacity(0.3)),
+                      border: Border.all(
+                        color: AppColors.info.withOpacity(0.3),
+                      ),
                     ),
                     child: const Row(
                       children: [
-                        Icon(Icons.info_outline, color: AppColors.info, size: 20),
+                        Icon(
+                          Icons.info_outline,
+                          color: AppColors.info,
+                          size: 20,
+                        ),
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Selecione um serviço para agendar. O valor será descontado dos seus créditos.',
-                            style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ),
                       ],
@@ -348,11 +398,18 @@ class ClinicServicesScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: AppColors.error,
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         'Erro ao carregar serviços',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       const Text(
@@ -379,11 +436,18 @@ class ClinicServicesScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.medical_services_outlined, size: 64, color: AppColors.mediumGrey),
+                      Icon(
+                        Icons.medical_services_outlined,
+                        size: 64,
+                        color: AppColors.mediumGrey,
+                      ),
                       SizedBox(height: 16),
                       Text(
                         'Nenhum serviço disponível',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -407,7 +471,8 @@ class ClinicServicesScreen extends StatelessWidget {
                       service: service,
                       userCredits: controller.userCredits.value,
                       creditsLoaded: controller.creditsLoaded.value,
-                      onBookPressed: () => controller.showBookingConfirmation(service),
+                      onBookPressed: () =>
+                          controller.showBookingConfirmation(service),
                     );
                   },
                 ),

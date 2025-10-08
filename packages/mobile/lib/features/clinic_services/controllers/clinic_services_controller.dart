@@ -294,6 +294,12 @@ class ClinicServicesController extends GetxController {
         return;
       }
 
+      // Check if clinic is available
+      if (clinic == null) {
+        Get.snackbar('Erro', 'Nenhuma clínica selecionada');
+        return;
+      }
+
       // Step 1: Schedule appointment and get confirmation token
       print(
         'DEBUG: Scheduling appointment with clinicId: ${clinic.id}, serviceId: ${service.id}',
@@ -423,7 +429,7 @@ class ClinicServicesController extends GetxController {
                         service.name,
                       ),
                       const SizedBox(height: 12),
-                      _buildDetailRow(Icons.business, 'Clínica', clinic.name),
+                      _buildDetailRow(Icons.business, 'Clínica', clinic?.name ?? 'N/A'),
                       const SizedBox(height: 12),
                       _buildDetailRow(
                         Icons.calendar_today,
