@@ -25,9 +25,13 @@ public class FirebaseRefreshTokenCleanupJob
     /// </summary>
     public async Task<int> ExecuteAsync()
     {
+        var now = DateTime.UtcNow;
+        
+        // Note: Cannot use IsActive (computed property) in LINQ query
+        // Must use the underlying fields directly
         var tokens = await _context.RefreshTokens
             .Include(rt => rt.User)
-            .Where(rt => rt.IsActive && rt.User.FirebaseUid != null)
+            .Where(rt => !rt.IsRevoked && rt.ExpiresAt > now && rt.User.FirebaseUid != null)
             .OrderByDescending(rt => rt.CreatedAt)
             .ToListAsync();
 
@@ -37,7 +41,6 @@ public class FirebaseRefreshTokenCleanupJob
             return 0;
         }
 
-        var now = DateTime.UtcNow;
         var revokedCount = 0;
 
         foreach (var group in tokens.GroupBy(t => t.UserId))
