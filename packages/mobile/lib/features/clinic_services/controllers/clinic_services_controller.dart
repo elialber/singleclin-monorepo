@@ -110,20 +110,20 @@ class ClinicServicesController extends GetxController {
         return;
       }
 
-      final userId = _authController.currentUser?.id;
+      final userId = _authController.user?.id;
       print('DEBUG: loadUserCredits - userId: $userId');
       print(
-        'DEBUG: loadUserCredits - currentUser: ${_authController.currentUser}',
+        'DEBUG: loadUserCredits - user: ${_authController.user}',
       );
 
       // Force sync user with backend to ensure user exists
       try {
         final syncResult = await _userApiService.syncUserWithBackend(
-          firebaseUid: _authController.currentUser!.id,
-          email: _authController.currentUser!.email,
-          displayName: _authController.currentUser!.displayName,
-          photoUrl: _authController.currentUser!.photoUrl,
-          isEmailVerified: _authController.currentUser!.isEmailVerified,
+          firebaseUid: _authController.user!.id,
+          email: _authController.user!.email,
+          displayName: _authController.user!.displayName,
+          photoUrl: _authController.user!.photoUrl,
+          isEmailVerified: _authController.user!.isEmailVerified,
         );
         print('DEBUG: User synced successfully: ${syncResult.id}');
       } catch (syncError) {
