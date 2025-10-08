@@ -48,12 +48,17 @@ class OnboardingController extends GetxController
   Future<void> _checkFirstLaunch() async {
     try {
       isLoading.value = true;
-      final hasSeenOnboarding =
-          await _storageService.getBool(_firstLaunchKey) ?? false;
-      isFirstLaunch.value = !hasSeenOnboarding;
+      
+      // TEMP: Forçar que onboarding nunca seja exibido
+      await _storageService.setBool(_firstLaunchKey, true);
+      isFirstLaunch.value = false;
+      
+      // final hasSeenOnboarding =
+      //     await _storageService.getBool(_firstLaunchKey) ?? false;
+      // isFirstLaunch.value = !hasSeenOnboarding;
     } catch (e) {
       print('Error checking first launch: $e');
-      isFirstLaunch.value = true;
+      isFirstLaunch.value = false; // Nunca mostrar em caso de erro
     } finally {
       isLoading.value = false;
     }
