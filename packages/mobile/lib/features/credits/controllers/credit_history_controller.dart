@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
+import 'package:singleclin_mobile/features/credits/models/appointment_model.dart';
+import 'package:singleclin_mobile/features/credits/services/appointments_api_service.dart';
 
 enum HistoryPeriodFilter { all, today, week, month, quarter, year, custom }
 
@@ -24,8 +26,10 @@ class CreditHistoryController extends GetxController {
   final _isLoadingMore = false.obs;
   final _transactions = <CreditTransactionModel>[].obs;
   final _filteredTransactions = <CreditTransactionModel>[].obs;
+  final _appointments = <AppointmentModel>[].obs;
   final _hasMoreData = true.obs;
   final _currentPage = 1.obs;
+  final _errorMessage = ''.obs;
 
   // Filter states
   final _periodFilter = HistoryPeriodFilter.all.obs;
@@ -44,6 +48,7 @@ class CreditHistoryController extends GetxController {
   bool get isLoading => _isLoading.value;
   bool get isLoadingMore => _isLoadingMore.value;
   List<CreditTransactionModel> get transactions => _filteredTransactions;
+  List<AppointmentModel> get appointments => _appointments;
   bool get hasMoreData => _hasMoreData.value;
   int get currentPage => _currentPage.value;
   String get error => _errorMessage.value;
@@ -111,24 +116,46 @@ class CreditHistoryController extends GetxController {
         _currentPage.value = 1;
         _hasMoreData.value = true;
         _transactions.clear();
+        _appointments.clear();
+        _errorMessage.value = '';
       }
 
       _isLoading.value = true;
 
-      // Mock API call - replace with actual service
-      await Future.delayed(const Duration(seconds: 1));
+      // Fetch real appointments from API
+      try {
+        final fetchedAppointments = await AppointmentsApiService.getMyAppointments(
+          includeCompleted: true,
+        );
 
-      final mockTransactions = _generateMockTransactions();
+        _appointments.assignAll(fetchedAppointments);
+        print('DEBUG: Loaded ${fetchedAppointments.length} appointments from API');
 
-      if (isRefresh) {
-        _transactions.assignAll(mockTransactions);
-      } else {
-        _transactions.addAll(mockTransactions);
+        // Convert appointments to transactions for the unified view
+        final appointmentTransactions = _convertAppointmentsToTransactions(fetchedAppointments);
+
+        if (isRefresh) {
+          _transactions.assignAll(appointmentTransactions);
+        } else {
+          _transactions.addAll(appointmentTransactions);
+        }
+      } catch (e) {
+        print('DEBUG: Error loading appointments: $e');
+        _errorMessage.value = 'Não foi possível carregar os agendamentos';
+        
+        // Fallback to mock data if API fails
+        final mockTransactions = _generateMockTransactions();
+        if (isRefresh) {
+          _transactions.assignAll(mockTransactions);
+        } else {
+          _transactions.addAll(mockTransactions);
+        }
       }
 
       _calculateStatistics();
       _applyFilters();
     } catch (e) {
+      _errorMessage.value = 'Erro ao carregar histórico';
       Get.snackbar(
         'Erro',
         'Não foi possível carregar o histórico',
@@ -137,6 +164,28 @@ class CreditHistoryController extends GetxController {
     } finally {
       _isLoading.value = false;
     }
+  }
+
+  /// Convert appointments to transaction models for unified display
+  List<CreditTransactionModel> _convertAppointmentsToTransactions(
+    List<AppointmentModel> appointments,
+  ) {
+    return appointments.map((appointment) {
+      final isCancelled = appointment.isCancelled;
+
+      return CreditTransactionModel(
+        id: appointment.id,
+        userId: appointment.userId,
+        amount: isCancelled ? appointment.totalCredits : -appointment.totalCredits,
+        balanceAfter: 0, // This would need to be calculated properly
+        type: isCancelled ? TransactionType.refunded : TransactionType.spent,
+        source: TransactionSource.appointmentBooking,
+        description: appointment.serviceName,
+        relatedEntityId: appointment.id,
+        relatedEntityType: 'appointment',
+        createdAt: appointment.createdAt,
+      );
+    }).toList();
   }
 
   Future<void> loadMoreTransactions() async {

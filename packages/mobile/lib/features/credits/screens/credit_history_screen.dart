@@ -123,98 +123,274 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
   }
 
   Widget _buildTransactionCard(dynamic transaction) {
-    final isDebit = transaction.type == 'debit';
-    final isCredit = transaction.type == 'credit';
+    final isDebit = transaction.amount < 0;
+    final absoluteAmount = transaction.amount.abs();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: isDebit
-                    ? AppColors.error.withOpacity(0.1)
-                    : AppColors.success.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: () {
+          _showTransactionDetails(transaction);
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isDebit
+                      ? AppColors.error.withOpacity(0.1)
+                      : AppColors.success.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  isDebit
+                      ? Icons.event_busy_outlined
+                      : Icons.event_available_outlined,
+                  color: isDebit ? AppColors.error : AppColors.success,
+                  size: 24,
+                ),
               ),
-              child: Icon(
-                isDebit
-                    ? Icons.remove_circle_outline
-                    : Icons.add_circle_outline,
-                color: isDebit ? AppColors.error : AppColors.success,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    transaction.description ?? 'Transação',
-                    style: Get.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  if (transaction.clinicName != null) ...[
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      transaction.clinicName!,
-                      style: Get.textTheme.bodySmall?.copyWith(
-                        color: AppColors.mediumGrey,
+                      transaction.description ?? 'Transação',
+                      style: Get.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.darkGrey,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
+                    if (transaction.clinicName != null) ...[
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.business_outlined,
+                            size: 14,
+                            color: AppColors.mediumGrey,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              transaction.clinicName!,
+                              style: Get.textTheme.bodySmall?.copyWith(
+                                color: AppColors.mediumGrey,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.access_time_outlined,
+                          size: 14,
+                          color: AppColors.mediumGrey,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _formatDate(transaction.createdAt),
+                          style: Get.textTheme.bodySmall?.copyWith(
+                            color: AppColors.mediumGrey,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
                   Text(
-                    _formatDate(transaction.createdAt),
+                    '${isDebit ? '-' : '+'}$absoluteAmount',
+                    style: Get.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isDebit ? AppColors.error : AppColors.success,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'créditos',
                     style: Get.textTheme.bodySmall?.copyWith(
                       color: AppColors.mediumGrey,
+                      fontSize: 10,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(transaction.status).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: _getStatusColor(transaction.status),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      _getStatusText(transaction.status),
+                      style: Get.textTheme.bodySmall?.copyWith(
+                        color: _getStatusColor(transaction.status),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showTransactionDetails(dynamic transaction) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(
-                  '${isDebit ? '-' : '+'}${transaction.amount} SG',
-                  style: Get.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: isDebit ? AppColors.error : AppColors.success,
-                  ),
-                ),
-                const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
-                    color: _getStatusColor(transaction.status).withOpacity(0.1),
+                    color: (transaction.amount < 0
+                            ? AppColors.error
+                            : AppColors.success)
+                        .withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    _getStatusText(transaction.status),
-                    style: Get.textTheme.bodySmall?.copyWith(
-                      color: _getStatusColor(transaction.status),
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Icon(
+                    transaction.amount < 0
+                        ? Icons.event_busy
+                        : Icons.event_available,
+                    color: transaction.amount < 0
+                        ? AppColors.error
+                        : AppColors.success,
+                    size: 28,
                   ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Detalhes da Transação',
+                        style: Get.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      Text(
+                        _formatDate(transaction.createdAt),
+                        style: Get.textTheme.bodySmall?.copyWith(
+                          color: AppColors.mediumGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Get.back(),
+                  icon: const Icon(Icons.close),
+                  color: AppColors.mediumGrey,
                 ),
               ],
             ),
+            const Divider(height: 32),
+            _buildDetailRow('Serviço', transaction.description ?? 'N/A'),
+            if (transaction.clinicName != null)
+              _buildDetailRow('Clínica', transaction.clinicName!),
+            _buildDetailRow(
+              'Créditos',
+              '${transaction.amount < 0 ? '-' : '+'}${transaction.amount.abs()} créditos',
+            ),
+            _buildDetailRow('Status', _getStatusText(transaction.status)),
+            _buildDetailRow('ID da Transação', transaction.id),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Get.back(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Fechar',
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: AppColors.mediumGrey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: AppColors.darkGrey,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -259,6 +435,9 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
         return 'Concluído';
       case 'pending':
         return 'Pendente';
+      case 'cancelled':
+      case 'canceled':
+        return 'Cancelado';
       case 'failed':
       case 'error':
         return 'Falhou';
