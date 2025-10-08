@@ -11,6 +11,7 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
 
   @override
   Widget build(BuildContext context) {
+    print('📱 CreditHistoryScreen.build() - Construindo tela');
     return Scaffold(
       appBar: const CustomAppBar(
         title: 'Histórico de Transações',
@@ -18,7 +19,7 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
       ),
       body: Obx(_buildBody),
       bottomNavigationBar: CustomBottomNav(
-        currentIndex: 2,
+        currentIndex: 1, // CORRIGIDO: Index 1 = Transações
         onTap: (index) => Get.find<BottomNavController>().changePage(index),
       ),
     );

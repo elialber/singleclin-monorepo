@@ -91,7 +91,9 @@ class CreditHistoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print('🔥 CreditHistoryController.onInit() - Loading transaction history...');
+    print(
+      '🔥 CreditHistoryController.onInit() - Loading transaction history...',
+    );
     loadTransactionHistory();
     _setupFilterListeners();
   }
