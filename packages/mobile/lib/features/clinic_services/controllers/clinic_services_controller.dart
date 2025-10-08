@@ -8,18 +8,21 @@ import 'package:singleclin_mobile/features/clinic_services/services/clinic_servi
 
 class ClinicServicesController extends GetxController {
   final RxList<ClinicService> services = <ClinicService>[].obs;
-  final RxList<Clinic> clinics = <Clinic>[].obs;
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   final RxInt userCredits = 0.obs;
   final RxBool creditsLoaded = false.obs;
-  final RxBool isClinicListMode = false.obs;
 
   Clinic? _clinic;
   final AuthController _authController = Get.find<AuthController>();
   final UserApiService _userApiService = UserApiService();
 
-  Clinic? get clinic => _clinic;
+  Clinic get clinic {
+    if (_clinic == null) {
+      throw Exception('Clinic data not initialized');
+    }
+    return _clinic!;
+  }
 
   @override
   void onInit() {
@@ -33,16 +36,15 @@ class ClinicServicesController extends GetxController {
       print('DEBUG: Arguments received: $arguments');
       print('DEBUG: Arguments type: ${arguments.runtimeType}');
 
-      if (arguments == null || arguments is! Clinic) {
-        print('DEBUG: No clinic provided - switching to clinic list mode');
-        isClinicListMode.value = true;
-        // Load credits first, then clinics to ensure token is fresh
-        loadUserCredits().then((_) {
-          // Add a small delay to ensure token is fully propagated
-          Future.delayed(const Duration(milliseconds: 500), () {
-            loadClinics();
-          });
-        });
+      if (arguments == null) {
+        print('DEBUG: Arguments is null');
+        _handleNavigationError('Dados da clínica não encontrados (null)');
+        return;
+      }
+
+      if (arguments is! Clinic) {
+        print('DEBUG: Arguments is not Clinic type');
+        _handleNavigationError('Dados da clínica inválidos');
         return;
       }
 
@@ -56,7 +58,7 @@ class ClinicServicesController extends GetxController {
       });
     } catch (e) {
       print('DEBUG: Exception in onInit: $e');
-      error.value = 'Erro ao inicializar: $e';
+      _handleNavigationError('Erro ao inicializar: $e');
     }
   }
 
@@ -72,32 +74,6 @@ class ClinicServicesController extends GetxController {
     );
   }
 
-  /// Load all clinics from API
-  Future<void> loadClinics() async {
-    print('DEBUG: loadClinics() API called');
-    try {
-      isLoading.value = true;
-      error.value = '';
-
-      final loadedClinics = await ClinicServicesApi.getClinics();
-      clinics.value = loadedClinics;
-      print('DEBUG: Clinics loaded from API: ${loadedClinics.length} clinics');
-    } catch (e) {
-      print('DEBUG: API error loading clinics: $e');
-      error.value = 'Erro ao carregar clínicas: $e';
-      clinics.value = [];
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  /// Select a clinic and load its services
-  void selectClinic(Clinic selectedClinic) {
-    _clinic = selectedClinic;
-    isClinicListMode.value = false;
-    loadServices();
-  }
-
   /// Load services from API
   Future<void> loadServices() async {
     print('DEBUG: loadServices() API called');
@@ -106,14 +82,9 @@ class ClinicServicesController extends GetxController {
       error.value = '';
       print('DEBUG: Loading set to true');
 
-      if (clinic == null) {
-        error.value = 'Nenhuma clínica selecionada';
-        return;
-      }
-
-      print('DEBUG: Calling API for clinic ID: ${clinic!.id}');
+      print('DEBUG: Calling API for clinic ID: ${clinic.id}');
       final loadedServices = await ClinicServicesApi.getClinicServices(
-        clinic!.id,
+        clinic.id,
       );
       services.value = loadedServices;
       print(
@@ -299,19 +270,12 @@ class ClinicServicesController extends GetxController {
         return;
       }
 
-      // Check if clinic is available and capture in local variable for null safety
-      final selectedClinic = clinic;
-      if (selectedClinic == null) {
-        Get.snackbar('Erro', 'Nenhuma clínica selecionada');
-        return;
-      }
-
       // Step 1: Schedule appointment and get confirmation token
       print(
-        'DEBUG: Scheduling appointment with clinicId: ${selectedClinic.id}, serviceId: ${service.id}',
+        'DEBUG: Scheduling appointment with clinicId: ${clinic.id}, serviceId: ${service.id}',
       );
       final scheduleResponse = await ClinicServicesApi.scheduleAppointment(
-        clinicId: selectedClinic.id,
+        clinicId: clinic.id,
         serviceId: service.id,
         appointmentDate: DateTime.now().add(
           const Duration(days: 1),
@@ -435,11 +399,7 @@ class ClinicServicesController extends GetxController {
                         service.name,
                       ),
                       const SizedBox(height: 12),
-                      _buildDetailRow(
-                        Icons.business,
-                        'Clínica',
-                        clinic?.name ?? 'N/A',
-                      ),
+                      _buildDetailRow(Icons.business, 'Clínica', clinic.name),
                       const SizedBox(height: 12),
                       _buildDetailRow(
                         Icons.calendar_today,

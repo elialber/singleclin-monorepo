@@ -3,9 +3,6 @@ import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
 import 'package:singleclin_mobile/features/clinic_services/controllers/clinic_services_controller.dart';
 import 'package:singleclin_mobile/features/clinic_services/widgets/service_list_item.dart';
-import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_app_bar.dart';
-import 'package:singleclin_mobile/shared/widgets/custom_bottom_nav.dart';
 
 class ClinicServicesScreen extends StatelessWidget {
   const ClinicServicesScreen({super.key});
@@ -14,202 +11,36 @@ class ClinicServicesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(ClinicServicesController());
 
-    return Obx(() {
-      if (controller.isClinicListMode.value) {
-        return _buildClinicListView(controller);
-      } else {
-        return _buildServiceListView(controller);
-      }
-    });
-  }
-
-  Widget _buildClinicListView(ClinicServicesController controller) {
-    return Scaffold(
-      appBar: const CustomAppBar(title: 'Clínicas', showBackButton: false),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
-          );
-        }
-
-        if (controller.error.value.isNotEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: AppColors.error,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  controller.error.value,
-                  style: const TextStyle(color: AppColors.error),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: controller.loadClinics,
-                  child: const Text('Tentar Novamente'),
-                ),
-              ],
-            ),
-          );
-        }
-
-        if (controller.clinics.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.business_outlined,
-                  size: 64,
-                  color: AppColors.mediumGrey,
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Nenhuma clínica disponível',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.clinics.length,
-          itemBuilder: (context, index) {
-            final clinic = controller.clinics[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: InkWell(
-                onTap: () => controller.selectClinic(clinic),
-                borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          clinic.imageUrl.isNotEmpty
-                              ? clinic.imageUrl
-                              : 'https://via.placeholder.com/60',
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceVariant,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.local_hospital,
-                                color: AppColors.primary,
-                                size: 30,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              clinic.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.star,
-                                  color: AppColors.warning,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  clinic.rating.toStringAsFixed(1),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                const Icon(
-                                  Icons.location_on,
-                                  color: AppColors.primary,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '${clinic.distance.toStringAsFixed(1)} km',
-                                  style: const TextStyle(
-                                    color: AppColors.mediumGrey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: AppColors.mediumGrey,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      }),
-      bottomNavigationBar: CustomBottomNav(
-        currentIndex: 0,
-        onTap: (index) => Get.find<BottomNavController>().changePage(index),
-      ),
-    );
-  }
-
-  Widget _buildServiceListView(ClinicServicesController controller) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Obx(() {
-          final clinic = controller.clinic;
-          return Text(
-            clinic != null ? 'Serviços - ${clinic.name}' : 'Serviços',
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-          );
-        }),
+        title: GetBuilder<ClinicServicesController>(
+          builder: (controller) {
+            try {
+              return Text(
+                'Serviços - ${controller.clinic.name}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+              );
+            } catch (e) {
+              return const Text(
+                'Serviços',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+              );
+            }
+          },
+        ),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.onPrimary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, size: 20),
-          onPressed: () {
-            controller.isClinicListMode.value = true;
-            controller.services.clear();
-          },
+          onPressed: Get.back,
         ),
         actions: [
+          // Credits display
           Container(
             margin: const EdgeInsets.only(right: 16),
             child: Obx(
@@ -249,151 +80,181 @@ class ClinicServicesScreen extends StatelessWidget {
       body: Column(
         children: [
           // Clinic info header
-          Obx(() {
-            final clinic = controller.clinic;
-            if (clinic == null) return const SizedBox.shrink();
-
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.shadow.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadow.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: GetBuilder<ClinicServicesController>(
+              builder: (controller) {
+                try {
+                  final clinic = controller.clinic;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          clinic.imageUrl.isNotEmpty
-                              ? clinic.imageUrl
-                              : 'https://via.placeholder.com/60',
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              clinic.imageUrl.isNotEmpty
+                                  ? clinic.imageUrl
+                                  : 'https://via.placeholder.com/60x60?text=Clinic',
                               width: 60,
                               height: 60,
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceVariant,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.local_hospital,
-                                color: AppColors.primary,
-                                size: 30,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              clinic.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceVariant,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(
+                                    Icons.local_hospital,
+                                    color: AppColors.primary,
+                                    size: 30,
+                                  ),
+                                );
+                              },
                             ),
-                            const SizedBox(height: 4),
-                            Row(
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.star,
-                                  color: AppColors.warning,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
                                 Text(
-                                  clinic.rating.toStringAsFixed(1),
+                                  clinic.name,
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(width: 8),
-                                const Icon(
-                                  Icons.location_on,
-                                  color: AppColors.primary,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '${clinic.distance.toStringAsFixed(1)} km',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.star,
+                                      color: AppColors.warning,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      clinic.rating.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      Icons.location_on,
+                                      color: AppColors.primary,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      '${clinic.distance.toStringAsFixed(1)} km',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.info.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.info.withOpacity(0.3),
+                          ),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: AppColors.info,
+                              size: 20,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Selecione um serviço para agendar. O valor será descontado dos seus créditos.',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.info.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: AppColors.info.withOpacity(0.3),
-                      ),
-                    ),
-                    child: const Row(
+                  );
+                } catch (e) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    child: const Column(
                       children: [
                         Icon(
-                          Icons.info_outline,
-                          color: AppColors.info,
-                          size: 20,
+                          Icons.error_outline,
+                          size: 48,
+                          color: AppColors.error,
                         ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Selecione um serviço para agendar. O valor será descontado dos seus créditos.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Erro ao carregar informações da clínica',
+                          style: TextStyle(
+                            color: AppColors.error,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            );
-          }),
+                  );
+                }
+              },
+            ),
+          ),
 
           // Services list
           Expanded(
             child: Obx(() {
+              print(
+                'DEBUG: Rebuilding services list - Loading: ${controller.isLoading.value}, Error: ${controller.error.value}, Services: ${controller.services.length}',
+              );
+
               if (controller.isLoading.value) {
+                print('DEBUG: Showing loading indicator');
                 return const Center(
                   child: CircularProgressIndicator(color: AppColors.primary),
                 );
               }
 
               if (controller.error.value.isNotEmpty) {
+                print('DEBUG: Showing error state: ${controller.error.value}');
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -409,6 +270,7 @@ class ClinicServicesScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -432,6 +294,7 @@ class ClinicServicesScreen extends StatelessWidget {
               }
 
               if (controller.services.isEmpty) {
+                print('DEBUG: Showing empty state - no services available');
                 return const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -447,6 +310,7 @@ class ClinicServicesScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       SizedBox(height: 8),
@@ -460,6 +324,9 @@ class ClinicServicesScreen extends StatelessWidget {
                 );
               }
 
+              print(
+                'DEBUG: Showing services list - ${controller.services.length} items',
+              );
               return RefreshIndicator(
                 onRefresh: controller.refreshServices,
                 child: ListView.builder(
@@ -467,6 +334,9 @@ class ClinicServicesScreen extends StatelessWidget {
                   itemCount: controller.services.length,
                   itemBuilder: (context, index) {
                     final service = controller.services[index];
+                    print(
+                      'DEBUG: Building service item $index: ${service.name}',
+                    );
                     return ServiceListItem(
                       service: service,
                       userCredits: controller.userCredits.value,

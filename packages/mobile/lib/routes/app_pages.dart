@@ -11,6 +11,8 @@ import 'package:singleclin_mobile/features/auth/controllers/auth_binding.dart';
 import 'package:singleclin_mobile/features/auth/screens/forgot_password_screen.dart';
 import 'package:singleclin_mobile/features/auth/screens/login_screen.dart';
 import 'package:singleclin_mobile/features/auth/screens/register_screen.dart';
+// Clinic discovery
+import 'package:singleclin_mobile/features/clinic_discovery/screens/clinics_list_screen.dart';
 // Clinic services
 import 'package:singleclin_mobile/features/clinic_services/screens/clinic_services_screen.dart';
 import 'package:singleclin_mobile/features/credits/bindings/credits_binding.dart';
@@ -94,6 +96,9 @@ class AppPages {
 
     // Home Route - Tela inicial simples
     GetPage(name: AppRoutes.home, page: () => const HomeScreen()),
+
+    // Clinics List Route - Lista de clínicas disponíveis
+    GetPage(name: AppRoutes.clinicsList, page: () => const ClinicsListScreen()),
 
     // Discovery Routes
     // TEMPORARIAMENTE COMENTADO - DiscoveryScreen tem erros

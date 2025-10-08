@@ -12,6 +12,7 @@ class AppRoutes {
 
   // Discovery Routes
   static const String discovery = '/discovery';
+  static const String clinicsList = '/clinics-list';
   static const String clinicDetails = '/clinic-details';
   static const String serviceDetails = '/service-details';
   static const String searchResults = '/search-results';
