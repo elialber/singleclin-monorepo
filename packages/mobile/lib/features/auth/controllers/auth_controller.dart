@@ -116,7 +116,7 @@ class AuthController extends GetxController {
 
       // Step 6: Navigate to appropriate screen
       // TEMP: Dashboard está comentado, ir para clinic services
-      Get.offAllNamed(AppRoutes.clinicServices);
+      Get.offAllNamed(AppRoutes.home);
 
       // final onboardingCompleted = await isOnboardingCompleted();
       // if (onboardingCompleted) {
@@ -168,7 +168,7 @@ class AuthController extends GetxController {
 
       // Step 6: Navigate to appropriate screen
       // TEMP: Dashboard está comentado, ir para clinic services
-      Get.offAllNamed(AppRoutes.clinicServices);
+      Get.offAllNamed(AppRoutes.home);
 
       // final onboardingCompleted = await isOnboardingCompleted();
       // if (onboardingCompleted) {
@@ -357,8 +357,8 @@ class AuthController extends GetxController {
     _user.value = userProfile;
     _isAuthenticated.value = true;
 
-    // Navigate to clinic services (dashboard está comentado)
-    Get.offAllNamed(AppRoutes.clinicServices);
+               // Navigate to home screen (dashboard está comentado)
+               Get.offAllNamed(AppRoutes.home);
 
     // final onboardingCompleted = await isOnboardingCompleted();
     // if (onboardingCompleted) {

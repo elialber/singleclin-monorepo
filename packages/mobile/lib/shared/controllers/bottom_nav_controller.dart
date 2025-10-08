@@ -22,8 +22,8 @@ class BottomNavController extends GetxController {
     print('🔵 _navigateToPage() - Index: $index');
     switch (index) {
       case 0:
-        print('🔵 Navigating to Discovery');
-        Get.offAllNamed(AppRoutes.discovery); // Início = Lista de clínicas
+        print('🔵 Navigating to Home');
+        Get.offAllNamed(AppRoutes.home); // Início = Home (Menu principal)
         break;
       case 1:
         print('🔵 Navigating to Credit History');

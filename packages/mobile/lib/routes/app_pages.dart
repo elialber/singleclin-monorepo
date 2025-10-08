@@ -17,6 +17,8 @@ import 'package:singleclin_mobile/features/credits/bindings/credits_binding.dart
 // Credits screens
 import 'package:singleclin_mobile/features/credits/screens/credit_history_screen.dart';
 import 'package:singleclin_mobile/features/credits/screens/subscription_plans_screen.dart';
+// Home screen
+import 'package:singleclin_mobile/features/home/screens/home_screen.dart';
 // TEMP: Comentado - Dashboard tem erros
 // import 'package:singleclin_mobile/features/dashboard/controllers/dashboard_binding.dart';
 // Dashboard screens
@@ -89,11 +91,12 @@ class AppPages {
     //   page: () => const DashboardScreen(),
     //   binding: DashboardBinding(),
     // ),
-    // GetPage(
-    //   name: AppRoutes.home,
-    //   page: () => const HomeScreen(),
-    //   binding: DashboardBinding(),
-    // ),
+    
+    // Home Route - Tela inicial simples
+    GetPage(
+      name: AppRoutes.home,
+      page: () => const HomeScreen(),
+    ),
 
     // Discovery Routes
     // TEMPORARIAMENTE COMENTADO - DiscoveryScreen tem erros
