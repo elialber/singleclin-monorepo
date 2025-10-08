@@ -308,23 +308,185 @@ class ClinicServicesController extends GetxController {
       print('DEBUG: Confirmation token: $confirmationToken');
 
       // Step 2: Confirm appointment (this automatically creates transaction and debits credits)
-      await ClinicServicesApi.confirmAppointment(
+      final confirmResponse = await ClinicServicesApi.confirmAppointment(
         confirmationToken: confirmationToken,
       );
 
       // Update local credits based on service price
       userCredits.value = (userCredits.value - service.price).toInt();
 
-      Get.snackbar(
-        'Agendamento Confirmado',
-        'Seu agendamento foi realizado com sucesso! Transação registrada.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      // Extract appointment details from response
+      String appointmentId = 'N/A';
+      String scheduledDate = 'N/A';
+      try {
+        final responseData = confirmResponse as Map<String, dynamic>?;
+        if (responseData != null) {
+          appointmentId = responseData['id']?.toString() ?? 'N/A';
+          scheduledDate = responseData['scheduledDate']?.toString() ?? 'N/A';
+          
+          // Format date if available
+          if (scheduledDate != 'N/A') {
+            try {
+              final date = DateTime.parse(scheduledDate);
+              scheduledDate = '${date.day}/${date.month}/${date.year} às ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+            } catch (e) {
+              print('DEBUG: Error parsing date: $e');
+            }
+          }
+        }
+      } catch (e) {
+        print('DEBUG: Error extracting appointment details: $e');
+      }
 
-      // Navigate back
-      Get.back();
+      // Show success dialog with appointment details
+      Get.dialog(
+        Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Icon
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 64,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Title
+                const Text(
+                  'Agendamento Confirmado!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                
+                // Subtitle
+                Text(
+                  'Seu agendamento foi realizado com sucesso',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                
+                // Appointment Details Card
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailRow(
+                        Icons.medical_services,
+                        'Serviço',
+                        service.name,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildDetailRow(
+                        Icons.business,
+                        'Clínica',
+                        clinic.name,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildDetailRow(
+                        Icons.calendar_today,
+                        'Data',
+                        scheduledDate,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildDetailRow(
+                        Icons.receipt,
+                        'ID do Agendamento',
+                        appointmentId.substring(0, 8) + '...',
+                      ),
+                      const Divider(height: 24),
+                      _buildDetailRow(
+                        Icons.account_balance_wallet,
+                        'Créditos Debitados',
+                        '${service.price} créditos',
+                        valueColor: Colors.red,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildDetailRow(
+                        Icons.account_balance_wallet_outlined,
+                        'Saldo Restante',
+                        '${userCredits.value} créditos',
+                        valueColor: Colors.green,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Get.back(); // Close dialog
+                          Get.back(); // Go back to previous screen
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: BorderSide(color: Colors.grey[400]!),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Voltar'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.back(); // Close dialog
+                          Get.back(); // Go back to previous screen
+                          Get.toNamed('/appointments'); // Navigate to appointments screen
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Ver Agendamentos',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
     } catch (e) {
       print('DEBUG: Booking error: $e');
 
@@ -350,5 +512,48 @@ class ClinicServicesController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// Helper method to build detail rows in the confirmation dialog
+  Widget _buildDetailRow(
+    IconData icon,
+    String label,
+    String value, {
+    Color? valueColor,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: Colors.grey[600],
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: valueColor ?? Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
