@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 /// Represents a medical/aesthetic service offered by a clinic
 class Service extends Equatable {

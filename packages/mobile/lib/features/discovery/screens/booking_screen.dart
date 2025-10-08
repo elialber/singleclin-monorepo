@@ -68,10 +68,13 @@ class _BookingScreenState extends State<BookingScreen>
   }
 
   PreferredSizeWidget _buildAppBar() {
-    return Obx(
-      () => CustomAppBar(
-        title: controller.stepTitle,
-        onBackPressed: _handleBackPress,
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(kToolbarHeight),
+      child: Obx(
+        () => CustomAppBar(
+          title: controller.stepTitle,
+          onBackPressed: _handleBackPress,
+        ),
       ),
     );
   }
