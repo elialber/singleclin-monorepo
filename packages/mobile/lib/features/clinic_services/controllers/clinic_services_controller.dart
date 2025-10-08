@@ -8,21 +8,18 @@ import 'package:singleclin_mobile/features/clinic_services/services/clinic_servi
 
 class ClinicServicesController extends GetxController {
   final RxList<ClinicService> services = <ClinicService>[].obs;
+  final RxList<Clinic> clinics = <Clinic>[].obs;
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   final RxInt userCredits = 0.obs;
   final RxBool creditsLoaded = false.obs;
+  final RxBool isClinicListMode = false.obs;
 
   Clinic? _clinic;
   final AuthController _authController = Get.find<AuthController>();
   final UserApiService _userApiService = UserApiService();
 
-  Clinic get clinic {
-    if (_clinic == null) {
-      throw Exception('Clinic data not initialized');
-    }
-    return _clinic!;
-  }
+  Clinic? get clinic => _clinic;
 
   @override
   void onInit() {
@@ -36,15 +33,11 @@ class ClinicServicesController extends GetxController {
       print('DEBUG: Arguments received: $arguments');
       print('DEBUG: Arguments type: ${arguments.runtimeType}');
 
-      if (arguments == null) {
-        print('DEBUG: Arguments is null');
-        _handleNavigationError('Dados da clínica não encontrados (null)');
-        return;
-      }
-
-      if (arguments is! Clinic) {
-        print('DEBUG: Arguments is not Clinic type');
-        _handleNavigationError('Dados da clínica inválidos');
+      if (arguments == null || arguments is! Clinic) {
+        print('DEBUG: No clinic provided - switching to clinic list mode');
+        isClinicListMode.value = true;
+        loadUserCredits();
+        loadClinics();
         return;
       }
 
@@ -58,7 +51,7 @@ class ClinicServicesController extends GetxController {
       });
     } catch (e) {
       print('DEBUG: Exception in onInit: $e');
-      _handleNavigationError('Erro ao inicializar: $e');
+      error.value = 'Erro ao inicializar: $e';
     }
   }
 
@@ -74,6 +67,32 @@ class ClinicServicesController extends GetxController {
     );
   }
 
+  /// Load all clinics from API
+  Future<void> loadClinics() async {
+    print('DEBUG: loadClinics() API called');
+    try {
+      isLoading.value = true;
+      error.value = '';
+
+      final loadedClinics = await ClinicServicesApi.getClinics();
+      clinics.value = loadedClinics;
+      print('DEBUG: Clinics loaded from API: ${loadedClinics.length} clinics');
+    } catch (e) {
+      print('DEBUG: API error loading clinics: $e');
+      error.value = 'Erro ao carregar clínicas: $e';
+      clinics.value = [];
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Select a clinic and load its services
+  void selectClinic(Clinic selectedClinic) {
+    _clinic = selectedClinic;
+    isClinicListMode.value = false;
+    loadServices();
+  }
+
   /// Load services from API
   Future<void> loadServices() async {
     print('DEBUG: loadServices() API called');
@@ -82,9 +101,14 @@ class ClinicServicesController extends GetxController {
       error.value = '';
       print('DEBUG: Loading set to true');
 
-      print('DEBUG: Calling API for clinic ID: ${clinic.id}');
+      if (clinic == null) {
+        error.value = 'Nenhuma clínica selecionada';
+        return;
+      }
+
+      print('DEBUG: Calling API for clinic ID: ${clinic!.id}');
       final loadedServices = await ClinicServicesApi.getClinicServices(
-        clinic.id,
+        clinic!.id,
       );
       services.value = loadedServices;
       print(

@@ -1,9 +1,31 @@
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/features/clinic_services/models/clinic_service.dart';
 
 class ClinicServicesApi {
   static final ApiService _apiService = Get.find<ApiService>();
+
+  static Future<List<Clinic>> getClinics() async {
+    try {
+      print('DEBUG: Making API call to get all clinics');
+      final response = await _apiService.get('/clinic');
+
+      print('DEBUG: API response: $response');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        final clinics = data.map((json) => Clinic.fromJson(json)).toList();
+        print('DEBUG: Converted ${clinics.length} clinics from API');
+        return clinics;
+      } else {
+        throw Exception('Failed to load clinics: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('DEBUG: API error: $e');
+      throw Exception('Error fetching clinics: $e');
+    }
+  }
 
   static Future<List<ClinicService>> getClinicServices(String clinicId) async {
     try {

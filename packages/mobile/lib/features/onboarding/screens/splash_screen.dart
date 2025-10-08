@@ -99,8 +99,8 @@ class _SplashScreenState extends State<SplashScreen>
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (authController.isAuthenticated) {
-        // Usuário já está logado, ir para a tela principal (Home)
-        Get.offNamed(AppRoutes.home);
+        // Usuário já está logado, ir para a tela de clínicas
+        Get.offNamed(AppRoutes.clinicServices);
       } else {
         // Usuário não está logado, ir para login
         Get.offNamed(AppRoutes.login);
