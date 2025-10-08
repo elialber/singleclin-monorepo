@@ -91,6 +91,7 @@ class CreditHistoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print('🔥 CreditHistoryController.onInit() - Loading transaction history...');
     loadTransactionHistory();
     _setupFilterListeners();
   }
@@ -124,15 +125,20 @@ class CreditHistoryController extends GetxController {
 
       // Fetch real appointments from API
       try {
-        final fetchedAppointments = await AppointmentsApiService.getMyAppointments(
-          includeCompleted: true,
-        );
+        final fetchedAppointments =
+            await AppointmentsApiService.getMyAppointments(
+              includeCompleted: true,
+            );
 
         _appointments.assignAll(fetchedAppointments);
-        print('DEBUG: Loaded ${fetchedAppointments.length} appointments from API');
+        print(
+          'DEBUG: Loaded ${fetchedAppointments.length} appointments from API',
+        );
 
         // Convert appointments to transactions for the unified view
-        final appointmentTransactions = _convertAppointmentsToTransactions(fetchedAppointments);
+        final appointmentTransactions = _convertAppointmentsToTransactions(
+          fetchedAppointments,
+        );
 
         if (isRefresh) {
           _transactions.assignAll(appointmentTransactions);
@@ -142,7 +148,7 @@ class CreditHistoryController extends GetxController {
       } catch (e) {
         print('DEBUG: Error loading appointments: $e');
         _errorMessage.value = 'Não foi possível carregar os agendamentos';
-        
+
         // Fallback to mock data if API fails
         final mockTransactions = _generateMockTransactions();
         if (isRefresh) {
@@ -176,7 +182,9 @@ class CreditHistoryController extends GetxController {
       return CreditTransactionModel(
         id: appointment.id,
         userId: appointment.userId,
-        amount: isCancelled ? appointment.totalCredits : -appointment.totalCredits,
+        amount: isCancelled
+            ? appointment.totalCredits
+            : -appointment.totalCredits,
         balanceAfter: 0, // This would need to be calculated properly
         type: isCancelled ? TransactionType.refunded : TransactionType.spent,
         source: TransactionSource.appointmentBooking,

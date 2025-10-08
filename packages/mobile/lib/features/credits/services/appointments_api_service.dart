@@ -46,7 +46,9 @@ class AppointmentsApiService {
           appointmentsJson = [];
         }
 
-        print('DEBUG: Parsing ${appointmentsJson.length} appointments from JSON');
+        print(
+          'DEBUG: Parsing ${appointmentsJson.length} appointments from JSON',
+        );
         final appointments = appointmentsJson
             .map(
               (json) => AppointmentModel.fromJson(json as Map<String, dynamic>),

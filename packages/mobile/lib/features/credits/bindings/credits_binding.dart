@@ -5,6 +5,9 @@ class CreditsBinding extends Bindings {
   @override
   void dependencies() {
     // Using put instead of lazyPut to force fresh instance
-    Get.put<CreditHistoryController>(CreditHistoryController(), tag: 'creditHistory');
+    Get.put<CreditHistoryController>(
+      CreditHistoryController(),
+      tag: 'creditHistory',
+    );
   }
 }

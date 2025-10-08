@@ -239,7 +239,9 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(transaction.status).withOpacity(0.15),
+                      color: _getStatusColor(
+                        transaction.status,
+                      ).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: _getStatusColor(transaction.status),
@@ -282,10 +284,11 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: (transaction.amount < 0
-                            ? AppColors.error
-                            : AppColors.success)
-                        .withOpacity(0.1),
+                    color:
+                        (transaction.amount < 0
+                                ? AppColors.error
+                                : AppColors.success)
+                            .withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(

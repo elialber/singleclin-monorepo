@@ -126,4 +126,3 @@ class AppointmentModel {
     return '$day/$month/$year';
   }
 }
-
