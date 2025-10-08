@@ -122,6 +122,10 @@ class CreditTransactionModel {
     final String prefix = isPositive ? '+' : '-';
     return '$prefix$amount SG';
   }
+  
+  // Propriedades opcionais para transações de agendamento
+  String? get clinicName => metadata?['clinicName'];
+  String? get status => metadata?['status'];
 }
 
 class SubscriptionPlan {
