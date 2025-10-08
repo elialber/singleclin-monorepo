@@ -294,18 +294,19 @@ class ClinicServicesController extends GetxController {
         return;
       }
 
-      // Check if clinic is available
-      if (clinic == null) {
+      // Check if clinic is available and capture in local variable for null safety
+      final selectedClinic = clinic;
+      if (selectedClinic == null) {
         Get.snackbar('Erro', 'Nenhuma clínica selecionada');
         return;
       }
 
       // Step 1: Schedule appointment and get confirmation token
       print(
-        'DEBUG: Scheduling appointment with clinicId: ${clinic.id}, serviceId: ${service.id}',
+        'DEBUG: Scheduling appointment with clinicId: ${selectedClinic.id}, serviceId: ${service.id}',
       );
       final scheduleResponse = await ClinicServicesApi.scheduleAppointment(
-        clinicId: clinic.id,
+        clinicId: selectedClinic.id,
         serviceId: service.id,
         appointmentDate: DateTime.now().add(
           const Duration(days: 1),
@@ -429,7 +430,11 @@ class ClinicServicesController extends GetxController {
                         service.name,
                       ),
                       const SizedBox(height: 12),
-                      _buildDetailRow(Icons.business, 'Clínica', clinic?.name ?? 'N/A'),
+                      _buildDetailRow(
+                        Icons.business,
+                        'Clínica',
+                        clinic?.name ?? 'N/A',
+                      ),
                       const SizedBox(height: 12),
                       _buildDetailRow(
                         Icons.calendar_today,
