@@ -85,6 +85,11 @@ public class AppointmentService : IAppointmentService
             // Generate confirmation token
             var confirmationToken = GenerateConfirmationToken();
 
+            // Ensure scheduled date is in UTC
+            var scheduledDateUtc = scheduleDto.ScheduledDate.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(scheduleDto.ScheduledDate, DateTimeKind.Utc)
+                : scheduleDto.ScheduledDate.ToUniversalTime();
+
             // Create appointment
             var appointment = new Appointment
             {
@@ -92,7 +97,7 @@ public class AppointmentService : IAppointmentService
                 UserId = user.Id,
                 ServiceId = scheduleDto.ServiceId,
                 ClinicId = scheduleDto.ClinicId,
-                ScheduledDate = scheduleDto.ScheduledDate,
+                ScheduledDate = scheduledDateUtc,
                 Status = AppointmentStatus.Scheduled,
                 TotalCredits = service.CreditCost,
                 ConfirmationToken = confirmationToken,
