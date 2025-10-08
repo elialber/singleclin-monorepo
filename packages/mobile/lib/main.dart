@@ -18,10 +18,10 @@ import 'package:singleclin_mobile/data/services/firebase_initialization_service.
 import 'package:singleclin_mobile/data/services/session_revocation_service.dart';
 import 'package:singleclin_mobile/data/services/token_refresh_service.dart';
 import 'package:singleclin_mobile/features/appointment_booking/screens/appointment_booking_screen.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_details_screen.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/screens/clinic_discovery_screen.dart';
 import 'package:singleclin_mobile/firebase_options.dart';
-import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/presentation/screens/auth/login_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/auth/register_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/firebase_unavailable_screen.dart';
