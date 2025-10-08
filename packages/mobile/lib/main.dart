@@ -30,6 +30,7 @@ import 'package:singleclin_mobile/presentation/screens/profile_screen.dart';
 import 'package:singleclin_mobile/presentation/screens/splash_screen.dart';
 import 'package:singleclin_mobile/shared/controllers/bottom_nav_controller.dart';
 import 'package:singleclin_mobile/temp_dashboard.dart';
+import 'package:singleclin_mobile/routes/app_pages.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -179,39 +180,12 @@ class SingleClinApp extends StatelessWidget {
 
       // Navigation - Start with splash to check authentication
       initialRoute: '/splash',
-      getPages: [
-        GetPage(name: '/splash', page: () => const SplashScreen()),
-        GetPage(name: '/login', page: () => const LoginScreen()),
-        GetPage(name: '/register', page: () => const RegisterScreen()),
-        GetPage(
-          name: '/firebase-unavailable',
-          page: () => const FirebaseUnavailableScreen(),
-        ),
-        GetPage(name: '/home', page: () => const ClinicDiscoveryScreen()),
-        GetPage(name: '/dashboard', page: () => const TempDashboardScreen()),
-        GetPage(
-          name: '/discovery',
-          page: () => const ClinicDiscoveryWithNavScreen(),
-        ),
-        GetPage(
-          name: '/credit-history',
-          page: () => const TempTransactionsScreen(),
-        ),
-        GetPage(
-          name: '/subscription-plans',
-          page: () => const TempPlansScreen(),
-        ),
-        GetPage(name: '/profile', page: () => const ProfileScreen()),
-        GetPage(name: '/old-home', page: () => const HomeScreen()),
-        GetPage(
-          name: '/clinic-details',
-          page: () => ClinicDetailsScreen(clinic: Get.arguments),
-        ),
-        GetPage(
-          name: '/appointment-booking',
-          page: () => AppointmentBookingScreen(clinic: Get.arguments),
-        ),
-      ],
+      getPages: AppPages.routes,
+      // Legacy routes for backward compatibility
+      unknownRoute: GetPage(
+        name: '/notfound',
+        page: () => const SplashScreen(),
+      ),
 
       // Global configuration
       defaultTransition: Transition.cupertino,
