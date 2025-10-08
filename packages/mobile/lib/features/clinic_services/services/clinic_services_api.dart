@@ -18,14 +18,20 @@ class ClinicServicesApi {
         // Response is paginated: {items: [...], pageNumber, pageSize, totalPages, totalCount}
         final responseData = response.data;
         print('DEBUG: Response data type: ${responseData.runtimeType}');
-        print('DEBUG: Response keys: ${responseData is Map ? responseData.keys : 'Not a map'}');
-        
-        final List<dynamic> data = responseData is Map && responseData.containsKey('items')
+        print(
+          'DEBUG: Response keys: ${responseData is Map ? responseData.keys : 'Not a map'}',
+        );
+
+        final List<dynamic> data =
+            responseData is Map && responseData.containsKey('items')
             ? responseData['items']
             : (responseData is List ? responseData : []);
-        
+
         print('DEBUG: Data list length: ${data.length}');
-        final clinics = data.map((json) => Clinic.fromJson(json as Map<String, dynamic>)).toList();
+        // Use fromBackendDto to properly parse backend response
+        final clinics = data
+            .map((json) => Clinic.fromBackendDto(json as Map<String, dynamic>))
+            .toList();
         print('DEBUG: Converted ${clinics.length} clinics from API');
         return clinics;
       } else {
