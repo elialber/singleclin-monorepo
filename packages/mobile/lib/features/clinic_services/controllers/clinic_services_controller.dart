@@ -36,8 +36,13 @@ class ClinicServicesController extends GetxController {
       if (arguments == null || arguments is! Clinic) {
         print('DEBUG: No clinic provided - switching to clinic list mode');
         isClinicListMode.value = true;
-        loadUserCredits();
-        loadClinics();
+        // Load credits first, then clinics to ensure token is fresh
+        loadUserCredits().then((_) {
+          // Add a small delay to ensure token is fully propagated
+          Future.delayed(const Duration(milliseconds: 500), () {
+            loadClinics();
+          });
+        });
         return;
       }
 

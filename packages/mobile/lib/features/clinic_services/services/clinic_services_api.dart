@@ -9,12 +9,18 @@ class ClinicServicesApi {
   static Future<List<Clinic>> getClinics() async {
     try {
       print('DEBUG: Making API call to get all clinics');
-      final response = await _apiService.get('/clinic');
+      // Use dev endpoint which doesn't require admin auth
+      final response = await _apiService.get('/clinic/dev');
 
       print('DEBUG: API response: $response');
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
+        // Response is paginated: {data: [...], pageNumber, pageSize, totalPages, totalCount}
+        final responseData = response.data;
+        final List<dynamic> data = responseData is Map && responseData.containsKey('data')
+            ? responseData['data']
+            : responseData;
+        
         final clinics = data.map((json) => Clinic.fromJson(json)).toList();
         print('DEBUG: Converted ${clinics.length} clinics from API');
         return clinics;
