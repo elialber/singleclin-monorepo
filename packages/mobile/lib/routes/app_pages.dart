@@ -26,13 +26,13 @@ import 'package:singleclin_mobile/features/home/screens/home_screen.dart';
 // Dashboard screens
 // import 'package:singleclin_mobile/features/dashboard/screens/dashboard_screen.dart';
 // import 'package:singleclin_mobile/features/dashboard/screens/home_screen.dart';
-// TEMP: Comentado - Discovery tem erros
-// import 'package:singleclin_mobile/features/discovery/controllers/discovery_binding.dart';
-// import 'package:singleclin_mobile/features/discovery/screens/booking_screen.dart';
-// import 'package:singleclin_mobile/features/discovery/screens/clinic_details_screen.dart';
-// import 'package:singleclin_mobile/features/discovery/screens/discovery_screen.dart';
-// import 'package:singleclin_mobile/features/discovery/screens/filters_screen.dart';
-// import 'package:singleclin_mobile/features/discovery/screens/map_view_screen.dart';
+// Discovery
+import 'package:singleclin_mobile/features/discovery/controllers/discovery_binding.dart';
+import 'package:singleclin_mobile/features/discovery/screens/booking_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/clinic_details_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/discovery_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/filters_screen.dart';
+import 'package:singleclin_mobile/features/discovery/screens/map_view_screen.dart';
 // TEMP: Comentado - Engagement tem muitos erros
 // import 'package:singleclin_mobile/features/engagement/bindings/engagement_binding.dart';
 // import 'package:singleclin_mobile/features/engagement/screens/community_screen.dart';
@@ -101,36 +101,34 @@ class AppPages {
     GetPage(name: AppRoutes.clinicsList, page: () => const ClinicsListScreen()),
 
     // Discovery Routes
-    // TEMPORARIAMENTE COMENTADO - DiscoveryScreen tem erros
-    // GetPage(
-    //   name: AppRoutes.discovery,
-    //   page: () => const DiscoveryScreen(),
-    //   binding: DiscoveryBinding(),
-    // ),
-    // TEMPORARIAMENTE COMENTADO - Discovery avançado tem erros
-    // GetPage(
-    //   name: AppRoutes.clinicDetails,
-    //   page: () => ClinicDetailsScreen(clinic: Get.arguments),
-    //   binding: DiscoveryBinding(),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.mapView,
-    //   page: () => MapViewScreen(
-    //     clinics: Get.arguments['clinics'],
-    //     onClinicTap: Get.arguments['onClinicTap'],
-    //   ),
-    //   binding: DiscoveryBinding(),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.filters,
-    //   page: () => const FiltersScreen(),
-    //   binding: DiscoveryBinding(),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.booking,
-    //   page: () => const BookingScreen(),
-    //   binding: DiscoveryBinding(),
-    // ),
+    GetPage(
+      name: AppRoutes.discovery,
+      page: () => const DiscoveryScreen(),
+      binding: DiscoveryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.clinicDetails,
+      page: () => ClinicDetailsScreen(clinic: Get.arguments),
+      binding: DiscoveryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.mapView,
+      page: () => MapViewScreen(
+        clinics: Get.arguments['clinics'],
+        onClinicTap: Get.arguments['onClinicTap'],
+      ),
+      binding: DiscoveryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.filters,
+      page: () => const FiltersScreen(),
+      binding: DiscoveryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.booking,
+      page: () => const BookingScreen(),
+      binding: DiscoveryBinding(),
+    ),
     // TEMP: Comentado - AppointmentBooking e ScanHistory têm erros
     // GetPage(
     //   name: AppRoutes.appointmentBooking,
