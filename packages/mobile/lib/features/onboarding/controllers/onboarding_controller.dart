@@ -190,8 +190,8 @@ class OnboardingController extends GetxController
       // Mark onboarding as completed
       await _storageService.setBool(_firstLaunchKey, true);
 
-      // Navigate to dashboard with replacement
-      Get.offAllNamed('/dashboard');
+      // Navigate to login with replacement (dashboard está temporariamente desabilitado)
+      Get.offAllNamed('/login');
     } catch (e) {
       print('Error completing onboarding: $e');
       Get.snackbar(
