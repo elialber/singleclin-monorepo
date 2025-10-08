@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' as getx;
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
-import 'package:singleclin_mobile/presentation/controllers/auth_controller.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 
 class ApiService extends getx.GetxService {
   late Dio _dio;
