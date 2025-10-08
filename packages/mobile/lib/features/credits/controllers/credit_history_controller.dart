@@ -189,8 +189,8 @@ class CreditHistoryController extends GetxController {
             : -appointment.totalCredits,
         balanceAfter: 0, // This would need to be calculated properly
         type: isCancelled ? TransactionType.refunded : TransactionType.spent,
-        source: isCancelled 
-            ? TransactionSource.appointmentCancel 
+        source: isCancelled
+            ? TransactionSource.appointmentCancel
             : TransactionSource.appointmentBooking,
         description: appointment.serviceName,
         relatedEntityId: appointment.id,

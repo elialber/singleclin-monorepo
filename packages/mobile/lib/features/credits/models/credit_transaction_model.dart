@@ -8,6 +8,9 @@ enum TransactionSource {
   appointmentCancel,
   bonus,
   refund,
+  reviewBonus,
+  communityBonus,
+  feedbackBonus,
 }
 
 class CreditTransactionModel {
@@ -107,6 +110,12 @@ class CreditTransactionModel {
         return 'Bônus';
       case TransactionSource.refund:
         return 'Reembolso';
+      case TransactionSource.reviewBonus:
+        return 'Bônus de Avaliação';
+      case TransactionSource.communityBonus:
+        return 'Bônus da Comunidade';
+      case TransactionSource.feedbackBonus:
+        return 'Bônus de Feedback';
     }
   }
 
@@ -122,7 +131,7 @@ class CreditTransactionModel {
     final String prefix = isPositive ? '+' : '-';
     return '$prefix$amount SG';
   }
-  
+
   // Propriedades opcionais para transações de agendamento
   String? get clinicName => metadata?['clinicName'];
   String? get status => metadata?['status'];

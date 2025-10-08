@@ -273,6 +273,9 @@ class MapController extends GetxController {
       case MapType.terrain:
         _mapType.value = MapType.normal;
         break;
+      case MapType.none:
+        _mapType.value = MapType.normal;
+        break;
     }
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/constants/app_colors.dart';
-import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
+import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart' hide SubscriptionPlan;
 import 'package:singleclin_mobile/features/credits/models/subscription_plan.dart';
 import 'package:singleclin_mobile/features/credits/models/wallet_balance.dart';
 
