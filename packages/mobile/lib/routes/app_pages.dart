@@ -90,34 +90,36 @@ class AppPages {
     ),
 
     // Discovery Routes
-    GetPage(
-      name: AppRoutes.discovery,
-      page: () => const DiscoveryScreen(),
-      binding: DiscoveryBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.clinicDetails,
-      page: () => ClinicDetailsScreen(clinic: Get.arguments),
-      binding: DiscoveryBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.mapView,
-      page: () => MapViewScreen(
-        clinics: Get.arguments['clinics'],
-        onClinicTap: Get.arguments['onClinicTap'],
-      ),
-      binding: DiscoveryBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.filters,
-      page: () => const FiltersScreen(),
-      binding: DiscoveryBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.booking,
-      page: () => const BookingScreen(),
-      binding: DiscoveryBinding(),
-    ),
+    // TEMPORARIAMENTE COMENTADO - DiscoveryScreen tem erros
+    // GetPage(
+    //   name: AppRoutes.discovery,
+    //   page: () => const DiscoveryScreen(),
+    //   binding: DiscoveryBinding(),
+    // ),
+    // TEMPORARIAMENTE COMENTADO - Discovery avançado tem erros
+    // GetPage(
+    //   name: AppRoutes.clinicDetails,
+    //   page: () => ClinicDetailsScreen(clinic: Get.arguments),
+    //   binding: DiscoveryBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.mapView,
+    //   page: () => MapViewScreen(
+    //     clinics: Get.arguments['clinics'],
+    //     onClinicTap: Get.arguments['onClinicTap'],
+    //   ),
+    //   binding: DiscoveryBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.filters,
+    //   page: () => const FiltersScreen(),
+    //   binding: DiscoveryBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.booking,
+    //   page: () => const BookingScreen(),
+    //   binding: DiscoveryBinding(),
+    // ),
     GetPage(
       name: AppRoutes.appointmentBooking,
       page: () => AppointmentBookingScreen(clinic: Get.arguments),
@@ -151,53 +153,54 @@ class AppPages {
       page: () => const ProfileScreen(),
       binding: ProfileBinding(),
     ),
-    GetPage(
-      name: AppRoutes.healthHistory,
-      page: () => const HealthHistoryScreen(),
-      binding: ProfileBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.documents,
-      page: () => const DocumentsScreen(),
-      binding: ProfileBinding(),
-    ),
+    // TEMPORARIAMENTE COMENTADO - Health History e Documents têm erros
+    // GetPage(
+    //   name: AppRoutes.healthHistory,
+    //   page: () => const HealthHistoryScreen(),
+    //   binding: ProfileBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.documents,
+    //   page: () => const DocumentsScreen(),
+    //   binding: ProfileBinding(),
+    // ),
 
-    // Module 5 - Engagement Routes
-    GetPage(
-      name: AppRoutes.reviews,
-      page: () => const ReviewsScreen(),
-      binding: ReviewsBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.writeReview,
-      page: () => const WriteReviewScreen(),
-      binding: WriteReviewBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.support,
-      page: () => const SupportScreen(),
-      binding: SupportBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.faq,
-      page: () => const FaqScreen(),
-      binding: FaqBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.community,
-      page: () => const CommunityScreen(),
-      binding: CommunityBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.feedback,
-      page: () => const FeedbackScreen(),
-      binding: FeedbackBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.trustCenter,
-      page: () => const TrustCenterScreen(),
-      binding: TrustCenterBinding(),
-    ),
+    // Module 5 - Engagement Routes - TEMPORARIAMENTE COMENTADO
+    // GetPage(
+    //   name: AppRoutes.reviews,
+    //   page: () => const ReviewsScreen(),
+    //   binding: ReviewsBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.writeReview,
+    //   page: () => const WriteReviewScreen(),
+    //   binding: WriteReviewBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.support,
+    //   page: () => const SupportScreen(),
+    //   binding: SupportBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.faq,
+    //   page: () => const FaqScreen(),
+    //   binding: FaqBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.community,
+    //   page: () => const CommunityScreen(),
+    //   binding: CommunityBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.feedback,
+    //   page: () => const FeedbackScreen(),
+    //   binding: FeedbackBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.trustCenter,
+    //   page: () => const TrustCenterScreen(),
+    //   binding: TrustCenterBinding(),
+    // ),
 
     // Credits Routes
     GetPage(
