@@ -4,10 +4,12 @@ import 'package:singleclin_mobile/features/credits/controllers/credit_history_co
 class CreditsBinding extends Bindings {
   @override
   void dependencies() {
+    print('🟢 CreditsBinding.dependencies() - Iniciando binding');
     // Using put instead of lazyPut to force fresh instance
-    Get.put<CreditHistoryController>(
+    final controller = Get.put<CreditHistoryController>(
       CreditHistoryController(),
       tag: 'creditHistory',
     );
+    print('🟢 CreditsBinding.dependencies() - Controller criado: $controller');
   }
 }
