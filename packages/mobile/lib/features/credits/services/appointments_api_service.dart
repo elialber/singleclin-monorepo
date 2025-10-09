@@ -17,8 +17,9 @@ class AppointmentsApiService {
         queryParameters['includeCompleted'] = includeCompleted.toString();
       }
 
+      // Using my-appointments-by-email endpoint as fallback for UserId issues
       final response = await _apiService.get(
-        '/Appointments/my-appointments',
+        '/Appointments/my-appointments-by-email',
         queryParameters: queryParameters.isNotEmpty ? queryParameters : null,
       );
 
