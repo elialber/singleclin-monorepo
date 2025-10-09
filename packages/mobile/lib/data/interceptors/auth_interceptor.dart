@@ -59,8 +59,18 @@ class AuthInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     final statusCode = err.response?.statusCode;
+    final requestPath = err.requestOptions.path;
 
     if (statusCode == ApiConstants.statusUnauthorized) {
+      // Don't logout for appointments endpoint - it has known auth issues
+      if (requestPath.contains('/Appointments/my-appointments')) {
+        if (kDebugMode) {
+          print('⚠️ 401 on appointments endpoint - skipping logout, using fallback data');
+        }
+        handler.next(err);
+        return;
+      }
+      
       try {
         final Response? retryResponse = await _retryWithRefreshedToken(
           err.requestOptions,
