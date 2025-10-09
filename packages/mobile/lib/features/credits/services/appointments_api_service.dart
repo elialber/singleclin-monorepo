@@ -1,9 +1,10 @@
+import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
 import 'package:singleclin_mobile/features/credits/models/appointment_model.dart';
 
 /// Service to fetch appointments for transactions/history view
 class AppointmentsApiService {
-  static final ApiService _apiService = ApiService();
+  static ApiService get _apiService => Get.find<ApiService>();
 
   /// Get user's appointments (all or filtered by status)
   static Future<List<AppointmentModel>> getMyAppointments({
