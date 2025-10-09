@@ -195,9 +195,18 @@ public class AppointmentsController : BaseController
     {
         try
         {
+            Logger.LogInformation("GetMyAppointments called - CurrentUserId: {CurrentUserId}", CurrentUserId);
+            
+            if (string.IsNullOrEmpty(CurrentUserId))
+            {
+                Logger.LogWarning("CurrentUserId is null or empty");
+                return UnauthorizedResponse("User ID not found in token");
+            }
+            
             if (!Guid.TryParse(CurrentUserId, out var userId))
             {
-                return UnauthorizedResponse("Invalid user ID");
+                Logger.LogWarning("Failed to parse CurrentUserId '{CurrentUserId}' to Guid", CurrentUserId);
+                return UnauthorizedResponse("Invalid user ID format");
             }
 
             Logger.LogInformation("User {UserId} getting appointments, includeCompleted: {IncludeCompleted}",
@@ -205,6 +214,7 @@ public class AppointmentsController : BaseController
 
             var appointments = await _appointmentService.GetUserAppointmentsAsync(userId, includeCompleted);
 
+            Logger.LogInformation("Retrieved {Count} appointments for user {UserId}", appointments.Count(), userId);
             return OkResponse(appointments, $"Retrieved {appointments.Count()} appointments");
         }
         catch (Exception ex)
