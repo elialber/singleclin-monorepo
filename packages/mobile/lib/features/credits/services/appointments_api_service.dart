@@ -61,10 +61,12 @@ class AppointmentsApiService {
       } else {
         throw Exception('Failed to load appointments: ${response.statusCode}');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('DEBUG: Error fetching appointments: $e');
-      print('DEBUG: Error stack trace: ${StackTrace.current}');
-      throw Exception('Error fetching appointments: $e');
+      print('DEBUG: Stack trace: $stackTrace');
+      
+      // Re-throw the original exception for better error handling upstream
+      rethrow;
     }
   }
 

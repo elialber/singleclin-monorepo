@@ -152,7 +152,14 @@ class CreditHistoryController extends GetxController {
         print('✅ Converted to ${_transactions.length} transactions');
       } catch (e) {
         print('❌ Error loading appointments: $e');
-        _errorMessage.value = 'Não foi possível carregar os agendamentos';
+        
+        // Check if it's a 401 error
+        if (e.toString().contains('401')) {
+          _errorMessage.value = 'Sessão expirada. Faça logout e login novamente.';
+          print('🔑 Token expirado ou inválido - sugira logout/login');
+        } else {
+          _errorMessage.value = 'Não foi possível carregar os agendamentos';
+        }
 
         // Fallback to mock data if API fails
         print('⚠️ Using mock data as fallback');
