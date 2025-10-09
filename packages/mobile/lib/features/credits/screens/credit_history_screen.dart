@@ -44,11 +44,18 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
       onRefresh: controller.refresh,
       color: AppColors.primary,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: controller.transactions.length,
         itemBuilder: (context, index) {
           final transaction = controller.transactions[index];
-          return _buildTransactionCard(transaction);
+          final isFirst = index == 0;
+          final isLast = index == controller.transactions.length - 1;
+          
+          return _buildTimelineItem(
+            transaction,
+            isFirst: isFirst,
+            isLast: isLast,
+          );
         },
       ),
     );
@@ -119,6 +126,196 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTimelineItem(
+    dynamic transaction, {
+    required bool isFirst,
+    required bool isLast,
+  }) {
+    final isDebit = transaction.amount < 0;
+    final balanceAfter = transaction.balanceAfter ?? 0;
+    
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Timeline line and dot
+          Column(
+            children: [
+              // Top line (except for first item)
+              if (!isFirst)
+                Container(
+                  width: 2,
+                  height: 20,
+                  color: AppColors.lightGrey,
+                ),
+              
+              // Timeline dot
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: isDebit
+                      ? AppColors.error.withOpacity(0.1)
+                      : AppColors.success.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isDebit ? AppColors.error : AppColors.success,
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  isDebit ? Icons.remove : Icons.add,
+                  color: isDebit ? AppColors.error : AppColors.success,
+                  size: 20,
+                ),
+              ),
+              
+              // Bottom line (except for last item)
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: AppColors.lightGrey,
+                  ),
+                ),
+            ],
+          ),
+          
+          const SizedBox(width: 16),
+          
+          // Transaction card
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: InkWell(
+                onTap: () => _showTransactionDetails(transaction),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Transaction info
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    transaction.description ?? 'Transação',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '${isDebit ? '' : '+'}${transaction.amount} créditos',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDebit ? AppColors.error : AppColors.success,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 14,
+                                  color: AppColors.mediumGrey,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _formatDate(transaction.createdAt),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.mediumGrey,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Icon(
+                                  Icons.access_time,
+                                  size: 14,
+                                  color: AppColors.mediumGrey,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _formatTime(transaction.createdAt),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.mediumGrey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      // Balance divider and info
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                              color: AppColors.lightGrey.withOpacity(0.5),
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Saldo após transação',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.mediumGrey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              '$balanceAfter créditos',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
