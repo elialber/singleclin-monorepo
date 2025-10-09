@@ -288,13 +288,26 @@ class ApiService extends getx.GetxService {
 
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
-        final message =
-            error.response?.data?['message'] ??
-            error.response?.statusMessage ??
-            AppConstants.genericError;
+        
+        // Safely extract message from response data (can be String or Map)
+        String message = AppConstants.genericError;
+        try {
+          final responseData = error.response?.data;
+          if (responseData is Map<String, dynamic>) {
+            message = responseData['message'] ?? error.response?.statusMessage ?? AppConstants.genericError;
+          } else if (responseData is String) {
+            message = responseData.isNotEmpty ? responseData : (error.response?.statusMessage ?? AppConstants.genericError);
+          } else {
+            message = error.response?.statusMessage ?? AppConstants.genericError;
+          }
+        } catch (e) {
+          message = error.response?.statusMessage ?? AppConstants.genericError;
+        }
 
         switch (statusCode) {
           case 401:
+            print('🚫 401 Unauthorized: $message');
+            print('🔍 Response data type: ${error.response?.data.runtimeType}');
             return Exception(AppConstants.unauthorizedError);
           case 404:
             return Exception('Recurso não encontrado');
