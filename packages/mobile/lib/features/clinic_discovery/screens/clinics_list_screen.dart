@@ -20,12 +20,36 @@ class ClinicsListScreen extends StatelessWidget {
         showBackButton: false,
       ),
       backgroundColor: AppColors.background,
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
-          );
-        }
+      body: Column(
+        children: [
+          // Barra de busca
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: Colors.white,
+            child: TextField(
+              onChanged: controller.onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Buscar clínicas ou especialidades...',
+                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                filled: true,
+                fillColor: AppColors.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          
+          // Lista de clínicas
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                );
+              }
 
         if (controller.error.value.isNotEmpty) {
           return Center(
@@ -49,34 +73,45 @@ class ClinicsListScreen extends StatelessWidget {
           );
         }
 
-        if (controller.clinics.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.business_outlined, size: 64, color: AppColors.mediumGrey),
-                SizedBox(height: 16),
-                Text(
-                  'Nenhuma clínica disponível',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          );
-        }
+              if (controller.clinics.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        controller.searchQuery.value.isEmpty
+                            ? Icons.business_outlined
+                            : Icons.search_off,
+                        size: 64,
+                        color: AppColors.mediumGrey,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        controller.searchQuery.value.isEmpty
+                            ? 'Nenhuma clínica disponível'
+                            : 'Nenhuma clínica encontrada',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-        return RefreshIndicator(
-          onRefresh: controller.loadClinics,
-          child: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: controller.clinics.length,
-            itemBuilder: (context, index) {
-              final clinic = controller.clinics[index];
-              return _buildClinicCard(clinic);
-            },
+              return RefreshIndicator(
+                onRefresh: controller.loadClinics,
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: controller.clinics.length,
+                  itemBuilder: (context, index) {
+                    final clinic = controller.clinics[index];
+                    return _buildClinicCard(clinic);
+                  },
+                ),
+              );
+            }),
           ),
-        );
-      }),
+        ],
+      ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: 0,
         onTap: (index) => Get.find<BottomNavController>().changePage(index),

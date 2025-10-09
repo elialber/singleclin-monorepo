@@ -213,7 +213,7 @@ class Clinic {
   final String id;
   final String name;
   final String address;
-  final double distance; // in kilometers
+  double distance; // in kilometers - mutable para recalcular com geolocalização
   final double rating;
   final int reviewCount;
   final List<String> specializations;
