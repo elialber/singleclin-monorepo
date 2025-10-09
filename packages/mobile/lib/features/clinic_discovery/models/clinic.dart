@@ -1,5 +1,5 @@
 class Clinic {
-  const Clinic({
+  Clinic({
     required this.id,
     required this.name,
     required this.address,

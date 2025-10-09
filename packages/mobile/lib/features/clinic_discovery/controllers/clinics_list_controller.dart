@@ -56,12 +56,12 @@ class ClinicsListController extends GetxController {
     if (userLocation == null) return;
 
     for (var clinic in _allClinics) {
-      if (clinic.latitude != null && clinic.longitude != null) {
+      if (clinic.coordinates.latitude != 0 && clinic.coordinates.longitude != 0) {
         final distance = Geolocator.distanceBetween(
           userLocation!.latitude,
           userLocation!.longitude,
-          clinic.latitude!,
-          clinic.longitude!,
+          clinic.coordinates.latitude,
+          clinic.coordinates.longitude,
         );
         // Converter para km
         clinic.distance = distance / 1000;
