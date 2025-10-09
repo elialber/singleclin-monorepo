@@ -9,13 +9,11 @@ class BottomNavController extends GetxController {
   void changePage(int index) {
     print('🔵 BottomNavController.changePage() - Index: $index');
     print('🔵 Current index: ${_currentIndex.value}');
-    if (_currentIndex.value != index) {
-      _currentIndex.value = index;
-      print('🔵 Navigating to index: $index');
-      _navigateToPage(index);
-    } else {
-      print('🔵 Same index, skipping navigation');
-    }
+    
+    // Always navigate, even if same index (to handle cases where other screens are on top)
+    _currentIndex.value = index;
+    print('🔵 Navigating to index: $index');
+    _navigateToPage(index);
   }
 
   void _navigateToPage(int index) {
