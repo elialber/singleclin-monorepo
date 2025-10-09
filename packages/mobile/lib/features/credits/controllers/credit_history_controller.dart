@@ -125,11 +125,9 @@ class CreditHistoryController extends GetxController {
 
       _isLoading.value = true;
 
-      // TEMP: Desabilitado até corrigir erro 401
-      // Usando apenas dados mockados por enquanto
-      /*
       // Fetch real appointments from API
       try {
+        print('📡 Fetching appointments from API...');
         final fetchedAppointments =
             await AppointmentsApiService.getMyAppointments(
               includeCompleted: true,
@@ -137,7 +135,7 @@ class CreditHistoryController extends GetxController {
 
         _appointments.assignAll(fetchedAppointments);
         print(
-          'DEBUG: Loaded ${fetchedAppointments.length} appointments from API',
+          '✅ Loaded ${fetchedAppointments.length} appointments from API',
         );
 
         // Convert appointments to transactions for the unified view
@@ -150,27 +148,20 @@ class CreditHistoryController extends GetxController {
         } else {
           _transactions.addAll(appointmentTransactions);
         }
+        
+        print('✅ Converted to ${_transactions.length} transactions');
       } catch (e) {
-        print('DEBUG: Error loading appointments: $e');
+        print('❌ Error loading appointments: $e');
         _errorMessage.value = 'Não foi possível carregar os agendamentos';
 
         // Fallback to mock data if API fails
+        print('⚠️ Using mock data as fallback');
         final mockTransactions = _generateMockTransactions();
         if (isRefresh) {
           _transactions.assignAll(mockTransactions);
         } else {
           _transactions.addAll(mockTransactions);
         }
-      }
-      */
-
-      // Usando dados mockados diretamente
-      print('DEBUG: Using mock data for transactions');
-      final mockTransactions = _generateMockTransactions();
-      if (isRefresh) {
-        _transactions.assignAll(mockTransactions);
-      } else {
-        _transactions.addAll(mockTransactions);
       }
 
       _calculateStatistics();
