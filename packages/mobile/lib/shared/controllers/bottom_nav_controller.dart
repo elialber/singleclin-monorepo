@@ -27,7 +27,14 @@ class BottomNavController extends GetxController {
         break;
       case 1:
         print('🔵 Navigating to Credit History');
-        Get.offAllNamed(AppRoutes.creditHistory); // Transações
+        // TEMP: Desabilitado até corrigir o erro 401
+        Get.snackbar(
+          'Em Desenvolvimento',
+          'A tela de transações está em manutenção. Por favor, tente mais tarde.',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
+        );
+        // Get.offAllNamed(AppRoutes.creditHistory); // Transações
         break;
       case 2:
         print('🔵 Navigating to Subscription Plans');
