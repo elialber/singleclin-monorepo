@@ -241,18 +241,18 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
                     ),
                     decoration: BoxDecoration(
                       color: _getStatusColor(
-                        transaction.status,
+                        transaction.metadata?['status']?.toString(),
                       ).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: _getStatusColor(transaction.status),
+                        color: _getStatusColor(transaction.metadata?['status']?.toString()),
                         width: 1,
                       ),
                     ),
                     child: Text(
-                      _getStatusText(transaction.status),
+                      _getStatusText(transaction.metadata?['status']?.toString()),
                       style: Get.textTheme.bodySmall?.copyWith(
-                        color: _getStatusColor(transaction.status),
+                        color: _getStatusColor(transaction.metadata?['status']?.toString()),
                         fontWeight: FontWeight.w700,
                         fontSize: 11,
                       ),
@@ -338,7 +338,7 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
               'Créditos',
               '${transaction.amount < 0 ? '-' : '+'}${transaction.amount.abs()} créditos',
             ),
-            _buildDetailRow('Status', _getStatusText(transaction.status)),
+            _buildDetailRow('Status', _getStatusText(transaction.metadata?['status']?.toString())),
             _buildDetailRow('ID da Transação', transaction.id),
             const SizedBox(height: 24),
             SizedBox(
@@ -417,12 +417,17 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
     return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(String? status) {
+    if (status == null) return AppColors.mediumGrey;
+    
     switch (status.toLowerCase()) {
       case 'completed':
       case 'success':
+      case 'concluído':
         return AppColors.success;
       case 'pending':
+      case 'pendente':
+      case 'agendado':
         return AppColors.warning;
       case 'failed':
       case 'error':
@@ -432,21 +437,29 @@ class CreditHistoryScreen extends GetView<CreditHistoryController> {
     }
   }
 
-  String _getStatusText(String status) {
+  String _getStatusText(String? status) {
+    if (status == null) return '-';
+    
     switch (status.toLowerCase()) {
       case 'completed':
       case 'success':
+      case 'concluído':
         return 'Concluído';
       case 'pending':
+      case 'pendente':
         return 'Pendente';
+      case 'agendado':
+      case 'scheduled':
+        return 'Agendado';
       case 'cancelled':
       case 'canceled':
+      case 'cancelado':
         return 'Cancelado';
       case 'failed':
       case 'error':
         return 'Falhou';
       default:
-        return 'Desconhecido';
+        return status; // Retorna o valor original se não reconhecido
     }
   }
 }
