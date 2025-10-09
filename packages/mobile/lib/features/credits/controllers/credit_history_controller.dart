@@ -125,6 +125,9 @@ class CreditHistoryController extends GetxController {
 
       _isLoading.value = true;
 
+      // TEMP: Desabilitado até corrigir erro 401
+      // Usando apenas dados mockados por enquanto
+      /*
       // Fetch real appointments from API
       try {
         final fetchedAppointments =
@@ -158,6 +161,16 @@ class CreditHistoryController extends GetxController {
         } else {
           _transactions.addAll(mockTransactions);
         }
+      }
+      */
+
+      // Usando dados mockados diretamente
+      print('DEBUG: Using mock data for transactions');
+      final mockTransactions = _generateMockTransactions();
+      if (isRefresh) {
+        _transactions.assignAll(mockTransactions);
+      } else {
+        _transactions.addAll(mockTransactions);
       }
 
       _calculateStatistics();
