@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SingleClin.API.Services;
 using SingleClin.API.DTOs.Appointment;
 using Swashbuckle.AspNetCore.Annotations;
@@ -18,15 +19,18 @@ public class AppointmentsController : BaseController
     private readonly IAppointmentService _appointmentService;
     private readonly ICreditValidationService _creditValidationService;
     private readonly ITransactionService _transactionService;
+    private readonly Data.AppDbContext _appDbContext;
 
     public AppointmentsController(
         IAppointmentService appointmentService,
         ICreditValidationService creditValidationService,
-        ITransactionService transactionService)
+        ITransactionService transactionService,
+        Data.AppDbContext appDbContext)
     {
         _appointmentService = appointmentService;
         _creditValidationService = creditValidationService;
         _transactionService = transactionService;
+        _appDbContext = appDbContext;
     }
 
     /// <summary>
@@ -220,6 +224,54 @@ public class AppointmentsController : BaseController
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error getting appointments for user {UserId}", CurrentUserId);
+            return InternalServerErrorResponse();
+        }
+    }
+
+    /// <summary>
+    /// Get my appointments by email (fallback endpoint)
+    /// </summary>
+    /// <param name="includeCompleted">Include completed appointments</param>
+    /// <returns>List of user's appointments</returns>
+    [HttpGet("my-appointments-by-email")]
+    [SwaggerOperation(
+        Summary = "Get my appointments by email",
+        Description = "Retrieves all appointments for the current user using email claim"
+    )]
+    [ProducesResponseType(typeof(IEnumerable<AppointmentResponseDto>), 200)]
+    [ProducesResponseType(401)]
+    public async Task<IActionResult> GetMyAppointmentsByEmail([FromQuery] bool includeCompleted = false)
+    {
+        try
+        {
+            var userEmail = CurrentUserEmail;
+            Logger.LogInformation("GetMyAppointmentsByEmail called - Email: {Email}", userEmail);
+            
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                Logger.LogWarning("CurrentUserEmail is null or empty");
+                return UnauthorizedResponse("User email not found in token");
+            }
+
+            // Find user by email
+            var user = await _appDbContext.Users
+                .FirstOrDefaultAsync(u => u.Email == userEmail);
+            
+            if (user == null)
+            {
+                Logger.LogWarning("User not found with email: {Email}", userEmail);
+                return NotFound($"User not found with email: {userEmail}");
+            }
+
+            Logger.LogInformation("User found: {UserId} (ApplicationUserId: {AppUserId}), getting appointments", user.Id, user.ApplicationUserId);
+            var appointments = await _appointmentService.GetUserAppointmentsAsync(user.ApplicationUserId, includeCompleted);
+
+            Logger.LogInformation("Retrieved {Count} appointments for user {Email}", appointments.Count(), userEmail);
+            return OkResponse(appointments, $"Retrieved {appointments.Count()} appointments");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error getting appointments by email for user {Email}", CurrentUserEmail);
             return InternalServerErrorResponse();
         }
     }
