@@ -244,12 +244,23 @@ public class AppointmentsController : BaseController
     {
         try
         {
+            // Debug: Log all claims in the token
+            Logger.LogInformation("=== GetMyAppointmentsByEmail DEBUG ===");
+            Logger.LogInformation("User.Identity.IsAuthenticated: {IsAuth}", User.Identity?.IsAuthenticated);
+            Logger.LogInformation("User.Identity.Name: {Name}", User.Identity?.Name);
+            Logger.LogInformation("All claims:");
+            foreach (var claim in User.Claims)
+            {
+                Logger.LogInformation("  - {Type}: {Value}", claim.Type, claim.Value);
+            }
+            Logger.LogInformation("======================================");
+            
             var userEmail = CurrentUserEmail;
             Logger.LogInformation("GetMyAppointmentsByEmail called - Email: {Email}", userEmail);
             
             if (string.IsNullOrEmpty(userEmail))
             {
-                Logger.LogWarning("CurrentUserEmail is null or empty");
+                Logger.LogWarning("CurrentUserEmail is null or empty - check JWT token claims");
                 return UnauthorizedResponse("User email not found in token");
             }
 
