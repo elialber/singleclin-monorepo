@@ -308,6 +308,13 @@ class ApiService extends getx.GetxService {
           case 401:
             print('🚫 401 Unauthorized: $message');
             print('🔍 Response data type: ${error.response?.data.runtimeType}');
+            
+            // Don't throw exception for appointments endpoint - let it use fallback data
+            if (error.requestOptions.path.contains('/Appointments/my-appointments')) {
+              print('⚠️ 401 on appointments endpoint - returning error without throwing');
+              return Exception('Appointments endpoint auth issue - using fallback data');
+            }
+            
             return Exception(AppConstants.unauthorizedError);
           case 404:
             return Exception('Recurso não encontrado');
