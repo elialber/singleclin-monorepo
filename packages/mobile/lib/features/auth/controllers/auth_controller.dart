@@ -416,4 +416,34 @@ class AuthController extends GetxController {
       return null;
     }
   }
+
+  /// Refresh user data from backend
+  Future<void> refreshUser() async {
+    try {
+      final UserEntity? currentUser = await _authService.getCurrentUser();
+      
+      if (currentUser != null) {
+        // Sync with backend to get updated data
+        final userProfile = await _userApiService.syncUserWithBackend(
+          firebaseUid: currentUser.id,
+          email: currentUser.email,
+          displayName: currentUser.displayName,
+          photoUrl: currentUser.photoUrl,
+          isEmailVerified: currentUser.isEmailVerified,
+        );
+
+        // Update local storage
+        await _storageService.setString(
+          AppConstants.userKey,
+          userProfile.toJson().toString(),
+        );
+
+        // Update controller state
+        _user.value = userProfile;
+      }
+    } catch (e) {
+      print('Error refreshing user: $e');
+      rethrow;
+    }
+  }
 }

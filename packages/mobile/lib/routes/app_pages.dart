@@ -48,12 +48,9 @@ import 'package:singleclin_mobile/features/onboarding/controllers/onboarding_bin
 import 'package:singleclin_mobile/features/onboarding/screens/onboarding_screen.dart';
 // Onboarding and Auth screens
 import 'package:singleclin_mobile/features/onboarding/screens/splash_screen.dart';
-// TEMP: Comentado - Profile tem erros
-// import 'package:singleclin_mobile/features/profile/bindings/profile_binding.dart';
-// import 'package:singleclin_mobile/features/profile/screens/documents_screen.dart';
-// import 'package:singleclin_mobile/features/profile/screens/health_history_screen.dart';
-// Module 3 - Profile screens
-// import 'package:singleclin_mobile/features/profile/screens/profile_screen.dart';
+// Profile
+import 'package:singleclin_mobile/features/profile/bindings/profile_binding.dart';
+import 'package:singleclin_mobile/features/profile/screens/profile_screen.dart';
 // import 'package:singleclin_mobile/presentation/screens/clinic/scan_history_screen.dart';
 import 'package:singleclin_mobile/routes/app_routes.dart';
 
@@ -158,23 +155,12 @@ class AppPages {
     //   binding: AppointmentsBinding(),
     // ),
 
-    // Module 3 - Profile Routes - TEMPORARIAMENTE COMENTADO
-    // GetPage(
-    //   name: AppRoutes.profile,
-    //   page: () => const ProfileScreen(),
-    //   binding: ProfileBinding(),
-    // ),
-    // TEMPORARIAMENTE COMENTADO - Health History e Documents têm erros
-    // GetPage(
-    //   name: AppRoutes.healthHistory,
-    //   page: () => const HealthHistoryScreen(),
-    //   binding: ProfileBinding(),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.documents,
-    //   page: () => const DocumentsScreen(),
-    //   binding: ProfileBinding(),
-    // ),
+    // Profile Routes
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileScreen(),
+      binding: ProfileBinding(),
+    ),
 
     // Module 5 - Engagement Routes - TEMPORARIAMENTE COMENTADO
     // GetPage(
