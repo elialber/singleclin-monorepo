@@ -132,11 +132,14 @@ public class JwtAuthenticationMiddleware
     {
         try
         {
+            _logger.LogDebug("🔥 Attempting Firebase token validation...");
             var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
+            _logger.LogInformation("✅ Firebase token validated successfully for UID: {Uid}", decodedToken.Uid);
             return decodedToken;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "❌ Firebase token validation failed: {Message}", ex.Message);
             return null;
         }
     }
