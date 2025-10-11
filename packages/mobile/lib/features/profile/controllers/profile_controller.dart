@@ -51,19 +51,37 @@ class ProfileController extends GetxController {
   Future<void> _loadCredits() async {
     try {
       isLoading.value = true;
-      final response = await _apiService.get('/Credits/available');
+      
+      // Get current user ID
+      final user = _authController.user;
+      if (user == null) {
+        print('❌ No user found, cannot load credits');
+        credits.value = 0;
+        return;
+      }
+
+      print('🔍 Loading credits for user: ${user.id}');
+      final response = await _apiService.get('/User/${user.id}/credits');
+
+      print('📊 Credits response: ${response.statusCode} - ${response.data}');
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data is Map<String, dynamic> && data.containsKey('data')) {
-          credits.value = data['data'] as int? ?? 0;
+        if (data is Map<String, dynamic>) {
+          // Response format: { "credits": 10 }
+          credits.value = data['credits'] as int? ?? 0;
+          print('✅ Credits loaded: ${credits.value}');
         } else if (data is int) {
           credits.value = data;
+          print('✅ Credits loaded (direct): ${credits.value}');
         }
+      } else {
+        print('⚠️ Unexpected status code: ${response.statusCode}');
       }
     } catch (e) {
       print('❌ Error loading credits: $e');
       // Não mostra erro para o usuário, apenas mantém créditos em 0
+      credits.value = 0;
     } finally {
       isLoading.value = false;
     }

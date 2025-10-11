@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
 import 'package:singleclin_mobile/features/credits/models/appointment_model.dart';
 import 'package:singleclin_mobile/features/credits/services/appointments_api_service.dart';
@@ -42,6 +44,7 @@ class CreditHistoryController extends GetxController {
   // Statistics
   final _totalEarned = 0.obs;
   final _totalSpent = 0.obs;
+  final _totalCredits = 0.obs;
   final _monthlyStats = <String, Map<String, int>>{}.obs;
 
   // Getters
@@ -125,6 +128,9 @@ class CreditHistoryController extends GetxController {
 
       _isLoading.value = true;
 
+      // First, fetch current balance
+      await _fetchCurrentBalance();
+
       // Fetch real appointments from API
       try {
         print('📡 Fetching appointments from API...');
@@ -185,11 +191,39 @@ class CreditHistoryController extends GetxController {
     }
   }
 
+  /// Fetch current balance from backend
+  Future<void> _fetchCurrentBalance() async {
+    try {
+      final authController = Get.find<AuthController>();
+      final user = authController.user;
+      
+      if (user == null) {
+        print('❌ No user found, cannot fetch balance');
+        return;
+      }
+
+      final apiService = Get.find<ApiService>();
+      final response = await apiService.get('/User/${user.id}/credits');
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          _totalCredits.value = data['credits'] as int? ?? 0;
+          print('✅ Current balance loaded: ${_totalCredits.value}');
+        }
+      }
+    } catch (e) {
+      print('❌ Error fetching current balance: $e');
+      // Continue with 0 balance if fetch fails
+      _totalCredits.value = 0;
+    }
+  }
+
   /// Convert appointments to transaction models for unified display
   List<CreditTransactionModel> _convertAppointmentsToTransactions(
     List<AppointmentModel> appointments,
   ) {
-    return appointments.map((appointment) {
+    final transactions = appointments.map((appointment) {
       final isCancelled = appointment.isCancelled;
 
       return CreditTransactionModel(
@@ -198,7 +232,7 @@ class CreditHistoryController extends GetxController {
         amount: isCancelled
             ? appointment.totalCredits
             : -appointment.totalCredits,
-        balanceAfter: 0, // This would need to be calculated properly
+        balanceAfter: 0, // Will be calculated below
         type: isCancelled ? TransactionType.refunded : TransactionType.spent,
         source: isCancelled
             ? TransactionSource.appointmentCancel
@@ -213,6 +247,52 @@ class CreditHistoryController extends GetxController {
         createdAt: appointment.createdAt,
       );
     }).toList();
+
+    // Calculate balanceAfter for each transaction
+    // Sort by date (oldest first) to calculate balance correctly
+    transactions.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    
+    // Get current balance and work backwards
+    return _calculateBalanceAfter(transactions);
+  }
+
+  /// Calculate balanceAfter for each transaction
+  List<CreditTransactionModel> _calculateBalanceAfter(
+    List<CreditTransactionModel> transactions,
+  ) {
+    if (transactions.isEmpty) return transactions;
+
+    // Start with current balance (from statistics)
+    int currentBalance = _totalCredits.value;
+
+    // Work backwards from most recent to oldest
+    final result = <CreditTransactionModel>[];
+    for (int i = transactions.length - 1; i >= 0; i--) {
+      final transaction = transactions[i];
+      
+      // Create new transaction with calculated balanceAfter
+      result.insert(
+        0,
+        CreditTransactionModel(
+          id: transaction.id,
+          userId: transaction.userId,
+          amount: transaction.amount,
+          balanceAfter: currentBalance,
+          type: transaction.type,
+          source: transaction.source,
+          description: transaction.description,
+          relatedEntityId: transaction.relatedEntityId,
+          relatedEntityType: transaction.relatedEntityType,
+          metadata: transaction.metadata,
+          createdAt: transaction.createdAt,
+        ),
+      );
+
+      // Update balance for previous transaction
+      currentBalance -= transaction.amount;
+    }
+
+    return result;
   }
 
   Future<void> loadMoreTransactions() async {
