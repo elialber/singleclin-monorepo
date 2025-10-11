@@ -118,7 +118,10 @@ class ClinicServicesApi {
 
   static Future<Map<String, dynamic>> getUserCredits(String userId) async {
     try {
+      print('DEBUG: Getting user credits from /Appointments/my-credits');
       final response = await _apiService.get('/Appointments/my-credits');
+
+      print('DEBUG: Credits API response: ${response.statusCode} - ${response.data}');
 
       if (response.statusCode == 200) {
         return response.data;
@@ -126,6 +129,7 @@ class ClinicServicesApi {
         throw Exception('Failed to load user credits: ${response.statusCode}');
       }
     } catch (e) {
+      print('DEBUG: Error fetching user credits: $e');
       throw Exception('Error fetching user credits: $e');
     }
   }

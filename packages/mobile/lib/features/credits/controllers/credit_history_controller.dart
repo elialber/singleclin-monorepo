@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/core/services/credits_service.dart';
 import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/features/credits/models/credit_transaction_model.dart';
 import 'package:singleclin_mobile/features/credits/models/appointment_model.dart';
@@ -23,6 +24,9 @@ enum HistorySourceFilter {
 enum HistorySortOrder { newest, oldest, highestAmount, lowestAmount }
 
 class CreditHistoryController extends GetxController {
+  // Services
+  CreditsService get _creditsService => Get.find<CreditsService>();
+
   // Reactive variables
   final _isLoading = false.obs;
   final _isLoadingMore = false.obs;
@@ -191,29 +195,15 @@ class CreditHistoryController extends GetxController {
     }
   }
 
-  /// Fetch current balance from backend
+  /// Fetch current balance from CreditsService
   Future<void> _fetchCurrentBalance() async {
     try {
-      final authController = Get.find<AuthController>();
-      final user = authController.user;
-      
-      if (user == null) {
-        print('❌ No user found, cannot fetch balance');
-        return;
-      }
-
-      final apiService = Get.find<ApiService>();
-      final response = await apiService.get('/User/${user.id}/credits');
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is Map<String, dynamic>) {
-          _totalCredits.value = data['credits'] as int? ?? 0;
-          print('✅ Current balance loaded: ${_totalCredits.value}');
-        }
-      }
+      // Use the centralized CreditsService to get current balance
+      await _creditsService.loadUserCredits(forceRefresh: true);
+      _totalCredits.value = _creditsService.credits.value;
+      print('✅ Current balance loaded from CreditsService: ${_totalCredits.value}');
     } catch (e) {
-      print('❌ Error fetching current balance: $e');
+      print('❌ Error fetching current balance from CreditsService: $e');
       // Continue with 0 balance if fetch fails
       _totalCredits.value = 0;
     }

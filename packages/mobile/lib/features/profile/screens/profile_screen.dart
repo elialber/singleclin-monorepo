@@ -13,17 +13,12 @@ class ProfileScreen extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     print('🟢 ProfileScreen.build() - Screen is being built');
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: 'Perfil',
-        showBackButton: false,
-      ),
+      appBar: const CustomAppBar(title: 'Perfil', showBackButton: false),
       backgroundColor: AppColors.background,
       body: Obx(
         () => controller.isLoading.value
             ? const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primary,
-                ),
+                child: CircularProgressIndicator(color: AppColors.primary),
               )
             : RefreshIndicator(
                 onRefresh: controller.refreshCredits,
@@ -109,10 +104,7 @@ class ProfileScreen extends GetView<ProfileController> {
                     SizedBox(height: 4),
                     Text(
                       'Disponíveis para uso',
-                      style: TextStyle(
-                        color: Colors.white60,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white60, fontSize: 12),
                     ),
                   ],
                 ),
@@ -121,14 +113,54 @@ class ProfileScreen extends GetView<ProfileController> {
           ),
           const SizedBox(height: 16),
           Obx(
-            () => Text(
-              '${controller.credits.value} créditos',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
+            () => Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  '${controller.credits}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'créditos',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.trending_up, color: Colors.white70, size: 16),
+                const SizedBox(width: 6),
+                Obx(
+                  () => Text(
+                    controller.lastUpdateText,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -247,10 +279,14 @@ class ProfileScreen extends GetView<ProfileController> {
                   fillColor: controller.isEditing.value
                       ? null
                       : AppColors.background,
-                  hintText: '(00) 00000-0000',
+                  hintText: '(11) 99999-9999',
+                  helperText: controller.isEditing.value ? 'Opcional' : null,
                 ),
                 validator: controller.validatePhone,
                 keyboardType: TextInputType.phone,
+                inputFormatters: controller.isEditing.value
+                    ? [controller.phoneFormatter]
+                    : null,
               ),
             ),
 
@@ -264,20 +300,33 @@ class ProfileScreen extends GetView<ProfileController> {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: controller.saveProfile,
+                            onPressed: controller.isSaving.value
+                                ? null
+                                : controller.saveProfile,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text(
-                              'Salvar Alterações',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
+                            child: Obx(
+                              () => controller.isSaving.value
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Salvar Alterações',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -297,7 +346,7 @@ class ProfileScreen extends GetView<ProfileController> {
       width: double.infinity,
       height: 50,
       child: OutlinedButton.icon(
-        onPressed: controller.logout,
+        onPressed: controller.isLoading.value ? null : controller.logout,
         icon: const Icon(Icons.logout, color: AppColors.error),
         label: const Text(
           'Sair da Conta',

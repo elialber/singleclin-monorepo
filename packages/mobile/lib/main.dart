@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
+import 'package:singleclin_mobile/core/services/credits_service.dart';
 import 'package:singleclin_mobile/core/services/session_manager.dart';
 import 'package:singleclin_mobile/core/services/location_service.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
@@ -129,6 +130,11 @@ Future<void> _initServices(
       // Register LocationService singleton (used across app)
       if (!Get.isRegistered<LocationService>()) {
         Get.put(LocationService(), permanent: true);
+      }
+
+      // Register CreditsService singleton (used across app for credit management)
+      if (!Get.isRegistered<CreditsService>()) {
+        Get.put(CreditsService(), permanent: true);
       }
     }
 

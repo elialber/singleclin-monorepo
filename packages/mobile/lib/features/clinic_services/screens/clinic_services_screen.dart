@@ -63,7 +63,7 @@ class ClinicServicesScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${controller.userCredits.value}',
+                      '${controller.userCredits}',
                       style: const TextStyle(
                         color: AppColors.onPrimary,
                         fontWeight: FontWeight.w600,
@@ -242,19 +242,13 @@ class ClinicServicesScreen extends StatelessWidget {
           // Services list
           Expanded(
             child: Obx(() {
-              print(
-                'DEBUG: Rebuilding services list - Loading: ${controller.isLoading.value}, Error: ${controller.error.value}, Services: ${controller.services.length}',
-              );
-
               if (controller.isLoading.value) {
-                print('DEBUG: Showing loading indicator');
                 return const Center(
                   child: CircularProgressIndicator(color: AppColors.primary),
                 );
               }
 
               if (controller.error.value.isNotEmpty) {
-                print('DEBUG: Showing error state: ${controller.error.value}');
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -294,7 +288,6 @@ class ClinicServicesScreen extends StatelessWidget {
               }
 
               if (controller.services.isEmpty) {
-                print('DEBUG: Showing empty state - no services available');
                 return const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -324,9 +317,6 @@ class ClinicServicesScreen extends StatelessWidget {
                 );
               }
 
-              print(
-                'DEBUG: Showing services list - ${controller.services.length} items',
-              );
               return RefreshIndicator(
                 onRefresh: controller.refreshServices,
                 child: ListView.builder(
@@ -334,13 +324,10 @@ class ClinicServicesScreen extends StatelessWidget {
                   itemCount: controller.services.length,
                   itemBuilder: (context, index) {
                     final service = controller.services[index];
-                    print(
-                      'DEBUG: Building service item $index: ${service.name}',
-                    );
                     return ServiceListItem(
                       service: service,
-                      userCredits: controller.userCredits.value,
-                      creditsLoaded: controller.creditsLoaded.value,
+                      userCredits: controller.userCredits,
+                      creditsLoaded: controller.creditsLoaded,
                       onBookPressed: () =>
                           controller.showBookingConfirmation(service),
                     );

@@ -33,7 +33,7 @@ class UserRepository extends BaseRepository<UserModel> {
   @override
   Future<UserModel?> fetchFromNetwork(String id) async {
     try {
-      final response = await dio.get('/api/user/$id');
+      final response = await dio.get('/user/$id');
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         return UserModel.fromJson(response.data['data']);
@@ -59,7 +59,7 @@ class UserRepository extends BaseRepository<UserModel> {
       };
 
       final response = await dio.get(
-        '/api/users',
+        '/users',
         queryParameters: queryParams,
       );
 
@@ -82,10 +82,10 @@ class UserRepository extends BaseRepository<UserModel> {
 
       if (id != null) {
         // Update existing user
-        response = await dio.put('/api/user/$id', data: data);
+        response = await dio.put('/user/$id', data: data);
       } else {
         // Create new user
-        response = await dio.post('/api/user', data: data);
+        response = await dio.post('/user', data: data);
       }
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -101,7 +101,7 @@ class UserRepository extends BaseRepository<UserModel> {
   @override
   Future<bool> deleteFromNetwork(String id) async {
     try {
-      final response = await dio.delete('/api/user/$id');
+      final response = await dio.delete('/user/$id');
       return response.statusCode == 200 && response.data['success'] == true;
     } catch (e) {
       print('❌ Failed to delete user from network: $e');
@@ -200,7 +200,7 @@ class UserRepository extends BaseRepository<UserModel> {
 
   Future<void> _preloadUserPreferences(String userId) async {
     try {
-      final response = await dio.get('/api/user/$userId/preferences');
+      final response = await dio.get('/user/$userId/preferences');
       if (response.statusCode == 200) {
         await cacheUserPreferences(userId, response.data['data']);
       }
@@ -212,7 +212,7 @@ class UserRepository extends BaseRepository<UserModel> {
   Future<void> _preloadUserActivity(String userId) async {
     try {
       final response = await dio.get(
-        '/api/user/$userId/activity',
+        '/user/$userId/activity',
         queryParameters: {'limit': 50},
       );
 

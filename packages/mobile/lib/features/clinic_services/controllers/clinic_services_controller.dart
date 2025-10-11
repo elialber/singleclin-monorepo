@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:singleclin_mobile/core/services/credits_service.dart';
 import 'package:singleclin_mobile/data/services/user_api_service.dart';
 import 'package:singleclin_mobile/features/auth/controllers/auth_controller.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
@@ -10,12 +11,17 @@ class ClinicServicesController extends GetxController {
   final RxList<ClinicService> services = <ClinicService>[].obs;
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
-  final RxInt userCredits = 0.obs;
-  final RxBool creditsLoaded = false.obs;
 
   Clinic? _clinic;
   final AuthController _authController = Get.find<AuthController>();
   final UserApiService _userApiService = UserApiService();
+
+  // Lazy access ao CreditsService
+  CreditsService get _creditsService => Get.find<CreditsService>();
+
+  // Créditos vêm do serviço centralizado
+  int get userCredits => _creditsService.credits.value;
+  bool get creditsLoaded => true; // Sempre true pois o serviço centralizado gerencia
 
   Clinic get clinic {
     if (_clinic == null) {
@@ -52,7 +58,7 @@ class ClinicServicesController extends GetxController {
       print('DEBUG: Clinic set successfully: ${_clinic!.name}');
 
       // Load credits first, then services to ensure proper validation
-      loadUserCredits().then((_) {
+      _creditsService.loadUserCredits().then((_) {
         // Always use API to get real service IDs and data
         loadServices();
       });
@@ -101,87 +107,9 @@ class ClinicServicesController extends GetxController {
     }
   }
 
-  Future<void> loadUserCredits() async {
-    try {
-      // Check authentication first
-      if (!_authController.isAuthenticated) {
-        print('DEBUG: User not authenticated, setting mock credits');
-        userCredits.value = 0; // No credits for unauthenticated users
-        return;
-      }
-
-      final userId = _authController.user?.id;
-      print('DEBUG: loadUserCredits - userId: $userId');
-      print('DEBUG: loadUserCredits - user: ${_authController.user}');
-
-      // Force sync user with backend to ensure user exists
-      try {
-        final syncResult = await _userApiService.syncUserWithBackend(
-          firebaseUid: _authController.user!.id,
-          email: _authController.user!.email,
-          displayName: _authController.user!.displayName,
-          photoUrl: _authController.user!.photoUrl,
-          isEmailVerified: _authController.user!.isEmailVerified,
-        );
-        print('DEBUG: User synced successfully: ${syncResult.id}');
-      } catch (syncError) {
-        print('DEBUG: Sync error (user may already exist): $syncError');
-      }
-
-      if (userId != null) {
-        try {
-          final creditsResponse = await ClinicServicesApi.getUserCredits(
-            userId,
-          );
-          print('DEBUG: Credits response: $creditsResponse');
-
-          // Try different response structures
-          dynamic creditsData = creditsResponse;
-          if (creditsResponse.containsKey('data') &&
-              creditsResponse['data'] != null) {
-            creditsData = creditsResponse['data'];
-          }
-
-          // Extract total available credits from the API response structure
-          int totalCredits = 0;
-          if (creditsData is Map) {
-            // API response structure: {"data": {"totalAvailableCredits": 0}}
-            if (creditsData.containsKey('totalAvailableCredits')) {
-              totalCredits = (creditsData['totalAvailableCredits'] as num)
-                  .toInt();
-            } else if (creditsData.containsKey('TotalAvailableCredits')) {
-              totalCredits = (creditsData['TotalAvailableCredits'] as num)
-                  .toInt();
-            } else if (creditsData.containsKey('credits')) {
-              totalCredits = (creditsData['credits'] as num).toInt();
-            }
-          }
-
-          userCredits.value = totalCredits;
-          print('DEBUG: User credits set to: $totalCredits');
-        } catch (e) {
-          print('DEBUG: API call failed: $e');
-          // If API fails, set credits to a default value for testing
-          userCredits.value = 100; // Mock credits for testing
-          print('DEBUG: Using mock credits: 100');
-        }
-      } else {
-        print('DEBUG: User not authenticated, using mock credits');
-        userCredits.value =
-            100; // Mock credits for testing when not authenticated
-      }
-    } catch (e) {
-      print('DEBUG: Error in loadUserCredits: $e');
-      userCredits.value = 100; // Fallback credits
-    } finally {
-      creditsLoaded.value =
-          true; // Mark credits as loaded regardless of success/failure
-    }
-  }
-
   Future<void> refreshServices() async {
     await loadServices();
-    await loadUserCredits();
+    await _creditsService.refreshCredits();
   }
 
   void showBookingConfirmation(ClinicService service) {
@@ -207,7 +135,7 @@ class ClinicServicesController extends GetxController {
             ),
             const SizedBox(height: 16),
             Text(
-              'Seus créditos: ${userCredits.value}',
+              'Seus créditos: ${userCredits}',
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ],
@@ -259,7 +187,7 @@ class ClinicServicesController extends GetxController {
       print('DEBUG: User authenticated with token available for booking');
 
       // Check if user has enough credits
-      if (userCredits.value < service.price) {
+      if (userCredits < service.price) {
         Get.snackbar(
           'Créditos Insuficientes',
           'Você não possui créditos suficientes para este serviço.',
@@ -310,8 +238,8 @@ class ClinicServicesController extends GetxController {
         confirmationToken: confirmationToken,
       );
 
-      // Update local credits based on service price
-      userCredits.value = (userCredits.value - service.price).toInt();
+      // Update local credits based on service price using centralized service
+      _creditsService.consumeCredits(service.price.toInt());
 
       // Extract appointment details from response
       String appointmentId = 'N/A';
@@ -423,7 +351,7 @@ class ClinicServicesController extends GetxController {
                       _buildDetailRow(
                         Icons.account_balance_wallet_outlined,
                         'Saldo Restante',
-                        '${userCredits.value} créditos',
+                        '${userCredits} créditos',
                         valueColor: Colors.green,
                       ),
                     ],

@@ -36,7 +36,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   @override
   Future<CreditTransactionModel?> fetchFromNetwork(String id) async {
     try {
-      final response = await dio.get('/api/credits/transactions/$id');
+      final response = await dio.get('/credits/transactions/$id');
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         return CreditTransactionModel.fromJson(response.data['data']);
@@ -56,7 +56,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   }) async {
     try {
       final response = await dio.get(
-        '/api/credits/transactions',
+        '/credits/transactions',
         queryParameters: queryParams,
       );
 
@@ -85,10 +85,10 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
 
       if (id != null) {
         // Update existing transaction (rare)
-        response = await dio.put('/api/credits/transactions/$id', data: data);
+        response = await dio.put('/credits/transactions/$id', data: data);
       } else {
         // Create new transaction
-        response = await dio.post('/api/credits/transactions', data: data);
+        response = await dio.post('/credits/transactions', data: data);
       }
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -104,7 +104,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
   @override
   Future<bool> deleteFromNetwork(String id) async {
     try {
-      final response = await dio.delete('/api/credits/transactions/$id');
+      final response = await dio.delete('/credits/transactions/$id');
       return response.statusCode == 200 && response.data['success'] == true;
     } catch (e) {
       print('❌ Failed to delete transaction from network: $e');
@@ -132,7 +132,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
 
       // Try to fetch from network
       if (networkService.isConnected) {
-        final response = await dio.get('/api/credits/balance');
+        final response = await dio.get('/credits/balance');
 
         if (response.statusCode == 200 && response.data['success'] == true) {
           final balance = WalletBalance.fromJson(response.data['data']);
@@ -282,7 +282,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
       }
 
       final response = await dio.post(
-        '/api/credits/purchase',
+        '/credits/purchase',
         data: {
           'amount': amount,
           'paymentMethod': paymentMethod,
@@ -327,6 +327,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
       }
 
       final response = await dio.post(
+        '/credits/use',
         data: {
           'serviceId': serviceId,
           'amount': amount,
@@ -373,7 +374,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
       }
 
       final response = await dio.post(
-        '/api/credits/transfer',
+        '/credits/transfer',
         data: {
           'recipientUserId': recipientUserId,
           'amount': amount,
@@ -411,7 +412,7 @@ class CreditRepository extends BaseRepository<CreditTransactionModel> {
 
       // Fetch from network
       if (networkService.isConnected) {
-        final response = await dio.get('/api/credits/packages');
+        final response = await dio.get('/credits/packages');
 
         if (response.statusCode == 200 && response.data['success'] == true) {
           final packages = List<Map<String, dynamic>>.from(

@@ -35,7 +35,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
   @override
   Future<ClinicModel?> fetchFromNetwork(String id) async {
     try {
-      final response = await dio.get('/api/clinics/$id');
+      final response = await dio.get('/clinics/$id');
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         return ClinicModel.fromJson(response.data['data']);
@@ -61,7 +61,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
       };
 
       final response = await dio.get(
-        '/api/clinics',
+        '/clinics',
         queryParameters: queryParams,
       );
 
@@ -84,10 +84,10 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
 
       if (id != null) {
         // Update existing clinic (admin only)
-        response = await dio.put('/api/clinics/$id', data: data);
+        response = await dio.put('/clinics/$id', data: data);
       } else {
         // Create new clinic (admin only)
-        response = await dio.post('/api/clinics', data: data);
+        response = await dio.post('/clinics', data: data);
       }
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -103,7 +103,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
   @override
   Future<bool> deleteFromNetwork(String id) async {
     try {
-      final response = await dio.delete('/api/clinics/$id');
+      final response = await dio.delete('/clinics/$id');
       return response.statusCode == 200 && response.data['success'] == true;
     } catch (e) {
       print('❌ Failed to delete clinic from network: $e');
@@ -439,7 +439,7 @@ class ClinicRepository extends BaseRepository<ClinicModel> {
   Future<void> _syncFavoritesToServer(List<String> favoriteIds) async {
     try {
       await dio.put(
-        '/api/user/favorites/clinics',
+        '/user/favorites/clinics',
         data: {'clinicIds': favoriteIds},
       );
     } catch (e) {
