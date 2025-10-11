@@ -99,6 +99,13 @@
             <response code="200">Returns list of appointments</response>
             <response code="401">Unauthorized</response>
         </member>
+        <member name="M:SingleClin.API.Controllers.AppointmentsController.GetMyAppointmentsByEmail(System.Boolean)">
+            <summary>
+            Get my appointments by email (fallback endpoint)
+            </summary>
+            <param name="includeCompleted">Include completed appointments</param>
+            <returns>List of user's appointments</returns>
+        </member>
         <member name="M:SingleClin.API.Controllers.AppointmentsController.CancelAppointment(System.Guid,System.String)">
             <summary>
             Cancel an appointment
@@ -5071,6 +5078,16 @@
         <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.LastName">
             <summary>
             User last name
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.FullName">
+            <summary>
+            User full name (alternative to FirstName + LastName)
+            </summary>
+        </member>
+        <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.Email">
+            <summary>
+            User email address
             </summary>
         </member>
         <member name="P:SingleClin.API.DTOs.User.UpdateUserDto.PhoneNumber">

@@ -250,6 +250,16 @@ public class UserService : IUserService
         {
             user.FullName = $"{dto.FirstName} {dto.LastName}";
         }
+        else if (!string.IsNullOrWhiteSpace(dto.FullName))
+        {
+            user.FullName = dto.FullName.Trim();
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Email))
+        {
+            user.Email = dto.Email.Trim();
+            user.UserName = dto.Email.Trim(); // In ASP.NET Identity, UserName is usually the email
+        }
 
         if (dto.PhoneNumber != null)
         {

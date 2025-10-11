@@ -146,7 +146,7 @@ public class UserController : BaseController
     /// Update user
     /// </summary>
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrator,ClinicOrigin,ClinicPartner")]
+    [Authorize(Roles = "Administrator,ClinicOrigin,ClinicPartner,Patient")]
     public async Task<ActionResult<ResponseWrapper<UserResponseDto>>> UpdateUser(
         Guid id,
         [FromBody] UpdateUserDto dto)
@@ -155,8 +155,16 @@ public class UserController : BaseController
         {
             var currentUserId = Guid.Parse(CurrentUserId ?? throw new UnauthorizedAccessException());
             var isAdmin = User.IsInRole("Administrator");
+            var isPatient = User.IsInRole("Patient");
 
-            if (!await _userService.CanAccessUserAsync(id, currentUserId, isAdmin))
+            // Patients can only update their own profile
+            if (isPatient && currentUserId != id)
+            {
+                return Forbid();
+            }
+
+            // For admin/clinic users, use the existing access check
+            if (!isPatient && !await _userService.CanAccessUserAsync(id, currentUserId, isAdmin))
             {
                 return Forbid();
             }
@@ -167,7 +175,17 @@ public class UserController : BaseController
                 dto.Role = null;
             }
 
-            // Validate clinic access if clinic ID is provided
+            // Patients can only update basic profile information (fullName, phoneNumber)
+            if (isPatient)
+            {
+                // Clear fields that patients shouldn't be able to modify
+                dto.Role = null;
+                dto.ClinicId = null;
+                dto.Email = null; // Email changes should go through a separate verification process
+                dto.IsActive = null; // Only admins can activate/deactivate users
+            }
+
+            // Validate clinic access if clinic ID is provided (for admin/clinic users only)
             if (dto.ClinicId.HasValue && !await _userService.CanAccessClinicAsync(dto.ClinicId.Value, currentUserId, isAdmin))
             {
                 return Forbid();

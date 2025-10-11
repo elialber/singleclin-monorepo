@@ -20,6 +20,18 @@ public class UpdateUserDto
     public string? LastName { get; set; }
 
     /// <summary>
+    /// User full name (alternative to FirstName + LastName)
+    /// </summary>
+    [MinLength(2)]
+    public string? FullName { get; set; }
+
+    /// <summary>
+    /// User email address
+    /// </summary>
+    [EmailAddress]
+    public string? Email { get; set; }
+
+    /// <summary>
     /// User phone number
     /// </summary>
     [Phone]
