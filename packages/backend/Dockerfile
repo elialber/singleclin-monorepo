@@ -47,9 +47,9 @@ ENV ASPNETCORE_HTTP_PORTS=8080
 # Expose port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+# Health check (use liveness probe and longer start period for cold starts)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
+    CMD curl -fsS http://localhost:8080/health/live || exit 1
 
 # Entry point
 ENTRYPOINT ["dotnet", "SingleClin.API.dll"]
