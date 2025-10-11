@@ -647,10 +647,10 @@ public class Program
             Predicate = check => check.Tags.Contains("live")
         });
 
-        // Readiness probe endpoint  
+        // Readiness probe endpoint (only checks tagged as 'ready')
         app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
-            Predicate = check => check.Tags.Contains("ready") || check.Tags.Contains("firebase")
+            Predicate = check => check.Tags.Contains("ready")
         });
 
         // Configure database migrations and seeding
