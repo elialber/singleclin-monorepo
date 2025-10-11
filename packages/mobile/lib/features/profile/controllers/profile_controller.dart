@@ -24,6 +24,7 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print('🟢 ProfileController.onInit() - Initializing controller');
     _loadUserData();
     _loadCredits();
   }

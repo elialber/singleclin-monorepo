@@ -11,6 +11,7 @@ class ProfileScreen extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
+    print('🟢 ProfileScreen.build() - Screen is being built');
     return Scaffold(
       appBar: const CustomAppBar(
         title: 'Perfil',
