@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:singleclin_mobile/core/constants/app_constants.dart';
 import 'package:singleclin_mobile/core/services/api_service.dart';
 import 'package:singleclin_mobile/core/services/session_manager.dart';
+import 'package:singleclin_mobile/core/services/location_service.dart';
 import 'package:singleclin_mobile/core/services/storage_service.dart';
 import 'package:singleclin_mobile/core/themes/app_theme.dart';
 import 'package:singleclin_mobile/data/services/api_client.dart';
@@ -103,7 +104,7 @@ Future<void> _initServices(
     Future<void> initializeFirebaseDependentServices() async {
       final authService = Get.put(AuthService(), permanent: true);
 
-      // Initialize SessionManager with required dependencies
+      // Initialize SessionManager with required dependencies (singleton)
       if (!Get.isRegistered<SessionManager>()) {
         Get.put(
           SessionManager(
@@ -114,27 +115,21 @@ Future<void> _initServices(
         );
       }
 
-      final tokenRefreshService = TokenRefreshService(
-        authService: authService,
-        storageService: storageService,
-      );
-      Get.put<TokenRefreshService>(tokenRefreshService, permanent: true);
-      await tokenRefreshService.initialize();
+      // Start session once (ensures single TokenRefreshService and lifecycle wiring)
+      await Get.find<SessionManager>().startSession();
 
-      Get.put(ApiClient.instance, permanent: true);
-      Get.put(ApiService(), permanent: true);
+      // Core API singletons
+      if (!Get.isRegistered<ApiClient>()) {
+        Get.put(ApiClient.instance, permanent: true);
+      }
+      if (!Get.isRegistered<ApiService>()) {
+        Get.put(ApiService(), permanent: true);
+      }
 
-      final lifecycleObserver = AppLifecycleObserver(tokenRefreshService)
-        ..initialize();
-      Get.put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
-
-      final revocationService = SessionRevocationService(
-        tokenRefreshService: tokenRefreshService,
-        storageService: storageService,
-        authService: authService,
-      );
-      await revocationService.initialize();
-      Get.put<SessionRevocationService>(revocationService, permanent: true);
+      // Register LocationService singleton (used across app)
+      if (!Get.isRegistered<LocationService>()) {
+        Get.put(LocationService(), permanent: true);
+      }
     }
 
     if (firebaseInitializationService.firebaseReady) {

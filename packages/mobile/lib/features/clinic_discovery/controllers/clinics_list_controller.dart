@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:singleclin_mobile/core/services/location_service.dart';
 import 'package:singleclin_mobile/features/clinic_discovery/models/clinic.dart';
 import 'package:singleclin_mobile/features/clinic_services/services/clinic_services_api.dart';
 
@@ -10,10 +11,12 @@ class ClinicsListController extends GetxController {
   final RxString error = ''.obs;
   final RxString searchQuery = ''.obs;
   Position? userLocation;
+  late final LocationService _locationService;
 
   @override
   void onInit() {
     super.onInit();
+    _locationService = Get.find<LocationService>();
     _getUserLocation();
     loadClinics();
   }
@@ -40,7 +43,8 @@ class ClinicsListController extends GetxController {
         return;
       }
 
-      userLocation = await Geolocator.getCurrentPosition();
+      userLocation = _locationService.currentPosition ??
+          await _locationService.getCurrentPosition();
       print('📍 User location: ${userLocation?.latitude}, ${userLocation?.longitude}');
       
       // Recalcular distâncias

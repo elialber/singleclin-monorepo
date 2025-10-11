@@ -31,6 +31,9 @@ class SessionManager extends GetxService {
 
   Future<void> startSession() async {
     if (isSessionActive) {
+      if (kDebugMode) {
+        print('🟢 SessionManager: session already active, skipping');
+      }
       return;
     }
 
@@ -42,11 +45,11 @@ class SessionManager extends GetxService {
       authService: _authService,
       storageService: _storageService,
     );
-    Get.put<TokenRefreshService>(tokenService);
+    Get.put<TokenRefreshService>(tokenService, permanent: true);
     await tokenService.initialize();
 
     final lifecycleObserver = AppLifecycleObserver(tokenService)..initialize();
-    Get.put<AppLifecycleObserver>(lifecycleObserver);
+    Get.put<AppLifecycleObserver>(lifecycleObserver, permanent: true);
 
     final revocationService = SessionRevocationService(
       onRevocation: (reason) =>
