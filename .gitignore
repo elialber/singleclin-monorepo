@@ -154,3 +154,11 @@ junit.xml
 tmp/
 temp/
 .tmp/ 
+
+# Credentials
+credentials/*.json
+firebase-service-account.json
+**/google-services.json
+**/GoogleService-Info.plist
+**/service-account*.json
+**/*firebase-adminsdk*.json
