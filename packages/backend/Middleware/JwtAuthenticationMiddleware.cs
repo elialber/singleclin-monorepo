@@ -3,6 +3,10 @@ using System.Security.Claims;
 using System.Text;
 using FirebaseAdmin.Auth;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SingleClin.API.Data.Models;
+using SingleClin.API.Data.Enums;
 
 namespace SingleClin.API.Middleware;
 
@@ -44,24 +48,65 @@ public class JwtAuthenticationMiddleware
             if (firebaseToken != null)
             {
                 _logger.LogDebug("Successfully validated Firebase token for user: {Uid}", firebaseToken.Uid);
+                // Map Firebase UID/email to our ApplicationUser and emit GUID-based claims
+                using var scope = context.RequestServices.CreateScope();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-                // Convert Firebase token claims to our internal JWT claims
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, firebaseToken.Uid),
-                    new Claim(ClaimTypes.Email, firebaseToken.Claims.GetValueOrDefault("email")?.ToString() ?? ""),
-                    new Claim("firebase_uid", firebaseToken.Uid)
-                };
+                var emailFromToken = firebaseToken.Claims.GetValueOrDefault("email")?.ToString();
 
-                // Add custom claims if present
-                if (firebaseToken.Claims.TryGetValue("role", out var role))
+                var user = await userManager.Users
+                    .FirstOrDefaultAsync(u => u.FirebaseUid == firebaseToken.Uid || (emailFromToken != null && u.Email == emailFromToken));
+
+                if (user == null)
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, role.ToString() ?? ""));
+                    user = new ApplicationUser
+                    {
+                        UserName = emailFromToken ?? firebaseToken.Uid,
+                        Email = emailFromToken,
+                        FullName = emailFromToken != null ? emailFromToken.Split('@')[0] : firebaseToken.Uid,
+                        Role = UserRole.Patient,
+                        EmailConfirmed = true,
+                        CreatedAt = DateTime.UtcNow,
+                        LastLoginAt = DateTime.UtcNow,
+                        IsActive = true,
+                        FirebaseUid = firebaseToken.Uid
+                    };
+
+                    var createResult = await userManager.CreateAsync(user);
+                    if (!createResult.Succeeded)
+                    {
+                        _logger.LogWarning("Failed to create ApplicationUser for Firebase UID {Uid}: {Errors}", firebaseToken.Uid, string.Join(", ", createResult.Errors.Select(e => e.Description)));
+                    }
+                }
+                else
+                {
+                    // Update last login and ensure Firebase UID is set
+                    var needsUpdate = false;
+                    if (string.IsNullOrEmpty(user.FirebaseUid))
+                    {
+                        user.FirebaseUid = firebaseToken.Uid;
+                        needsUpdate = true;
+                    }
+                    user.LastLoginAt = DateTime.UtcNow;
+                    needsUpdate = true;
+                    if (needsUpdate)
+                    {
+                        await userManager.UpdateAsync(user);
+                    }
                 }
 
-                if (firebaseToken.Claims.TryGetValue("clinicId", out var clinicId))
+                var claims = new List<Claim>
                 {
-                    claims.Add(new Claim("clinicId", clinicId.ToString() ?? ""));
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+                    new Claim(ClaimTypes.Role, user.Role.ToString()),
+                    new Claim("role", user.Role.ToString()),
+                    new Claim("firebase_uid", user.FirebaseUid ?? string.Empty)
+                };
+
+                if (user.ClinicId.HasValue)
+                {
+                    claims.Add(new Claim("clinicId", user.ClinicId.Value.ToString()));
                 }
 
                 var identity = new ClaimsIdentity(claims, "Firebase");

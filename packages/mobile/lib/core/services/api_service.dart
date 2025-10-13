@@ -85,7 +85,9 @@ class ApiService extends getx.GetxService {
           }
 
           if (token != null && token.isNotEmpty) {
+            // Envia tanto o Authorization padrão quanto o X-Firebase-Token para o backend gerar JWT interno com claims completas
             options.headers['Authorization'] = 'Bearer $token';
+            options.headers['X-Firebase-Token'] = token;
             if (kDebugMode) {
               print('✅ DEBUG: Authorization header added to request');
             }
@@ -288,17 +290,23 @@ class ApiService extends getx.GetxService {
 
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
-        
+
         // Safely extract message from response data (can be String or Map)
         String message = AppConstants.genericError;
         try {
           final responseData = error.response?.data;
           if (responseData is Map<String, dynamic>) {
-            message = responseData['message'] ?? error.response?.statusMessage ?? AppConstants.genericError;
+            message =
+                responseData['message'] ??
+                error.response?.statusMessage ??
+                AppConstants.genericError;
           } else if (responseData is String) {
-            message = responseData.isNotEmpty ? responseData : (error.response?.statusMessage ?? AppConstants.genericError);
+            message = responseData.isNotEmpty
+                ? responseData
+                : (error.response?.statusMessage ?? AppConstants.genericError);
           } else {
-            message = error.response?.statusMessage ?? AppConstants.genericError;
+            message =
+                error.response?.statusMessage ?? AppConstants.genericError;
           }
         } catch (e) {
           message = error.response?.statusMessage ?? AppConstants.genericError;
@@ -308,13 +316,19 @@ class ApiService extends getx.GetxService {
           case 401:
             print('🚫 401 Unauthorized: $message');
             print('🔍 Response data type: ${error.response?.data.runtimeType}');
-            
+
             // Don't throw exception for appointments endpoint - let it use fallback data
-            if (error.requestOptions.path.contains('/Appointments/my-appointments')) {
-              print('⚠️ 401 on appointments endpoint - returning error without throwing');
-              return Exception('Appointments endpoint auth issue - using fallback data');
+            if (error.requestOptions.path.contains(
+              '/Appointments/my-appointments',
+            )) {
+              print(
+                '⚠️ 401 on appointments endpoint - returning error without throwing',
+              );
+              return Exception(
+                'Appointments endpoint auth issue - using fallback data',
+              );
             }
-            
+
             return Exception(AppConstants.unauthorizedError);
           case 404:
             return Exception('Recurso não encontrado');
