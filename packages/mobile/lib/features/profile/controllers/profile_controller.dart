@@ -30,30 +30,34 @@ class ProfileController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
   // Phone formatter
-  final TextInputFormatter phoneFormatter = TextInputFormatter.withFunction(
-    (oldValue, newValue) {
-      final text = newValue.text.replaceAll(RegExp(r'\D'), '');
-      if (text.length <= 11) {
-        if (text.length <= 2) {
-          return TextEditingValue(
-            text: text.isEmpty ? '' : '($text',
-            selection: TextSelection.collapsed(offset: text.length + (text.isNotEmpty ? 1 : 0)),
-          );
-        } else if (text.length <= 7) {
-          return TextEditingValue(
-            text: '(${text.substring(0, 2)}) ${text.substring(2)}',
-            selection: TextSelection.collapsed(offset: text.length + 4),
-          );
-        } else {
-          return TextEditingValue(
-            text: '(${text.substring(0, 2)}) ${text.substring(2, 7)}-${text.substring(7)}',
-            selection: TextSelection.collapsed(offset: text.length + 5),
-          );
-        }
+  final TextInputFormatter phoneFormatter = TextInputFormatter.withFunction((
+    oldValue,
+    newValue,
+  ) {
+    final text = newValue.text.replaceAll(RegExp(r'\D'), '');
+    if (text.length <= 11) {
+      if (text.length <= 2) {
+        return TextEditingValue(
+          text: text.isEmpty ? '' : '($text',
+          selection: TextSelection.collapsed(
+            offset: text.length + (text.isNotEmpty ? 1 : 0),
+          ),
+        );
+      } else if (text.length <= 7) {
+        return TextEditingValue(
+          text: '(${text.substring(0, 2)}) ${text.substring(2)}',
+          selection: TextSelection.collapsed(offset: text.length + 4),
+        );
+      } else {
+        return TextEditingValue(
+          text:
+              '(${text.substring(0, 2)}) ${text.substring(2, 7)}-${text.substring(7)}',
+          selection: TextSelection.collapsed(offset: text.length + 5),
+        );
       }
-      return oldValue;
-    },
-  );
+    }
+    return oldValue;
+  });
 
   @override
   void onInit() {
@@ -104,12 +108,20 @@ class ProfileController extends GetxController {
     try {
       isSaving.value = true;
 
+      // Monta payload evitando enviar phoneNumber vazio (quebra validação do backend)
+      final Map<String, dynamic> payload = {
+        'fullName': fullNameController.text.trim(),
+      };
+      final cleanedPhone = phoneController.text
+          .replaceAll(RegExp(r'\D'), '')
+          .trim();
+      if (cleanedPhone.isNotEmpty) {
+        payload['phoneNumber'] = cleanedPhone; // envia apenas se houver dígitos
+      }
+
       final response = await _apiService.put(
         '/Users/${_authController.user?.id}',
-        data: {
-          'fullName': fullNameController.text.trim(),
-          'phoneNumber': phoneController.text.replaceAll(RegExp(r'\D'), '').trim(),
-        },
+        data: payload,
       );
 
       if (response.statusCode == 200) {
@@ -146,9 +158,7 @@ class ProfileController extends GetxController {
   Future<void> logout() async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Container(
@@ -157,19 +167,12 @@ class ProfileController extends GetxController {
                 color: Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.logout,
-                color: Colors.red,
-                size: 24,
-              ),
+              child: const Icon(Icons.logout, color: Colors.red, size: 24),
             ),
             const SizedBox(width: 12),
             const Text(
               'Confirmar Saída',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -184,10 +187,7 @@ class ProfileController extends GetxController {
             SizedBox(height: 8),
             Text(
               'Você precisará fazer login novamente para acessar o aplicativo.',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
           ],
         ),
@@ -199,10 +199,7 @@ class ProfileController extends GetxController {
             ),
             child: const Text(
               'Cancelar',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ),
           ElevatedButton(
@@ -217,10 +214,7 @@ class ProfileController extends GetxController {
             ),
             child: const Text(
               'Sair',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -271,5 +265,4 @@ class ProfileController extends GetxController {
     }
     return null;
   }
-
 }
